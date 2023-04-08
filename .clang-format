@@ -1,0 +1,7 @@
+BasedOnStyle: Microsoft
+UseTab: false
+PointerAlignment: Left
+ColumnLimit: 0
+IndentWidth: 4
+LineEnding: LF
+AlignAfterOpenBracket: AlwaysBreak

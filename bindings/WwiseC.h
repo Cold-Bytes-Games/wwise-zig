@@ -32,11 +32,365 @@ extern "C"
 #endif
 
 #ifndef __cplusplus
-#include <wchar.h> // wchar_t not a built-in type in C
 #include <stdbool.h>
+#include <wchar.h> // wchar_t not a built-in type in C
 #endif
 
 #include <AK/AkPlatforms.h>
+
+    // BEGIN AkTypes
+    typedef AkUInt32 WWISEC_AkUniqueID;          ///< Unique 32-bit ID
+    typedef AkUInt32 WWISEC_AkStateID;           ///< State ID
+    typedef AkUInt32 WWISEC_AkStateGroupID;      ///< State group ID
+    typedef AkUInt32 WWISEC_AkPlayingID;         ///< Playing ID
+    typedef AkInt32 WWISEC_AkTimeMs;             ///< Time in ms
+    typedef AkUInt16 WWISEC_AkPortNumber;        ///< Port number
+    typedef AkReal32 WWISEC_AkPitchValue;        ///< Pitch value
+    typedef AkReal32 WWISEC_AkVolumeValue;       ///< Volume value( also apply to LFE )
+    typedef AkUInt64 WWISEC_AkGameObjectID;      ///< Game object ID
+    typedef AkReal32 WWISEC_AkLPFType;           ///< Low-pass filter type
+    typedef AkInt32 WWISEC_AkMemPoolId;          ///< Memory pool ID
+    typedef AkUInt32 WWISEC_AkPluginID;          ///< Source or effect plug-in ID
+    typedef AkUInt32 WWISEC_AkCodecID;           ///< Codec plug-in ID
+    typedef AkUInt32 WWISEC_AkAuxBusID;          ///< Auxilliary bus ID
+    typedef AkInt16 WWISEC_AkPluginParamID;      ///< Source or effect plug-in parameter ID
+    typedef AkInt8 WWISEC_AkPriority;            ///< Priority
+    typedef AkUInt16 WWISEC_AkDataCompID;        ///< Data compression format ID
+    typedef AkUInt16 WWISEC_AkDataTypeID;        ///< Data sample type ID
+    typedef AkUInt8 WWISEC_AkDataInterleaveID;   ///< Data interleaved state ID
+    typedef AkUInt32 WWISEC_AkSwitchGroupID;     ///< Switch group ID
+    typedef AkUInt32 WWISEC_AkSwitchStateID;     ///< Switch ID
+    typedef AkUInt32 WWISEC_AkRtpcID;            ///< Real time parameter control ID
+    typedef AkReal32 WWISEC_AkRtpcValue;         ///< Real time parameter control value
+    typedef AkUInt32 WWISEC_AkBankID;            ///< Run time bank ID
+    typedef AkUInt32 WWISEC_AkBankType;          ///< Run time bank type
+    typedef AkUInt32 WWISEC_AkFileID;            ///< Integer-type file identifier
+    typedef AkUInt32 WWISEC_AkDeviceID;          ///< I/O device ID
+    typedef AkUInt32 WWISEC_AkTriggerID;         ///< Trigger ID
+    typedef AkUInt32 WWISEC_AkArgumentValueID;   ///< Argument value ID
+    typedef AkUInt32 WWISEC_AkChannelMask;       ///< Channel mask (similar to WAVE_FORMAT_EXTENSIBLE). Bit values are defined in AkSpeakerConfig.h.
+    typedef AkUInt32 WWISEC_AkModulatorID;       ///< Modulator ID
+    typedef AkUInt32 WWISEC_AkAcousticTextureID; ///< Acoustic Texture ID
+    typedef AkUInt32 WWISEC_AkImageSourceID;     ///< Image Source ID
+    typedef AkUInt64 WWISEC_AkOutputDeviceID;    ///< Audio Output device ID
+    typedef AkUInt32 WWISEC_AkPipelineID;        ///< Unique node (bus, voice) identifier for profiling.
+    typedef AkUInt32 WWISEC_AkRayID;             ///< Unique (per emitter) identifier for an emitter-listener ray.
+    typedef AkUInt64 WWISEC_AkAudioObjectID;     ///< Audio Object ID
+    typedef AkUInt32 WWISEC_AkJobType;           ///< Job type identifier
+
+    // Constants.
+    static const WWISEC_AkPluginID WWISEC_AK_INVALID_PLUGINID = (WWISEC_AkPluginID)-1;                  ///< Invalid FX ID
+    static const WWISEC_AkPluginID WWISEC_AK_INVALID_SHARE_SET_ID = (WWISEC_AkPluginID)-1;              ///< Invalid Share Set ID
+    static const WWISEC_AkGameObjectID WWISEC_K_INVALID_GAME_OBJECT = (WWISEC_AkGameObjectID)-1;        ///< Invalid game object (may also mean all game objects)
+    static const WWISEC_AkUniqueID WWISEC_AK_INVALID_UNIQUE_ID = 0;                                     ///< Invalid unique 32-bit ID
+    static const WWISEC_AkRtpcID WWISEC_AK_INVALID_RTPC_ID = WWISEC_AK_INVALID_UNIQUE_ID;               ///< Invalid RTPC ID
+    static const WWISEC_AkPlayingID WWISEC_AK_INVALID_PLAYING_ID = WWISEC_AK_INVALID_UNIQUE_ID;         ///< Invalid playing ID
+    static const AkUInt32 WWISEC_AK_DEFAULT_SWITCH_STATE = 0;                                           ///< Switch selected if no switch has been set yet
+    static const WWISEC_AkMemPoolId WWISEC_AK_INVALID_POOL_ID = -1;                                     ///< Invalid pool ID
+    static const WWISEC_AkMemPoolId WWISEC_AK_DEFAULT_POOL_ID = -1;                                     ///< Default pool ID, same as AK_INVALID_POOL_ID
+    static const WWISEC_AkAuxBusID WWISEC_AK_INVALID_AUX_ID = WWISEC_AK_INVALID_UNIQUE_ID;              ///< Invalid auxiliary bus ID (or no Aux bus ID)
+    static const WWISEC_AkFileID WWISEC_AK_INVALID_FILE_ID = (WWISEC_AkFileID)-1;                       ///< Invalid file ID
+    static const WWISEC_AkDeviceID WWISEC_AK_INVALID_DEVICE_ID = (WWISEC_AkDeviceID)-1;                 ///< Invalid streaming device ID
+    static const WWISEC_AkBankID WWISEC_AK_INVALID_BANK_ID = WWISEC_AK_INVALID_UNIQUE_ID;               ///< Invalid bank ID
+    static const WWISEC_AkArgumentValueID WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID = 0;                      ///< Fallback argument value ID
+    static const WWISEC_AkChannelMask WWISEC_AK_INVALID_CHANNELMASK = 0;                                ///< Invalid channel mask
+    static const AkUInt32 WWISEC_AK_INVALID_OUTPUT_DEVICE_ID = WWISEC_AK_INVALID_UNIQUE_ID;             ///< Invalid Device ID
+    static const WWISEC_AkPipelineID WWISEC_AK_INVALID_PIPELINE_ID = WWISEC_AK_INVALID_UNIQUE_ID;       ///< Invalid pipeline ID (for profiling)
+    static const WWISEC_AkAudioObjectID WWISEC_AK_INVALID_AUDIO_OBJECT_ID = (WWISEC_AkAudioObjectID)-1; ///< Invalid audio object ID
+
+    // Priority.
+    static const WWISEC_AkPriority WWISEC_AK_DEFAULT_PRIORITY = 50; ///< Default sound / I/O priority
+    static const WWISEC_AkPriority WWISEC_AK_MIN_PRIORITY = 0;      ///< Minimal priority value [0,100]
+    static const WWISEC_AkPriority WWISEC_AK_MAX_PRIORITY = 100;    ///< Maximal priority value [0,100]
+
+    // Default bank I/O settings.
+    static const WWISEC_AkPriority WWISEC_AK_DEFAULT_BANK_IO_PRIORITY = WWISEC_AK_DEFAULT_PRIORITY; ///<  Default bank load I/O priority
+    static const AkReal32 WWISEC_AK_DEFAULT_BANK_THROUGHPUT = 1 * 1024 * 1024 / 1000.f;             ///<  Default bank load throughput (1 Mb/ms)
+
+    // Bank version
+    static const AkUInt32 WWISEC_AK_SOUNDBANK_VERSION = 145; ///<  Version of the soundbank reader
+
+    // Job types
+    static const WWISEC_AkJobType WWISEC_AkJobType_Generic = 0;         ///< Job type for general-purpose work
+    static const WWISEC_AkJobType WWISEC_AkJobType_AudioProcessing = 1; ///< Job type for DSP work
+    static const WWISEC_AkJobType WWISEC_AkJobType_SpatialAudio = 2;    ///< Job type for Spatial Audio computations
+    static const AkUInt32 WWISEC_AK_NUM_JOB_TYPES = 3;                  ///< Number of possible job types recognized by the Sound Engine
+
+    typedef enum WWISEC_AKRESULT
+    {
+        WWISEC_AK_NotImplemented = 0,               ///< This feature is not implemented.
+        WWISEC_AK_Success = 1,                      ///< The operation was successful.
+        WWISEC_AK_Fail = 2,                         ///< The operation failed.
+        WWISEC_AK_PartialSuccess = 3,               ///< The operation succeeded partially.
+        WWISEC_AK_NotCompatible = 4,                ///< Incompatible formats
+        WWISEC_AK_AlreadyConnected = 5,             ///< The stream is already connected to another node.
+        WWISEC_AK_InvalidFile = 7,                  ///< The provided file is the wrong format or unexpected values causes the file to be invalid.
+        WWISEC_AK_AudioFileHeaderTooLarge = 8,      ///< The file header is too large.
+        WWISEC_AK_MaxReached = 9,                   ///< The maximum was reached.
+        WWISEC_AK_InvalidID = 14,                   ///< The ID is invalid.
+        WWISEC_AK_IDNotFound = 15,                  ///< The ID was not found.
+        WWISEC_AK_InvalidInstanceID = 16,           ///< The InstanceID is invalid.
+        WWISEC_AK_NoMoreData = 17,                  ///< No more data is available from the source.
+        WWISEC_AK_InvalidStateGroup = 20,           ///< The StateGroup is not a valid channel.
+        WWISEC_AK_ChildAlreadyHasAParent = 21,      ///< The child already has a parent.
+        WWISEC_AK_InvalidLanguage = 22,             ///< The language is invalid (applies to the Low-Level I/O).
+        WWISEC_AK_CannotAddItseflAsAChild = 23,     ///< It is not possible to add itself as its own child.
+        WWISEC_AK_InvalidParameter = 31,            ///< Something is not within bounds, check the documentation of the function returning this code.
+        WWISEC_AK_ElementAlreadyInList = 35,        ///< The item could not be added because it was already in the list.
+        WWISEC_AK_PathNotFound = 36,                ///< This path is not known.
+        WWISEC_AK_PathNoVertices = 37,              ///< Stuff in vertices before trying to start it
+        WWISEC_AK_PathNotRunning = 38,              ///< Only a running path can be paused.
+        WWISEC_AK_PathNotPaused = 39,               ///< Only a paused path can be resumed.
+        WWISEC_AK_PathNodeAlreadyInList = 40,       ///< This path is already there.
+        WWISEC_AK_PathNodeNotInList = 41,           ///< This path is not there.
+        WWISEC_AK_DataNeeded = 43,                  ///< The consumer needs more.
+        WWISEC_AK_NoDataNeeded = 44,                ///< The consumer does not need more.
+        WWISEC_AK_DataReady = 45,                   ///< The provider has available data.
+        WWISEC_AK_NoDataReady = 46,                 ///< The provider does not have available data.
+        WWISEC_AK_InsufficientMemory = 52,          ///< Memory error.
+        WWISEC_AK_Cancelled = 53,                   ///< The requested action was cancelled (not an error).
+        WWISEC_AK_UnknownBankID = 54,               ///< Trying to load a bank using an ID which is not defined.
+        WWISEC_AK_BankReadError = 56,               ///< Error while reading a bank.
+        WWISEC_AK_InvalidSwitchType = 57,           ///< Invalid switch type (used with the switch container)
+        WWISEC_AK_FormatNotReady = 63,              ///< Source format not known yet.
+        WWISEC_AK_WrongBankVersion = 64,            ///< The bank version is not compatible with the current bank reader.
+        WWISEC_AK_FileNotFound = 66,                ///< File not found.
+        WWISEC_AK_DeviceNotReady = 67,              ///< Specified ID doesn't match a valid hardware device: either the device doesn't exist or is disabled.
+        WWISEC_AK_BankAlreadyLoaded = 69,           ///< The bank load failed because the bank is already loaded.
+        WWISEC_AK_RenderedFX = 71,                  ///< The effect on the node is rendered.
+        WWISEC_AK_ProcessNeeded = 72,               ///< A routine needs to be executed on some CPU.
+        WWISEC_AK_ProcessDone = 73,                 ///< The executed routine has finished its execution.
+        WWISEC_AK_MemManagerNotInitialized = 74,    ///< The memory manager should have been initialized at this point.
+        WWISEC_AK_StreamMgrNotInitialized = 75,     ///< The stream manager should have been initialized at this point.
+        WWISEC_AK_SSEInstructionsNotSupported = 76, ///< The machine does not support SSE instructions (required on PC).
+        WWISEC_AK_Busy = 77,                        ///< The system is busy and could not process the request.
+        WWISEC_AK_UnsupportedChannelConfig = 78,    ///< Channel configuration is not supported in the current execution context.
+        WWISEC_AK_PluginMediaNotAvailable = 79,     ///< Plugin media is not available for effect.
+        WWISEC_AK_MustBeVirtualized = 80,           ///< Sound was Not Allowed to play.
+        WWISEC_AK_CommandTooLarge = 81,             ///< SDK command is too large to fit in the command queue.
+        WWISEC_AK_RejectedByFilter = 82,            ///< A play request was rejected due to the MIDI filter parameters.
+        WWISEC_AK_InvalidCustomPlatformName = 83,   ///< Detecting incompatibility between Custom platform of banks and custom platform of connected application
+        WWISEC_AK_DLLCannotLoad = 84,               ///< Plugin DLL could not be loaded, either because it is not found or one dependency is missing.
+        WWISEC_AK_DLLPathNotFound = 85,             ///< Plugin DLL search path could not be found.
+        WWISEC_AK_NoJavaVM = 86,                    ///< No Java VM provided in AkInitSettings.
+        WWISEC_AK_OpenSLError = 87,                 ///< OpenSL returned an error.  Check error log for more details.
+        WWISEC_AK_PluginNotRegistered = 88,         ///< Plugin is not registered.  Make sure to implement a AK::PluginRegistration class for it and use AK_STATIC_LINK_PLUGIN in the game binary.
+        WWISEC_AK_DataAlignmentError = 89,          ///< A pointer to audio data was not aligned to the platform's required alignment (check AkTypes.h in the platform-specific folder)
+        WWISEC_AK_DeviceNotCompatible = 90,         ///< Incompatible Audio device.
+        WWISEC_AK_DuplicateUniqueID = 91,           ///< Two Wwise objects share the same ID.
+        WWISEC_AK_InitBankNotLoaded = 92,           ///< The Init bank was not loaded yet, the sound engine isn't completely ready yet.
+        WWISEC_AK_DeviceNotFound = 93,              ///< The specified device ID does not match with any of the output devices that the sound engine is currently using.
+        WWISEC_AK_PlayingIDNotFound = 94,           ///< Calling a function with a playing ID that is not known.
+        WWISEC_AK_InvalidFloatValue = 95,           ///< One parameter has a invalid float value such as NaN, INF or FLT_MAX.
+        WWISEC_AK_FileFormatMismatch = 96,          ///< Media file format unexpected
+        WWISEC_AK_NoDistinctListener = 97,          ///< No distinct listener provided for AddOutput
+        WWISEC_AK_ACP_Error = 98,                   ///< Generic XMA decoder error.
+        WWISEC_AK_ResourceInUse = 99,               ///< Resource is in use and cannot be released.
+        WWISEC_AK_InvalidBankType = 100,            ///< Invalid bank type. The bank type was either supplied through a function call (e.g. LoadBank) or obtained from a bank loaded from memory.
+        WWISEC_AK_AlreadyInitialized = 101,         ///< Init() was called but that element was already initialized.
+        WWISEC_AK_NotInitialized = 102,             ///< The component being used is not initialized. Most likely AK::SoundEngine::Init() was not called yet, or AK::SoundEngine::Term was called too early.
+        WWISEC_AK_FilePermissionError = 103,        ///< The file access permissions prevent opening a file.
+        WWISEC_AK_UnknownFileError = 104,           ///< Rare file error occured, as opposed to AK_FileNotFound or AK_FilePermissionError. This lumps all unrecognized OS file system errors.
+    } WWISEC_AKRESULT;
+    // END AkTypes
+
+    // BEGIN AkMemoryMgr
+    /// Memory category IDs.
+    typedef enum WWISEC_AkMemID
+    {
+        WWISEC_AkMemID_Object,               ///< Generic placeholder for allocations tied to the Wwise project.
+        WWISEC_AkMemID_Event,                ///< Events from the Wwise project.
+        WWISEC_AkMemID_Structure,            ///< Structures from the Wwise project.
+        WWISEC_AkMemID_Media,                ///< Media from the Wwise project.
+        WWISEC_AkMemID_GameObject,           ///< Game Objects and related.
+        WWISEC_AkMemID_Processing,           ///< Anything tied to instancing and processing of the DSP graph.
+        WWISEC_AkMemID_ProcessingPlugin,     ///< Plug-in allocations related to the DSP graph.
+        WWISEC_AkMemID_Streaming,            ///< Streaming Manager objects.
+        WWISEC_AkMemID_StreamingIO,          ///< Streaming Manager I/O memory.
+        WWISEC_AkMemID_SpatialAudio,         ///< Spatial audio.
+        WWISEC_AkMemID_SpatialAudioGeometry, ///< Spatial audio geometry data.
+        WWISEC_AkMemID_SpatialAudioPaths,    ///< Spatial audio paths data.
+        WWISEC_AkMemID_GameSim,              ///< Game Simulator allocations.
+        WWISEC_AkMemID_MonitorQueue,         ///< Monitor Queue.
+        WWISEC_AkMemID_Profiler,             ///< Profiler.
+        WWISEC_AkMemID_FilePackage,          ///< File packager.
+        WWISEC_AkMemID_SoundEngine,          ///< Base sound engine allocations (managers, etc).
+        WWISEC_AkMemID_Integration,          ///< Game engine integration allocations.
+        WWISEC_AkMemID_JobMgr,               ///< Allocations for Sound Engine jobs and job dependencies.
+
+        WWISEC_AkMemID_NUM,               ///< Category count.
+        WWISEC_AkMemID_MASK = 0x1FFFFFFF, ///< Mask for category IDs.
+
+        WWISEC_AkMemType_Media = 0x20000000,  ///< Media memory type bit.
+        WWISEC_AkMemType_Device = 0x40000000, ///< Device memory type bit.
+        WWISEC_AkMemType_NoTrack = 0x80000000 ///< Do not track this allocation.
+    } WWISEC_AkMemID;
+
+    typedef struct WWISEC_AK_MemoryMgr_CategoryStats
+    {
+        // Current state
+        AkUInt64 uUsed; ///< Used memory (in bytes)
+
+        // Statistics
+        AkUInt64 uPeakUsed; ///< Peak used memory (in bytes)
+        AkUInt32 uAllocs;   ///< Number of allocation calls since initialization
+        AkUInt32 uFrees;    ///< Number of free calls since initialization
+    } WWISEC_AK_MemoryMgr_CategoryStats;
+
+    typedef struct WWISEC_AK_MemoryMgr_GlobalStats
+    {
+        AkUInt64 uUsed;       ///< Total memory used including all categories (in bytes)
+        AkUInt64 uDeviceUsed; ///< Total device memory used including all categories (in bytes)
+        AkUInt64 uReserved;   ///< Total reserved memory. (Used and unused). Will return 0 if the reserved memory is not traceable.
+        AkUInt64 uMax;        ///< Maximum total allocation size, specified in the initialization settings through uMemAllocationSizeLimit. Will be 0 if no limit was set.
+    } WWISEC_AK_MemoryMgr_GlobalStats;
+
+    bool WWISEC_AK_MemoryMgr_IsInitialized();
+    void WWISEC_AK_MemoryMgr_Term();
+    void WWISEC_AK_MemoryMgr_InitForThread();
+    void WWISEC_AK_MemoryMgr_TermForThread();
+    void* WWISEC_AK_MemoryMgr_Malloc(WWISEC_AkMemPoolId in_poolId, size_t in_uSize);
+    void* WWISEC_AK_MemoryMgr_ReallocAligned(WWISEC_AkMemPoolId in_poolId, void* in_pAlloc, size_t in_uSize, AkUInt32 in_uAlignment);
+    void WWISEC_AK_MemoryMgr_Free(WWISEC_AkMemPoolId in_poolId, void* in_pMemAddress);
+    void* WWISEC_AK_MemoryMgr_Malign(WWISEC_AkMemPoolId in_poolId, size_t in_USize, AkUInt32 in_uAlignment);
+    void WWISEC_AK_MemoryMgr_GetCategoryStats(WWISEC_AkMemPoolId in_poolId, WWISEC_AK_MemoryMgr_CategoryStats* out_poolStats);
+    void WWISEC_AK_MemoryMgr_GetGlobalStats(WWISEC_AK_MemoryMgr_GlobalStats* out_stats);
+    void WWISEC_AK_MemoryMgr_StartProfileThreadUsage();
+    AkUInt64 WWISEC_AK_MemoryMgr_StopProfileThreadUsage();
+    void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename);
+    // END AkMemoryMgr
+
+    // BEGIN AkModule
+    typedef void(AKSOUNDENGINE_CALL* AkMemInitForThread)();
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemTermForThread)();
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemTrimForThread)();
+
+    typedef void*(AKSOUNDENGINE_CALL* AkMemMalloc)(
+        WWISEC_AkMemPoolId poolId,
+        size_t uSize);
+
+    typedef void*(AKSOUNDENGINE_CALL* AkMemMalign)(
+        WWISEC_AkMemPoolId poolId,
+        size_t uSize,
+        AkUInt32 uAlignment);
+
+    typedef void*(AKSOUNDENGINE_CALL* AkMemRealloc)(
+        WWISEC_AkMemPoolId poolId,
+        void* pAddress,
+        size_t uSize);
+
+    typedef void*(AKSOUNDENGINE_CALL* AkMemReallocAligned)(
+        WWISEC_AkMemPoolId poolId,
+        void* pAddress,
+        size_t uSize,
+        AkUInt32 uAlignment);
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemFree)(
+        WWISEC_AkMemPoolId poolId,
+        void* pAddress);
+
+    typedef size_t(AKSOUNDENGINE_CALL* AkMemTotalReservedMemorySize)();
+
+    typedef size_t(AKSOUNDENGINE_CALL* AkMemSizeOfMemory)(
+        WWISEC_AkMemPoolId poolId,
+        void* pAddress);
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemDebugMalloc)(
+        WWISEC_AkMemPoolId poolId,
+        size_t uSize,
+        void* pAddress,
+        char const* pszFile,
+        AkUInt32 uLine);
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemDebugMalign)(
+        WWISEC_AkMemPoolId poolId,
+        size_t uSize,
+        AkUInt32 uAlignment,
+        void* pAddress,
+        char const* pszFile,
+        AkUInt32 uLine);
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemDebugRealloc)(
+        WWISEC_AkMemPoolId poolId,
+        void* pOldAddress,
+        size_t uSize,
+        void* pNewAddress,
+        char const* pszFile,
+        AkUInt32 uLine);
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemDebugReallocAligned)(
+        WWISEC_AkMemPoolId poolId,
+        void* pOldAddress,
+        size_t uSize,
+        AkUInt32 uAlignment,
+        void* pNewAddress,
+        char const* pszFile,
+        AkUInt32 uLine);
+
+    typedef void(AKSOUNDENGINE_CALL* AkMemDebugFree)(
+        WWISEC_AkMemPoolId poolId,
+        void* pAddress);
+
+    typedef void* (*AkMemAllocVM)(
+        size_t size,
+        size_t* extra);
+
+    typedef void (*AkMemFreeVM)(
+        void* address,
+        size_t size,
+        size_t extra,
+        size_t release);
+
+    typedef struct WWISEC_AkMemSettings
+    {
+        /// @name High-level memory allocation hooks. When not NULL, redirect allocations normally forwarded to rpmalloc.
+        //@{
+        AkMemInitForThread pfInitForThread;                     ///< (Optional) Thread-specific allocator initialization hook.
+        AkMemTermForThread pfTermForThread;                     ///< (Optional) Thread-specific allocator termination hook.
+        AkMemMalloc pfMalloc;                                   ///< (Optional) Memory allocation hook.
+        AkMemMalign pfMalign;                                   ///< (Optional) Memory allocation hook.
+        AkMemRealloc pfRealloc;                                 ///< (Optional) Memory allocation hook.
+        AkMemReallocAligned pfReallocAligned;                   ///< (Optional) Memory allocation hook.
+        AkMemFree pfFree;                                       ///< (Optional) Memory allocation hook.
+        AkMemTotalReservedMemorySize pfTotalReservedMemorySize; ///< (Optional) Memory allocation statistics hook.
+        AkMemSizeOfMemory pfSizeOfMemory;                       ///< (Optional) Memory allocation statistics hook.
+        //@}
+
+        /// @name Configuration.
+        //@{
+        AkUInt64 uMemAllocationSizeLimit; ///< When non-zero, limits the total amount of virtual and device memory allocated by AK::MemoryMgr.
+        bool bUseDeviceMemAlways;         ///< Use device memory for all allocations (on applicable platforms).
+        //@}
+
+        /// @name Page allocation hooks, used by rpmalloc. Default to AKPLATFORM::AllocVM et al.
+        //@{
+        AkMemAllocVM pfAllocVM;     ///< Virtual page allocation hook.
+        AkMemFreeVM pfFreeVM;       ///< Virtual page allocation hook.
+        AkMemAllocVM pfAllocDevice; ///< Device page allocation hook.
+        AkMemFreeVM pfFreeDevice;   ///< Device page allocation hook.
+        AkUInt32 uVMPageSize;       ///< Virtual memory page size. Defaults to 0 which means auto-detect.
+        AkUInt32 uDevicePageSize;   ///< Device memory page size. Defaults to 0 which means auto-detect.
+        //@}
+
+        /// @name Memory allocation debugging.
+        //@{
+        AkMemDebugMalloc pfDebugMalloc;                 ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfMalloc.
+        AkMemDebugMalign pfDebugMalign;                 ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfMalign.
+        AkMemDebugRealloc pfDebugRealloc;               ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfRealloc.
+        AkMemDebugReallocAligned pfDebugReallocAligned; ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfReallocAligned.
+        AkMemDebugFree pfDebugFree;                     ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfFree.
+        AkUInt32 uMemoryDebugLevel;                     ///< Default 0 disabled. 1 debug enabled. 2 stomp allocator enabled. 3 stomp allocator and debug enabled. User implementations may use multiple non-zero values to offer different features.
+        //@}
+
+        // Moved to end-of-struct to maintain stability across 2022.1 modules.
+        AkMemTrimForThread pfTrimForThread; ///< (Optional) Thread-specific allocator "trimming" hook.
+    } WWISEC_AkMemSettings;
+
+    WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings);
+    void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettings);
+    // END AkModule
 
 #ifdef __cplusplus
 }
