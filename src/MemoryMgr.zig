@@ -67,12 +67,12 @@ pub fn stopProfileThreadUsage() u64 {
     return c.WWISEC_AK_MemoryMgr_StopProfileThreadUsage();
 }
 
-pub fn dumpToFile(allocator: std.mem.Allocator, filename: []const u8) !void {
-    var os_string_allocator_instance = common.osCharAllocator(allocator);
-    var os_string_allocator = os_string_allocator_instance.get();
+pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !void {
+    var os_string_allocator = common.osCharAllocator(fallback_allocator);
+    var allocator = os_string_allocator.get();
 
-    const filename_oschar = try common.toOSChar(os_string_allocator, filename);
-    defer os_string_allocator.free(filename_oschar);
+    const filename_oschar = try common.toOSChar(allocator, filename);
+    defer allocator.free(filename_oschar);
 
     c.WWISEC_AK_MemoryMgr_DumpToFile(filename_oschar);
 }

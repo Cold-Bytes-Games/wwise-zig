@@ -19,6 +19,7 @@ Available options:
 | `configuration` | debug, profile, release | Which library configuration of Wwise to use |
 | `use_static_crt` | bool | On Windows, do you want to use the StaticCRT build of Wwise |
 | `use_communication` | bool | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time |
+| `string_stack_size` | usize | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 512) |
 
 We recommend using `AK` as your import name to match closely with the C++ API.
 
@@ -31,6 +32,25 @@ pub fn main() !void {
 
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
+}
+```
+
+### Handling AkOsChar and null-terminated strings
+
+`wwise-zig` is trying to save allocations by using stack-allocated space to convert to AkOsChar or null-terminated strings and use a fallback allocator if the string is bigger than the stack size.
+
+You can customize the size allocated by modifying the `string_stack_size` when importing the dependency.
+
+Each function that handle string looks similar to this: 
+```zig
+pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !void {
+    var os_string_allocator = common.osCharAllocator(fallback_allocator);
+    var allocator = os_string_allocator.get();
+
+    const filename_oschar = try common.toOSChar(allocator, filename);
+    defer allocator.free(filename_oschar);
+
+    c.WWISEC_AK_MemoryMgr_DumpToFile(filename_oschar);
 }
 ```
 

@@ -6,7 +6,7 @@ const WwiseConfiguration = enum {
     release,
 };
 
-const WwiseOptions = struct {
+const WwiseBuildOptions = struct {
     wwise_sdk_path: []const u8,
     configuration: WwiseConfiguration,
     use_static_crt: bool,
@@ -25,10 +25,11 @@ pub fn build(b: *std.Build) !void {
     const wwise_configuration_option = b.option(WwiseConfiguration, "configuration", "Which library of Wwise to use");
     const wwise_use_static_crt_option = b.option(bool, "use_static_crt", "On Windows, use the static CRT version of the library");
     const wwise_use_communication_option = b.option(bool, "use_communication", "Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time");
+    const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 512)");
 
     const wwise_configuration = wwise_configuration_option orelse .profile;
 
-    const wwise_options = WwiseOptions{
+    const wwise_build_options = WwiseBuildOptions{
         .wwise_sdk_path = getWwiseSDKPath(b, override_wwise_sdk_path_option),
         .configuration = wwise_configuration,
         .use_static_crt = wwise_use_static_crt_option orelse true,
@@ -47,20 +48,28 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     wwise_c.addCSourceFile("bindings/WwiseC.cpp", &.{"-std=c++17"});
-    try wwiseLink(wwise_c, wwise_options);
+    try wwiseLink(wwise_c, wwise_build_options);
     wwise_c.linkLibC();
 
     if (target.getOsTag() == .windows) {
         wwise_c.defineCMacro("UNICODE", null);
     }
 
-    if (wwise_options.use_communication) {
+    if (wwise_build_options.use_communication) {
         wwise_c.defineCMacro("WWISEC_USE_COMMUNICATION", null);
     }
+
+    const option_step = b.addOptions();
+    option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 512);
+
+    const wwise_compile_options = option_step.createModule();
 
     const wwise_zig_module = b.addModule("wwise-zig", .{
         .source_file = .{
             .path = "src/wwise-zig.zig",
+        },
+        .dependencies = &.{
+            .{ .name = "wwise_options", .module = wwise_compile_options },
         },
     });
 
@@ -72,7 +81,7 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    try wwiseLink(wwise_test, wwise_options);
+    try wwiseLink(wwise_test, wwise_build_options);
     wwise_test.linkLibrary(wwise_c);
     wwise_test.addModule("wwise-zig", wwise_zig_module);
     wwise_test.install();
@@ -88,14 +97,14 @@ pub fn build(b: *std.Build) !void {
     build_only_test_step.dependOn(b.getInstallStep());
 }
 
-fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_options: WwiseOptions) !void {
-    const wwise_library_relative_path = try getWwiseLibraryPath(compile_step.step.owner, compile_step.target, wwise_options);
+fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
+    const wwise_library_relative_path = try getWwiseLibraryPath(compile_step.step.owner, compile_step.target, wwise_build_options);
 
-    compile_step.addSystemIncludePath(compile_step.step.owner.pathJoin(&.{ wwise_options.wwise_sdk_path, "include" }));
+    compile_step.addSystemIncludePath(compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" }));
     compile_step.addIncludePath("bindings");
-    compile_step.addLibraryPath(compile_step.step.owner.pathJoin(&.{ wwise_options.wwise_sdk_path, wwise_library_relative_path }));
+    compile_step.addLibraryPath(compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path }));
 
-    if (wwise_options.use_communication) {
+    if (wwise_build_options.use_communication) {
         compile_step.linkSystemLibrary("CommunicationCentral");
 
         if (compile_step.target.getOsTag() == .windows) {
@@ -125,8 +134,8 @@ fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []co
     return "";
 }
 
-fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_options: WwiseOptions) ![]const u8 {
-    const config_string = switch (wwise_options.configuration) {
+fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_options: WwiseBuildOptions) ![]const u8 {
+    const config_string = switch (wwise_build_options.configuration) {
         .debug => "Debug",
         .profile => "Profile",
         .release => "Release",
@@ -140,7 +149,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_options
                 else => return error.ArchNotSupported,
             };
 
-            const static_crt_string = if (wwise_options.use_static_crt) "(StaticCRT)" else "";
+            const static_crt_string = if (wwise_build_options.use_static_crt) "(StaticCRT)" else "";
 
             return b.fmt("{s}_vc170/{s}{s}/lib", .{ arch_string, config_string, static_crt_string });
         },

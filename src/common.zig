@@ -1,6 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const c = @import("c.zig");
+const wwise_options = @import("wwise_options");
 
 pub const WwiseError = error{
     NotImplemented,
@@ -172,7 +173,6 @@ pub fn toCString(allocator: std.mem.Allocator, value: []const u8) ![:0]u8 {
     return std.cstr.addNullByte(allocator, value);
 }
 
-const OsCharAllocatorSize = 1024;
-pub fn osCharAllocator(allocator: std.mem.Allocator) std.heap.StackFallbackAllocator(OsCharAllocatorSize) {
-    return std.heap.stackFallback(OsCharAllocatorSize, allocator);
+pub fn osCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackFallbackAllocator(wwise_options.string_stack_size) {
+    return std.heap.stackFallback(wwise_options.string_stack_size, fallback_allocator);
 }
