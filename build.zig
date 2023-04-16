@@ -87,9 +87,9 @@ pub fn build(b: *std.Build) !void {
     try wwiseLink(wwise_test, wwise_build_options);
     wwise_test.linkLibrary(wwise_c);
     wwise_test.addModule("wwise-zig", wwise_zig_module);
-    wwise_test.install();
+    b.installArtifact(wwise_test);
 
-    const run_test_cmd = wwise_test.run();
+    const run_test_cmd = b.addRunArtifact(wwise_test);
     run_test_cmd.step.dependOn(b.getInstallStep());
 
     const test_step = b.step("test", "Run library tests");
