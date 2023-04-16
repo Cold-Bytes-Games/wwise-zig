@@ -50,6 +50,9 @@ pub fn build(b: *std.Build) !void {
     wwise_c.addCSourceFile("bindings/WwiseC.cpp", &.{"-std=c++17"});
     try wwiseLink(wwise_c, wwise_build_options);
     wwise_c.linkLibC();
+    if (target.getOsTag() != .windows) {
+        wwise_c.linkLibCpp();
+    }
 
     if (target.getOsTag() == .windows) {
         wwise_c.defineCMacro("UNICODE", null);

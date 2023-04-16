@@ -38,6 +38,10 @@ extern "C"
 
 #include <AK/AkPlatforms.h>
 
+#if !defined(AK_WIN)
+#define AKSOUNDENGINE_CALL
+#endif
+
     // BEGIN AkTypes
     typedef AkUInt32 WWISEC_AkUniqueID;          ///< Unique 32-bit ID
     typedef AkUInt32 WWISEC_AkStateID;           ///< State ID
@@ -192,6 +196,44 @@ extern "C"
         WWISEC_AK_FilePermissionError = 103,        ///< The file access permissions prevent opening a file.
         WWISEC_AK_UnknownFileError = 104,           ///< Rare file error occured, as opposed to AK_FileNotFound or AK_FilePermissionError. This lumps all unrecognized OS file system errors.
     } WWISEC_AKRESULT;
+
+    typedef enum WWISEC_AkGroupType
+    {
+        // should stay set as Switch = 0 and State = 1
+        WWISEC_AkGroupType_Switch = 0, ///< Type switch
+        WWISEC_AkGroupType_State = 1   ///< Type state
+    } WWISEC_AkGroupType;
+
+    /// Configured audio settings
+    typedef struct WWISEC_AkAudioSettings
+    {
+        AkUInt32 uNumSamplesPerFrame;  ///< Number of samples per audio frame (256, 512, 1024 or 2048).
+        AkUInt32 uNumSamplesPerSecond; ///< Number of samples per second.
+    } WWISEC_AkAudioSettings;
+
+    typedef enum WWISEC_AkAudioDeviceState
+    {
+        WWISEC_AkDeviceState_Unknown = 0,                                                                                                                          ///< The audio device state is unknown or invalid.
+        WWISEC_AkDeviceState_Active = 1 << 0,                                                                                                                      ///< The audio device is active That is, the audio adapter that connects to the endpoint device is present and enabled.
+        WWISEC_AkDeviceState_Disabled = 1 << 1,                                                                                                                    ///< The audio device is disabled.
+        WWISEC_AkDeviceState_NotPresent = 1 << 2,                                                                                                                  ///< The audio device is not present because the audio adapter that connects to the endpoint device has been removed from the system.
+        WWISEC_AkDeviceState_Unplugged = 1 << 3,                                                                                                                   ///< The audio device is unplugged.
+        WWISEC_AkDeviceState_All = WWISEC_AkDeviceState_Active | WWISEC_AkDeviceState_Disabled | WWISEC_AkDeviceState_NotPresent | WWISEC_AkDeviceState_Unplugged, ///< Includes audio devices in all states.
+    } WWISEC_AkAudioDeviceState;
+
+    typedef struct WWISEC_AkDeviceDescription
+    {
+        AkUInt32 idDevice;                         ///< Device ID for Wwise. This is the same as what is returned from AK::GetDeviceID and AK::GetDeviceIDFromName. Use it to specify the main device in AkPlatformInitSettings.idAudioDevice or in AK::SoundEngine::AddSecondaryOutput.
+        AkOSChar deviceName[AK_MAX_PATH];          ///< The user-friendly name for the device.
+        WWISEC_AkAudioDeviceState deviceStateMask; ///< Bitmask used to filter the device based on their state.
+        bool isDefaultDevice;                      ///< Identify default device. Always false when not supported.
+    } WWISEC_AkDeviceDescription;
+
+    typedef enum WWISEC_AkPanningRule
+    {
+        WWISEC_AkPanningRule_Speakers = 0,  ///< Left and right positioned 60 degrees apart (by default - see AK::SoundEngine::GetSpeakerAngles()).
+        WWISEC_AkPanningRule_Headphones = 1 ///< Left and right positioned 180 degrees apart.
+    } WWISEC_AkPanningRule;
     // END AkTypes
 
     // BEGIN AkMemoryMgr
@@ -261,50 +303,50 @@ extern "C"
     // END AkMemoryMgr
 
     // BEGIN AkModule
-    typedef void(AKSOUNDENGINE_CALL* AkMemInitForThread)();
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemInitForThread)();
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemTermForThread)();
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemTermForThread)();
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemTrimForThread)();
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemTrimForThread)();
 
-    typedef void*(AKSOUNDENGINE_CALL* AkMemMalloc)(
+    typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemMalloc)(
         WWISEC_AkMemPoolId poolId,
         size_t uSize);
 
-    typedef void*(AKSOUNDENGINE_CALL* AkMemMalign)(
+    typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemMalign)(
         WWISEC_AkMemPoolId poolId,
         size_t uSize,
         AkUInt32 uAlignment);
 
-    typedef void*(AKSOUNDENGINE_CALL* AkMemRealloc)(
+    typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemRealloc)(
         WWISEC_AkMemPoolId poolId,
         void* pAddress,
         size_t uSize);
 
-    typedef void*(AKSOUNDENGINE_CALL* AkMemReallocAligned)(
+    typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemReallocAligned)(
         WWISEC_AkMemPoolId poolId,
         void* pAddress,
         size_t uSize,
         AkUInt32 uAlignment);
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemFree)(
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemFree)(
         WWISEC_AkMemPoolId poolId,
         void* pAddress);
 
-    typedef size_t(AKSOUNDENGINE_CALL* AkMemTotalReservedMemorySize)();
+    typedef size_t(AKSOUNDENGINE_CALL* WWISEC_AkMemTotalReservedMemorySize)();
 
-    typedef size_t(AKSOUNDENGINE_CALL* AkMemSizeOfMemory)(
+    typedef size_t(AKSOUNDENGINE_CALL* WWISEC_AkMemSizeOfMemory)(
         WWISEC_AkMemPoolId poolId,
         void* pAddress);
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemDebugMalloc)(
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugMalloc)(
         WWISEC_AkMemPoolId poolId,
         size_t uSize,
         void* pAddress,
         char const* pszFile,
         AkUInt32 uLine);
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemDebugMalign)(
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugMalign)(
         WWISEC_AkMemPoolId poolId,
         size_t uSize,
         AkUInt32 uAlignment,
@@ -312,7 +354,7 @@ extern "C"
         char const* pszFile,
         AkUInt32 uLine);
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemDebugRealloc)(
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugRealloc)(
         WWISEC_AkMemPoolId poolId,
         void* pOldAddress,
         size_t uSize,
@@ -320,7 +362,7 @@ extern "C"
         char const* pszFile,
         AkUInt32 uLine);
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemDebugReallocAligned)(
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugReallocAligned)(
         WWISEC_AkMemPoolId poolId,
         void* pOldAddress,
         size_t uSize,
@@ -329,15 +371,15 @@ extern "C"
         char const* pszFile,
         AkUInt32 uLine);
 
-    typedef void(AKSOUNDENGINE_CALL* AkMemDebugFree)(
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugFree)(
         WWISEC_AkMemPoolId poolId,
         void* pAddress);
 
-    typedef void* (*AkMemAllocVM)(
+    typedef void* (*WWISEC_AkMemAllocVM)(
         size_t size,
         size_t* extra);
 
-    typedef void (*AkMemFreeVM)(
+    typedef void (*WWISEC_AkMemFreeVM)(
         void* address,
         size_t size,
         size_t extra,
@@ -347,15 +389,15 @@ extern "C"
     {
         /// @name High-level memory allocation hooks. When not NULL, redirect allocations normally forwarded to rpmalloc.
         //@{
-        AkMemInitForThread pfInitForThread;                     ///< (Optional) Thread-specific allocator initialization hook.
-        AkMemTermForThread pfTermForThread;                     ///< (Optional) Thread-specific allocator termination hook.
-        AkMemMalloc pfMalloc;                                   ///< (Optional) Memory allocation hook.
-        AkMemMalign pfMalign;                                   ///< (Optional) Memory allocation hook.
-        AkMemRealloc pfRealloc;                                 ///< (Optional) Memory allocation hook.
-        AkMemReallocAligned pfReallocAligned;                   ///< (Optional) Memory allocation hook.
-        AkMemFree pfFree;                                       ///< (Optional) Memory allocation hook.
-        AkMemTotalReservedMemorySize pfTotalReservedMemorySize; ///< (Optional) Memory allocation statistics hook.
-        AkMemSizeOfMemory pfSizeOfMemory;                       ///< (Optional) Memory allocation statistics hook.
+        WWISEC_AkMemInitForThread pfInitForThread;                     ///< (Optional) Thread-specific allocator initialization hook.
+        WWISEC_AkMemTermForThread pfTermForThread;                     ///< (Optional) Thread-specific allocator termination hook.
+        WWISEC_AkMemMalloc pfMalloc;                                   ///< (Optional) Memory allocation hook.
+        WWISEC_AkMemMalign pfMalign;                                   ///< (Optional) Memory allocation hook.
+        WWISEC_AkMemRealloc pfRealloc;                                 ///< (Optional) Memory allocation hook.
+        WWISEC_AkMemReallocAligned pfReallocAligned;                   ///< (Optional) Memory allocation hook.
+        WWISEC_AkMemFree pfFree;                                       ///< (Optional) Memory allocation hook.
+        WWISEC_AkMemTotalReservedMemorySize pfTotalReservedMemorySize; ///< (Optional) Memory allocation statistics hook.
+        WWISEC_AkMemSizeOfMemory pfSizeOfMemory;                       ///< (Optional) Memory allocation statistics hook.
         //@}
 
         /// @name Configuration.
@@ -366,31 +408,76 @@ extern "C"
 
         /// @name Page allocation hooks, used by rpmalloc. Default to AKPLATFORM::AllocVM et al.
         //@{
-        AkMemAllocVM pfAllocVM;     ///< Virtual page allocation hook.
-        AkMemFreeVM pfFreeVM;       ///< Virtual page allocation hook.
-        AkMemAllocVM pfAllocDevice; ///< Device page allocation hook.
-        AkMemFreeVM pfFreeDevice;   ///< Device page allocation hook.
-        AkUInt32 uVMPageSize;       ///< Virtual memory page size. Defaults to 0 which means auto-detect.
-        AkUInt32 uDevicePageSize;   ///< Device memory page size. Defaults to 0 which means auto-detect.
+        WWISEC_AkMemAllocVM pfAllocVM;     ///< Virtual page allocation hook.
+        WWISEC_AkMemFreeVM pfFreeVM;       ///< Virtual page allocation hook.
+        WWISEC_AkMemAllocVM pfAllocDevice; ///< Device page allocation hook.
+        WWISEC_AkMemFreeVM pfFreeDevice;   ///< Device page allocation hook.
+        AkUInt32 uVMPageSize;              ///< Virtual memory page size. Defaults to 0 which means auto-detect.
+        AkUInt32 uDevicePageSize;          ///< Device memory page size. Defaults to 0 which means auto-detect.
         //@}
 
         /// @name Memory allocation debugging.
         //@{
-        AkMemDebugMalloc pfDebugMalloc;                 ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfMalloc.
-        AkMemDebugMalign pfDebugMalign;                 ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfMalign.
-        AkMemDebugRealloc pfDebugRealloc;               ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfRealloc.
-        AkMemDebugReallocAligned pfDebugReallocAligned; ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfReallocAligned.
-        AkMemDebugFree pfDebugFree;                     ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfFree.
-        AkUInt32 uMemoryDebugLevel;                     ///< Default 0 disabled. 1 debug enabled. 2 stomp allocator enabled. 3 stomp allocator and debug enabled. User implementations may use multiple non-zero values to offer different features.
+        WWISEC_AkMemDebugMalloc pfDebugMalloc;                 ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfMalloc.
+        WWISEC_AkMemDebugMalign pfDebugMalign;                 ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfMalign.
+        WWISEC_AkMemDebugRealloc pfDebugRealloc;               ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfRealloc.
+        WWISEC_AkMemDebugReallocAligned pfDebugReallocAligned; ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfReallocAligned.
+        WWISEC_AkMemDebugFree pfDebugFree;                     ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfFree.
+        AkUInt32 uMemoryDebugLevel;                            ///< Default 0 disabled. 1 debug enabled. 2 stomp allocator enabled. 3 stomp allocator and debug enabled. User implementations may use multiple non-zero values to offer different features.
         //@}
 
         // Moved to end-of-struct to maintain stability across 2022.1 modules.
-        AkMemTrimForThread pfTrimForThread; ///< (Optional) Thread-specific allocator "trimming" hook.
+        WWISEC_AkMemTrimForThread pfTrimForThread; ///< (Optional) Thread-specific allocator "trimming" hook.
     } WWISEC_AkMemSettings;
 
     WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings);
     void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettings);
     // END AkModule
+
+    // BEGIN AkSpeakerConfig
+    typedef AkUInt32 WWISEC_AkChannelConfig;
+    // END AkSpeakerConfig
+
+    // BEGIN AkSoundEngine
+    typedef WWISEC_AKRESULT (*WWISEC_AkBackgroundMusicChangeCallbackFunc)(
+        bool in_bBackgroundMusicMuted, ///< Flag indicating whether the busses tagged as "background music" in the project are muted or not.
+        void* in_pCookie               ///< User-provided data, e.g. a user structure.
+    );
+
+    typedef struct WWISEC_AkOutputSettings
+    {
+        WWISEC_AkUniqueID audioDeviceShareset; ///< Unique ID of a custom audio device to be used. Custom audio devices are defined in the Audio Device Shareset section of the Wwise project.
+                                               ///< If you want to output normally through the output device defined on the Master Bus in your project, leave this field to its default value (AK_INVALID_UNIQUE_ID, or value 0).
+                                               ///< Typical usage: AkInitSettings.eOutputSettings.audioDeviceShareset = AK::SoundEngine::GetIDFromString("InsertYourAudioDeviceSharesetNameHere");
+                                               /// \sa <tt>\ref AK::SoundEngine::GetIDFromString()</tt>
+                                               /// \sa \ref soundengine_plugins_audiodevices
+                                               /// \sa \ref integrating_secondary_outputs
+                                               /// \sa \ref default_audio_devices
+
+        AkUInt32 idDevice; ///< Device specific identifier, when multiple devices of the same type are possible.  If only one device is possible, leave to 0.
+                           ///< - PS4 Controller-Speakers: UserID as returned from sceUserServiceGetLoginUserIdList
+                           ///< - XBoxOne Controller-Headphones: Use the AK::GetDeviceID function to get the ID from an IMMDevice. Find the player's device with the WASAPI API (IMMDeviceEnumerator, see Microsoft documentation) or use AK::GetDeviceIDFromName.
+                           ///< - Windows: Use AK::GetDeviceID or AK::GetDeviceIDFromName to get the correct ID.  Leave to 0 for the default Windows device as seen in Audio Properties.
+                           ///< - All other outputs: use 0 to select the default for the selected audio device type (shareset)
+
+        WWISEC_AkPanningRule ePanningRule; ///< Rule for 3D panning of signals routed to a stereo bus. In AkPanningRule_Speakers mode, the angle of the front loudspeakers
+                                           ///< (uSpeakerAngles[0]) is used. In AkPanningRule_Headphones mode, the speaker angles are superseded by constant power panning
+                                           ///< between two virtual microphones spaced 180 degrees apart.
+
+        WWISEC_AkChannelConfig channelConfig; ///< Channel configuration for this output. Call AkChannelConfig::Clear() to let the engine use the default output configuration.
+                                              ///< Hardware might not support the selected configuration.
+    } WWISEC_AkOutputSettings;
+
+    void AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning);
+
+    typedef enum WWISEC_AkFloorPlane
+    {
+        WWISEC_AkFloorPlane_XZ = 0,                          ///< The floor is oriented along the ZX-plane. The front vector points towards +Z, the up vector towards +Y, and the side vector towards +X.
+        WWISEC_AkFloorPlane_XY,                              ///< The floor is oriented along the XY-plane. The front vector points towards +X, the up vector towards +Z, and the side vector towards +Y.
+        WWISEC_AkFloorPlane_YZ,                              ///< The floor is oriented along the YZ-plane. The front vector points towards +Y, the up vector towards +X, and the side vector towards +Z.
+        WWISEC_AkFloorPlane_Default = WWISEC_AkFloorPlane_XZ ///< The Wwise default floor plane is ZX.
+    } WWISEC_AkFloorPlane;
+    // END AkSoundEngine
 
 #ifdef __cplusplus
 }

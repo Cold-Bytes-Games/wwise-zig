@@ -25,15 +25,21 @@ SOFTWARE.
 
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>
 #include <AK/SoundEngine/Common/AkModule.h>
+#include <AK/SoundEngine/Common/AkSoundEngine.h>
 #include <AK/SoundEngine/Common/AkTypes.h>
 
+#include <new>
+
 // BEGIN AkTypes
-static_assert(WWISEC_AK_UnknownFileError == AK_UnknownFileError);
-static_assert(WWISEC_AK_NUM_JOB_TYPES == AK_NUM_JOB_TYPES);
+static_assert(static_cast<std::size_t>(WWISEC_AK_UnknownFileError) == static_cast<std::size_t>(AK_UnknownFileError));
+static_assert(static_cast<std::size_t>(WWISEC_AK_NUM_JOB_TYPES) == static_cast<std::size_t>(AK_NUM_JOB_TYPES));
+static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
+static_assert(WWISEC_AkDeviceState_All == AkDeviceState_All);
+static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 // END AkTypes
 
 // BEGIN AkMemoryMgr
-static_assert(WWISEC_AkMemID_NUM == AkMemID_NUM);
+static_assert(static_cast<std::size_t>(WWISEC_AkMemID_NUM) == static_cast<std::size_t>(AkMemID_NUM));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_CategoryStats) == sizeof(AK::MemoryMgr::CategoryStats));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_GlobalStats) == sizeof(AK::MemoryMgr::GlobalStats));
 
@@ -115,4 +121,14 @@ void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettin
 {
     AK::MemoryMgr::GetDefaultSettings(*reinterpret_cast<AkMemSettings*>(out_pMemSettings));
 }
+
 // END AkModule
+
+// BEGIN AkSoundEngine
+static_assert(sizeof(WWISEC_AkOutputSettings) == sizeof(AkOutputSettings));
+
+void AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
+{
+    new (outputSettings) AkOutputSettings(in_szDeviceShareSet, static_cast<AkUniqueID>(in_idDevice), *reinterpret_cast<AkChannelConfig*>(&in_channelConfig), static_cast<AkPanningRule>(in_ePanning));
+}
+// END AkSoundEngine
