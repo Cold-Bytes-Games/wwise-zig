@@ -34,7 +34,7 @@ SOFTWARE.
 static_assert(static_cast<std::size_t>(WWISEC_AK_UnknownFileError) == static_cast<std::size_t>(AK_UnknownFileError));
 static_assert(static_cast<std::size_t>(WWISEC_AK_NUM_JOB_TYPES) == static_cast<std::size_t>(AK_NUM_JOB_TYPES));
 static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
-static_assert(WWISEC_AkDeviceState_All == AkDeviceState_All);
+static_assert(static_cast<std::size_t>(WWISEC_AkDeviceState_All) == static_cast<std::size_t>(AkDeviceState_All));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 // END AkTypes
 
@@ -127,8 +127,13 @@ void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettin
 // BEGIN AkSoundEngine
 static_assert(sizeof(WWISEC_AkOutputSettings) == sizeof(AkOutputSettings));
 
-void AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
+void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
 {
     new (outputSettings) AkOutputSettings(in_szDeviceShareSet, static_cast<AkUniqueID>(in_idDevice), *reinterpret_cast<AkChannelConfig*>(&in_channelConfig), static_cast<AkPanningRule>(in_ePanning));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
 }
 // END AkSoundEngine

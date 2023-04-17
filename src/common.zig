@@ -3,6 +3,78 @@ const builtin = @import("builtin");
 const c = @import("c.zig");
 const wwise_options = @import("wwise_options");
 
+pub const AkUniqueID = c.WWISEC_AkUniqueID;
+pub const AkStateID = c.WWISEC_AkStateID;
+pub const AkStateGroupID = c.WWISEC_AkStateGroupID;
+pub const AkPlayingID = c.WWISEC_AkPlayingID;
+pub const AkTimeMs = c.WWISEC_AkTimeMs;
+pub const AkPortNumber = c.WWISEC_AkPortNumber;
+pub const AkPitchValue = c.WWISEC_AkPitchValue;
+pub const AkVolumeValue = c.WWISEC_AkVolumeValue;
+pub const AkGameObjectID = c.WWISEC_AkGameObjectID;
+pub const AkLPFType = c.WWISEC_AkLPFType;
+pub const AkMemPoolId = c.WWISEC_AkMemPoolId;
+pub const AkPluginID = c.WWISEC_AkPluginID;
+pub const AkCodecID = c.WWISEC_AkCodecID;
+pub const AkAuxBusID = c.WWISEC_AkAuxBusID;
+pub const AkPluginParamID = c.WWISEC_AkPluginParamID;
+pub const AkPriority = c.WWISEC_AkPriority;
+pub const AkDataCompID = c.WWISEC_AkDataCompID;
+pub const AkDataTypeID = c.WWISEC_AkDataTypeID;
+pub const AkDataInterleaveID = c.WWISEC_AkDataInterleaveID;
+pub const AkSwitchGroupID = c.WWISEC_AkSwitchGroupID;
+pub const AkSwitchStateID = c.WWISEC_AkSwitchStateID;
+pub const AkRtpcID = c.WWISEC_AkRtpcID;
+pub const AkRtpcValue = c.WWISEC_AkRtpcValue;
+pub const AkBankID = c.WWISEC_AkBankID;
+pub const AkBankType = c.WWISEC_AkBankType;
+pub const AkFileID = c.WWISEC_AkFileID;
+pub const AkDeviceID = c.WWISEC_AkDeviceID;
+pub const AkTriggerID = c.WWISEC_AkTriggerID;
+pub const AkArgumentValueID = c.WWISEC_AkArgumentValueID;
+pub const AkChannelMask = c.WWISEC_AkChannelMask;
+pub const AkModulatorID = c.WWISEC_AkModulatorID;
+pub const AkAcousticTextureID = c.WWISEC_AkAcousticTextureID;
+pub const AkImageSourceID = c.WWISEC_AkImageSourceID;
+pub const AkOutputDeviceID = c.WWISEC_AkOutputDeviceID;
+pub const AkPipelineID = c.WWISEC_AkPipelineID;
+pub const AkRayID = c.WWISEC_AkRayID;
+pub const AkAudioObjectID = c.WWISEC_AkAudioObjectID;
+pub const AkJobType = c.WWISEC_AkJobType;
+pub const AK_INVALID_PLUGINID = c.WWISEC_AK_INVALID_PLUGINID;
+pub const AK_INVALID_SHARE_SET_ID = c.WWISEC_AK_INVALID_SHARE_SET_ID;
+pub const AK_INVALID_GAME_OBJECT = c.WWISEC_AK_INVALID_GAME_OBJECT;
+pub const AK_INVALID_UNIQUE_ID = c.WWISEC_AK_INVALID_UNIQUE_ID;
+pub const AK_INVALID_RTPC_ID = c.WWISEC_AK_INVALID_RTPC_ID;
+pub const AK_INVALID_PLAYING_ID = c.WWISEC_AK_INVALID_PLAYING_ID;
+pub const AK_DEFAULT_SWITCH_STATE = c.WWISEC_AK_DEFAULT_SWITCH_STATE;
+pub const AK_INVALID_POOL_ID = c.WWISEC_AK_INVALID_POOL_ID;
+pub const AK_DEFAULT_POOL_ID = c.WWISEC_AK_DEFAULT_POOL_ID;
+pub const AK_INVALID_AUX_ID = c.WWISEC_AK_INVALID_AUX_ID;
+pub const AK_INVALID_FILE_ID = c.WWISEC_AK_INVALID_FILE_ID;
+pub const AK_INVALID_DEVICE_ID = c.WWISEC_AK_INVALID_DEVICE_ID;
+pub const AK_INVALID_BANK_ID = c.WWISEC_AK_INVALID_BANK_ID;
+pub const AK_FALLBACK_ARGUMENTVALUE_ID = c.WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID;
+pub const AK_INVALID_CHANNELMASK = c.WWISEC_AK_INVALID_CHANNELMASK;
+pub const AK_INVALID_OUTPUT_DEVICE_ID = c.WWISEC_AK_INVALID_OUTPUT_DEVICE_ID;
+pub const AK_INVALID_PIPELINE_ID = c.WWISEC_AK_INVALID_PIPELINE_ID;
+pub const AK_INVALID_AUDIO_OBJECT_ID = c.WWISEC_AK_INVALID_AUDIO_OBJECT_ID;
+pub const AK_DEFAULT_PRIORITY = c.WWISEC_AK_DEFAULT_PRIORITY;
+pub const AK_MIN_PRIORITY = c.WWISEC_AK_MIN_PRIORITY;
+pub const AK_MAX_PRIORITY = c.WWISEC_AK_MAX_PRIORITY;
+pub const AK_DEFAULT_BANK_IO_PRIORITY = c.WWISEC_AK_DEFAULT_BANK_IO_PRIORITY;
+pub const AK_DEFAULT_BANK_THROUGHPUT = c.WWISEC_AK_DEFAULT_BANK_THROUGHPUT;
+pub const AK_SOUNDBANK_VERSION = c.WWISEC_AK_SOUNDBANK_VERSION;
+pub const AkJobType_Generic = c.WWISEC_AkJobType_Generic;
+pub const AkJobType_AudioProcessing = c.WWISEC_AkJobType_AudioProcessing;
+pub const AkJobType_SpatialAudio = c.WWISEC_AkJobType_SpatialAudio;
+pub const AK_NUM_JOB_TYPES = c.WWISEC_AK_NUM_JOB_TYPES;
+
+pub const AkPanningRule = enum(u8) {
+    speakers = c.WWISEC_AkPanningRule_Speakers,
+    headphones = c.WWISEC_AkPanningRule_Headphones,
+};
+
 pub const WwiseError = error{
     NotImplemented,
     Fail,
@@ -173,6 +245,6 @@ pub fn toCString(allocator: std.mem.Allocator, value: []const u8) ![:0]u8 {
     return std.cstr.addNullByte(allocator, value);
 }
 
-pub fn osCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackFallbackAllocator(wwise_options.string_stack_size) {
+pub fn stackCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackFallbackAllocator(wwise_options.string_stack_size) {
     return std.heap.stackFallback(wwise_options.string_stack_size, fallback_allocator);
 }

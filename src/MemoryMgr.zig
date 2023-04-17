@@ -68,8 +68,8 @@ pub fn stopProfileThreadUsage() u64 {
 }
 
 pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !void {
-    var os_string_allocator = common.osCharAllocator(fallback_allocator);
-    var allocator = os_string_allocator.get();
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
 
     const filename_oschar = try common.toOSChar(allocator, filename);
     defer allocator.free(filename_oschar);

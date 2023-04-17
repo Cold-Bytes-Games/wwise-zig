@@ -85,7 +85,7 @@ extern "C"
     // Constants.
     static const WWISEC_AkPluginID WWISEC_AK_INVALID_PLUGINID = (WWISEC_AkPluginID)-1;                  ///< Invalid FX ID
     static const WWISEC_AkPluginID WWISEC_AK_INVALID_SHARE_SET_ID = (WWISEC_AkPluginID)-1;              ///< Invalid Share Set ID
-    static const WWISEC_AkGameObjectID WWISEC_K_INVALID_GAME_OBJECT = (WWISEC_AkGameObjectID)-1;        ///< Invalid game object (may also mean all game objects)
+    static const WWISEC_AkGameObjectID WWISEC_AK_INVALID_GAME_OBJECT = (WWISEC_AkGameObjectID)-1;       ///< Invalid game object (may also mean all game objects)
     static const WWISEC_AkUniqueID WWISEC_AK_INVALID_UNIQUE_ID = 0;                                     ///< Invalid unique 32-bit ID
     static const WWISEC_AkRtpcID WWISEC_AK_INVALID_RTPC_ID = WWISEC_AK_INVALID_UNIQUE_ID;               ///< Invalid RTPC ID
     static const WWISEC_AkPlayingID WWISEC_AK_INVALID_PLAYING_ID = WWISEC_AK_INVALID_UNIQUE_ID;         ///< Invalid playing ID
@@ -468,7 +468,7 @@ extern "C"
                                               ///< Hardware might not support the selected configuration.
     } WWISEC_AkOutputSettings;
 
-    void AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning);
+    void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning);
 
     typedef enum WWISEC_AkFloorPlane
     {
@@ -477,6 +477,8 @@ extern "C"
         WWISEC_AkFloorPlane_YZ,                              ///< The floor is oriented along the YZ-plane. The front vector points towards +Y, the up vector towards +X, and the side vector towards +Z.
         WWISEC_AkFloorPlane_Default = WWISEC_AkFloorPlane_XZ ///< The Wwise default floor plane is ZX.
     } WWISEC_AkFloorPlane;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID *out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
     // END AkSoundEngine
 
 #ifdef __cplusplus

@@ -693,4 +693,12 @@ pub const AkChannelConfig = packed struct(u32) {
     pub inline fn hasCenter(self: AkChannelConfig) bool {
         return self.channel_mask.hasCenter();
     }
+
+    pub inline fn fromC(channel_config: u32) AkChannelConfig {
+        return @bitCast(AkChannelConfig, channel_config);
+    }
+
+    pub inline fn toC(self: AkChannelConfig) u32 {
+        return @bitCast(u32, self);
+    }
 };
