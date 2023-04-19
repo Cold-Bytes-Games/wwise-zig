@@ -229,6 +229,14 @@ pub fn handleAkResult(result: c.WWISEC_AKRESULT) WwiseError!void {
     };
 }
 
+pub const fromOSChar = blk: {
+    if (builtin.os.tag == .windows) {
+        break :blk fromOSCharUtf16;
+    } else {
+        break :blk fromCString;
+    }
+};
+
 pub const toOSChar = blk: {
     if (builtin.os.tag == .windows) {
         break :blk toOSCharUtf16;
@@ -237,8 +245,24 @@ pub const toOSChar = blk: {
     }
 };
 
+pub fn fromOSCharUtf16(allocator: std.mem.Allocator, value_opt: ?[*:0]const u16) ![]u8 {
+    if (value_opt) |value| {
+        return std.unicode.utf16leToUtf8Alloc(allocator, value[0..std.mem.len(value)]);
+    }
+
+    return "";
+}
+
 pub fn toOSCharUtf16(allocator: std.mem.Allocator, value: []const u8) ![:0]u16 {
     return std.unicode.utf8ToUtf16LeWithNull(allocator, value);
+}
+
+pub fn fromCString(allocator: std.mem.Allocator, value_opt: ?[*:0]const u8) ![]u8 {
+    if (value_opt) |value| {
+        return allocator.dupe(u8, value[0..std.mem.len(value)]);
+    }
+
+    return "";
 }
 
 pub fn toCString(allocator: std.mem.Allocator, value: []const u8) ![:0]u8 {

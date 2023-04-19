@@ -20,3 +20,8 @@ test "MemoryMgr dump to file" {
 
     try AK.MemoryMgr.dumpToFile(std.testing.allocator, "test.dat");
 }
+
+test "AkSoundEngine init" {
+    var init_settings: AK.AkInitSettings = undefined;
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
+}

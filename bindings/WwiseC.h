@@ -37,10 +37,7 @@ extern "C"
 #endif
 
 #include <AK/AkPlatforms.h>
-
-#if !defined(AK_WIN)
-#define AKSOUNDENGINE_CALL
-#endif
+#include <AK/SoundEngine/Common/AkSoundEngineExport.h>
 
     // BEGIN AkTypes
     typedef AkUInt32 WWISEC_AkUniqueID;          ///< Unique 32-bit ID
@@ -439,6 +436,13 @@ extern "C"
     // END AkSpeakerConfig
 
     // BEGIN AkSoundEngine
+    AK_CALLBACK(void, WWISEC_AkAssertHook)
+    (
+        const char* in_pszExpression, ///< Expression
+        const char* in_pszFileName,   ///< File Name
+        int in_lineNumber             ///< Line Number
+    );
+
     typedef WWISEC_AKRESULT (*WWISEC_AkBackgroundMusicChangeCallbackFunc)(
         bool in_bBackgroundMusicMuted, ///< Flag indicating whether the busses tagged as "background music" in the project are muted or not.
         void* in_pCookie               ///< User-provided data, e.g. a user structure.
@@ -478,9 +482,113 @@ extern "C"
         WWISEC_AkFloorPlane_Default = WWISEC_AkFloorPlane_XZ ///< The Wwise default floor plane is ZX.
     } WWISEC_AkFloorPlane;
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID *out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
+    // Function that the host runtime must call to allow for jobs to execute.
+    // in_jobType is the type originally provided by AkJobMgrSettings::FuncRequestJobWorker.
+    // in_uExecutionTimeUsec is the number of microseconds that the function should execute for before terminating.
+    // Note that the deadline is only checked after each individual job completes execution, so the function may run slightly
+    // longer than intended. The "in_uExecutionTimeUsec" should be considered a suggestion or guideline, not a strict rule.
+    // A value of 0 means that the function will run until there are no more jobs ready to be immediately executed.
+    AK_CALLBACK(void, WWISEC_AkJobWorkerFunc)
+    (
+        WWISEC_AkJobType in_jobType,
+        AkUInt32 in_uExecutionTimeUsec);
+
+    AK_CALLBACK(void, WWISEC_AkJobMgrSettings_FuncRequestJobWorker)
+    (
+        WWISEC_AkJobWorkerFunc in_fnJobWorker, ///< Function passed to host runtime that should be executed. Note that the function provided will exist for as long as the soundengine code is loaded, and will always be the same.
+        WWISEC_AkJobType in_jobType,           ///< The type of job worker that has been requested. This should be passed forward to in_fnJobWorker
+        AkUInt32 in_uNumWorkers,               ///< Number of workers requested
+        void* in_pClientData                   ///< Data provided by client in AkJobMgrSettings
+    );
+
+    /// Settings for the Sound Engine's internal job manager
+    typedef struct WWISEC_AkJobMgrSettings
+    {
+        WWISEC_AkJobMgrSettings_FuncRequestJobWorker fnRequestJobWorker; ///< Function called by the job manager when a new worker needs to be requested. When null, all jobs will be executed on the same thread that calls RenderAudio().
+
+        AkUInt32 uMaxActiveWorkers[WWISEC_AK_NUM_JOB_TYPES]; ///< The maximum number of concurrent workers that will be requested. Must be >= 1 for each jobType.
+
+        AkUInt32 uNumMemorySlabs; ///< Number of memory slabs to pre-allocate for job manager memory. At least one slab per worker thread should be pre-allocated. Default is 1.
+        AkUInt32 uMemorySlabSize; ///< Size of each memory slab used for job manager memory. Must be a power of two. Default is 8K.
+
+        void* pClientData; ///< Arbitrary data that will be passed back to the client when calling FuncRequestJobWorker
+    } WWISEC_AkJobMgrSettings;
+
+    /// External (optional) callback for tracking performance of the sound engine that is called when a timer starts. (only called in Debug and Profile binaries; this is not called in Release)
+    /// in_uPluginID may be non-zero when this function is called, to provide extra data about what context this Timer was started in.
+    /// in_pszZoneName will point to a static string, so the pointer can be stored for later use, not just the contents of the string itself.
+    AK_CALLBACK(void, WWISEC_AkProfilerPushTimerFunc)
+    (
+        WWISEC_AkPluginID in_uPluginID,
+        const char* in_pszZoneName);
+
+    /// External (optional) function for tracking performance of the sound engine that is called when a timer stops. (only called in Debug and Profile binaries; this is not called in Release)
+    AK_CALLBACK(void, WWISEC_AkProfilerPopTimerFunc)
+    ();
+
+    ///< External (optional) function for tracking notable events in the sound engine, to act as a marker or bookmark. (only called in Debug and Profile binaries; this is not called in Release)
+    /// in_uPluginID may be non-zero when this function is called, to provide extra data about what context this Marker was posted in.
+    /// in_pszMarkerName will point to a static string, so the pointer can be stored for later use, not just the contents of the string itself.
+    AK_CALLBACK(void, WWISEC_AkProfilerPostMarkerFunc)
+    (
+        WWISEC_AkPluginID in_uPluginID,
+        const char* in_pszMarkerName);
+
+    /// Platform-independent initialization settings of the sound engine
+    /// \sa
+    /// - <tt>AK::SoundEngine::Init()</tt>
+    /// - <tt>AK::SoundEngine::GetDefaultInitSettings()</tt>
+    /// - \ref soundengine_integration_init_advanced
+    typedef struct WWISEC_AkInitSettings
+    {
+        WWISEC_AkAssertHook pfnAssertHook; ///< External assertion handling function (optional)
+
+        AkUInt32 uMaxNumPaths;                 ///< Maximum number of paths for positioning
+        AkUInt32 uCommandQueueSize;            ///< Size of the command queue, in bytes
+        bool bEnableGameSyncPreparation;       ///< Sets to true to enable AK::SoundEngine::PrepareGameSync usage.
+        AkUInt32 uContinuousPlaybackLookAhead; ///< Number of quanta ahead when continuous containers should instantiate a new voice before which next sounds should start playing. This look-ahead time allows I/O to occur, and is especially useful to reduce the latency of continuous containers with trigger rate or sample-accurate transitions.
+                                               ///< Default is 1 audio quantum, also known as an audio frame. Its size is equal to AkInitSettings::uNumSamplesPerFrame / AkPlatformInitSettings::uSampleRate. For many platforms the default values - which can be overridden - are respectively 1,024 samples and 48 kHz. This gives a default 21.3 ms for an audio quantum, which is adequate if you have a RAM-based streaming device that completes transfers within 20 ms. With 1 look-ahead quantum, voices spawned by continuous containers are more likely to be ready when they are required to play, thereby improving the overall precision of sound scheduling. If your device completes transfers in 30 ms instead, you might consider increasing this value to 2 because it will grant new voices 2 audio quanta (~43 ms) to fetch data.
+
+        AkUInt32 uNumSamplesPerFrame; ///< Number of samples per audio frame (256, 512, 1024, or 2048).
+
+        AkUInt32 uMonitorQueuePoolSize;   ///< Size of the monitoring queue, in bytes. This parameter is not used in Release build.
+        AkUInt32 uCpuMonitorQueueMaxSize; ///< Maximum size of the CPU monitoring queue, per thread, in bytes. This parameter is not used in Release build.
+
+        WWISEC_AkOutputSettings settingsMainOutput; ///< Main output device settings.
+        WWISEC_AkJobMgrSettings settingsJobManager; ///< Settings to configure the behavior of the Sound Engine's internal job manager
+
+        AkUInt32 uMaxHardwareTimeoutMs; ///< Amount of time to wait for HW devices to trigger an audio interrupt. If there is no interrupt after that time, the sound engine will revert to  silent mode and continue operating until the HW finally comes back. Default value: 2000 (2 seconds)
+
+        bool bUseSoundBankMgrThread; ///< Use a separate thread for loading sound banks. Allows asynchronous operations.
+        bool bUseLEngineThread;      ///< Use a separate thread for processing audio. If set to false, audio processing will occur in RenderAudio(). \ref goingfurther_eventmgrthread
+
+        WWISEC_AkBackgroundMusicChangeCallbackFunc BGMCallback; ///< Application-defined audio source change event callback function.
+        void* BGMCallbackCookie;                                ///< Application-defined user data for the audio source change event callback function.
+        AkOSChar* szPluginDLLPath;                              ///< When using DLLs for plugins, specify their path. Leave NULL if DLLs are in the same folder as the game executable.
+
+        WWISEC_AkFloorPlane eFloorPlane; ///< Define the orientation of the the floor plane with respect to the X,Y,Z axes, and which axes represent the side, front and up vectors as a basis for rotations in Wwise.
+                                         ///< AkFloorPlane is used in to orient the Game Object 3D Viewer in Wwise, and in the transformation of geometry instances in Wwise Spatial Audio.
+
+        AkReal32 fGameUnitsToMeters; ///< The number of game units in a meter.
+                                     ///< This setting is used to adapt the size of elements in the Authoring's Game Object 3D Viewer and Audio Object 3D Viewer to meters.
+                                     ///< This setting is also used to simulate real-world positioning of System Audio Objects, to improve the HRTF in some cases.
+
+        AkUInt32 uBankReadBufferSize; ///< The number of bytes read by the BankReader when new data needs to be loaded from disk during serialization. Increasing this trades memory usage for larger, but fewer, file-read events during bank loading.
+
+        AkReal32 fDebugOutOfRangeLimit; ///< Debug setting: Only used when bDebugOutOfRangeCheckEnabled is true.  This defines the maximum values samples can have.  Normal audio must be contained within +1/-1.  This limit should be set higher to allow temporary or short excursions out of range.  Default is 16.
+
+        bool bDebugOutOfRangeCheckEnabled; ///< Debug setting: Enable checks for out-of-range (and NAN) floats in the processing code.  This incurs a small performance hit, but can be enabled in most scenarios.  Will print error messages in the log if invalid values are found at various point in the pipeline. Contact AK Support with the new error messages for more information.
+
+        WWISEC_AkProfilerPushTimerFunc fnProfilerPushTimer;   ///< External (optional) function for tracking performance of the sound engine that is called when a timer starts. (only called in Debug and Profile binaries; this is not called in Release)
+        WWISEC_AkProfilerPopTimerFunc fnProfilerPopTimer;     ///< External (optional) function for tracking performance of the sound engine that is called when a timer stops. (only called in Debug and Profile binaries; this is not called in Release)
+        WWISEC_AkProfilerPostMarkerFunc fnProfilerPostMarker; ///< External (optional) function for tracking significant events in the sound engine, to act as a marker or bookmark. (only called in Debug and Profile binaries; this is not called in Release)
+    } WWISEC_AkInitSettings;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID *out_pOutputDeviceId);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
+
+    void WWISEC_AK_SoundEngine_GetDefaultInitSettings(WWISEC_AkInitSettings* out_settings);
     // END AkSoundEngine
 
 #ifdef __cplusplus

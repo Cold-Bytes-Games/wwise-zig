@@ -24,3 +24,10 @@ pub fn replaceOutput(output_settings: settings.AkOutputSettings, in_device_id: c
         c.WWISEC_AK_SoundEngine_ReplaceOutput(&raw_settings, in_device_id, @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id)),
     );
 }
+
+pub fn getDefaultInitSettings(allocator: std.mem.Allocator, init_settings: *settings.AkInitSettings) !void {
+    var native_settings: c.WWISEC_AkInitSettings = undefined;
+    c.WWISEC_AK_SoundEngine_GetDefaultInitSettings(&native_settings);
+
+    init_settings.* = try settings.AkInitSettings.fromC(allocator, native_settings);
+}
