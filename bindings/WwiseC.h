@@ -435,6 +435,310 @@ extern "C"
     typedef AkUInt32 WWISEC_AkChannelConfig;
     // END AkSpeakerConfig
 
+    // BEGIN Platform-specific (Ak*SoundEngine and AkPlatformFunc)
+    typedef struct WWISEC_WIN_AkThreadProperties
+    {
+        int nPriority;           ///< Thread priority
+        AkUInt32 dwAffinityMask; ///< Affinity mask
+        AkUInt32 uStackSize;     ///< Thread stack size.
+    } WWISEC_WIN_AkThreadProperties;
+
+    typedef struct WWISEC_WIN_AkPlatformInitSettings
+    {
+        // Direct sound.
+        void* hWnd; ///< Handle of the window associated with the audio.
+                    ///< Each game must specify the HWND of the application for device detection purposes.
+                    ///< The value returned by GetDefaultPlatformInitSettings is the foreground HWND at
+                    ///< the moment of the initialization of the sound engine and might not be the correct one for your game.
+                    ///< Each game must provide the correct HWND to use.
+
+        // Threading model.
+        WWISEC_WIN_AkThreadProperties threadLEngine;     ///< Lower engine threading properties
+        WWISEC_WIN_AkThreadProperties threadOutputMgr;   ///< Ouput thread threading properties
+        WWISEC_WIN_AkThreadProperties threadBankManager; ///< Bank manager threading properties (its default priority is AK_THREAD_PRIORITY_NORMAL)
+        WWISEC_WIN_AkThreadProperties threadMonitor;     ///< Monitor threading properties (its default priority is AK_THREAD_PRIORITY_ABOVENORMAL). This parameter is not used in Release build.
+
+        // Voices.
+        AkUInt16 uNumRefillsInVoice; ///< Number of refill buffers in voice buffer. 2 == double-buffered, defaults to 4.
+
+        AkUInt32 uSampleRate; ///< Sampling Rate. Default is 48000 Hz. Use 24000hz for low quality. Any positive reasonable sample rate is supported. However be careful setting a custom value. Using an odd or really low sample rate may result in malfunctionning sound engine.
+
+        bool bEnableAvxSupport; ///< Enables run-time detection of AVX and AVX2 SIMD support in the engine and plug-ins. Disabling this may improve CPU performance by allowing for higher CPU clockspeeds.
+
+        AkUInt32 uMaxSystemAudioObjects; ///< Dictates how many Microsoft Spatial Sound dynamic objects will be reserved by the System sink. On Windows, other running processes will be prevented from reserving these objects. Set to 0 to disable the use of System Audio Objects. Default is 128.
+    } WWISEC_WIN_AkPlatformInitSettings;
+
+    typedef struct WWISEC_POSIX_AkThreadProperties
+    {
+        int nPriority;           ///< Thread priority
+        size_t uStackSize;       ///< Thread stack size
+        int uSchedPolicy;        ///< Thread scheduling policy
+        AkUInt32 dwAffinityMask; ///< Affinity mask
+    } WWISEC_POSIX_AkThreadProperties;
+
+    /// \cond !(Web)
+    ///< API used for audio output
+    ///< Use with AkPlatformInitSettings to select the API used for audio output.
+    ///< Use AkAPI_Default, it will select the more appropriate API depending on the computer's capabilities.  Other values should be used for testing purposes.
+    ///< \sa AK::SoundEngine::Init
+    typedef enum WWISEC_AkAudioAPILinux
+    {
+        WWISEC_AkAPI_PulseAudio = 1 << 0,                                   ///< Use PulseAudio (this is the preferred API on Linux)
+        WWISEC_AkAPI_ALSA = 1 << 1,                                         ///< Use ALSA
+        WWISEC_AkAPI_Default = WWISEC_AkAPI_PulseAudio | WWISEC_AkAPI_ALSA, ///< Default value, will select the more appropriate API
+    } WWISEC_AkAudioAPILinux;
+
+    /// Platform specific initialization settings
+    /// \sa AK::SoundEngine::Init
+    /// \sa AK::SoundEngine::GetDefaultPlatformInitSettings
+    typedef struct WWISEC_LINUX_AkPlatformInitSettings
+    {
+        // Threading model.
+        WWISEC_POSIX_AkThreadProperties threadLEngine;     ///< Lower engine threading properties
+        WWISEC_POSIX_AkThreadProperties threadOutputMgr;   ///< Ouput thread threading properties
+        WWISEC_POSIX_AkThreadProperties threadBankManager; ///< Bank manager threading properties (its default priority is AK_THREAD_PRIORITY_NORMAL)
+        WWISEC_POSIX_AkThreadProperties threadMonitor;     ///< Monitor threading properties (its default priority is AK_THREAD_PRIORITY_ABOVENORMAL). This parameter is not used in Release build.
+
+        // Voices.
+        AkUInt32 uSampleRate;             ///< Sampling Rate. Default 48000 Hz
+        AkUInt16 uNumRefillsInVoice;      ///< Number of refill buffers in voice buffer. 2 == double-buffered, defaults to 4.
+        WWISEC_AkAudioAPILinux eAudioAPI; ///< Main audio API to use. Leave to AkAPI_Default for the default sink (default value).
+                                          ///< If a valid audioDeviceShareset plug-in is provided, the AkAudioAPI will be Ignored.
+                                          ///< \ref AkAudioAPI
+        WWISEC_AkDataTypeID sampleType;   ///< Sample type. AK_FLOAT for 32 bit float, AK_INT for 16 bit signed integer, defaults to AK_FLOAT.
+                                          ///< Supported by AkAPI_PulseAudio only.
+    } WWISEC_LINUX_AkPlatformInitSettings;
+
+    /// \cond !(Web)
+    /// Platform specific initialization settings
+    /// \sa AK::SoundEngine::Init
+    /// \sa AK::SoundEngine::GetDefaultPlatformInitSettings
+    typedef struct WWISEC_MACOSX_AkPlatformInitSettings
+    {
+        // Threading model.
+        WWISEC_POSIX_AkThreadProperties threadLEngine;     ///< Lower engine threading properties
+        WWISEC_POSIX_AkThreadProperties threadOutputMgr;   ///< Ouput thread threading properties
+        WWISEC_POSIX_AkThreadProperties threadBankManager; ///< Bank manager threading properties (its default priority is AK_THREAD_PRIORITY_NORMAL)
+        WWISEC_POSIX_AkThreadProperties threadMonitor;     ///< Monitor threading properties (its default priority is AK_THREAD_PRIORITY_ABOVENORMAL). This parameter is not used in Release build.
+
+        AkUInt32 uSampleRate; ///< Sampling Rate. Default 48000 Hz
+        // Voices.
+        AkUInt16 uNumRefillsInVoice; ///< Number of refill buffers in voice buffer. 2 == double-buffered, defaults to 4.
+    } WWISEC_MACOSX_AkPlatformInitSettings;
+
+    /// \cond !(Web)
+    ///< API used for audio output
+    ///< Use with AkPlatformInitSettings to select the API used for audio output.
+    ///< Use AkAudioAPI_Default, it will select the more appropriate API depending on the computer's capabilities.  Other values should be used for testing purposes.
+    ///< \sa AK::SoundEngine::Init
+    typedef enum WWISEC_AkAudioAPIAndroid
+    {
+        WWISEC_AkAudioAPI_AAudio = 1 << 0,                                                  ///< Use AAudio (lower latency, available only for Android 8.1 or above)
+        WWISEC_AkAudioAPI_OpenSL_ES = 1 << 1,                                               ///< Use OpenSL ES (older API, compatible with all Android devices)
+        WWISEC_AkAudioAPI_Default = WWISEC_AkAudioAPI_AAudio | WWISEC_AkAudioAPI_OpenSL_ES, ///< Default value, will select the more appropriate API (AAudio for compatible devices, OpenSL for others)
+    } WWISEC_AkAudioAPIAndroid;
+
+    typedef const void* WWISEC_SLObjectItf;
+    typedef const void* WWISEC_JavaVM;
+    typedef void* WWISEC_jobject;
+
+    /// Platform specific initialization settings
+    /// \sa AK::SoundEngine::Init
+    /// \sa AK::SoundEngine::GetDefaultPlatformInitSettings
+    typedef struct WWISEC_ANDROID_AkPlatformInitSettings
+    {
+        // Threading model.
+        WWISEC_POSIX_AkThreadProperties threadLEngine;     ///< Lower engine threading properties
+        WWISEC_POSIX_AkThreadProperties threadOutputMgr;   ///< Ouput thread threading properties
+        WWISEC_POSIX_AkThreadProperties threadBankManager; ///< Bank manager threading properties (its default priority is AK_THREAD_PRIORITY_NORMAL)
+        WWISEC_POSIX_AkThreadProperties threadMonitor;     ///< Monitor threading properties (its default priority is AK_THREAD_PRIORITY_ABOVENORMAL). This parameter is not used in Release build.
+
+        WWISEC_AkAudioAPIAndroid eAudioAPI; ///< Main audio API to use. Leave to AkAPI_Default for the default sink (default value).
+                                            ///< \ref AkAudioAPI
+
+        AkUInt32 uSampleRate;         ///< Sampling Rate.  Set to 0 to get the native sample rate.  Default value is 0.
+        AkUInt16 uNumRefillsInVoice;  ///< Number of refill buffers in voice buffer.  Defaults to 4.
+        bool bRoundFrameSizeToHWSize; ///< Used when hardware-preferred frame size and user-preferred frame size (AkInitSettings.uNumSamplesPerFrame) are not compatible.
+                                      /// If true (default) the sound engine will initialize to a multiple of the HW setting, close to the user setting.
+                                      /// If false, the user setting is used as is, regardless of the HW preference (might incur a performance hit).
+
+        WWISEC_SLObjectItf pSLEngine; ///< OpenSL engine reference for sharing between various audio components.
+        WWISEC_JavaVM* pJavaVM;       ///< Active JavaVM for the app, used for internal system calls.  Usually provided through the android_app structure given at startup or the NativeActivity. This parameter needs to be set to allow the sound engine initialization.
+        WWISEC_jobject jActivity;     ///< android.app.Activity instance for this application. Usually provided through the android_app structure, or through other means if your application has an overridden activity.
+
+        bool bVerboseSink;      ///< Enable this to inspect sink behavior. Useful for debugging non-standard Android devices.
+        bool bEnableLowLatency; ///< Used the lowest output latency possible for the current hardware.
+                                /// If true (default), the output audio device will be initialized in low-latency operation, allowing for more responsive audio playback on most devices. However, when operating in low-latency mode, some devices may have differences in audio reproduction.
+                                /// If false, the output audio device will be initialized without low-latency operation.
+    } WWISEC_ANDROID_AkPlatformInitSettings;
+
+    /// The IDs of the iOS audio session categories, useful for defining app-level audio behaviours such as inter-app audio mixing policies and audio routing behaviours. These IDs are funtionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session categories. The original prefix "AV" is replaced with "Ak" for the ID names.
+    ///
+    /// \sa
+    /// - \ref AkPlatformInitSettings
+    /// - \ref AkAudioSessionCategoryOptions
+    /// - \ref AkAudioSessionProperties
+    typedef enum WWISEC_IOS_AkAudioSessionCategory
+    {
+        WWISEC_IOS_AkAudioSessionCategoryAmbient,       ///< Audio session category corresponding to the AVAudiosession's AVAudioSessionCategoryAmbient constant
+        WWISEC_IOS_AkAudioSessionCategorySoloAmbient,   ///< Audio session category corresponding to the AVAudiosession's AVAudioSessionCategorySoloAmbient constant
+        WWISEC_IOS_AkAudioSessionCategoryPlayAndRecord, ///< Audio session category corresponding to the AVAudiosession's AVAudioSessionCategoryPlayAndRecord constant
+        WWISEC_IOS_AkAudioSessionCategoryPlayback       ///< Audio session category corresponding to the AVAudiosession's AVAudioSessionCategoryPlayback constant
+    } WWISEC_IOS_AkAudioSessionCategory;
+
+    /// The IDs of the iOS audio session category options, used for customizing the audio session category features. These IDs are funtionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session category options. The original prefix "AV" is replaced with "Ak" for the ID names.
+    /// \remark These options only have an effect with specific audio session categories. See the documentation for each option to learn which category they affect.
+    ///
+    /// \sa
+    /// - \ref AkPlatformInitSettings
+    /// - \ref AkAudioSessionCategory
+    /// - \ref AkAudioSessionProperties
+    typedef enum WWISEC_IOS_AkAudioSessionCategoryOptions
+    {
+        WWISEC_IOS_AkAudioSessionCategoryOptionMixWithOthers = 1,        ///< Same as AVAudioSessionCategoryOptionMixWithOthers. Only affects PlayAndRecord and Playback categories.
+        WWISEC_IOS_AkAudioSessionCategoryOptionDuckOthers = 2,           ///< Same as AVAudioSessionCategoryOptionDuckOthers. Implicitely sets the MixWithOthers option. Only affects PlayAndRecord and Playback categories.
+        WWISEC_IOS_AkAudioSessionCategoryOptionAllowBluetooth = 4,       ///< Same as AVAudioSessionCategoryOptionAllowBluetooth. Only affects PlayAndRecord category.
+        WWISEC_IOS_AkAudioSessionCategoryOptionDefaultToSpeaker = 8,     ///< Same as AVAudioSessionCategoryOptionDefaultToSpeaker. Only affects PlayAndRecord category.
+        WWISEC_IOS_AkAudioSessionCategoryOptionAllowBluetoothA2DP = 0x20 ///< Same as AVAudioSessionCategoryOptionAllowBluetoothA2DP. Only affects PlayAndRecord category.
+    } WWISEC_IOS_AkAudioSessionCategoryOptions;
+
+    /// The IDs of the iOS audio session modes, used for customizing the audio session for typical app types. These IDs are funtionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session category options. The original prefix "AV" is replaced with "Ak" for the ID names.
+    ///
+    /// \sa
+    /// - \ref AkPlatformInitSettings
+    /// - \ref AkAudioSessionProperties
+    typedef enum WWISEC_IOS_AkAudioSessionMode
+    {
+        WWISEC_IOS_AkAudioSessionModeDefault = 0,    ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeDefault constant
+        WWISEC_IOS_AkAudioSessionModeVoiceChat,      ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeVoiceChat constant
+        WWISEC_IOS_AkAudioSessionModeGameChat,       ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeGameChat constant
+        WWISEC_IOS_AkAudioSessionModeVideoRecording, ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeVideoRecording constant
+        WWISEC_IOS_AkAudioSessionModeMeasurement,    ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeMeasurement constant
+        WWISEC_IOS_AkAudioSessionModeMoviePlayback,  ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeMoviePlayback constant
+        WWISEC_IOS_AkAudioSessionModeVideoChat       ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeMoviePlayback constant
+    } WWISEC_IOS_AkAudioSessionMode;
+
+    /// The behavior flags for when iOS audio session is activated. These IDs are functionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session options. The original prefix "AV" is replaced with "Ak" for the ID names.
+    ///
+    /// \sa
+    /// - \ref AkPlatformInitSettings
+    /// - \ref AkAudioSessionProperties
+    typedef enum WWISEC_IOS_AkAudioSessionSetActiveOptions
+    {
+        WWISEC_IOS_AkAudioSessionSetActiveOptionNotifyOthersOnDeactivation = 1 ///< Audio session activation option corresponding to the AVAudiosession's AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation constant
+    } WWISEC_IOS_AkAudioSessionSetActiveOptions;
+
+    /// Flags that can modify the default Sound Engine behavior related to the management of the audio session. These do not have equivalences in the official iOS SDK; they apply uniquely to Wwise's approach to interruption handling.
+    typedef enum WWISEC_IOS_AkAudioSessionBehaviorOptions
+    {
+        WWISEC_IOS_AkAudioSessionBehaviorSuspendInBackground = 0x1 ///< By default, the Sound Engine continues to render audio in the background when using PlayAndRecord or Playback categories. Setting this flag causes the Sound Engine to suspend audio rendering when in the background, thus disabling background audio. Only affects Playback and PlayAndRecord audio session categories.
+    } WWISEC_IOS_AkAudioSessionBehaviorOptions;
+
+    /// The API structure used with AkPlatformInitSettings for specifying iOS audio session for the sound engine.
+    ///
+    /// \sa
+    /// - \ref AkPlatformInitSettings
+    /// - \ref AkAudioSessionCategory
+    /// - \ref AkAudioSessionCategoryOptions
+    /// - \ref AkAudioSessionMode
+    /// - \ref AkAudioSessionSetActiveOptions
+    typedef struct WWISEC_IOS_AkAudioSessionProperties
+    {
+        WWISEC_IOS_AkAudioSessionCategory eCategory;                    ///< \sa AkAudioSessionCategory
+        WWISEC_IOS_AkAudioSessionCategoryOptions eCategoryOptions;      ///< \sa AkAudioSessionCategoryOptions
+        WWISEC_IOS_AkAudioSessionMode eMode;                            ///< \sa AkAudioSessionMode
+        WWISEC_IOS_AkAudioSessionSetActiveOptions eSetActivateOptions;  ///< \sa AkAudioSessionSetActiveOptions
+        WWISEC_IOS_AkAudioSessionBehaviorOptions eAudioSessionBehavior; ///< Flags to change the default Sound Engine behavior related to the management of the iOS Audio Session with regards to application lifecycle events. \sa AkAudioSessionBehaviorFlags
+    } WWISEC_IOS_AkAudioSessionProperties;
+
+    typedef struct WWISEC_AudioBufferList WWISEC_AudioBufferList;
+
+    /// iOS-only callback function prototype used for audio input source plugin. Implement this function to transfer the
+    /// input sample data to the sound engine and perform brief custom processing.
+    /// \remark See the remarks of \ref AkGlobalCallbackFunc.
+    ///
+    /// \sa
+    /// - \ref AkPlatformInitSettings
+    typedef WWISEC_AKRESULT (*WWISEC_IOS_AudioInputCallbackFunc)(
+        WWISEC_AudioBufferList* io_Data, ///< An exposed CoreAudio structure that holds the input audio samples generated from
+                                         ///< audio input hardware. The buffer is pre-allocated by the sound engine and the buffer
+                                         ///< size can be obtained from the structure. Refer to the microphone demo of the IntegrationDemo for an example of usage.
+        void* in_pCookie                 ///< User-provided data, e.g., a user structure.
+    );
+
+    /// iOS-only callback function prototype used for handling audio session interruptions.
+    /// Implementing this is optional, but useful for application-specific responses to interruptions. For example, an application can enable or disable certain UI elements when an interruption begins and ends.
+    /// \remark
+    /// - There is no need to call AK::SoundEngine::Suspend() and AK::SoundEngine::WakeupFromSuspend() in this callback. The sound engine call them internally depending on the interruption status.
+    /// - When in_bEnterInterruption is true, this callback is called \a before the sound engine calls AK::SoundEngine::Suspend(), where the user can take actions to prepare for the suspend, e.g., posting global pause events or switching to a special user interface.
+    /// - When in_bEnterInterruption is false, this callback is called \a before the sound engine calls AK::SoundEngine::WakeFromSuspend(). In this callback, the user can restore suspended resources, e.g., post global resume events or switch back to the default user interface.
+    /// - To receive a callback \a after the Sound Engine has woken up from suspend after an interruption, use AK::SoundEngine::RegisterGlobalCallback with the AkGlobalCallbackLocation_WakeupFromSuspend location instead.
+    ///
+    /// \sa
+    /// - \ref AkGlobalCallbackFunc
+    /// - \ref AkPlatformInitSettings
+    /// - \ref AK::SoundEngine::Suspend
+    /// - \ref AK::SoundEngine::WakeupFromSuspend
+    /// - \ref AK::SoundEngine::RegisterGlobalCallback
+    typedef void (*WWISEC_IOS_AudioInterruptionCallbackFunc)(
+        bool in_bEnterInterruption, ///< Indicating whether or not an interruption is about to start (e.g., an incoming
+                                    ///< call is received) or end (e.g., the incoming call is dismissed).
+
+        void* in_pCookie ///< User-provided data, e.g., a user structure.
+    );
+
+    /// The API structure used for specifying all iOS-specific callback functions and user data from the app side.
+    ///
+    /// \sa
+    /// - \ref AkPlatformInitSettings
+    typedef struct WWISEC_IOS_AkAudioCallbacks
+    {
+        WWISEC_IOS_AudioInputCallbackFunc inputCallback;               ///< Application-defined audio input callback function
+        void* inputCallbackCookie;                                     ///< Application-defined user data for the audio input callback function
+        WWISEC_IOS_AudioInterruptionCallbackFunc interruptionCallback; ///< Application-defined audio interruption callback function
+        void* interruptionCallbackCookie;                              ///< Application-defined user data for the audio interruption callback function
+    } WWISEC_IOS_AkAudioCallbacks;
+
+    /// \cond !(Web)
+    /// Platform specific initialization settings
+    /// \sa AK::SoundEngine::Init
+    /// \sa AK::SoundEngine::GetDefaultPlatformInitSettings
+    /// - \ref AK::SoundEngine::iOS::AkAudioSessionCategory
+    typedef struct WWISEC_IOS_AkPlatformInitSettings
+    {
+        // Threading model.
+        WWISEC_POSIX_AkThreadProperties threadLEngine;     ///< Lower engine threading properties
+        WWISEC_POSIX_AkThreadProperties threadOutputMgr;   ///< Ouput thread threading properties
+        WWISEC_POSIX_AkThreadProperties threadBankManager; ///< Bank manager threading properties (its default priority is AK_THREAD_PRIORITY_NORMAL)
+        WWISEC_POSIX_AkThreadProperties threadMonitor;     ///< Monitor threading properties (its default priority is AK_THREAD_PRIORITY_ABOVENORMAL). This parameter is not used in Release build.
+
+        AkUInt32 uSampleRate; ///< Sampling Rate. Default 48000 Hz
+        // Voices.
+        AkUInt16 uNumRefillsInVoice;                      ///< Number of refill buffers in voice buffer. 2 == double-buffered, defaults to 4
+        WWISEC_IOS_AkAudioSessionProperties audioSession; ///< iOS audio session properties
+        WWISEC_IOS_AkAudioCallbacks audioCallbacks;       ///< iOS audio callbacks
+
+        bool bVerboseSystemOutput; ///< Print additional debugging information specific to iOS to the system output log.
+    } WWISEC_IOS_AkPlatformInitSettings;
+
+#if defined(AK_WIN)
+    typedef WWISEC_WIN_AkThreadProperties WWISEC_AkThreadProperties;
+    typedef WWISEC_WIN_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
+#elif defined(AK_LINUX_DESKTOP)
+typedef WWISEC_POSIX_AkThreadProperties WWISEC_AkThreadProperties;
+typedef WWISEC_LINUX_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
+#elif defined(AK_ANDROID)
+typedef WWISEC_POSIX_AkThreadProperties WWISEC_AkThreadProperties;
+typedef WWISEC_ANDROID_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
+#elif defined(AK_MAC_OS_X)
+typedef WWISEC_POSIX_AkThreadProperties WWISEC_AkThreadProeprties;
+typedef WWISEC_MACOSX_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
+#elif defined(AK_IOS)
+typedef WWISEC_POSIX_AkThreadProperties WWISEC_AkThreadProperties;
+typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
+#endif
+    // END Platform-specific
+
     // BEGIN AkSoundEngine
     AK_CALLBACK(void, WWISEC_AkAssertHook)
     (
@@ -585,10 +889,19 @@ extern "C"
     } WWISEC_AkInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
 
     void WWISEC_AK_SoundEngine_GetDefaultInitSettings(WWISEC_AkInitSettings* out_settings);
+
+    void WWISEC_AK_SoundEngine_GetDefaultPlatformInitSettings(WWISEC_AkPlatformInitSettings* out_platformSettings);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Init(WWISEC_AkInitSettings* in_pSettings, WWISEC_AkPlatformInitSettings* in_pPlatformSettings);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
+
+    void WWISEC_AK_SoundEngine_Term();
+
     // END AkSoundEngine
 
 #ifdef __cplusplus

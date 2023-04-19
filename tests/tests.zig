@@ -22,6 +22,20 @@ test "MemoryMgr dump to file" {
 }
 
 test "AkSoundEngine init" {
+    var memory_settings: AK.AkMemSettings = undefined;
+    AK.MemoryMgr.getDefaultSettings(&memory_settings);
+
+    try AK.MemoryMgr.init(&memory_settings);
+    defer AK.MemoryMgr.term();
+
     var init_settings: AK.AkInitSettings = undefined;
-    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
+    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+
+    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
+
+    init_settings.plugin_dll_path = "C:\\test";
+
+    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    defer AK.SoundEngine.term();
 }
