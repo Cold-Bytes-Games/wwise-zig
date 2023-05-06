@@ -74,7 +74,7 @@ pub const AkOutputSettings = struct {
     }
 };
 
-pub const AkFloorPlane = enum(i32) {
+pub const AkFloorPlane = enum(common.DefaultEnumType) {
     xz = c.WWISEC_AkFloorPlane_XZ,
     xy = c.WWISEC_AkFloorPlane_XY,
     yz = c.WWISEC_AkFloorPlane_YZ,
@@ -298,9 +298,10 @@ pub const WIN_AkPlatformInitSettings = struct {
     }
 };
 
-pub const AkAudioAPILinux = packed struct {
+pub const AkAudioAPILinux = packed struct(u32) {
     pulse_audio: bool = false,
     alsa: bool = false,
+    padding: u30 = 0,
 
     pub const Default = .{ .pulse_audio = true, .alsa = true };
 
@@ -336,7 +337,7 @@ pub const LINUX_AkPlatformInitSettings = struct {
         };
     }
 
-    pub fn toC(self: LINUX_AkPlatformInitSettings) c.Ak_LINUX_PlatformInitSettings {
+    pub fn toC(self: LINUX_AkPlatformInitSettings) c.WWISEC_LINUX_AkPlatformInitSettings {
         return .{
             .threadLEngine = self.thread_l_engine.toC(),
             .threadOutputMgr = self.thread_output_mgr.toC(),
@@ -345,7 +346,7 @@ pub const LINUX_AkPlatformInitSettings = struct {
             .uSampleRate = self.sample_rate,
             .uNumRefillsInVoice = self.num_refills_in_voice,
             .eAudioAPI = self.audio_api.toC(),
-            .sampleType = self.sample_type.toC(),
+            .sampleType = self.sample_type,
         };
     }
 };

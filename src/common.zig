@@ -272,3 +272,8 @@ pub fn toCString(allocator: std.mem.Allocator, value: []const u8) ![:0]u8 {
 pub fn stackCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackFallbackAllocator(wwise_options.string_stack_size) {
     return std.heap.stackFallback(wwise_options.string_stack_size, fallback_allocator);
 }
+
+pub const DefaultEnumType = switch (builtin.abi) {
+    .msvc => i32,
+    else => u32,
+};
