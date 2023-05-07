@@ -54,6 +54,8 @@ pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !
 }
 ```
 
+### Handling C++ interfaces and inheritance
+
 ## Supported platforms
 
 | Platform | Architecture           |  Tested |

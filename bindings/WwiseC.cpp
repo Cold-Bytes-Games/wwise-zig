@@ -168,5 +168,61 @@ void WWISEC_AK_SoundEngine_Term()
 {
     AK::SoundEngine::Term();
 }
-
 // END AkSoundEngine
+
+class TestVTable
+{
+  public:
+    virtual ~TestVTable()
+    {
+        fprintf(stderr, "~TestVTable()\n");
+    }
+
+    virtual void Print(int value) = 0;
+};
+
+class TestVTable_Default : public TestVTable
+{
+    void Print(int) override
+    {
+    }
+};
+
+TestVTable* testVtableInstance = nullptr;
+
+template <typename T>
+inline void WWISEC_CallVirtualDestructor(T* instance)
+{
+    using DestructorFn = void (*)(T* instance);
+
+    char dummyClassInstance[sizeof(T)];
+    new (dummyClassInstance) T();
+    DestructorFn** vtable = reinterpret_cast<DestructorFn**>(dummyClassInstance);
+    if (vtable[0])
+    {
+        (*vtable[0])(instance);
+    }
+}
+
+void WWISEC_TestVTable_dtor(void* dynamic)
+{
+    WWISEC_CallVirtualDestructor(reinterpret_cast<TestVTable_Default*>(dynamic));
+}
+
+void WWISEC_SetTestVTable(void* dynamic)
+{
+    testVtableInstance = reinterpret_cast<TestVTable*>(dynamic);
+}
+
+void WWISEC_CallTest()
+{
+    if (testVtableInstance)
+    {
+        testVtableInstance->Print(4269420);
+    }
+}
+
+void WWISEC_DtorFromCppSide(void* dynamic)
+{
+    reinterpret_cast<TestVTable*>(dynamic)->~TestVTable();
+}

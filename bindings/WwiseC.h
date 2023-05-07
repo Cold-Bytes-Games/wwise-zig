@@ -39,6 +39,12 @@ extern "C"
 #include <AK/AkPlatforms.h>
 #include <AK/SoundEngine/Common/AkSoundEngineExport.h>
 
+#if defined(_MSC_VER)
+#define WWISEC_VTABLE_HEADER const void* __vtable_header[1]
+#else
+#define WWISEC_VTABLE_HEADER const void* __vtable_header[2]
+#endif
+
     // BEGIN AkTypes
     typedef AkUInt32 WWISEC_AkUniqueID;          ///< Unique 32-bit ID
     typedef AkUInt32 WWISEC_AkStateID;           ///< State ID
@@ -903,7 +909,18 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_SoundEngine_Term();
 
     // END AkSoundEngine
+    typedef struct WWISEC_TestVTable
+    {
+        WWISEC_VTABLE_HEADER;
 
+        void (*Print)(void* in_self, int value);
+    } WWISEC_TestVTable;
+
+    void WWISEC_TestVTable_dtor(void* dynamic);
+
+    void WWISEC_SetTestVTable(void* dynamic);
+    void WWISEC_CallTest();
+    void WWISEC_DtorFromCppSide(void* dynamic);
 #ifdef __cplusplus
 }
 #endif

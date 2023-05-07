@@ -273,6 +273,42 @@ pub fn stackCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackF
     return std.heap.stackFallback(wwise_options.string_stack_size, fallback_allocator);
 }
 
+pub fn VirtualDestructor(comptime T: type) type {
+    return switch (builtin.abi) {
+        .msvc => extern struct {
+            destructor: ?*const fn (self: *T) callconv(.C) void = null,
+
+            pub fn call(self: @This(), instance: *T) void {
+                if (self.destructor) |dtor| {
+                    dtor(instance);
+                }
+            }
+        },
+        else => extern struct {
+            destructor: ?*const fn (iself: *T) callconv(.C) void = null,
+            destructor_with_delete: ?*const fn (iself: *T) callconv(.C) void = null,
+
+            pub fn call(self: @This(), instance: *T) void {
+                if (self.destructor) |dtor| {
+                    dtor(instance);
+                }
+            }
+        },
+    };
+}
+
+pub fn CastMethods(comptime T: type) type {
+    return extern struct {
+        pub inline fn cast(instance: ?*anyopaque) *T {
+            return @ptrCast(*T, @alignCast(@alignOf(*T), instance));
+        }
+
+        pub inline fn constCast(instance: ?*const anyopaque) *const T {
+            return @ptrCast(*const T, @alignCast(@alignOf(*const T), instance));
+        }
+    };
+}
+
 pub const DefaultEnumType = switch (builtin.abi) {
     .msvc => i32,
     else => u32,
