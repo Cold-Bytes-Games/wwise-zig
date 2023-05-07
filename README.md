@@ -15,11 +15,11 @@ This is a 3rd party binding and it is not affiliated with Audiokinetic.
 Available options:
 | Option | Values | Description |
 | -- | -- | -- |
-| `override_wwise_sdk` | []const u8 | Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK") |
+| `override_wwise_sdk` | `[]const u8` | Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK") |
 | `configuration` | debug, profile, release | Which library configuration of Wwise to use |
-| `use_static_crt` | bool | On Windows, do you want to use the StaticCRT build of Wwise |
-| `use_communication` | bool | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time |
-| `string_stack_size` | usize | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 512) |
+| `use_static_crt` | `bool` | On Windows, do you want to use the StaticCRT build of Wwise |
+| `use_communication` | `bool` | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time |
+| `string_stack_size` | `usize` | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 512) |
 
 We recommend using `AK` as your import name to match closely with the C++ API.
 
