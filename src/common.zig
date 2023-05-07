@@ -150,7 +150,7 @@ pub const WwiseError = error{
     UnknownFileError,
 };
 
-pub fn handleAkResult(result: c.WWISEC_AKRESULT) WwiseError!void {
+pub inline fn handleAkResult(result: c.WWISEC_AKRESULT) WwiseError!void {
     return switch (result) {
         c.WWISEC_AK_NotImplemented => return WwiseError.NotImplemented,
         c.WWISEC_AK_Success => return,

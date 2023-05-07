@@ -26,7 +26,9 @@ SOFTWARE.
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>
 #include <AK/SoundEngine/Common/AkModule.h>
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
+#include <AK/SoundEngine/Common/AkStreamMgrModule.h>
 #include <AK/SoundEngine/Common/AkTypes.h>
+#include <AK/SoundEngine/Common/IAkStreamMgr.h>
 
 #include <new>
 
@@ -170,59 +172,29 @@ void WWISEC_AK_SoundEngine_Term()
 }
 // END AkSoundEngine
 
-class TestVTable
+// BEGIN IAkStreamMgr
+void* WWISEC_AK_IAkStreamMgr_Get()
 {
-  public:
-    virtual ~TestVTable()
-    {
-        fprintf(stderr, "~TestVTable()\n");
-    }
+    return AK::IAkStreamMgr::Get();
+}
+// END IAkStreamMgr
 
-    virtual void Print(int value) = 0;
-};
+// BEGIN StreamMgrModule
+static_assert(sizeof(WWISEC_AkStreamMgrSettings) == sizeof(AkStreamMgrSettings));
+static_assert(sizeof(WWISEC_AkDeviceSettings) == sizeof(AkDeviceSettings));
 
-class TestVTable_Default : public TestVTable
+void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings)
 {
-    void Print(int) override
-    {
-    }
-};
-
-TestVTable* testVtableInstance = nullptr;
-
-template <typename T>
-inline void WWISEC_CallVirtualDestructor(T* instance)
-{
-    using DestructorFn = void (*)(T* instance);
-
-    char dummyClassInstance[sizeof(T)];
-    new (dummyClassInstance) T();
-    DestructorFn** vtable = reinterpret_cast<DestructorFn**>(dummyClassInstance);
-    if (vtable[0])
-    {
-        (*vtable[0])(instance);
-    }
+    return AK::StreamMgr::Create(*reinterpret_cast<AkStreamMgrSettings*>(in_settings));
 }
 
-void WWISEC_TestVTable_dtor(void* dynamic)
+void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings)
 {
-    WWISEC_CallVirtualDestructor(reinterpret_cast<TestVTable_Default*>(dynamic));
+    AK::StreamMgr::GetDefaultSettings(*reinterpret_cast<AkStreamMgrSettings*>(out_settings));
 }
 
-void WWISEC_SetTestVTable(void* dynamic)
+void WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(WWISEC_AkDeviceSettings* out_settings)
 {
-    testVtableInstance = reinterpret_cast<TestVTable*>(dynamic);
+    AK::StreamMgr::GetDefaultDeviceSettings(*reinterpret_cast<AkDeviceSettings*>(out_settings));
 }
-
-void WWISEC_CallTest()
-{
-    if (testVtableInstance)
-    {
-        testVtableInstance->Print(4269420);
-    }
-}
-
-void WWISEC_DtorFromCppSide(void* dynamic)
-{
-    reinterpret_cast<TestVTable*>(dynamic)->~TestVTable();
-}
+// END StreamMgrModule

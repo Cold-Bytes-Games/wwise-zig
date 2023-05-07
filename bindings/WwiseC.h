@@ -909,18 +909,37 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_SoundEngine_Term();
 
     // END AkSoundEngine
-    typedef struct WWISEC_TestVTable
+
+    // BEGIN IAkStreamMgr
+    void* WWISEC_AK_IAkStreamMgr_Get();
+    // END IAkStreamMgr
+
+    // BEGIN AkStreamMgrModule
+    typedef struct WWISEC_AkStreamMgrSettings
     {
-        WWISEC_VTABLE_HEADER;
+    } WWISEC_AkStreamMgrSettings;
 
-        void (*Print)(void* in_self, int value);
-    } WWISEC_TestVTable;
+    typedef struct WWISEC_AkDeviceSettings
+    {
+        void* pIOMemory;                            ///< Pointer for I/O memory allocated by user.
+                                                    ///< Pass NULL if you want memory to be allocated via AK::MemoryMgr::Malign().
+                                                    ///< If specified, uIOMemorySize, uIOMemoryAlignment and ePoolAttributes are ignored.
+        AkUInt32 uIOMemorySize;                     ///< Size of memory for I/O (for automatic streams). It is passed directly to AK::MemoryMgr::Malign(), after having been rounded down to a multiple of uGranularity.
+        AkUInt32 uIOMemoryAlignment;                ///< I/O memory alignment. It is passed directly to AK::MemoryMgr::Malign().
+        AkUInt32 ePoolAttributes;                   ///< Attributes for I/O memory. Here, specify the allocation type (AkMemType_Device, and so on). It is passed directly to AK::MemoryMgr::Malign().
+        AkUInt32 uGranularity;                      ///< I/O requests granularity (typical bytes/request).
+        AkUInt32 uSchedulerTypeFlags;               ///< Scheduler type flags.
+        WWISEC_AkThreadProperties threadProperties; ///< Scheduler thread properties.
+        AkReal32 fTargetAutoStmBufferLength;        ///< Targetted automatic stream buffer length (ms). When a stream reaches that buffering, it stops being scheduled for I/O except if the scheduler is idle.
+        AkUInt32 uMaxConcurrentIO;                  ///< Maximum number of transfers that can be sent simultaneously to the Low-Level I/O.
+        bool bUseStreamCache;                       ///< If true, the device attempts to reuse I/O buffers that have already been streamed from disk. This is particularly useful when streaming small looping sounds. However, there is a small increase in CPU usage when allocating memory, and a slightly larger memory footprint in the StreamManager pool.
+        AkUInt32 uMaxCachePinnedBytes;              ///< Maximum number of bytes that can be "pinned" using AK::SoundEngine::PinEventInStreamCache() or AK::IAkStreamMgr::PinFileInCache()
+    } WWISEC_AkDeviceSettings;
 
-    void WWISEC_TestVTable_dtor(void* dynamic);
-
-    void WWISEC_SetTestVTable(void* dynamic);
-    void WWISEC_CallTest();
-    void WWISEC_DtorFromCppSide(void* dynamic);
+    void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings);
+    void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings);
+    void WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(WWISEC_AkDeviceSettings* out_settings);
+    // END AkStreamMgrModule
 #ifdef __cplusplus
 }
 #endif
