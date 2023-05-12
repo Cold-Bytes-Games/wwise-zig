@@ -10,6 +10,19 @@ The library assumes that you installed Wwise using the Wwise Launcher. We do not
 
 This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
+## Versioning info
+
+This binding mimic the versioning of Wwise but add the Zig binding version at the end.
+
+Example:
+
+2022.1.4-zig0
+
+* 2022 = year
+* 1 = major Wwise version
+* 4 = minor Wwise version
+* -zig0 = Zig binding version
+
 ## Usage
 
 Available options:
