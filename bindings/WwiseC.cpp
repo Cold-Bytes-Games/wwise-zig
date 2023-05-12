@@ -32,16 +32,18 @@ SOFTWARE.
 
 #include <new>
 
+#define WWISEC_ASSERT_ENUM_VALUE_SAME(name) static_assert(static_cast<std::size_t>(WWISEC_##name) == static_cast<std::size_t>(name))
+
 // BEGIN AkTypes
-static_assert(static_cast<std::size_t>(WWISEC_AK_UnknownFileError) == static_cast<std::size_t>(AK_UnknownFileError));
-static_assert(static_cast<std::size_t>(WWISEC_AK_NUM_JOB_TYPES) == static_cast<std::size_t>(AK_NUM_JOB_TYPES));
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_UnknownFileError);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_NUM_JOB_TYPES);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AkDeviceState_All);
 static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
-static_assert(static_cast<std::size_t>(WWISEC_AkDeviceState_All) == static_cast<std::size_t>(AkDeviceState_All));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 // END AkTypes
 
 // BEGIN AkMemoryMgr
-static_assert(static_cast<std::size_t>(WWISEC_AkMemID_NUM) == static_cast<std::size_t>(AkMemID_NUM));
+WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
 static_assert(sizeof(WWISEC_AK_MemoryMgr_CategoryStats) == sizeof(AK::MemoryMgr::CategoryStats));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_GlobalStats) == sizeof(AK::MemoryMgr::GlobalStats));
 
@@ -173,6 +175,18 @@ void WWISEC_AK_SoundEngine_Term()
 // END AkSoundEngine
 
 // BEGIN IAkStreamMgr
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_StmStatusError);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MoveEnd);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_OpenModeReadWrite);
+static_assert(sizeof(WWISEC_AkFileSystemFlags) == sizeof(AkFileSystemFlags));
+static_assert(sizeof(WWISEC_AkStreamInfo) == sizeof(AkStreamInfo));
+static_assert(sizeof(WWISEC_AkAutoStmHeuristics) == sizeof(AkAutoStmHeuristics));
+static_assert(sizeof(WWISEC_AkAutoStmBufSettings) == sizeof(WWISEC_AkAutoStmBufSettings));
+static_assert(sizeof(WWISEC_AkDeviceDesc) == sizeof(AkDeviceDesc));
+static_assert(sizeof(WWISEC_AkDeviceData) == sizeof(AkDeviceData));
+static_assert(sizeof(WWISEC_AkStreamRecord) == sizeof(AkStreamRecord));
+static_assert(sizeof(WWISEC_AkStreamData) == sizeof(AkStreamData));
+
 void* WWISEC_AK_IAkStreamMgr_Get()
 {
     return AK::IAkStreamMgr::Get();

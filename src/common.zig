@@ -299,12 +299,12 @@ pub fn VirtualDestructor(comptime T: type) type {
 
 pub fn CastMethods(comptime T: type) type {
     return extern struct {
-        pub inline fn cast(instance: ?*anyopaque) *T {
-            return @ptrCast(*T, @alignCast(@alignOf(*T), instance));
+        pub inline fn cast(instance: ?*anyopaque) ?*T {
+            return @ptrCast(?*T, @alignCast(@alignOf(?*T), instance));
         }
 
-        pub inline fn constCast(instance: ?*const anyopaque) *const T {
-            return @ptrCast(*const T, @alignCast(@alignOf(*const T), instance));
+        pub inline fn constCast(instance: ?*const anyopaque) ?*const T {
+            return @ptrCast(?*const T, @alignCast(@alignOf(?*const T), instance));
         }
     };
 }

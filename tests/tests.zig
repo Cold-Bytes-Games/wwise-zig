@@ -49,3 +49,35 @@ test "AkSoundEngine init" {
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
     defer AK.SoundEngine.term();
 }
+
+test "AkDeviceDesc toC()" {
+    var device_desc = AK.AkDeviceDesc{
+        .device_id = 0,
+        .can_write = true,
+        .can_read = true,
+        .device_name = "Zig test",
+    };
+
+    var raw_device_desc = try device_desc.toC();
+
+    try std.testing.expectEqualSlices(u16, std.unicode.utf8ToUtf16LeStringLiteral("Zig test"), raw_device_desc.szDeviceName[0..raw_device_desc.uStringSize]);
+    try std.testing.expectEqual(device_desc.device_name.len, raw_device_desc.uStringSize);
+}
+
+test "AkStreamRecord toC()" {
+    var stream_record = AK.AkStreamRecord{
+        .stream_id = 0,
+        .device_id = 0,
+        .stream_name = "Test Stream",
+        .file_size = 123456,
+        .custom_param_size = 256,
+        .custom_param = 42,
+        .is_auto_stream = false,
+        .is_caching_stream = true,
+    };
+
+    var raw_stream_record = try stream_record.toC();
+
+    try std.testing.expectEqualSlices(u16, std.unicode.utf8ToUtf16LeStringLiteral("Test Stream"), raw_stream_record.szStreamName[0..raw_stream_record.uStringSize]);
+    try std.testing.expectEqual(stream_record.stream_name.len, raw_stream_record.uStringSize);
+}

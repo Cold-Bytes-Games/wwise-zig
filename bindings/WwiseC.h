@@ -910,7 +910,156 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     // END AkSoundEngine
 
-    // BEGIN IAkStreamMgr
+// BEGIN IAkStreamMgr
+#define WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH (64)
+#define WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH (16)
+
+    /// Stream status.
+    typedef enum WWISEC_AkStmStatus
+    {
+        WWISEC_AK_StmStatusIdle = 0,      ///< The stream is idle
+        WWISEC_AK_StmStatusCompleted = 1, ///< Operation completed / Automatic stream reached end
+        WWISEC_AK_StmStatusPending = 2,   ///< Operation pending / The stream is waiting for I/O
+        WWISEC_AK_StmStatusCancelled = 3, ///< Operation cancelled
+        WWISEC_AK_StmStatusError = 4      ///< The low-level I/O reported an error
+    } WWISEC_AkStmStatus;
+
+    /// Move method for position change.
+    /// \sa
+    /// - AK::IAkStdStream::SetPosition()
+    /// - AK::IAkAutoStream::SetPosition()
+    typedef enum WWISEC_AkMoveMethod
+    {
+        WWISEC_AK_MoveBegin = 0,   ///< Move offset from the start of the stream
+        WWISEC_AK_MoveCurrent = 1, ///< Move offset from the current stream position
+        WWISEC_AK_MoveEnd = 2      ///< Move offset from the end of the stream
+    } WWISEC_AkMoveMethod;
+
+    /// File open mode.
+    typedef enum WWISEC_AkOpenMode
+    {
+        WWISEC_AK_OpenModeRead = 0,       ///< Read-only access
+        WWISEC_AK_OpenModeWrite = 1,      ///< Write-only access (opens the file if it already exists)
+        WWISEC_AK_OpenModeWriteOvrwr = 2, ///< Write-only access (deletes the file if it already exists)
+        WWISEC_AK_OpenModeReadWrite = 3   ///< Read and write access
+    } WWISEC_AkOpenMode;
+
+    typedef struct WWISEC_AkFileSystemFlags
+    {
+        AkUInt32 uCompanyID;        ///< Company ID (Wwise uses AKCOMPANYID_AUDIOKINETIC, defined in AkTypes.h, for soundbanks and standard streaming files, and AKCOMPANYID_AUDIOKINETIC_EXTERNAL for streaming external sources).
+        AkUInt32 uCodecID;          ///< File/codec type ID (defined in AkTypes.h)
+        AkUInt32 uCustomParamSize;  ///< Size of the custom parameter
+        void* pCustomParam;         ///< Custom parameter
+        bool bIsLanguageSpecific;   ///< True when the file location depends on language
+        bool bIsAutomaticStream;    ///< True when the file is opened to be used as an automatic stream. Note that you don't need to set it.
+                                    ///< If you pass an AkFileSystemFlags to IAkStreamMgr CreateStd|Auto(), it will be set internally to the correct value.
+        WWISEC_AkFileID uCacheID;   ///< Cache ID for caching system used by automatic streams. The user is responsible for guaranteeing unicity of IDs.
+                                    ///< When set, it supersedes the file ID passed to AK::IAkStreamMgr::CreateAuto() (ID version). Caching is optional and depends on the implementation.
+        AkUInt32 uNumBytesPrefetch; ///< Indicates the number of bytes from the beginning of the file that should be streamed into cache via a caching stream. This field is only relevant when opening caching streams via
+                                    ///< AK::IAkStreamMgr::PinFileInCache() and AK::SoundEngine::PinEventInStreamCache().  When using AK::SoundEngine::PinEventInStreamCache(),
+                                    ///< it is initialized to the prefetch size stored in the sound bank, but may be changed by the file location resolver, or set to 0 to cancel caching.
+        AkUInt32 uDirectoryHash;    ///< If the implementation uses a hashed directory structure, this is the hash value that should be employed for determining the directory structure
+    } WWISEC_AkFileSystemFlags;
+
+    typedef struct WWISEC_AkStreamInfo
+    {
+        WWISEC_AkDeviceID deviceID; ///< Device ID
+        const AkOSChar* pszName;    ///< User-defined stream name (specified through AK::IAkStdStream::SetStreamName() or AK::IAkAutoStream::SetStreamName())
+        AkUInt64 uSize;             ///< Total stream/file size in bytes
+        bool bIsOpen;               ///< True when the file is open (implementations may defer file opening)
+    } WWISEC_AkStreamInfo;
+
+    /// Automatic streams heuristics.
+    typedef struct WWISEC_AkAutoStmHeuristics
+    {
+        AkReal32 fThroughput;       ///< Average throughput in bytes/ms
+        AkUInt32 uLoopStart;        ///< Set to the start of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
+        AkUInt32 uLoopEnd;          ///< Set to the end of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
+        AkUInt8 uMinNumBuffers;     ///< Minimum number of buffers if you plan to own more than one buffer at a time, 0 or 1 otherwise
+                                    ///< \remarks You should always release buffers as fast as possible, therefore this heuristic should be used only when
+                                    ///< dealing with special contraints, like drivers or hardware that require more than one buffer at a time.\n
+                                    ///< Also, this is only a heuristic: it does not guarantee that data will be ready when calling AK::IAkAutoStream::GetBuffer().
+        WWISEC_AkPriority priority; ///< The stream priority. it should be between AK_MIN_PRIORITY and AK_MAX_PRIORITY (included).
+    } WWISEC_AkAutoStmHeuristics;
+
+    /// Automatic streams buffer settings/constraints.
+    typedef struct WWISEC_AkAutoStmBufSettings
+    {
+        AkUInt32 uBufferSize;    ///< Hard user constraint: When non-zero, forces the I/O buffer to be of size uBufferSize
+                                 ///< (overriding the device's granularity).
+                                 ///< Otherwise, the size is determined by the device's granularity.
+        AkUInt32 uMinBufferSize; ///< Soft user constraint: When non-zero, specifies a minimum buffer size
+                                 ///< \remarks Ignored if uBufferSize is specified.
+        AkUInt32 uBlockSize;     ///< Hard user constraint: When non-zero, buffer size will be a multiple of that number, and returned addresses will always be aligned on multiples of this value.
+    } WWISEC_AkAutoStmBufSettings;
+
+#pragma pack(push, 4)
+
+    /// Device descriptor.
+    typedef struct WWISEC_AkDeviceDesc
+    {
+        WWISEC_AkDeviceID deviceID;                                   ///< Device ID
+        bool bCanWrite;                                               ///< Specifies whether or not the device is writable
+        bool bCanRead;                                                ///< Specifies whether or not the device is readable
+        AkUtf16 szDeviceName[WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH]; ///< Device name
+        AkUInt32 uStringSize;                                         ///< Device name string's size (number of characters)
+    } WWISEC_AkDeviceDesc;
+
+    /// Device descriptor.
+    typedef struct WWISEC_AkDeviceData
+    {
+        WWISEC_AkDeviceID deviceID;             ///< Device ID
+        AkUInt32 uMemSize;                      ///< IO memory pool size
+        AkUInt32 uMemUsed;                      ///< IO memory pool used
+        AkUInt32 uAllocs;                       ///< Cumulative number of allocations
+        AkUInt32 uFrees;                        ///< Cumulative number of deallocations
+        AkUInt32 uPeakRefdMemUsed;              ///< Memory peak since monitoring started
+        AkUInt32 uUnreferencedCachedBytes;      ///< IO memory that is cached but is not currently used for active streams.
+        AkUInt32 uGranularity;                  ///< IO memory pool block size
+        AkUInt32 uNumActiveStreams;             ///< Number of streams that have been active in the previous frame
+        AkUInt32 uTotalBytesTransferred;        ///< Number of bytes transferred, including cached transfers
+        AkUInt32 uLowLevelBytesTransferred;     ///< Number of bytes transferred exclusively via low-level
+        AkReal32 fAvgCacheEfficiency;           ///< Total bytes from cache as a percentage of total bytes.
+        AkUInt32 uNumLowLevelRequestsCompleted; ///< Number of low-level transfers that have completed in the previous monitoring frame
+        AkUInt32 uNumLowLevelRequestsCancelled; ///< Number of low-level transfers that were cancelled in the previous monitoring frame
+        AkUInt32 uNumLowLevelRequestsPending;   ///< Number of low-level transfers that are currently pending
+        AkUInt32 uCustomParam;                  ///< Custom number queried from low-level IO.
+        AkUInt32 uCachePinnedBytes;             ///< Number of bytes that can be pinned into cache.
+    } WWISEC_AkDeviceData;
+
+    /// Stream general information.
+    typedef struct WWISEC_AkStreamRecord
+    {
+        AkUInt32 uStreamID;                                           ///< Unique stream identifier
+        WWISEC_AkDeviceID deviceID;                                   ///< Device ID
+        AkUtf16 szStreamName[WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH]; ///< Stream name
+        AkUInt32 uStringSize;                                         ///< Stream name string's size (number of characters)
+        AkUInt64 uFileSize;                                           ///< File size
+        AkUInt32 uCustomParamSize;                                    ///< File descriptor's uCustomParamSize
+        AkUInt32 uCustomParam;                                        ///< File descriptor's pCustomParam (on 32 bits)
+        bool bIsAutoStream;                                           ///< True for auto streams
+        bool bIsCachingStream;                                        ///< True for caching streams
+    } WWISEC_AkStreamRecord;
+
+    /// Stream statistics.
+    typedef struct WWISEC_AkStreamData
+    {
+        AkUInt32 uStreamID; ///< Unique stream identifier
+        // Status (replace)
+        AkUInt32 uPriority;                   ///< Stream priority
+        AkUInt64 uFilePosition;               ///< Current position
+        AkUInt32 uTargetBufferingSize;        ///< Total stream buffer size (specific to IAkAutoStream)
+        AkUInt32 uVirtualBufferingSize;       ///< Size of available data including requested data (specific to IAkAutoStream)
+        AkUInt32 uBufferedSize;               ///< Size of available data (specific to IAkAutoStream)
+        AkUInt32 uNumBytesTransfered;         ///< Transfered amount since last query (Accumulate/Reset)
+        AkUInt32 uNumBytesTransferedLowLevel; ///< Transfered amount (from low-level IO only) since last query (Accumulate/Reset)
+        AkUInt32 uMemoryReferenced;           ///< Amount of streaming memory referenced by this stream
+        AkReal32 fEstimatedThroughput;        ///< Estimated throughput heuristic
+        bool bActive;                         ///< True if this stream has been active (that is, was ready for I/O or had at least one pending I/O transfer, uncached or not) in the previous frame
+    } WWISEC_AkStreamData;
+
+#pragma pack(pop)
+
     void* WWISEC_AK_IAkStreamMgr_Get();
     // END IAkStreamMgr
 
