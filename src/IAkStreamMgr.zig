@@ -370,7 +370,76 @@ pub const IAkStreamProfile = extern struct {
     pub usingnamespace common.CastMethods(@This());
 };
 
-pub const IAkDeviceProfile = extern struct {};
+pub const IAkDeviceProfile = extern struct {
+    __v: *const VTable,
+
+    pub const VTable = extern struct {
+        virtual_destructor: common.VirtualDestructor(IAkDeviceProfile) = .{},
+        on_profile_start: *const fn (iself: *IAkDeviceProfile) callconv(.C) void,
+        on_profile_end: *const fn (iself: *IAkDeviceProfile) callconv(.C) void,
+        get_desc: *const fn (iself: *IAkDeviceProfile, out_device_desc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
+        get_data: *const fn (iself: *IAkDeviceProfile, out_device_data: *c.WWISEC_AkDeviceData) callconv(.C) void,
+        is_new: *const fn (iself: *IAkDeviceProfile) callconv(.C) bool,
+        clear_new: *const fn (iself: *IAkDeviceProfile) callconv(.C) void,
+        get_num_streams: *const fn (iself: *IAkDeviceProfile) callconv(.C) u32,
+        get_stream_profile: *const fn (iself: *IAkDeviceProfile, in_stream_index: u32) callconv(.C) ?*IAkStreamProfile,
+    };
+
+    pub fn Methods(comptime T: type) type {
+        return extern struct {
+            pub inline fn toSelf(iself: *const IAkDeviceProfile) *const T {
+                return @ptrCast(*const T, iself);
+            }
+
+            pub inline fn toMutableSelf(iself: *IAkDeviceProfile) *T {
+                return @ptrCast(*T, iself);
+            }
+
+            pub inline fn deinit(self: *T) void {
+                @ptrCast(*const IAkDeviceProfile.VTable, self.__v).virtual_destructor.call(@ptrCast(*IAkDeviceProfile, self));
+            }
+
+            pub inline fn onProfileStart(self: *T) void {
+                @ptrCast(*const IAkDeviceProfile.VTable, self.__v).on_profile_start(@ptrCast(*IAkDeviceProfile, self));
+            }
+
+            pub inline fn onProfileEnd(self: *T) void {
+                @ptrCast(*const IAkDeviceProfile.VTable, self.__v).on_profile_end(@ptrCast(*IAkDeviceProfile, self));
+            }
+
+            pub inline fn getDesc(self: *T, allocator: std.mem.Allocator, out_device_desc: *AkDeviceDesc) !void {
+                var raw_device_desc: c.WWISEC_AkDeviceDesc = undefined;
+                @ptrCast(*const IAkDeviceProfile.VTable, self.__v).get_desc(@ptrCast(*IAkDeviceProfile, self), &raw_device_desc);
+                out_device_desc.* = try AkDeviceDesc.fromC(raw_device_desc, allocator);
+            }
+
+            pub inline fn getData(self: *T, out_device_data: *AkDeviceData) void {
+                var raw_device_data: c.WWISEC_AkDeviceData = undefined;
+                @ptrCast(*const IAkDeviceProfile.VTable, self.__v).get_data(@ptrCast(*IAkDeviceProfile, self), &raw_device_data);
+                out_device_data.* = AkDeviceData.fromC(raw_device_data);
+            }
+
+            pub inline fn isNew(self: *T) bool {
+                return @ptrCast(*const IAkDeviceProfile.VTable, self.__v).is_new(@ptrCast(*IAkDeviceProfile, self));
+            }
+
+            pub inline fn clearNew(self: *T) void {
+                @ptrCast(*const IAkDeviceProfile.VTable, self.__v).clear_new(@ptrCast(*IAkDeviceProfile, self));
+            }
+
+            pub inline fn getNumStreams(self: *T) u32 {
+                return @ptrCast(*const IAkDeviceProfile.VTable, self.__v).get_num_streams(@ptrCast(*IAkDeviceProfile, self));
+            }
+
+            pub inline fn getStreamProfile(self: *T, in_stream_index: u32) ?*IAkStreamProfile {
+                return @ptrCast(*const IAkDeviceProfile.VTable, self.__v).get_stream_profile(@ptrCast(*IAkDeviceProfile, self), in_stream_index);
+            }
+        };
+    }
+
+    pub usingnamespace Methods(@This());
+    pub usingnamespace common.CastMethods(@This());
+};
 
 pub const IAkStreamMgrProfile = extern struct {};
 
