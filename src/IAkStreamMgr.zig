@@ -441,7 +441,54 @@ pub const IAkDeviceProfile = extern struct {
     pub usingnamespace common.CastMethods(@This());
 };
 
-pub const IAkStreamMgrProfile = extern struct {};
+pub const IAkStreamMgrProfile = extern struct {
+    __v: *const VTable,
+
+    pub const VTable = extern struct {
+        virtual_destructor: common.VirtualDestructor(IAkStreamMgrProfile) = .{},
+        start_monitoring: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) c.WWISEC_AKRESULT,
+        stop_monitoring: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) void,
+        get_num_devices: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) u32,
+        get_device_profile: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) ?*IAkDeviceProfile,
+    };
+
+    pub fn Methods(comptime T: type) type {
+        return extern struct {
+            pub inline fn toSelf(iself: *const IAkStreamMgrProfile) *const T {
+                return @ptrCast(*const T, iself);
+            }
+
+            pub inline fn toMutableSelf(iself: *IAkStreamMgrProfile) *T {
+                return @ptrCast(*T, iself);
+            }
+
+            pub inline fn deinit(self: *T) void {
+                @ptrCast(*const IAkStreamMgrProfile.VTable, self.__v).virtual_destructor.call(@ptrCast(*IAkStreamMgrProfile, self));
+            }
+
+            pub inline fn startMonitoring(self: *T) common.WwiseError!void {
+                return common.handleAkResult(
+                    @ptrCast(*const IAkStreamMgrProfile.VTable, self.__v).start_monitoring(@ptrCast(*IAkStreamMgrProfile, self)),
+                );
+            }
+
+            pub inline fn stopMonitoring(self: *T) void {
+                @ptrCast(*const IAkStreamMgrProfile.VTable, self.__v).stop_monitoring(@ptrCast(*IAkStreamMgrProfile, self));
+            }
+
+            pub inline fn getNumDevices(self: *T) u32 {
+                return @ptrCast(*const IAkStreamMgrProfile.VTable, self.__v).get_num_devices(@ptrCast(*IAkStreamMgrProfile, self));
+            }
+
+            pub inline fn getDeviceProfile(self: *T) ?*IAkDeviceProfile {
+                return @ptrCast(*const IAkStreamMgrProfile.VTable, self.__v).get_device_profile(@ptrCast(*IAkStreamMgrProfile, self));
+            }
+        };
+    }
+
+    pub usingnamespace Methods(@This());
+    pub usingnamespace common.CastMethods(@This());
+};
 
 pub const IAkStdStream = extern struct {};
 
