@@ -319,6 +319,59 @@ pub const AkStreamData = struct {
     }
 };
 
+pub const IAkStreamProfile = extern struct {
+    __v: *const VTable,
+
+    pub const VTable = extern struct {
+        virtual_destructor: common.VirtualDestructor(IAkStreamProfile) = .{},
+        get_stream_record: *const fn (self: *IAkStreamProfile, out_streamRecord: *c.WWISEC_AkStreamRecord) callconv(.C) void,
+        get_stream_data: *const fn (self: *IAkStreamProfile, ouut_streamData: *c.WWISEC_AkStreamData) callconv(.C) void,
+        is_new: *const fn (self: *IAkStreamProfile) callconv(.C) bool,
+        clear_new: *const fn (self: *IAkStreamProfile) callconv(.C) void,
+    };
+
+    pub fn Methods(comptime T: type) type {
+        return extern struct {
+            pub inline fn toSelf(iself: *const IAkStreamProfile) *const T {
+                return @ptrCast(*const T, iself);
+            }
+
+            pub inline fn toMutableSelf(iself: *IAkStreamProfile) *T {
+                return @ptrCast(*T, iself);
+            }
+
+            pub inline fn deinit(self: *T) void {
+                @ptrCast(*const IAkStreamProfile.VTable, self.__v).virtual_destructor.call(@ptrCast(*IAkStreamProfile, self));
+            }
+
+            pub inline fn getStreamRecord(self: *T, allocator: std.mem.Allocator, out_stream_record: *AkStreamRecord) !void {
+                var raw_stream_record: c.WWISEC_AkStreamRecord = undefined;
+                @ptrCast(*const IAkStreamProfile.VTable, self.__v).get_stream_record(@ptrCast(*IAkStreamProfile, self), &raw_stream_record);
+                out_stream_record.* = try AkStreamRecord.fromC(raw_stream_record, allocator);
+            }
+
+            pub inline fn getStreamData(self: *T, out_stream_data: *AkStreamData) void {
+                var raw_stream_data: c.WWISEC_AkStreamData = undefined;
+                @ptrCast(*const IAkStreamProfile.VTable, self.__v).get_stream_data(@ptrCast(*IAkStreamProfile, self), &raw_stream_data);
+                out_stream_data.* = AkStreamData.fromC(raw_stream_data);
+            }
+
+            pub inline fn isNew(self: *T) bool {
+                return @ptrCast(*const IAkStreamProfile.VTable, self.__v).is_new(@ptrCast(*IAkStreamProfile, self));
+            }
+
+            pub inline fn clearNew(self: *T) void {
+                @ptrCast(*const IAkStreamProfile.VTable, self.__v).clear_new(@ptrCast(*IAkStreamProfile, self));
+            }
+        };
+    }
+
+    pub usingnamespace Methods(@This());
+    pub usingnamespace common.CastMethods(@This());
+};
+
+pub const IAkDeviceProfile = extern struct {};
+
 pub const IAkStreamMgrProfile = extern struct {};
 
 pub const IAkStdStream = extern struct {};
@@ -333,7 +386,7 @@ pub const IAkStreamMgr = extern struct {
         destroy: *const fn (
             self: *IAkStreamMgr,
         ) callconv(.C) void,
-        getStreamMgrProfile: *const fn (
+        get_stream_mgr_profile: *const fn (
             self: *IAkStreamMgr,
         ) callconv(.C) ?*IAkStreamMgrProfile,
         create_std_string: *const fn (
@@ -426,7 +479,7 @@ pub const IAkStreamMgr = extern struct {
             }
 
             pub inline fn getStreamMgrProfile(self: *T) ?*IAkStreamMgrProfile {
-                return @ptrCast(*const IAkStreamMgr.VTable, self.__v).getStreamMgrProfile(@ptrCast(*IAkStreamMgr, self));
+                return @ptrCast(*const IAkStreamMgr.VTable, self.__v).get_stream_mgr_profile(@ptrCast(*IAkStreamMgr, self));
             }
 
             pub inline fn createStdString(
