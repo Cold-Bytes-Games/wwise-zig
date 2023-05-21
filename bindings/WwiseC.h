@@ -1085,9 +1085,86 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUInt32 uMaxCachePinnedBytes;              ///< Maximum number of bytes that can be "pinned" using AK::SoundEngine::PinEventInStreamCache() or AK::IAkStreamMgr::PinFileInCache()
     } WWISEC_AkDeviceSettings;
 
+#define WWISEC_AK_SCHEDULER_BLOCKING (0x01)
+#define WWISEC_AK_SCHEDULER_DEFERRED_LINED_UP (0x02)
+
+    typedef struct WWISEC_AkFileDesc
+    {
+        AkInt64 iFileSize;          ///< File size in bytes
+        AkUInt64 uSector;           ///< Start sector (the sector size is specified by the low-level I/O)
+                                    ///< \sa
+                                    ///< - AK::StreamMgr::IAkFileLocationResolver::Open()
+                                    ///< - AK::StreamMgr::IAkLowLevelIOHook::GetBlockSize()
+        AkUInt32 uCustomParamSize;  ///< Size of the custom parameter
+        void* pCustomParam;         ///< Custom parameter
+        AkFileHandle hFile;         ///< File handle/identifier
+        WWISEC_AkDeviceID deviceID; ///< Device ID, obtained from CreateDevice() \sa AK::IAkStreamMgr::CreateDevice()
+        void* pPackage;             ///< If this file is in a File Package, this will be the
+    } WWISEC_AkFileDesc;
+
+    typedef struct WWISEC_AkIOTransferInfo
+    {
+        AkUInt64 uFilePosition;  ///< File offset where transfer should begin.
+        AkUInt32 uBufferSize;    ///< Size of the buffer in which the I/O hook can write to.
+        AkUInt32 uRequestedSize; ///< Exact number of requested bytes for this transfer. Always equal to or smaller than uBufferSize.
+    } WWISEC_AkIOTransferInfo;
+
+    struct WWISEC_AkAsyncIOTransferInfo;
+
+    AK_CALLBACK(void, WWISEC_AkIOCallback)
+    (
+        struct WWISEC_AkAsyncIOTransferInfo* in_pTransferInfo, ///< Pointer to the AkAsyncIOTransferInfo structure that was passed to corresponding Read() or Write() call.
+        WWISEC_AKRESULT in_eResult                             ///< Result of transfer: AK_Success or AK_Fail (streams waiting for this transfer become invalid).
+    );
+
+    AK_CALLBACK(void, WWISEC_AkBatchIOCallback)
+    (
+        AkUInt32 in_uNumTransfers,                               ///< Number of transfers to process
+        struct WWISEC_AkAsyncIOTransferInfo** in_ppTransferInfo, ///< List of pointers to AkAsyncIOTransferInfo structures that were previously passed in to BatchRead() or BatchWrite()
+        WWISEC_AKRESULT* in_peResult                             ///< Array of results of each transfer: AK_Success or AK_Fail (streams waiting for this transfer become invalid).
+    );
+
+    typedef struct WWISEC_AkAsyncIOTransferInfo
+    {
+        WWISEC_AkIOTransferInfo base;
+        void* pBuffer;                 ///< Buffer for data transfer.
+        WWISEC_AkIOCallback pCallback; ///< Callback function used to notify the high-level device when the transfer is complete.
+        void* pCookie;                 ///< Reserved. The I/O device uses this cookie to retrieve the owner of the transfer.
+        void* pUserData;               ///< Custom user data.
+    } WWISEC_AkAsyncIOTransferInfo;
+
+    typedef struct WWISEC_AkIoHeuristics
+    {
+        AkReal32 fDeadline;         ///< Operation deadline (ms).
+        WWISEC_AkPriority priority; ///< Operation priority (at the time it was scheduled and sent to the Low-Level I/O). Range is [AK_MIN_PRIORITY,AK_MAX_PRIORITY], inclusively.
+    } WWISEC_AkIoHeuristics;
+
+    AK_CALLBACK(void, WWISEC_AK_StreamMgr_AkLanguageChangeHandler)
+    (
+        const AkOSChar* const in_pLanguageName, ///< New language name.
+        void* in_pCookie                        ///< Cookie that was passed to AddLanguageChangeObserver().
+    );
+
+    typedef struct WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem
+    {
+        WWISEC_AkFileDesc* pFileDesc;
+        WWISEC_AkIoHeuristics ioHeuristics;
+        WWISEC_AkAsyncIOTransferInfo* pTransferInfo;
+    } WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem;
+
     void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings);
     void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings);
+    void* WWISEC_AK_StreamMgr_GetFileLocationResolver();
+    void WWISEC_AK_StreamMgr_SetFileLocationResolver(void* in_pFileLocationResolver);
+    WWISEC_AkDeviceID WWISEC_AK_StreamMgr_CreateDevice(WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(WWISEC_AkDeviceID in_deviceID);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_PerformIO();
     void WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(WWISEC_AkDeviceSettings* out_settings);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_SetCurrentLanguage(const AkOSChar* in_pszLanguageName);
+    const AkOSChar* WWISEC_AK_StreamMgr_GetCurrentLanguage();
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_AddLanguageChangeObserver(WWISEC_AK_StreamMgr_AkLanguageChangeHandler in_handler, void* in_pCookie);
+    void WWISEC_AK_StreamMgr_RemoveLanguageChangeObserver(void* in_pCookie);
+    void WWISEC_AK_StreamMgr_FlushAllCaches();
     // END AkStreamMgrModule
 #ifdef __cplusplus
 }

@@ -70,6 +70,8 @@ pub const AkJobType_AudioProcessing = c.WWISEC_AkJobType_AudioProcessing;
 pub const AkJobType_SpatialAudio = c.WWISEC_AkJobType_SpatialAudio;
 pub const AK_NUM_JOB_TYPES = c.WWISEC_AK_NUM_JOB_TYPES;
 
+pub const AkFileHandle = ?*anyopaque;
+
 pub const AkPanningRule = enum(u8) {
     speakers = c.WWISEC_AkPanningRule_Speakers,
     headphones = c.WWISEC_AkPanningRule_Headphones,

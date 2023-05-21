@@ -196,6 +196,11 @@ void* WWISEC_AK_IAkStreamMgr_Get()
 // BEGIN StreamMgrModule
 static_assert(sizeof(WWISEC_AkStreamMgrSettings) == sizeof(AkStreamMgrSettings));
 static_assert(sizeof(WWISEC_AkDeviceSettings) == sizeof(AkDeviceSettings));
+static_assert(sizeof(WWISEC_AkFileDesc) == sizeof(AkFileDesc));
+static_assert(sizeof(WWISEC_AkIOTransferInfo) == sizeof(AkIOTransferInfo));
+static_assert(sizeof(WWISEC_AkAsyncIOTransferInfo) == sizeof(AkAsyncIOTransferInfo));
+static_assert(sizeof(WWISEC_AkIoHeuristics) == sizeof(WWISEC_AkIoHeuristics));
+static_assert(sizeof(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem) == sizeof(AK::StreamMgr::IAkIOHookDeferredBatch::BatchIoTransferItem));
 
 void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings)
 {
@@ -207,8 +212,58 @@ void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_sett
     AK::StreamMgr::GetDefaultSettings(*reinterpret_cast<AkStreamMgrSettings*>(out_settings));
 }
 
+void* WWISEC_AK_StreamMgr_GetFileLocationResolver()
+{
+    return AK::StreamMgr::GetFileLocationResolver();
+}
+
+void WWISEC_AK_StreamMgr_SetFileLocationResolver(void* in_pFileLocationResolver)
+{
+    AK::StreamMgr::SetFileLocationResolver(reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(in_pFileLocationResolver));
+}
+
+WWISEC_AkDeviceID WWISEC_AK_StreamMgr_CreateDevice(WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook)
+{
+    return AK::StreamMgr::CreateDevice(*reinterpret_cast<AkDeviceSettings*>(in_settings), reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(in_pLowLevelHook));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(WWISEC_AkDeviceID in_deviceID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::StreamMgr::DestroyDevice(static_cast<AkDeviceID>(in_deviceID)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_PerformIO()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::StreamMgr::PerformIO());
+}
+
 void WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(WWISEC_AkDeviceSettings* out_settings)
 {
     AK::StreamMgr::GetDefaultDeviceSettings(*reinterpret_cast<AkDeviceSettings*>(out_settings));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_SetCurrentLanguage(const AkOSChar* in_pszLanguageName)
+{
+    return WWISEC_AKRESULT(AK::StreamMgr::SetCurrentLanguage(in_pszLanguageName));
+}
+
+const AkOSChar* WWISEC_AK_StreamMgr_GetCurrentLanguage()
+{
+    return AK::StreamMgr::GetCurrentLanguage();
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_AddLanguageChangeObserver(WWISEC_AK_StreamMgr_AkLanguageChangeHandler in_handler, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::StreamMgr::AddLanguageChangeObserver(reinterpret_cast<AK::StreamMgr::AkLanguageChangeHandler>(in_handler), in_pCookie));
+}
+
+void WWISEC_AK_StreamMgr_RemoveLanguageChangeObserver(void* in_pCookie)
+{
+    AK::StreamMgr::RemoveLanguageChangeObserver(in_pCookie);
+}
+
+void WWISEC_AK_StreamMgr_FlushAllCaches()
+{
+    AK::StreamMgr::FlushAllCaches();
 }
 // END StreamMgrModule
