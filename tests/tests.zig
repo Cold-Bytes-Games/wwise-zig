@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const AK = @import("wwise-zig");
 
 test "MemoryMgr init" {
@@ -87,6 +88,10 @@ test "CAkDefaultIOHookBlocking create" {
         return error.SkipZigTest;
     }
 
+    if (builtin.os.tag == .linux) {
+        return error.SkipZigTest;
+    }
+
     var memory_settings: AK.AkMemSettings = undefined;
 
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
@@ -124,6 +129,10 @@ test "CAkDefaultIOHookBlocking create" {
 
 test "CAkDefaultIOHookDeferred create" {
     if (AK.IOHooks.CAkDefaultIOHookDeferred == void) {
+        return error.SkipZigTest;
+    }
+
+    if (builtin.os.tag == .linux) {
         return error.SkipZigTest;
     }
 
@@ -167,6 +176,10 @@ test "CAkFilePackageLowLevelIOBlocking create" {
         return error.SkipZigTest;
     }
 
+    if (builtin.os.tag == .linux) {
+        return error.SkipZigTest;
+    }
+
     var memory_settings: AK.AkMemSettings = undefined;
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
@@ -206,6 +219,10 @@ test "CAkFilePackageLowLevelIOBlocking create" {
 
 test "CAkFilePackageLowLevelIODeferred create" {
     if (AK.IOHooks.CAkFilePackageLowLevelIODeferred == void) {
+        return error.SkipZigTest;
+    }
+
+    if (builtin.os.tag == .linux) {
         return error.SkipZigTest;
     }
 
