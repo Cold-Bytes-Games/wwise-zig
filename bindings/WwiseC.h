@@ -243,6 +243,21 @@ extern "C"
     } WWISEC_AkPanningRule;
     // END AkTypes
 
+    // BEGIN AkCallback
+    typedef struct WWISEC_AkSegmentInfo
+    {
+        WWISEC_AkTimeMs iCurrentPosition;        ///< Current position of the segment, relative to the Entry Cue, in milliseconds. Range is [-iPreEntryDuration, iActiveDuration+iPostExitDuration].
+        WWISEC_AkTimeMs iPreEntryDuration;       ///< Duration of the pre-entry region of the segment, in milliseconds.
+        WWISEC_AkTimeMs iActiveDuration;         ///< Duration of the active region of the segment (between the Entry and Exit Cues), in milliseconds.
+        WWISEC_AkTimeMs iPostExitDuration;       ///< Duration of the post-exit region of the segment, in milliseconds.
+        WWISEC_AkTimeMs iRemainingLookAheadTime; ///< Number of milliseconds remaining in the "looking-ahead" state of the segment, when it is silent but streamed tracks are being prefetched.
+        AkReal32 fBeatDuration;           ///< Beat Duration in seconds.
+        AkReal32 fBarDuration;            ///< Bar Duration in seconds.
+        AkReal32 fGridDuration;           ///< Grid duration in seconds.
+        AkReal32 fGridOffset;             ///< Grid offset in seconds.
+    } WWISEC_AkSegmentInfo;
+    // END AkCallback
+
     // BEGIN AkMemoryMgr
     /// Memory category IDs.
     typedef enum WWISEC_AkMemID
@@ -1171,6 +1186,18 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_StreamMgr_RemoveLanguageChangeObserver(void* in_pCookie);
     void WWISEC_AK_StreamMgr_FlushAllCaches();
     // END AkStreamMgrModule
+
+    // BEGIN AkMusicEngine
+    typedef struct WWISEC_AkMusicSettings
+    {
+        AkReal32 fStreamingLookAheadRatio; ///< Multiplication factor for all streaming look-ahead heuristic values.
+    } WWISEC_AkMusicSettings;
+
+    WWISEC_AKRESULT WWISEC_AK_MusicEngine_Init(WWISEC_AkMusicSettings* in_pSettings);
+    void WWISEC_AK_MusicEngine_GetDefaultInitSettings(WWISEC_AkMusicSettings* out_settings);
+    void WWISEC_AK_MusicEngine_Term();
+    WWISEC_AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate);
+    // END AkMusicEngine
 
     // BEGIN AkCommunication
 #if defined(WWISEC_USE_COMMUNICATION)

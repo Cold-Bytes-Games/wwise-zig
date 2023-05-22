@@ -23,6 +23,9 @@ SOFTWARE.
 */
 #include "WwiseC.h"
 
+#include <AK/MusicEngine/Common/AkMusicEngine.h>
+
+#include <AK/SoundEngine/Common/AkCallback.h>
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>
 #include <AK/SoundEngine/Common/AkModule.h>
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
@@ -42,6 +45,10 @@ static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 static_assert(WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT == AK_COMM_DEFAULT_DISCOVERY_PORT);
 // END AkTypes
+
+// BEGIN AkCallback
+static_assert(sizeof(WWISEC_AkSegmentInfo) == sizeof(AkSegmentInfo));
+// END AkCallback
 
 // BEGIN AkMemoryMgr
 WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
@@ -267,7 +274,32 @@ void WWISEC_AK_StreamMgr_FlushAllCaches()
 {
     AK::StreamMgr::FlushAllCaches();
 }
+
 // END StreamMgrModule
+
+// BEGIN AkMusicEngine
+static_assert(sizeof(WWISEC_AkMusicSettings) == sizeof(AkMusicSettings));
+
+WWISEC_AKRESULT WWISEC_AK_MusicEngine_Init(WWISEC_AkMusicSettings* in_pSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::MusicEngine::Init(reinterpret_cast<AkMusicSettings*>(in_pSettings)));
+}
+
+void WWISEC_AK_MusicEngine_GetDefaultInitSettings(WWISEC_AkMusicSettings* out_settings)
+{
+    AK::MusicEngine::GetDefaultInitSettings(*reinterpret_cast<AkMusicSettings*>(out_settings));
+}
+
+void WWISEC_AK_MusicEngine_Term()
+{
+    AK::MusicEngine::Term();
+}
+
+WWISEC_AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::MusicEngine::GetPlayingSegmentInfo(in_PlayingID, *reinterpret_cast<AkSegmentInfo*>(out_segmentInfo), in_bExtrapolate));
+}
+// END AkMusicEngine
 
 // BEGIN AkCommunication
 #if defined(WWISEC_USE_COMMUNICATION)
