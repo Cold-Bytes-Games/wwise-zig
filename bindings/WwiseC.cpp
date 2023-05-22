@@ -135,7 +135,7 @@ static_assert(sizeof(WWISEC_AkPlatformInitSettings) == sizeof(AkPlatformInitSett
 
 void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
 {
-    new (outputSettings) AkOutputSettings(in_szDeviceShareSet, static_cast<AkUniqueID>(in_idDevice), *reinterpret_cast<AkChannelConfig*>(&in_channelConfig), static_cast<AkPanningRule>(in_ePanning));
+    ::new (outputSettings) AkOutputSettings(in_szDeviceShareSet, static_cast<AkUniqueID>(in_idDevice), *reinterpret_cast<AkChannelConfig*>(&in_channelConfig), static_cast<AkPanningRule>(in_ePanning));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
@@ -267,3 +267,189 @@ void WWISEC_AK_StreamMgr_FlushAllCaches()
     AK::StreamMgr::FlushAllCaches();
 }
 // END StreamMgrModule
+
+// BEGIN IO Hooks
+#if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
+#include <AkDefaultIOHookBlocking.h>
+size_t WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof()
+{
+    return sizeof(CAkDefaultIOHookBlocking);
+}
+
+void* WWISEC_AK_CAkDefaultIOHookBlocking_Create(char* in_ioHookBuffer)
+{
+    ::new (in_ioHookBuffer) CAkDefaultIOHookBlocking();
+    return reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHookBuffer);
+}
+
+void WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(void* in_ioHook)
+{
+#if defined(AK_WIN)
+    reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->~CAkDefaultIOHookBlocking();
+#endif
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+}
+
+void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook)
+{
+    reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Term();
+}
+#endif
+
+#if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED)
+#include <AkDefaultIOHookDeferred.h>
+
+size_t WWISEC_AK_CAkDefaultIOHookDeferred_Sizeof()
+{
+    return sizeof(CAkDefaultIOHookDeferred);
+}
+
+void* WWISEC_AK_CAkDefaultIOHookDeferred_Create(char* in_ioHookBuffer)
+{
+    new (in_ioHookBuffer) CAkDefaultIOHookDeferred();
+    return reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHookBuffer);
+}
+
+void WWISEC_AK_CAkDefaultIOHookDeferred_Destroy(void* in_ioHook)
+{
+#if defined(AK_WIN)
+    reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->~CAkDefaultIOHookDeferred();
+#endif
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+}
+
+void WWISEC_AK_CAkDefaultIOHookDeferred_Term(void* in_ioHook)
+{
+    reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->Term();
+}
+#endif
+
+#if defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING)
+#include <AkFilePackageLowLevelIOBlocking.h>
+
+size_t WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof()
+{
+    return sizeof(CAkFilePackageLowLevelIOBlocking);
+}
+
+void* WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Create(char* in_ioHookBuffer)
+{
+    new (in_ioHookBuffer) CAkFilePackageLowLevelIOBlocking();
+    return reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHookBuffer);
+}
+
+void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(void* in_ioHook)
+{
+#if defined(AK_WIN)
+    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->~CAkFilePackageLowLevelIOBlocking();
+#endif
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+}
+
+void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(void* in_ioHook)
+{
+    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->Term();
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePackageName, AkUInt32* out_uPackageID)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->LoadFilePackage(in_pszFilePackageName, *out_uPackageID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->UnloadFilePackage(in_uPackageID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadAllFilePackages(void* in_ioHook)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->UnloadAllFilePackages());
+}
+
+void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetPackageFallbackBehavior(void* in_ioHook, bool bFallback)
+{
+    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->SetPackageFallbackBehavior(bFallback);
+}
+#endif
+
+#if defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED)
+#include <AkFilePackageLowLevelIODeferred.h>
+
+size_t WWISEC_AK_CAkFilePackageLowLevelIODeferred_Sizeof()
+{
+    return sizeof(CAkFilePackageLowLevelIODeferred);
+}
+
+void* WWISEC_AK_CAkFilePackageLowLevelIODeferred_Create(char* in_ioHookBuffer)
+{
+    ::new (in_ioHookBuffer) CAkFilePackageLowLevelIODeferred();
+    return reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHookBuffer);
+}
+
+void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Destroy(void* in_ioHook)
+{
+#if defined(AK_WIN)
+    reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->~CAkFilePackageLowLevelIODeferred();
+#endif
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+}
+
+void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Term(void* in_ioHook)
+{
+    reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->Term();
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePackageName, AkUInt32* out_uPackageID)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->LoadFilePackage(in_pszFilePackageName, *out_uPackageID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->UnloadFilePackage(in_uPackageID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_UnloadAllFilePackages(void* in_ioHook)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->UnloadAllFilePackages());
+}
+
+void WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetPackageFallbackBehavior(void* in_ioHook, bool bFallback)
+{
+    reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->SetPackageFallbackBehavior(bFallback);
+}
+#endif
+
+#if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING) || defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED) || defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING) || defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED)
+WWISEC_AKRESULT WWISEC_AK_CAkMultipleFileLocation_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkMultipleFileLocation*>(in_ioHook)->SetBasePath(in_pszBasePath));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkMultipleFileLocation_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkMultipleFileLocation*>(in_ioHook)->AddBasePath(in_pszBasePath));
+}
+
+void WWISEC_CAkMultipleFileLocation_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
+{
+    reinterpret_cast<CAkMultipleFileLocation*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
+}
+#endif
+// END IO Hooks

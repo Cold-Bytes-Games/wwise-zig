@@ -11,7 +11,21 @@ const WwiseBuildOptions = struct {
     configuration: WwiseConfiguration,
     use_static_crt: bool,
     use_communication: bool,
+    include_default_io_hook_blocking: bool,
+    include_default_io_hook_deferred: bool,
+    include_file_package_io_blocking: bool,
+    include_file_package_io_deferred: bool,
+
+    pub fn useDefaultIoHooks(self: WwiseBuildOptions) bool {
+        return self.include_default_io_hook_blocking or self.include_default_io_hook_deferred or self.include_file_package_io_blocking or self.include_default_io_hook_deferred;
+    }
+
+    pub fn useFilePackageIO(self: WwiseBuildOptions) bool {
+        return self.include_file_package_io_blocking or self.include_file_package_io_deferred;
+    }
 };
+
+const CppFlags: []const []const u8 = &.{ "-std=c++17", "-Wall", "-Wpedantic" };
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
@@ -21,11 +35,16 @@ pub fn build(b: *std.Build) !void {
         return error.GnuAbiNotSupported;
     }
 
-    const override_wwise_sdk_path_option = b.option([]const u8, "override_wwise_sdk", "Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK");
+    const override_wwise_sdk_path_option = b.option([]const u8, "wwise_sdk", "Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK");
     const wwise_configuration_option = b.option(WwiseConfiguration, "configuration", "Which library of Wwise to use");
     const wwise_use_static_crt_option = b.option(bool, "use_static_crt", "On Windows, use the static CRT version of the library");
     const wwise_use_communication_option = b.option(bool, "use_communication", "Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time");
     const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 512)");
+
+    const wwise_include_default_io_hook_blocking_option = b.option(bool, "include_default_io_hook_blocking", "Include the Default IO Hook Blocking");
+    const wwise_include_default_io_hook_deferred_option = b.option(bool, "include_default_io_hook_deferred", "Include the Default IO Hook Deferred");
+    const wwise_include_file_package_io_blocking_option = b.option(bool, "include_file_package_io_blocking", "Include the File Package IO Hook Blocking");
+    const wwise_include_file_package_io_deferred_option = b.option(bool, "include_file_package_io_deferred", "Include the File Package IO Hook Deferred");
 
     const wwise_configuration = wwise_configuration_option orelse .profile;
 
@@ -40,6 +59,10 @@ pub fn build(b: *std.Build) !void {
 
             break :blk wwise_use_communication_option orelse false;
         },
+        .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null,
+        .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null,
+        .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse false,
+        .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse false,
     };
 
     const wwise_c = b.addStaticLibrary(.{
@@ -47,7 +70,7 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    wwise_c.addCSourceFile("bindings/WwiseC.cpp", &.{"-std=c++17"});
+    wwise_c.addCSourceFile("bindings/WwiseC.cpp", CppFlags);
     try wwiseLink(wwise_c, wwise_build_options);
     wwise_c.linkLibC();
     if (target.getOsTag() != .windows) {
@@ -62,8 +85,14 @@ pub fn build(b: *std.Build) !void {
         wwise_c.defineCMacro("WWISEC_USE_COMMUNICATION", null);
     }
 
+    try handleDefaultIOHooks(wwise_c, wwise_build_options);
+
     const option_step = b.addOptions();
     option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 512);
+    option_step.addOption(bool, "include_default_io_hook_blocking", wwise_build_options.include_default_io_hook_blocking);
+    option_step.addOption(bool, "include_default_io_hook_deferred", wwise_build_options.include_default_io_hook_deferred);
+    option_step.addOption(bool, "include_file_package_io_blocking", wwise_build_options.include_file_package_io_blocking);
+    option_step.addOption(bool, "include_file_package_io_deferred", wwise_build_options.include_file_package_io_deferred);
 
     const wwise_compile_options = option_step.createModule();
 
@@ -202,4 +231,60 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
     }
 
     return "";
+}
+
+fn handleDefaultIOHooks(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
+    if (!wwise_build_options.useDefaultIoHooks()) {
+        return;
+    }
+
+    const platform_name = blk: {
+        switch (compile_step.target.getOsTag()) {
+            .windows => break :blk "Win32",
+            .linux,
+            .macos,
+            .ios,
+            .tvos,
+            => {
+                if (compile_step.target.getAbi() == .android) {
+                    break :blk "Android";
+                }
+                break :blk "POSIX";
+            },
+            else => {
+                return error.OsNotSupported;
+            },
+        }
+
+        break :blk "";
+    };
+
+    compile_step.addIncludePath(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path}));
+    compile_step.addIncludePath(compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}", .{ wwise_build_options.wwise_sdk_path, platform_name }));
+
+    compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkMultipleFileLocation.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
+    compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkGeneratedSoundBanksResolver.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
+
+    if (wwise_build_options.include_default_io_hook_blocking) {
+        compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING", null);
+        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookBlocking.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }), CppFlags);
+    }
+
+    if (wwise_build_options.include_default_io_hook_deferred) {
+        compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", null);
+        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }), CppFlags);
+    }
+
+    if (wwise_build_options.include_file_package_io_blocking) {
+        compile_step.defineCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING", null);
+    }
+
+    if (wwise_build_options.include_file_package_io_deferred) {
+        compile_step.defineCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED", null);
+    }
+
+    if (wwise_build_options.useFilePackageIO()) {
+        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackage.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
+        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackageLUT.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
+    }
 }
