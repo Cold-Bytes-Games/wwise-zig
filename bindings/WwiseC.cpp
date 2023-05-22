@@ -40,6 +40,7 @@ WWISEC_ASSERT_ENUM_VALUE_SAME(AK_NUM_JOB_TYPES);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AkDeviceState_All);
 static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
+static_assert(WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT == AK_COMM_DEFAULT_DISCOVERY_PORT);
 // END AkTypes
 
 // BEGIN AkMemoryMgr
@@ -267,6 +268,42 @@ void WWISEC_AK_StreamMgr_FlushAllCaches()
     AK::StreamMgr::FlushAllCaches();
 }
 // END StreamMgrModule
+
+// BEGIN AkCommunication
+#if defined(WWISEC_USE_COMMUNICATION)
+#include <AK/Comm/AkCommunication.h>
+
+static_assert(sizeof(WWISEC_AkCommSettings_Ports) == sizeof(AkCommSettings::Ports));
+static_assert(sizeof(WWISEC_AkCommSettings) == sizeof(AkCommSettings));
+static_assert(WWISEC_AK_COMM_SETTINGS_MAX_STRING_SIZE == AK_COMM_SETTINGS_MAX_STRING_SIZE);
+static_assert(WWISEC_AK_COMM_SETTINGS_MAX_URL_SIZE == AK_COMM_SETTINGS_MAX_URL_SIZE);
+
+WWISEC_AKRESULT WWISEC_AK_Comm_Init(WWISEC_AkCommSettings* in_settings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::Comm::Init(*reinterpret_cast<AkCommSettings*>(in_settings)));
+}
+
+void WWISEC_AK_Comm_GetDefaultInitSettings(WWISEC_AkCommSettings* out_settings)
+{
+    AK::Comm::GetDefaultInitSettings(*reinterpret_cast<AkCommSettings*>(out_settings));
+}
+
+void WWISEC_AK_Comm_Term()
+{
+    AK::Comm::Term();
+}
+
+WWISEC_AKRESULT WWISEC_AK_Comm_Reset()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::Comm::Reset());
+}
+
+const WWISEC_AkCommSettings* WWISEC_AK_Comm_GetCurrentSettings()
+{
+    return reinterpret_cast<const WWISEC_AkCommSettings*>(&AK::Comm::GetCurrentSettings());
+}
+#endif
+// END AkCommunication
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)

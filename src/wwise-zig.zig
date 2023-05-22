@@ -1,4 +1,7 @@
+const wwise_options = @import("wwise_options");
+
 pub const AkMemSettings = MemoryMgr.AkMemSettings;
+pub const Comm = if (wwise_options.use_communication) @import("Comm.zig") else void;
 pub const IOHooks = @import("IOHooks.zig");
 pub const MemoryMgr = @import("MemoryMgr.zig");
 pub const SoundEngine = @import("SoundEngine.zig");

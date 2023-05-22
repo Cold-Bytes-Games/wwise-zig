@@ -6,7 +6,7 @@
         {
             "label": "Run tests",
             "type": "shell",
-            "command": "zig build test -Dtarget=native-native-msvc -Dinclude_file_package_io_blocking -Dinclude_file_package_io_deferred",
+            "command": "zig build test -Dtarget=native-native-msvc -Dinclude_file_package_io_blocking -Dinclude_file_package_io_deferred -Duse_communication",
             "problemMatcher": [
                 "$gcc"
             ],
@@ -18,7 +18,7 @@
         {
             "label": "build tests",
             "type": "shell",
-            "command": "zig build test_build_only -Dtarget=native-native-msvc -Dinclude_file_package_io_blocking -Dinclude_file_package_io_deferred",
+            "command": "zig build test_build_only -Dtarget=native-native-msvc -Dinclude_file_package_io_blocking -Dinclude_file_package_io_deferred -Duse_communication",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -26,7 +26,7 @@
         {
             "label": "build tests Linux",
             "type": "shell",
-            "command": "zig build test_build_only -Dinclude_file_package_io_blocking -Dinclude_file_package_io_deferred -Dwwise_sdk=/mnt/c/AK/Wwise_2022.1.4/SDK",
+            "command": "zig build test_build_only -Dinclude_file_package_io_blocking -Dinclude_file_package_io_deferred -Duse_communication -Dwwise_sdk=/mnt/c/AK/Wwise_2022.1.4/SDK",
             "problemMatcher": [
                 "$gcc"
             ]

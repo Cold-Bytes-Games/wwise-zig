@@ -1,6 +1,9 @@
 const wwise_options = @import("wwise_options");
 
 pub usingnamespace @cImport({
+    if (wwise_options.use_communication) {
+        @cDefine("WWISEC_USE_COMMUNICATION", "");
+    }
     if (wwise_options.include_default_io_hook_blocking) {
         @cDefine("WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING", "");
     }

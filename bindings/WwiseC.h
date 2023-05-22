@@ -123,6 +123,10 @@ extern "C"
     static const WWISEC_AkJobType WWISEC_AkJobType_SpatialAudio = 2;    ///< Job type for Spatial Audio computations
     static const AkUInt32 WWISEC_AK_NUM_JOB_TYPES = 3;                  ///< Number of possible job types recognized by the Sound Engine
 
+#ifndef WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT
+#define WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT 24024 ///< Default discovery port for most platforms using IP sockets for communication.
+#endif
+
     typedef enum WWISEC_AKRESULT
     {
         WWISEC_AK_NotImplemented = 0,               ///< This feature is not implemented.
@@ -1166,7 +1170,41 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_AddLanguageChangeObserver(WWISEC_AK_StreamMgr_AkLanguageChangeHandler in_handler, void* in_pCookie);
     void WWISEC_AK_StreamMgr_RemoveLanguageChangeObserver(void* in_pCookie);
     void WWISEC_AK_StreamMgr_FlushAllCaches();
-// END AkStreamMgrModule
+    // END AkStreamMgrModule
+
+    // BEGIN AkCommunication
+#if defined(WWISEC_USE_COMMUNICATION)
+#define WWISEC_AK_COMM_SETTINGS_MAX_STRING_SIZE 64
+#define WWISEC_AK_COMM_SETTINGS_MAX_URL_SIZE 128
+
+    typedef struct WWISEC_AkCommSettings_Ports
+    {
+        AkUInt16 uDiscoveryBroadcast;
+        AkUInt16 uCommand;
+    } WWISEC_AkCommSettings_Ports;
+
+    typedef enum WWISEC_AkCommSettings_AkCommSystem
+    {
+        AkCommSystem_Socket, /// The recommended default communication system
+        AkCommSystem_HTCS    /// HTCS when available only, will default to AkCommSystem_Socket if the HTCS system is not available.
+    } WWISEC_AkCommSettings_AkCommSystem;
+
+    typedef struct WWISEC_AkCommSettings
+    {
+        WWISEC_AkCommSettings_Ports ports;
+        WWISEC_AkCommSettings_AkCommSystem commSystem;
+        bool bInitSystemLib;
+        char szAppNetworkName[WWISEC_AK_COMM_SETTINGS_MAX_STRING_SIZE];
+        char szCommProxyServerUrl[WWISEC_AK_COMM_SETTINGS_MAX_URL_SIZE];
+    } WWISEC_AkCommSettings;
+
+    WWISEC_AKRESULT WWISEC_AK_Comm_Init(WWISEC_AkCommSettings* in_settings);
+    void WWISEC_AK_Comm_GetDefaultInitSettings(WWISEC_AkCommSettings* out_settings);
+    void WWISEC_AK_Comm_Term();
+    WWISEC_AKRESULT WWISEC_AK_Comm_Reset();
+    const WWISEC_AkCommSettings* WWISEC_AK_Comm_GetCurrentSettings();
+#endif
+    // END AkCommunication
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
