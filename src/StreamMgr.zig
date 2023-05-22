@@ -736,6 +736,8 @@ pub const IAkFileLocationResolver = extern struct {
                 var allocator = stack_oschar_allocator.get();
 
                 var raw_file_name = common.toOSChar(allocator, in_file_name) catch return common.WwiseError.Fail;
+                defer allocator.free(raw_file_name);
+
                 var raw_flags = blk: {
                     if (in_flags) |flags| {
                         var raw_c_flags = flags.toC();
