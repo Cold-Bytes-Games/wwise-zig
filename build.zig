@@ -85,6 +85,10 @@ pub fn build(b: *std.Build) !void {
         wwise_c.defineCMacro("WWISEC_USE_COMMUNICATION", null);
     }
 
+    if (wwise_build_options.configuration == .release) {
+        wwise_c.defineCMacro("AK_OPTIMIZED", null);
+    }
+
     try handleDefaultIOHooks(wwise_c, wwise_build_options);
 
     const option_step = b.addOptions();
