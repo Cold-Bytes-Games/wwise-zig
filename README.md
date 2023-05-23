@@ -48,8 +48,8 @@ You can customize the size allocated by modifying the `string_stack_size` when i
 Each function that handle strings looks similar to this: 
 ```zig
 pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !void {
-    var os_string_allocator = common.osCharAllocator(fallback_allocator);
-    var allocator = os_string_allocator.get();
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
 
     const filename_oschar = try common.toOSChar(allocator, filename);
     defer allocator.free(filename_oschar);
@@ -105,7 +105,7 @@ pub fn main() !void {
 | iOS      |                        | ❌      |
 | tvOS     |                        | ❌      |
 
-- On Windows, the default GNU ABI is not supported, always use MSVC ABI
+- On Windows, the default GNU ABI is not supported, always use the MSVC ABI
 - On Windows, we always use the latest supported Visual Studio (currently 2022)
 - On Linux, the default I/O hooks are currently not supported (see #1)
 - UWP is gonna be deprecated so it is not supported
