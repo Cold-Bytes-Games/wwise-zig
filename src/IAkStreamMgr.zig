@@ -24,43 +24,27 @@ pub const AkOpenMode = enum(common.DefaultEnumType) {
     read_write = c.WWISEC_AK_OpenModeReadWrite,
 };
 
-pub const AkFileSystemFlags = struct {
+pub const AkFileSystemFlags = extern struct {
     company_id: u32 = common.AK_INVALID_FILE_ID,
-    codec_id: u32,
-    custom_param_size: u32,
-    custom_param: ?*anyopaque,
-    is_language_specific: bool,
-    is_automatic_stream: bool,
-    cache_id: common.AkFileID,
-    num_bytes_prefetch: u32,
+    codec_id: u32 = 0,
+    custom_param_size: u32 = 0,
+    custom_param: ?*anyopaque = null,
+    is_language_specific: bool = false,
+    is_automatic_stream: bool = false,
+    cache_id: common.AkFileID = 0,
+    num_bytes_prefetch: u32 = 0,
     directory_hash: u32 = common.AK_INVALID_UNIQUE_ID,
 
     pub fn fromC(value: c.WWISEC_AkFileSystemFlags) AkFileSystemFlags {
-        return .{
-            .company_id = value.uCompanyID,
-            .codec_id = value.uCodecID,
-            .custom_param_size = value.uCustomParamSize,
-            .custom_param = value.pCustomParam,
-            .is_language_specific = value.bIsLanguageSpecific,
-            .is_automatic_stream = value.bIsAutomaticStream,
-            .cache_id = value.uCacheID,
-            .num_bytes_prefetch = value.uNumBytesPrefetch,
-            .directory_hash = value.uDirectoryHash,
-        };
+        return @bitCast(AkFileSystemFlags, value);
     }
 
     pub fn toC(self: AkFileSystemFlags) c.WWISEC_AkFileSystemFlags {
-        return .{
-            .uCompanyID = self.company_id,
-            .uCodecID = self.codec_id,
-            .uCustomParamSize = self.custom_param_size,
-            .pCustomParam = self.custom_param,
-            .bIsLanguageSpecific = self.is_language_specific,
-            .bIsAutomaticStream = self.is_automatic_stream,
-            .uCacheID = self.cache_id,
-            .uNumBytesPrefetch = self.num_bytes_prefetch,
-            .uDirectoryHash = self.directory_hash,
-        };
+        return @bitCast(c.WWISEC_AkFileSystemFlags, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkFileSystemFlags) == @sizeOf(c.WWISEC_AkFileSystemFlags));
     }
 };
 
@@ -89,7 +73,7 @@ pub const AkStreamInfo = struct {
     }
 };
 
-pub const AkAutoStmHeuristics = struct {
+pub const AkAutoStmHeuristics = extern struct {
     throughput: f32,
     loop_start: u32,
     loop_end: u32,
@@ -97,45 +81,33 @@ pub const AkAutoStmHeuristics = struct {
     priority: common.AkPriority,
 
     pub fn fromC(value: c.WWISEC_AkAutoStmHeuristics) AkAutoStmHeuristics {
-        return .{
-            .throughout = value.fThroughput,
-            .loop_start = value.uLoopStart,
-            .loop_end = value.uLoopEnd,
-            .min_num_buffers = value.uMinNumBuffers,
-            .priority = value.priority,
-        };
+        return @bitCast(AkAutoStmHeuristics, value);
     }
 
     pub fn toC(self: AkAutoStmHeuristics) c.WWISEC_AkAutoStmHeuristics {
-        return .{
-            .fThroughput = self.throughout,
-            .uLoopStart = self.loop_start,
-            .uLoopEnd = self.loop_end,
-            .uMinNumBuffers = self.min_num_buffers,
-            .priority = self.priority,
-        };
+        return @bitCast(c.WWISEC_AkAutoStmHeuristics, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkAutoStmHeuristics) == @sizeOf(c.WWISEC_AkAutoStmHeuristics));
     }
 };
 
-pub const AkAutoStmBufSettings = struct {
+pub const AkAutoStmBufSettings = extern struct {
     buffer_size: u32,
     min_buffer_size: u32,
     block_size: u32,
 
-    pub fn fromC(value: c.WWISEC_AkAutoStmBufSettings) AkAutoStmBufSettings {
-        return .{
-            .buffer_size = value.uBufferSize,
-            .min_buffer_size = value.uMinBufferSize,
-            .block_size = value.uBlockSize,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkAutoStmBufSettings) AkAutoStmBufSettings {
+        return @bitCast(AkAutoStmBufSettings, value);
     }
 
-    pub fn toC(self: AkAutoStmBufSettings) c.WWISEC_AkAutoStmBufSettings {
-        return .{
-            .uBufferSize = self.buffer_size,
-            .uMinBufferSize = self.min_buffer_size,
-            .uBlockSize = self.block_size,
-        };
+    pub inline fn toC(self: AkAutoStmBufSettings) c.WWISEC_AkAutoStmBufSettings {
+        return @bitCast(c.WWISEC_AkAutoStmBufSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkAutoStmBufSettings) == @sizeOf(c.WWISEC_AkAutoStmBufSettings));
     }
 };
 
@@ -168,7 +140,7 @@ pub const AkDeviceDesc = struct {
     }
 };
 
-pub const AkDeviceData = struct {
+pub const AkDeviceData = extern struct {
     device_id: common.AkDeviceID,
     mem_size: u32,
     mem_used: u32,
@@ -187,48 +159,16 @@ pub const AkDeviceData = struct {
     custom_param: u32,
     cache_pinned_bytes: u32,
 
-    pub fn fromC(value: c.WWISEC_AkDeviceData) AkDeviceData {
-        return .{
-            .device_id = value.deviceID,
-            .mem_size = value.uMemSize,
-            .mem_use = value.uMemUsed,
-            .allocs = value.uAllocs,
-            .frees = value.uFrees,
-            .peak_refd_mem_used = value.uPeakRefdMemUsed,
-            .unreferenced_cached_bytes = value.uUnreferencedCachedBytes,
-            .granularity = value.uGranularity,
-            .num_active_streams = value.uNumActiveStreams,
-            .total_bytes_transferred = value.uTotalBytesTransferred,
-            .low_level_bytes_transferred = value.uLowLevelBytesTransferred,
-            .avg_cache_efficiency = value.fAvgCacheEfficiency,
-            .num_low_level_requests_completed = value.uNumLowLevelRequestsCompleted,
-            .num_low_level_requests_cancelled = value.uNumLowLevelRequestsCancelled,
-            .num_low_level_requests_pending = value.uNumLowLevelRequestsPending,
-            .custom_param = value.uCustomParam,
-            .cache_pinned_bytes = value.uCachePinnedBytes,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkDeviceData) AkDeviceData {
+        return @bitCast(AkDeviceData, value);
     }
 
-    pub fn toC(self: AkDeviceData) c.WWISEC_AkDeviceData {
-        return .{
-            .deviceID = self.device_id,
-            .uMemSize = self.mem_size,
-            .uMemUsed = self.mem_used,
-            .uAllocs = self.allocs,
-            .uFrees = self.frees,
-            .uPeakRefdMemUsed = self.peak_refd_mem_used,
-            .uUnreferencedCachedBytes = self.unreferenced_cached_bytes,
-            .uGranularity = self.granularity,
-            .uNumActiveStreams = self.num_active_streams,
-            .uTotalBytesTransferred = self.total_bytes_transferred,
-            .uLowLevelBytesTransferred = self.low_level_bytes_transferred,
-            .fAvgCacheEfficiency = self.avg_cache_efficiency,
-            .uNumLowLevelRequestsCompleted = self.num_low_level_requests_completed,
-            .uNumLowLevelRequestsCancelled = self.num_low_level_requests_cancelled,
-            .uNumLowLevelRequestsPending = self.num_low_level_requests_pending,
-            .uCustomParam = self.custom_param,
-            .uCachePinnedBytes = self.cache_pinned_bytes,
-        };
+    pub inline fn toC(self: AkDeviceData) c.WWISEC_AkDeviceData {
+        return @bitCast(c.WWISEC_AkDeviceData, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkDeviceData) == @sizeOf(c.WWISEC_AkDeviceData));
     }
 };
 
@@ -273,7 +213,7 @@ pub const AkStreamRecord = struct {
     }
 };
 
-pub const AkStreamData = struct {
+pub const AkStreamData = extern struct {
     stream_id: u32,
     priority: u32,
     file_position: u64,
@@ -286,36 +226,16 @@ pub const AkStreamData = struct {
     estimated_throughput: f32,
     active: bool,
 
-    pub fn fromC(value: c.WWISEC_AkStreamData) AkStreamData {
-        return AkStreamData{
-            .stream_id = value.uStreamID,
-            .priority = value.uPriority,
-            .file_position = value.uFilePosition,
-            .target_buffering_size = value.uTargetBufferingSize,
-            .virtual_buffering_size = value.uVirtualBufferingSize,
-            .buffered_size = value.uBufferedSize,
-            .num_bytes_transfered = value.uNumBytesTransfered,
-            .num_bytes_transfered_low_level = value.uNumBytesTransferedLowLevel,
-            .memory_referenced = value.uMemoryReferenced,
-            .estimated_throughput = value.fEstimatedThroughput,
-            .active = value.bActive,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkStreamData) AkStreamData {
+        return @bitCast(AkStreamData, value);
     }
 
-    pub fn toC(self: AkStreamData) c.WWISEC_AkStreamData {
-        return .{
-            .uStreamID = self.stream_id,
-            .uPriority = self.priority,
-            .uFilePosition = self.file_position,
-            .uTargetBufferingSize = self.target_buffering_size,
-            .uVirtualBufferingSize = self.virtual_buffering_size,
-            .uBufferedSize = self.buffered_size,
-            .uNumBytesTransfered = self.num_bytes_transfered,
-            .uNumBytesTransferedLowLevel = self.num_bytes_transfered_low_level,
-            .uMemoryReferenced = self.memory_referenced,
-            .fEstimatedThroughput = self.estimated_throughput,
-            .bActive = self.active,
-        };
+    pub inline fn toC(self: AkStreamData) c.WWISEC_AkStreamData {
+        return @bitCast(c.WWISEC_AkStreamData, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkStreamData) == @sizeOf(c.WWISEC_AkStreamData));
     }
 };
 

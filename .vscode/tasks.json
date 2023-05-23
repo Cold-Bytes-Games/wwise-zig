@@ -34,7 +34,10 @@
         {
             "label": "AST Verify",
             "type": "shell",
-            "command": "zig fmt --check --ast-check ${workspaceFolder}/src"
+            "command": "zig fmt --check --ast-check ${workspaceFolder}/src",
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }
