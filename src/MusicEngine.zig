@@ -3,34 +3,26 @@ const c = @import("c.zig");
 const common = @import("common.zig");
 const callback = @import("callback.zig");
 
-pub const AkMusicSettings = struct {
-    streaming_look_ahead_ratio: f32,
+pub const AkMusicSettings = extern struct {
+    streaming_look_ahead_ratio: f32 = 0.0,
 
-    pub fn fromC(value: c.WWISEC_AkMusicSettings) AkMusicSettings {
-        return .{
-            .streaming_look_ahead_ratio = value.fStreamingLookAheadRatio,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkMusicSettings) AkMusicSettings {
+        return @bitCast(AkMusicSettings, value);
     }
 
-    pub fn toC(self: AkMusicSettings) c.WWISEC_AkMusicSettings {
-        return .{
-            .fStreamingLookAheadRatio = self.streaming_look_ahead_ratio,
-        };
+    pub inline fn toC(self: AkMusicSettings) c.WWISEC_AkMusicSettings {
+        return @bitCast(c.WWISEC_AkMusicSettings, self);
     }
 };
 
-pub fn init(in_settings: *AkMusicSettings) common.WwiseError!void {
-    var raw_settings = in_settings.toC();
-
+pub fn init(in_settings: ?*AkMusicSettings) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_MusicEngine_Init(&raw_settings),
+        c.WWISEC_AK_MusicEngine_Init(@ptrCast(?*c.WWISEC_AkMusicSettings, in_settings)),
     );
 }
 
 pub fn getDefaultInitSettings(out_settings: *AkMusicSettings) void {
-    var raw_settings: c.WWISEC_AkMusicSettings = undefined;
-    c.WWISEC_AK_MusicEngine_GetDefaultInitSettings(&raw_settings);
-    out_settings.* = AkMusicSettings.fromC(raw_settings);
+    c.WWISEC_AK_MusicEngine_GetDefaultInitSettings(@ptrCast(*c.WWISEC_AkMusicSettings, out_settings));
 }
 
 pub fn term() void {
@@ -38,11 +30,7 @@ pub fn term() void {
 }
 
 pub fn getPlayingSegmentInfo(in_playing_id: common.AkPlayingID, out_segment_info: *callback.AkSegmentInfo, extrapolate: bool) common.WwiseError!void {
-    var raw_segment_info: c.WWISEC_AkSegmentInfo = undefined;
-
     try common.handleAkResult(
-        c.WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(in_playing_id, &raw_segment_info, extrapolate),
+        c.WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(in_playing_id, @ptrCast(*c.WWISEC_AkSegmentInfo, out_segment_info), extrapolate),
     );
-
-    out_segment_info.* = callback.AkSegmentInfo.fromC(raw_segment_info);
 }

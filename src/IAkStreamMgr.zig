@@ -49,10 +49,10 @@ pub const AkFileSystemFlags = extern struct {
 };
 
 pub const AkStreamInfo = struct {
-    device_id: common.AkDeviceID,
+    device_id: common.AkDeviceID = 0,
     name: []const u8,
-    size: u64,
-    is_open: bool,
+    size: u64 = 0,
+    is_open: bool = false,
 
     pub fn fromC(value: c.WWISEC_AkStreamInfo, allocator: std.mem.Allocator) !AkStreamInfo {
         return .{
@@ -74,11 +74,11 @@ pub const AkStreamInfo = struct {
 };
 
 pub const AkAutoStmHeuristics = extern struct {
-    throughput: f32,
-    loop_start: u32,
-    loop_end: u32,
-    min_num_buffers: u32,
-    priority: common.AkPriority,
+    throughput: f32 = 0.0,
+    loop_start: u32 = 0,
+    loop_end: u32 = 0,
+    min_num_buffers: u32 = 0,
+    priority: common.AkPriority = 0,
 
     pub fn fromC(value: c.WWISEC_AkAutoStmHeuristics) AkAutoStmHeuristics {
         return @bitCast(AkAutoStmHeuristics, value);
@@ -94,9 +94,9 @@ pub const AkAutoStmHeuristics = extern struct {
 };
 
 pub const AkAutoStmBufSettings = extern struct {
-    buffer_size: u32,
-    min_buffer_size: u32,
-    block_size: u32,
+    buffer_size: u32 = 0,
+    min_buffer_size: u32 = 0,
+    block_size: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkAutoStmBufSettings) AkAutoStmBufSettings {
         return @bitCast(AkAutoStmBufSettings, value);
@@ -112,9 +112,9 @@ pub const AkAutoStmBufSettings = extern struct {
 };
 
 pub const AkDeviceDesc = struct {
-    device_id: common.AkDeviceID,
-    can_write: bool,
-    can_read: bool,
+    device_id: common.AkDeviceID = 0,
+    can_write: bool = false,
+    can_read: bool = false,
     device_name: []const u8,
 
     pub fn fromC(value: c.WWISEC_AkDeviceDesc, allocator: std.mem.Allocator) !AkDeviceDesc {
@@ -141,23 +141,23 @@ pub const AkDeviceDesc = struct {
 };
 
 pub const AkDeviceData = extern struct {
-    device_id: common.AkDeviceID,
-    mem_size: u32,
-    mem_used: u32,
-    allocs: u32,
-    frees: u32,
-    peak_refd_mem_used: u32,
-    unreferenced_cached_bytes: u32,
-    granularity: u32,
-    num_active_streams: u32,
-    total_bytes_transferred: u32,
-    low_level_bytes_transferred: u32,
-    avg_cache_efficiency: f32,
-    num_low_level_requests_completed: u32,
-    num_low_level_requests_cancelled: u32,
-    num_low_level_requests_pending: u32,
-    custom_param: u32,
-    cache_pinned_bytes: u32,
+    device_id: common.AkDeviceID = 0,
+    mem_size: u32 = 0,
+    mem_used: u32 = 0,
+    allocs: u32 = 0,
+    frees: u32 = 0,
+    peak_refd_mem_used: u32 = 0,
+    unreferenced_cached_bytes: u32 = 0,
+    granularity: u32 = 0,
+    num_active_streams: u32 = 0,
+    total_bytes_transferred: u32 = 0,
+    low_level_bytes_transferred: u32 = 0,
+    avg_cache_efficiency: f32 = 0.0,
+    num_low_level_requests_completed: u32 = 0,
+    num_low_level_requests_cancelled: u32 = 0,
+    num_low_level_requests_pending: u32 = 0,
+    custom_param: u32 = 0,
+    cache_pinned_bytes: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkDeviceData) AkDeviceData {
         return @bitCast(AkDeviceData, value);
@@ -173,14 +173,14 @@ pub const AkDeviceData = extern struct {
 };
 
 pub const AkStreamRecord = struct {
-    stream_id: u32,
-    device_id: common.AkDeviceID,
+    stream_id: u32 = 0,
+    device_id: common.AkDeviceID = 0,
     stream_name: []const u8,
-    file_size: u64,
-    custom_param_size: u32,
-    custom_param: u32,
-    is_auto_stream: bool,
-    is_caching_stream: bool,
+    file_size: u64 = 0,
+    custom_param_size: u32 = 0,
+    custom_param: u32 = 0,
+    is_auto_stream: bool = false,
+    is_caching_stream: bool = false,
 
     pub fn fromC(value: c.WWISEC_AkStreamRecord, allocator: std.mem.Allocator) !AkStreamRecord {
         return .{
@@ -214,17 +214,17 @@ pub const AkStreamRecord = struct {
 };
 
 pub const AkStreamData = extern struct {
-    stream_id: u32,
-    priority: u32,
-    file_position: u64,
-    target_buffering_size: u32,
-    virtual_buffering_size: u32,
-    buffered_size: u32,
-    num_bytes_transfered: u32,
-    num_bytes_transfered_low_level: u32,
-    memory_referenced: u32,
-    estimated_throughput: f32,
-    active: bool,
+    stream_id: u32 = 0,
+    priority: u32 = 0,
+    file_position: u64 = 0,
+    target_buffering_size: u32 = 0,
+    virtual_buffering_size: u32 = 0,
+    buffered_size: u32 = 0,
+    num_bytes_transfered: u32 = 0,
+    num_bytes_transfered_low_level: u32 = 0,
+    memory_referenced: u32 = 0,
+    estimated_throughput: f32 = 0.0,
+    active: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_AkStreamData) AkStreamData {
         return @bitCast(AkStreamData, value);

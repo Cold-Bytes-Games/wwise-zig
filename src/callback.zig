@@ -50,8 +50,8 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
 };
 
 pub const AkCallbackInfo = extern struct {
-    cookie: ?*anyopaque,
-    game_obj_id: common.AkGameObjectID,
+    cookie: ?*anyopaque = null,
+    game_obj_id: common.AkGameObjectID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkCallbackInfo) AkCallbackInfo {
         return @bitCast(AkCallbackInfo, value);
@@ -67,9 +67,9 @@ pub const AkCallbackInfo = extern struct {
 };
 
 pub const AkEventCallbackInfo = extern struct {
-    base: AkCallbackInfo,
-    playing_id: common.AkPlayingID,
-    event_id: common.AkUniqueID,
+    base: AkCallbackInfo = .{},
+    playing_id: common.AkPlayingID = 0,
+    event_id: common.AkUniqueID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkEventCallbackInfo) AkEventCallbackInfo {
         return @bitCast(AkEventCallbackInfo, value);
@@ -85,7 +85,7 @@ pub const AkEventCallbackInfo = extern struct {
 };
 
 pub const AkMIDIEventCallbackInfo = extern struct {
-    base: AkEventCallbackInfo,
+    base: AkEventCallbackInfo = .{},
     midi_event: midi_types.AkMIDIEvent,
 
     pub inline fn fromC(value: c.WWISEC_AkMIDIEventCallbackInfo) AkMIDIEventCallbackInfo {
@@ -102,10 +102,10 @@ pub const AkMIDIEventCallbackInfo = extern struct {
 };
 
 pub const AkMarkerCallbackInfo = extern struct {
-    base: AkEventCallbackInfo,
-    identifier: u32,
-    position: u32,
-    str_label: ?[*:0]const u8,
+    base: AkEventCallbackInfo = .{},
+    identifier: u32 = 0,
+    position: u32 = 0,
+    str_label: ?[*:0]const u8 = null,
 
     pub inline fn fromC(value: c.WWISEC_AkMarkerCallbackInfo) AkMarkerCallbackInfo {
         return @bitCast(AkMarkerCallbackInfo, value);
@@ -142,10 +142,10 @@ pub const AkDurationCallbackInfo = extern struct {
 };
 
 pub const AkDynamicSequenceItemCallbackInfo = extern struct {
-    base: AkCallbackInfo,
-    playing_id: common.AkPlayingID,
-    audio_node_id: common.AkUniqueID,
-    custom_info: ?*anyopaque,
+    base: AkCallbackInfo = .{},
+    playing_id: common.AkPlayingID = 0,
+    audio_node_id: common.AkUniqueID = 0,
+    custom_info: ?*anyopaque = null,
 
     pub inline fn fromC(value: c.WWISEC_AkDynamicSequenceItemCallbackInfo) AkDynamicSequenceItemCallbackInfo {
         return @bitCast(AkDynamicSequenceItemCallbackInfo, value);
@@ -161,14 +161,14 @@ pub const AkDynamicSequenceItemCallbackInfo = extern struct {
 };
 
 pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
-    base: AkEventCallbackInfo,
+    base: AkEventCallbackInfo = .{},
     volumes: SpeakerVolumes.MatrixPtr,
-    input_config: speaker_config.AkChannelConfig,
-    output_config: speaker_config.AkChannelConfig,
+    input_config: speaker_config.AkChannelConfig = .{},
+    output_config: speaker_config.AkChannelConfig = .{},
     base_volume: [*]f32,
     emitter_listener_volume: [*]f32,
-    context: ?*IAkPlugin.IAkMixerInputContext,
-    mixer_context: ?*IAkPlugin.IAkMixerPluginContext,
+    context: ?*IAkPlugin.IAkMixerInputContext = null,
+    mixer_context: ?*IAkPlugin.IAkMixerPluginContext = null,
 
     pub inline fn fromC(value: c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
         return @bitCast(AkSpeakerVolumeMatrixCallbackInfo, value);
@@ -184,10 +184,10 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
 };
 
 pub const AkBusMeteringCallbackInfo = extern struct {
-    base: AkCallbackInfo,
-    metering: ?*common_defs.AK_AkMetering,
-    channel_config: speaker_config.AkChannelConfig,
-    metering_flags: common.AkMeteringFlags,
+    base: AkCallbackInfo = .{},
+    metering: ?*common_defs.AK_AkMetering = null,
+    channel_config: speaker_config.AkChannelConfig = .{},
+    metering_flags: common.AkMeteringFlags = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkBusMeteringCallbackInfo) AkBusMeteringCallbackInfo {
         return @bitCast(AkBusMeteringCallbackInfo, value);
@@ -203,14 +203,14 @@ pub const AkBusMeteringCallbackInfo = extern struct {
 };
 
 pub const AkOutputDeviceMeteringCallbackInfo = extern struct {
-    base: AkCallbackInfo,
-    main_mix_metering: ?*common_defs.AkMetering,
-    main_mix_config: speaker_config.AkChannelConfig,
-    passthrough_metering: ?*common_defs.AkMetering,
-    passthrough_mix_config: speaker_config.AkChannelConfig,
-    num_system_audio_objects: u32,
+    base: AkCallbackInfo = .{},
+    main_mix_metering: ?*common_defs.AkMetering = null,
+    main_mix_config: speaker_config.AkChannelConfig = .{},
+    passthrough_metering: ?*common_defs.AkMetering = null,
+    passthrough_mix_config: speaker_config.AkChannelConfig = .{},
+    num_system_audio_objects: u32 = 0,
     system_audio_object_meteering: [*]?*common_defs.AkMetering,
-    metering_flags: common.AkMeteringFlags,
+    metering_flags: common.AkMeteringFlags = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkOutputDeviceMeteringCallbackInfo) AkOutputDeviceMeteringCallbackInfo {
         return @bitCast(AkOutputDeviceMeteringCallbackInfo, value);
@@ -226,11 +226,11 @@ pub const AkOutputDeviceMeteringCallbackInfo = extern struct {
 };
 
 pub const AkMusicPlaylistCallbackInfo = extern struct {
-    base: AkEventCallbackInfo,
-    playlist_id: common.AkUniqueID,
-    num_playist_items: u32,
-    playlist_selection: u32,
-    playlist_item_done: u32,
+    base: AkEventCallbackInfo = .{},
+    playlist_id: common.AkUniqueID = 0,
+    num_playist_items: u32 = 0,
+    playlist_selection: u32 = 0,
+    playlist_item_done: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkMusicPlaylistCallbackInfo) AkMusicPlaylistCallbackInfo {
         return @bitCast(AkMusicPlaylistCallbackInfo, value);
@@ -246,15 +246,15 @@ pub const AkMusicPlaylistCallbackInfo = extern struct {
 };
 
 pub const AkSegmentInfo = extern struct {
-    current_position: common.AkTimeMs,
-    pre_entry_duration: common.AkTimeMs,
-    active_duration: common.AkTimeMs,
-    post_exit_duration: common.AkTimeMs,
-    remaining_look_ahead_time: common.AkTimeMs,
-    beat_duration: f32,
-    bar_duration: f32,
-    grid_duration: f32,
-    grid_offset: f32,
+    current_position: common.AkTimeMs = 0,
+    pre_entry_duration: common.AkTimeMs = 0,
+    active_duration: common.AkTimeMs = 0,
+    post_exit_duration: common.AkTimeMs = 0,
+    remaining_look_ahead_time: common.AkTimeMs = 0,
+    beat_duration: f32 = 0.0,
+    bar_duration: f32 = 0.0,
+    grid_duration: f32 = 0.0,
+    grid_offset: f32 = 0.0,
 
     pub inline fn fromC(value: c.WWISEC_AkSegmentInfo) AkSegmentInfo {
         return @bitCast(AkSegmentInfo, value);
@@ -270,11 +270,11 @@ pub const AkSegmentInfo = extern struct {
 };
 
 pub const AkMusicSyncCallbackInfo = extern struct {
-    base: AkCallbackInfo,
-    playing_id: common.AkPlayingID,
-    segment_info: AkSegmentInfo,
-    music_sync_type: AkCallbackType,
-    user_cue_name: ?[*:0]const u8,
+    base: AkCallbackInfo = .{},
+    playing_id: common.AkPlayingID = 0,
+    segment_info: AkSegmentInfo = .{},
+    music_sync_type: AkCallbackType = .{},
+    user_cue_name: ?[*:0]const u8 = null,
 
     pub inline fn fromC(value: c.WWISEC_AkMusicSyncCallbackInfo) AkMusicSyncCallbackInfo {
         return @bitCast(AkMusicSyncCallbackInfo, value);
@@ -290,12 +290,12 @@ pub const AkMusicSyncCallbackInfo = extern struct {
 };
 
 pub const AkResourceMonitorDataSummary = extern struct {
-    total_cpu: f32,
-    plugin_cpu: f32,
-    physical_voices: u32,
-    virtual_voices: u32,
-    total_voices: u32,
-    nb_active_events: u32,
+    total_cpu: f32 = 0.0,
+    plugin_cpu: f32 = 0.0,
+    physical_voices: u32 = 0,
+    virtual_voices: u32 = 0,
+    total_voices: u32 = 0,
+    nb_active_events: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkResourceMonitorDataSummary) AkResourceMonitorDataSummary {
         return @bitCast(AkResourceMonitorDataSummary, value);
