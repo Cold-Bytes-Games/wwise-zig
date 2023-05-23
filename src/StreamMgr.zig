@@ -10,16 +10,20 @@ pub const AK_SCHEDULER_DEFERRED_LINED_UP = c.WWISEC_AK_SCHEDULER_DEFERRED_LINED_
 pub const AkStreamMgrSettings = extern struct {
     dummy: u8 = 0,
 
-    pub fn fromC(_: c.WWISEC_AkStreamMgrSettings) AkStreamMgrSettings {
-        return .{};
+    pub inline fn fromC(value: c.WWISEC_AkStreamMgrSettings) AkStreamMgrSettings {
+        return @bitCast(AkStreamMgrSettings, value);
     }
 
-    pub fn toC(_: AkStreamMgrSettings) c.WWISEC_AkStreamMgrSettings {
-        return std.mem.zeroes(c.WWISEC_AkStreamMgrSettings);
+    pub fn toC(self: AkStreamMgrSettings) c.WWISEC_AkStreamMgrSettings {
+        return @bitCast(c.WWISEC_AkStreamMgrSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkStreamMgrSettings) == @sizeOf(c.WWISEC_AkStreamMgrSettings));
     }
 };
 
-pub const AkDeviceSettings = struct {
+pub const AkDeviceSettings = extern struct {
     io_memory: ?*anyopaque = null,
     io_memory_size: u32 = 0,
     io_memory_alignment: u32 = 0,
@@ -32,142 +36,96 @@ pub const AkDeviceSettings = struct {
     use_stream_cache: bool = false,
     max_cache_pinned_bytes: u32 = 0,
 
-    pub fn fromC(device_settings: c.WWISEC_AkDeviceSettings) AkDeviceSettings {
-        return .{
-            .io_memory = device_settings.pIOMemory,
-            .io_memory_size = device_settings.uIOMemorySize,
-            .io_memory_alignment = device_settings.uIOMemoryAlignment,
-            .pool_attributes = device_settings.ePoolAttributes,
-            .granularity = device_settings.uGranularity,
-            .scheduler_type_flags = device_settings.uSchedulerTypeFlags,
-            .thread_properties = settings.AkThreadProperties.fromC(device_settings.threadProperties),
-            .target_auto_stm_buffer_length = device_settings.fTargetAutoStmBufferLength,
-            .max_concurrent_io = device_settings.uMaxConcurrentIO,
-            .use_stream_cache = device_settings.bUseStreamCache,
-            .max_cache_pinned_bytes = device_settings.uMaxCachePinnedBytes,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkDeviceSettings) AkDeviceSettings {
+        return @bitCast(AkDeviceSettings, value);
     }
 
     pub fn toC(self: AkDeviceSettings) c.WWISEC_AkDeviceSettings {
-        return .{
-            .pIOMemory = self.io_memory,
-            .uIOMemorySize = self.io_memory_size,
-            .uIOMemoryAlignment = self.io_memory_alignment,
-            .ePoolAttributes = self.pool_attributes,
-            .uGranularity = self.granularity,
-            .uSchedulerTypeFlags = self.scheduler_type_flags,
-            .threadProperties = self.thread_properties.toC(),
-            .fTargetAutoStmBufferLength = self.target_auto_stm_buffer_length,
-            .uMaxConcurrentIO = self.max_concurrent_io,
-            .bUseStreamCache = self.use_stream_cache,
-            .uMaxCachePinnedBytes = self.max_cache_pinned_bytes,
-        };
+        return @bitCast(c.WWISEC_AkDeviceSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkDeviceSettings) == @sizeOf(c.WWISEC_AkDeviceSettings));
     }
 };
 
-pub const AkFileDesc = struct {
-    file_size: i64,
-    sector: u64,
-    custom_param_size: u32,
-    custom_param: ?*anyopaque,
-    file_handle: common.AkFileHandle,
-    device_id: common.AkDeviceID,
-    package: ?*anyopaque,
+pub const AkFileDesc = extern struct {
+    file_size: i64 = 0,
+    sector: u64 = 0,
+    custom_param_size: u32 = 0,
+    custom_param: ?*anyopaque = null,
+    file_handle: common.AkFileHandle = null,
+    device_id: common.AkDeviceID = 0,
+    package: ?*anyopaque = null,
 
-    pub fn fromC(value: c.WWISEC_AkFileDesc) AkFileDesc {
-        return .{
-            .file_size = value.iFileSize,
-            .sector = value.uSector,
-            .custom_param_size = value.uCustomParamSize,
-            .custom_param = value.pCustomParam,
-            .file_handle = value.hFile,
-            .device_id = value.deviceID,
-            .package = value.pPackage,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkFileDesc) AkFileDesc {
+        return @bitCast(AkFileDesc, value);
     }
 
     pub fn toC(self: AkFileDesc) c.WWISEC_AkFileDesc {
-        return .{
-            .iFileSize = self.file_size,
-            .uSector = self.sector,
-            .uCustomParamSize = self.custom_param_size,
-            .pCustomParam = self.custom_param,
-            .hFile = self.file_handle,
-            .deviceID = self.device_id,
-            .pPackage = self.package,
-        };
+        return @bitCast(c.WWISEC_AkFileDesc, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkFileDesc) == @sizeOf(c.WWISEC_AkFileDesc));
     }
 };
 
-pub const AkIOTransferInfo = struct {
-    file_position: u64,
-    buffer_size: u32,
-    requested_size: u32,
+pub const AkIOTransferInfo = extern struct {
+    file_position: u64 = 0,
+    buffer_size: u32 = 0,
+    requested_size: u32 = 0,
 
-    pub fn fromC(value: c.WWISEC_AkIOTransferInfo) AkIOTransferInfo {
-        return .{
-            .file_position = value.uFilePosition,
-            .buffer_size = value.uBufferSize,
-            .requested_size = value.uRequestedSize,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkIOTransferInfo) AkIOTransferInfo {
+        return @bitCast(AkIOTransferInfo, value);
     }
 
     pub fn toC(self: AkIOTransferInfo) c.WWISEC_AkIOTransferInfo {
-        return .{
-            .uFilePosition = self.file_position,
-            .uBufferSize = self.buffer_size,
-            .uRequestedSize = self.requested_size,
-        };
+        return @bitCast(c.WWISEC_AkIOTransferInfo, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkIOTransferInfo) == @sizeOf(c.WWISEC_AkIOTransferInfo));
     }
 };
 
 pub const AkIOCallback = c.WWISEC_AkIOCallback;
 pub const AkBatchIOCallback = c.WWISEC_AkBatchIOCallback;
 
-pub const AkAsyncIOTransferInfo = struct {
-    base: AkIOTransferInfo,
-    buffer: ?*anyopaque,
-    callback: AkIOCallback,
-    cookie: ?*anyopaque,
-    user_data: ?*anyopaque,
+pub const AkAsyncIOTransferInfo = extern struct {
+    base: AkIOTransferInfo = .{},
+    buffer: ?*anyopaque = null,
+    callback: AkIOCallback = null,
+    cookie: ?*anyopaque = null,
+    user_data: ?*anyopaque = null,
 
-    pub fn fromC(value: c.WWISEC_AkAsyncIOTransferInfo) AkAsyncIOTransferInfo {
-        return .{
-            .base = AkIOTransferInfo.fromC(value.base),
-            .buffer = value.pBuffer,
-            .callback = value.pCallback,
-            .cookie = value.pCookie,
-            .user_data = value.pUserData,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkAsyncIOTransferInfo) AkAsyncIOTransferInfo {
+        return @bitCast(AkAsyncIOTransferInfo, value);
     }
 
     pub fn toC(self: AkAsyncIOTransferInfo) c.WWISEC_AkAsyncIOTransferInfo {
-        return .{
-            .base = self.base.toC(),
-            .pBuffer = self.buffer,
-            .pCallback = self.callback,
-            .pCookie = self.cookie,
-            .pUserData = self.user_data,
-        };
+        return @bitCast(c.WWISEC_AkAsyncIOTransferInfo, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkAsyncIOTransferInfo) == @sizeOf(c.WWISEC_AkAsyncIOTransferInfo));
     }
 };
 
-pub const AkIoHeuristics = struct {
-    deadline: f32,
-    priority: common.AkPriority,
+pub const AkIoHeuristics = extern struct {
+    deadline: f32 = 0.0,
+    priority: common.AkPriority = 0,
 
-    pub fn fromC(value: c.WWISEC_AkIoHeuristics) AkIoHeuristics {
-        return .{
-            .deadline = value.fDeadline,
-            .priority = value.priority,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkIoHeuristics) AkIoHeuristics {
+        return @bitCast(AkIoHeuristics, value);
     }
 
     pub fn toC(self: AkIoHeuristics) c.WWISEC_AkIoHeuristics {
-        return .{
-            .fDeadline = self.deadline,
-            .priority = self.priority,
-        };
+        return @bitCast(c.WWISEC_AkIoHeuristics, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkIoHeuristics) == @sizeOf(c.WWISEC_AkIoHeuristics));
     }
 };
 
@@ -807,15 +765,12 @@ pub const IAkFileLocationResolver = extern struct {
 pub fn create(in_settings: *AkStreamMgrSettings) ?*stream_interfaces.IAkStreamMgr {
     return @ptrCast(?*stream_interfaces.IAkStreamMgr, @alignCast(
         @alignOf(?*stream_interfaces.IAkStreamMgr),
-        c.WWISEC_AK_StreamMgr_Create(@ptrCast([*c]c.WWISEC_AkStreamMgrSettings, in_settings)),
+        c.WWISEC_AK_StreamMgr_Create(@ptrCast(*c.WWISEC_AkStreamMgrSettings, in_settings)),
     ));
 }
 
 pub fn getDefaultSettings(out_settings: *AkStreamMgrSettings) void {
-    var temp_raw_settings: c.WWISEC_AkStreamMgrSettings = undefined;
-    c.WWISEC_AK_StreamMgr_GetDefaultSettings(&temp_raw_settings);
-
-    out_settings.* = AkStreamMgrSettings.fromC(temp_raw_settings);
+    c.WWISEC_AK_StreamMgr_GetDefaultSettings(@ptrCast(*c.WWISEC_AkStreamMgrSettings, out_settings));
 }
 
 pub fn getFileLocationResolver() ?*IAkFileLocationResolver {
@@ -826,9 +781,8 @@ pub fn setFileLocationResolver(in_file_location_resolver: ?*IAkFileLocationResol
     c.WWISEC_AK_StreamMgr_SetFileLocationResolver(in_file_location_resolver);
 }
 
-pub fn createDevice(in_settings: AkDeviceSettings, in_low_level_hook: ?*IAkLowLevelIOHook) common.AkDeviceID {
-    var raw_settings = in_settings.toC();
-    return c.WWISEC_AK_StreamMgr_CreateDevice(&raw_settings, in_low_level_hook);
+pub fn createDevice(in_settings: *const AkDeviceSettings, in_low_level_hook: ?*IAkLowLevelIOHook) common.AkDeviceID {
+    return c.WWISEC_AK_StreamMgr_CreateDevice(@ptrCast(*const c.WWISEC_AkDeviceSettings, in_settings), in_low_level_hook);
 }
 
 pub fn destroyDevice(in_deviceID: common.AkDeviceID) common.WwiseError!void {
@@ -844,10 +798,7 @@ pub fn performIO() common.WwiseError!void {
 }
 
 pub fn getDefaultDeviceSettings(out_settings: *AkDeviceSettings) void {
-    var temp_raw_settings: c.WWISEC_AkDeviceSettings = undefined;
-    c.WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(&temp_raw_settings);
-
-    out_settings.* = AkDeviceSettings.fromC(temp_raw_settings);
+    c.WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(@ptrCast(*c.WWISEC_AkDeviceSettings, out_settings));
 }
 
 pub fn setCurrentLanguage(fallback_allocator: std.mem.Allocator, language_name: []const u8) common.WwiseError!void {

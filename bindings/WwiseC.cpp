@@ -378,9 +378,9 @@ void WWISEC_AK_StreamMgr_SetFileLocationResolver(void* in_pFileLocationResolver)
     AK::StreamMgr::SetFileLocationResolver(reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(in_pFileLocationResolver));
 }
 
-WWISEC_AkDeviceID WWISEC_AK_StreamMgr_CreateDevice(WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook)
+WWISEC_AkDeviceID WWISEC_AK_StreamMgr_CreateDevice(const WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook)
 {
-    return AK::StreamMgr::CreateDevice(*reinterpret_cast<AkDeviceSettings*>(in_settings), reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(in_pLowLevelHook));
+    return AK::StreamMgr::CreateDevice(*reinterpret_cast<const AkDeviceSettings*>(in_settings), reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(in_pLowLevelHook));
 }
 
 WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(WWISEC_AkDeviceID in_deviceID)

@@ -1662,7 +1662,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings);
     void* WWISEC_AK_StreamMgr_GetFileLocationResolver();
     void WWISEC_AK_StreamMgr_SetFileLocationResolver(void* in_pFileLocationResolver);
-    WWISEC_AkDeviceID WWISEC_AK_StreamMgr_CreateDevice(WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook);
+    WWISEC_AkDeviceID WWISEC_AK_StreamMgr_CreateDevice(const WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook);
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(WWISEC_AkDeviceID in_deviceID);
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_PerformIO();
     void WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(WWISEC_AkDeviceSettings* out_settings);
