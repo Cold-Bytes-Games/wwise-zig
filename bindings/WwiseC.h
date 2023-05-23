@@ -241,9 +241,400 @@ extern "C"
         WWISEC_AkPanningRule_Speakers = 0,  ///< Left and right positioned 60 degrees apart (by default - see AK::SoundEngine::GetSpeakerAngles()).
         WWISEC_AkPanningRule_Headphones = 1 ///< Left and right positioned 180 degrees apart.
     } WWISEC_AkPanningRule;
+
+    typedef AkUInt8 WWISEC_AkMeteringFlags;
     // END AkTypes
 
+    // BEGIN AkSpeakerConfig
+    typedef AkUInt32 WWISEC_AkChannelConfig;
+    // END AkSpeakerConfig
+
+    // BEGIN AkMidiTypes
+    //-----------------------------------------------------------------------------
+    // Types.
+    //-----------------------------------------------------------------------------
+
+    typedef AkUInt8 WWISEC_AkMidiChannelNo; ///< MIDI channel number, usually 0-15.
+    typedef AkUInt8 WWISEC_AkMidiNoteNo;    ///< MIDI note number.
+
+    //-----------------------------------------------------------------------------
+    // Constants.
+    //-----------------------------------------------------------------------------
+
+    // Invalid values
+    static const WWISEC_AkMidiChannelNo WWISEC_AK_INVALID_MIDI_CHANNEL = (WWISEC_AkMidiChannelNo)-1; ///< Not a valid midi channel
+    static const WWISEC_AkMidiNoteNo WWISEC_AK_INVALID_MIDI_NOTE = (AkUInt8)-1;                      ///< Not a valid midi note
+
+// List of event types
+#define WWISEC_AK_MIDI_EVENT_TYPE_INVALID 0x00
+#define WWISEC_AK_MIDI_EVENT_TYPE_NOTE_OFF 0x80
+#define WWISEC_AK_MIDI_EVENT_TYPE_NOTE_ON 0x90
+#define WWISEC_AK_MIDI_EVENT_TYPE_NOTE_AFTERTOUCH 0xa0
+#define WWISEC_AK_MIDI_EVENT_TYPE_CONTROLLER 0xb0
+#define WWISEC_AK_MIDI_EVENT_TYPE_PROGRAM_CHANGE 0xc0
+#define WWISEC_AK_MIDI_EVENT_TYPE_CHANNEL_AFTERTOUCH 0xd0
+#define WWISEC_AK_MIDI_EVENT_TYPE_PITCH_BEND 0xe0
+#define WWISEC_AK_MIDI_EVENT_TYPE_SYSEX 0xf0
+#define WWISEC_AK_MIDI_EVENT_TYPE_ESCAPE 0xf7
+#define WWISEC_AK_MIDI_EVENT_TYPE_WWISE_CMD 0xfe
+#define WWISEC_AK_MIDI_EVENT_TYPE_META 0xff
+
+// List of Continuous Controller (cc) values
+#define WWISEC_AK_MIDI_CC_BANK_SELECT_COARSE 0
+#define WWISEC_AK_MIDI_CC_MOD_WHEEL_COARSE 1
+#define WWISEC_AK_MIDI_CC_BREATH_CTRL_COARSE 2
+#define WWISEC_AK_MIDI_CC_CTRL_3_COARSE 3
+#define WWISEC_AK_MIDI_CC_FOOT_PEDAL_COARSE 4
+#define WWISEC_AK_MIDI_CC_PORTAMENTO_COARSE 5
+#define WWISEC_AK_MIDI_CC_DATA_ENTRY_COARSE 6
+#define WWISEC_AK_MIDI_CC_VOLUME_COARSE 7
+#define WWISEC_AK_MIDI_CC_BALANCE_COARSE 8
+#define WWISEC_AK_MIDI_CC_CTRL_9_COARSE 9
+#define WWISEC_AK_MIDI_CC_PAN_POSITION_COARSE 10
+#define WWISEC_AK_MIDI_CC_EXPRESSION_COARSE 11
+#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_1_COARSE 12
+#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_2_COARSE 13
+#define WWISEC_AK_MIDI_CC_CTRL_14_COARSE 14
+#define WWISEC_AK_MIDI_CC_CTRL_15_COARSE 15
+#define WWISEC_AK_MIDI_CC_GEN_SLIDER_1 16
+#define WWISEC_AK_MIDI_CC_GEN_SLIDER_2 17
+#define WWISEC_AK_MIDI_CC_GEN_SLIDER_3 18
+#define WWISEC_AK_MIDI_CC_GEN_SLIDER_4 19
+#define WWISEC_AK_MIDI_CC_CTRL_20_COARSE 20
+#define WWISEC_AK_MIDI_CC_CTRL_21_COARSE 21
+#define WWISEC_AK_MIDI_CC_CTRL_22_COARSE 22
+#define WWISEC_AK_MIDI_CC_CTRL_23_COARSE 23
+#define WWISEC_AK_MIDI_CC_CTRL_24_COARSE 24
+#define WWISEC_AK_MIDI_CC_CTRL_25_COARSE 25
+#define WWISEC_AK_MIDI_CC_CTRL_26_COARSE 26
+#define WWISEC_AK_MIDI_CC_CTRL_27_COARSE 27
+#define WWISEC_AK_MIDI_CC_CTRL_28_COARSE 28
+#define WWISEC_AK_MIDI_CC_CTRL_29_COARSE 29
+#define WWISEC_AK_MIDI_CC_CTRL_30_COARSE 30
+#define WWISEC_AK_MIDI_CC_CTRL_31_COARSE 31
+#define WWISEC_AK_MIDI_CC_BANK_SELECT_FINE 32
+#define WWISEC_AK_MIDI_CC_MOD_WHEEL_FINE 33
+#define WWISEC_AK_MIDI_CC_BREATH_CTRL_FINE 34
+#define WWISEC_AK_MIDI_CC_CTRL_3_FINE 35
+#define WWISEC_AK_MIDI_CC_FOOT_PEDAL_FINE 36
+#define WWISEC_AK_MIDI_CC_PORTAMENTO_FINE 37
+#define WWISEC_AK_MIDI_CC_DATA_ENTRY_FINE 38
+#define WWISEC_AK_MIDI_CC_VOLUME_FINE 39
+#define WWISEC_AK_MIDI_CC_BALANCE_FINE 40
+#define WWISEC_AK_MIDI_CC_CTRL_9_FINE 41
+#define WWISEC_AK_MIDI_CC_PAN_POSITION_FINE 42
+#define WWISEC_AK_MIDI_CC_EXPRESSION_FINE 43
+#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_1_FINE 44
+#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_2_FINE 45
+#define WWISEC_AK_MIDI_CC_CTRL_14_FINE 46
+#define WWISEC_AK_MIDI_CC_CTRL_15_FINE 47
+
+#define WWISEC_AK_MIDI_CC_CTRL_20_FINE 52
+#define WWISEC_AK_MIDI_CC_CTRL_21_FINE 53
+#define WWISEC_AK_MIDI_CC_CTRL_22_FINE 54
+#define WWISEC_AK_MIDI_CC_CTRL_23_FINE 55
+#define WWISEC_AK_MIDI_CC_CTRL_24_FINE 56
+#define WWISEC_AK_MIDI_CC_CTRL_25_FINE 57
+#define WWISEC_AK_MIDI_CC_CTRL_26_FINE 58
+#define WWISEC_AK_MIDI_CC_CTRL_27_FINE 59
+#define WWISEC_AK_MIDI_CC_CTRL_28_FINE 60
+#define WWISEC_AK_MIDI_CC_CTRL_29_FINE 61
+#define WWISEC_AK_MIDI_CC_CTRL_30_FINE 62
+#define WWISEC_AK_MIDI_CC_CTRL_31_FINE 63
+
+#define WWISEC_AK_MIDI_CC_HOLD_PEDAL 64
+#define WWISEC_AK_MIDI_CC_PORTAMENTO_ON_OFF 65
+#define WWISEC_AK_MIDI_CC_SUSTENUTO_PEDAL 66
+#define WWISEC_AK_MIDI_CC_SOFT_PEDAL 67
+#define WWISEC_AK_MIDI_CC_LEGATO_PEDAL 68
+#define WWISEC_AK_MIDI_CC_HOLD_PEDAL_2 69
+
+#define WWISEC_AK_MIDI_CC_SOUND_VARIATION 70
+#define WWISEC_AK_MIDI_CC_SOUND_TIMBRE 71
+#define WWISEC_AK_MIDI_CC_SOUND_RELEASE_TIME 72
+#define WWISEC_AK_MIDI_CC_SOUND_ATTACK_TIME 73
+#define WWISEC_AK_MIDI_CC_SOUND_BRIGHTNESS 74
+#define WWISEC_AK_MIDI_CC_SOUND_CTRL_6 75
+#define WWISEC_AK_MIDI_CC_SOUND_CTRL_7 76
+#define WWISEC_AK_MIDI_CC_SOUND_CTRL_8 77
+#define WWISEC_AK_MIDI_CC_SOUND_CTRL_9 78
+#define WWISEC_AK_MIDI_CC_SOUND_CTRL_10 79
+
+#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_1 80
+#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_2 81
+#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_3 82
+#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_4 83
+
+#define WWISEC_AK_MIDI_CC_REVERB_LEVEL 91
+#define WWISEC_AK_MIDI_CC_TREMOLO_LEVEL 92
+#define WWISEC_AK_MIDI_CC_CHORUS_LEVEL 93
+#define WWISEC_AK_MIDI_CC_CELESTE_LEVEL 94
+#define WWISEC_AK_MIDI_CC_PHASER_LEVEL 95
+#define WWISEC_AK_MIDI_CC_DATA_BUTTON_P1 96
+#define WWISEC_AK_MIDI_CC_DATA_BUTTON_M1 97
+
+#define WWISEC_AK_MIDI_CC_NON_REGISTER_COARSE 98
+#define WWISEC_AK_MIDI_CC_NON_REGISTER_FINE 99
+
+#define WWISEC_AK_MIDI_CC_ALL_SOUND_OFF 120
+#define WWISEC_AK_MIDI_CC_ALL_CONTROLLERS_OFF 121
+#define WWISEC_AK_MIDI_CC_LOCAL_KEYBOARD 122
+#define WWISEC_AK_MIDI_CC_ALL_NOTES_OFF 123
+#define WWISEC_AK_MIDI_CC_OMNI_MODE_OFF 124
+#define WWISEC_AK_MIDI_CC_OMNI_MODE_ON 125
+#define WWISEC_AK_MIDI_CC_OMNI_MONOPHONIC_ON 126
+#define WWISEC_AK_MIDI_CC_OMNI_POLYPHONIC_ON 127
+
+    typedef struct WWISEC_AkMIDIEvent_tGen
+    {
+        AkUInt8 byParam1;
+        AkUInt8 byParam2;
+    } WWISEC_AkMIDIEvent_tGen;
+
+    typedef struct WWISEC_AkMIDIEvent_tNoteOnOff
+    {
+        WWISEC_AkMidiNoteNo byNote;
+        AkUInt8 byVelocity;
+    } WWISEC_AkMIDIEvent_tNoteOnOff;
+
+    typedef struct WWISEC_AkMIDIEvent_tCc
+    {
+        AkUInt8 byCc;
+        AkUInt8 byValue;
+    } WWISEC_AkMIDIEvent_tCc;
+
+    typedef struct WWISEC_AkMIDIEvent_tPitchBend
+    {
+        AkUInt8 byValueLsb;
+        AkUInt8 byValueMsb;
+    } WWISEC_AkMIDIEvent_tPitchBend;
+
+    typedef struct WWISEC_AkMIDIEvent_tNoteAftertouch
+    {
+        AkUInt8 byNote;
+        AkUInt8 byValue;
+    } WWISEC_AkMIDIEvent_tNoteAftertouch;
+
+    typedef struct WWISEC_AkMIDIEvent_tChanAftertouch
+    {
+        AkUInt8 byValue;
+    } WWISEC_AkMIDIEvent_tChanAftertouch;
+
+    typedef struct WWISEC_AkMIDIEvent_tProgramChange
+    {
+        AkUInt8 byProgramNum;
+    } WWISEC_AkMIDIEvent_tProgramChange;
+
+    typedef struct WWISEC_AkMIDIEvent_tWwiseCmd
+    {
+        AkUInt16 uCmd; ///< See AK_MIDI_WWISE_CMD_* pre-processor definitions
+        AkUInt32 uArg; ///< Optional argument for some commands
+    } WWISEC_AkMIDIEvent_tWwiseCmd;
+
+    typedef struct WWISEC_AkMIDIEvent
+    {
+        AkUInt8 byType; ///< See AK_MIDI_EVENT_TYPE_* pre-processor definitions
+        WWISEC_AkMidiChannelNo byChan;
+
+        union {
+            WWISEC_AkMIDIEvent_tGen Gen;
+            WWISEC_AkMIDIEvent_tCc Cc;
+            WWISEC_AkMIDIEvent_tNoteOnOff NoteOnOff;
+            WWISEC_AkMIDIEvent_tPitchBend PitchBend;
+            WWISEC_AkMIDIEvent_tNoteAftertouch NoteAftertouch;
+            WWISEC_AkMIDIEvent_tChanAftertouch ChanAftertouch;
+            WWISEC_AkMIDIEvent_tProgramChange ProgramChange;
+            WWISEC_AkMIDIEvent_tWwiseCmd WwiseCmd;
+        };
+    } WWISEC_AkMIDIEvent;
+
+#pragma pack(push, 4)
+
+    typedef struct WWISEC_AkMIDIPost
+    {
+        WWISEC_AkMIDIEvent base;
+        AkUInt64 uOffset; ///< Frame offset (in samples) for MIDI event post
+    } WWISEC_AkMIDIPost;
+
+#pragma pack(pop)
+    // END AkMidiTypes
+
+    // BEGIN AkSpeakerVolumes
+    typedef AkReal32* WWISEC_AK_SpeakerVolumes_VectorPtr;            ///< Volume vector. Access each element with the standard bracket [] operator.
+    typedef AkReal32* WWISEC_AK_SpeakerVolumes_MatrixPtr;            ///< Volume matrix. Access each input channel vector with AK::SpeakerVolumes::Matrix::GetChannel().
+    typedef const AkReal32* WWISEC_AK_SpeakerVolumes_ConstVectorPtr; ///< Constant volume vector. Access each element with the standard bracket [] operator.
+    typedef const AkReal32* WWISEC_AK_SpeakerVolumes_ConstMatrixPtr; ///< Constant volume matrix. Access each input channel vector with AK::SpeakerVolumes::Matrix::GetChannel().
+    // END AkSpeakerVolumes
+
+    // BEGIN IAkPlugin
+    typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
+    typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
+    typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
+    // END IAkPlugin
+
+    // BEGIN AkCommonDefs
+    typedef struct WWISEC_AK_AkMetering
+    {
+        /// Peak of each channel in this frame.
+        /// Vector of linear peak levels, corresponding to each channel. NULL if AK_EnableBusMeter_Peak is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
+        WWISEC_AK_SpeakerVolumes_VectorPtr peak;
+
+        /// True peak of each channel (as defined by ITU-R BS.1770) in this frame.
+        /// Vector of linear true peak levels, corresponding to each channel. NULL if AK_EnableBusMeter_TruePeak is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
+        WWISEC_AK_SpeakerVolumes_VectorPtr truePeak;
+
+        /// RMS value of each channel in this frame.
+        /// Vector of linear rms levels, corresponding to each channel. NULL if AK_EnableBusMeter_RMS is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
+        WWISEC_AK_SpeakerVolumes_VectorPtr rms;
+
+        /// Mean k-weighted power value in this frame, used to compute loudness (as defined by ITU-R BS.1770).
+        /// Total linear k-weighted power of all channels. 0 if AK_EnableBusMeter_KPower is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
+        AkReal32 fMeanPowerK;
+    } WWISEC_AK_AkMetering;
+
+    typedef AkReal32 WWISEC_AkSampleType; ///< Audio sample data type (32 bit floating point)
+
+    typedef struct WWISEC_AkAudioBuffer
+    {
+        void* pData;                          ///< Start of the audio buffer.
+        WWISEC_AkChannelConfig channelConfig; ///< Channel config.
+        WWISEC_AKRESULT eState;               ///< Execution status
+        AkUInt16 uMaxFrames;                  ///< Number of sample frames the buffer can hold. Access through AkAudioBuffer::MaxFrames().
+        AkUInt16 uValidFrames;                ///< Number of valid sample frames in the audio buffer
+    } WWISEC_AkAudioBuffer;
+
+    void WWISEC_AkAudioBuffer_ClearData(WWISEC_AkAudioBuffer* instance);
+    void WWISEC_AkAudioBuffer_Clear(WWISEC_AkAudioBuffer* instance);
+    AkUInt32 WWISEC_AkAudioBuffer_NumChannels(const WWISEC_AkAudioBuffer* instance);
+    bool WWISEC_AkAudioBufer_HasLFE(const WWISEC_AkAudioBuffer* instance);
+    WWISEC_AkChannelConfig WWISEC_AkAudioBuffer_GetChannelConfig(const WWISEC_AkAudioBuffer* instance);
+    void* WWISEC_AkAudioBuffer_GetInterleavedData(WWISEC_AkAudioBuffer* instance);
+    void WWISEC_AkAudioBuffer_AttachInterleavedData(WWISEC_AkAudioBuffer* instance, void* in_pData, AkUInt16 in_uMaxFrames, AkUInt16 in_uValidFrames);
+    void WWISEC_AkAudioBuffer_AttachInterleavedData1(WWISEC_AkAudioBuffer* instance, void* in_pData, AkUInt16 in_uMaxFrames, AkUInt16 in_uValidFrames, WWISEC_AkChannelConfig in_channelConfig);
+    bool WWISEC_AkAudioBuffer_HasData(const WWISEC_AkAudioBuffer* instance);
+    AkUInt32 WWISEC_AkAudioBuffer_StandardToPipelineIndex(WWISEC_AkChannelConfig in_channelConfig, AkUInt32 in_uChannelIdx);
+    WWISEC_AkSampleType* WWISEC_AkAudioBuffer_GetChannel(WWISEC_AkAudioBuffer* instance, AkUInt32 in_uIndex);
+    WWISEC_AkSampleType* WWISEC_AkAudioBuffer_GetLFE(WWISEC_AkAudioBuffer* instance);
+    void WWISEC_AkAudioBuffer_ZeroPadToMaxFrames(WWISEC_AkAudioBuffer* instance);
+    void WWISEC_AkAudioBuffer_AttachContiguousDeinterleavedData(WWISEC_AkAudioBuffer* instance, void* in_pData, AkUInt16 in_uMaxFrames, AkUInt16 in_uValidFrames, WWISEC_AkChannelConfig in_channelConfig);
+    void* WWISEC_AkAudioBuffer_DetachContiguousDeinterleavedData(WWISEC_AkAudioBuffer* instance);
+    bool WWISEC_AkAudioBuffer_CheckValidSamples(WWISEC_AkAudioBuffer* instance);
+    void WWISEC_AkAudioBuffer_RelocateMedia(WWISEC_AkAudioBuffer* instance, AkUInt8* in_pNewMedia, AkUInt8* in_pOldMedia);
+    AkUInt16 WWISEC_AkAudioBuffer_MaxFrames(const WWISEC_AkAudioBuffer* instance);
+    // END AkCommonDefs
+
     // BEGIN AkCallback
+    typedef enum WWISEC_AkCallbackType
+    {
+        WWISEC_AK_EndOfEvent = 0x0001,                      ///< Callback triggered when reaching the end of an event. AkCallbackInfo can be cast to AkEventCallbackInfo.
+        WWISEC_AK_EndOfDynamicSequenceItem = 0x0002,        ///< Callback triggered when reaching the end of a dynamic sequence item. AkCallbackInfo can be cast to AkDynamicSequenceItemCallbackInfo.
+        WWISEC_AK_Marker = 0x0004,                          ///< Callback triggered when encountering a marker during playback. AkCallbackInfo can be cast to AkMarkerCallbackInfo.
+        WWISEC_AK_Duration = 0x0008,                        ///< Callback triggered when the duration of the sound is known by the sound engine. AkCallbackInfo can be cast to AkDurationCallbackInfo.
+        WWISEC_AK_SpeakerVolumeMatrix = 0x0010,             ///< Callback triggered at each frame, letting the client modify the speaker volume matrix. AkCallbackInfo can be cast to AkSpeakerVolumeMatrixCallbackInfo.
+        WWISEC_AK_Starvation = 0x0020,                      ///< Callback triggered when playback skips a frame due to stream starvation. AkCallbackInfo can be cast to AkEventCallbackInfo.
+        WWISEC_AK_MusicPlaylistSelect = 0x0040,             ///< Callback triggered when music playlist container must select the next item to play. AkCallbackInfo can be cast to AkMusicPlaylistCallbackInfo.
+        WWISEC_AK_MusicPlayStarted = 0x0080,                ///< Callback triggered when a "Play" or "Seek" command has been executed ("Seek" commands are issued from AK::SoundEngine::SeekOnEvent()). Applies to objects of the Interactive-Music Hierarchy only. AkCallbackInfo can be cast to AkEventCallbackInfo.
+        WWISEC_AK_MusicSyncBeat = 0x0100,                   ///< Enable notifications on Music Beat. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncBar = 0x0200,                    ///< Enable notifications on Music Bar. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncEntry = 0x0400,                  ///< Enable notifications on Music Entry Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncExit = 0x0800,                   ///< Enable notifications on Music Exit Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncGrid = 0x1000,                   ///< Enable notifications on Music Grid. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncUserCue = 0x2000,                ///< Enable notifications on Music Custom Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncPoint = 0x4000,                  ///< Enable notifications on Music switch transition synchronization point. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncAll = 0x7f00,                    ///< Use this flag if you want to receive all notifications concerning AK_MusicSync registration.
+        WWISEC_AK_MIDIEvent = 0x10000,                      ///< Enable notifications for MIDI events. AkCallbackInfo can be cast to AkMIDIEventCallbackInfo.
+        WWISEC_AK_CallbackBits = 0xfffff,                   ///< Bitmask for all callback types.
+        WWISEC_AK_EnableGetSourcePlayPosition = 0x100000,   ///< Enable play position information for use by AK::SoundEngine::GetSourcePlayPosition().
+        WWISEC_AK_EnableGetMusicPlayPosition = 0x200000,    ///< Enable play position information of music objects, queried via AK::MusicEngine::GetPlayingSegmentInfo().
+        WWISEC_AK_EnableGetSourceStreamBuffering = 0x400000 ///< Enable stream buffering information for use by AK::SoundEngine::GetSourceStreamBuffering().
+    } WWISEC_AkCallbackType;
+
+    typedef struct WWISEC_AkCallbackInfo
+    {
+        void* pCookie;                   ///< User data, passed to PostEvent()
+        WWISEC_AkGameObjectID gameObjID; ///< Game object ID
+    } WWISEC_AkCallbackInfo;
+
+    typedef struct WWISEC_AkEventCallbackInfo
+    {
+        WWISEC_AkCallbackInfo base;
+        WWISEC_AkPlayingID playingID; ///< Playing ID of Event, returned by PostEvent()
+        WWISEC_AkUniqueID eventID;    ///< Unique ID of Event, passed to PostEvent()
+    } WWISEC_AkEventCallbackInfo;
+
+    typedef struct WWISEC_AkMIDIEventCallbackInfo
+    {
+        WWISEC_AkEventCallbackInfo base;
+        WWISEC_AkMIDIEvent midiEvent; ///< MIDI event triggered by event.
+    } WWISEC_AkMIDIEventCallbackInfo;
+
+    typedef struct WWISEC_AkMarkerCallbackInfo
+    {
+        WWISEC_AkEventCallbackInfo base;
+        AkUInt32 uIdentifier; ///< Cue point identifier
+        AkUInt32 uPosition;   ///< Position in the cue point (unit: sample frames)
+        const char* strLabel; ///< Label of the marker, read from the file
+    } WWISEC_AkMarkerCallbackInfo;
+
+    typedef struct WWISEC_AkDurationCallbackInfo
+    {
+        WWISEC_AkEventCallbackInfo base;
+        AkReal32 fDuration;            ///< Duration of the sound (unit: milliseconds)
+        AkReal32 fEstimatedDuration;   ///< Estimated duration of the sound depending on source settings such as pitch. (unit: milliseconds)
+        WWISEC_AkUniqueID audioNodeID; ///< Audio Node ID of playing item
+        WWISEC_AkUniqueID mediaID;     ///< Media ID of playing item. (corresponds to 'ID' attribute of 'File' element in SoundBank metadata file)
+        bool bStreaming;               ///< True if source is streaming, false otherwise.
+    } WWISEC_AkDurationCallbackInfo;
+
+    typedef struct WWISEC_AkDynamicSequenceItemCallbackInfo
+    {
+        WWISEC_AkCallbackInfo base;
+        WWISEC_AkPlayingID playingID;  ///< Playing ID of Dynamic Sequence, returned by AK::SoundEngine:DynamicSequence::Open()
+        WWISEC_AkUniqueID audioNodeID; ///< Audio Node ID of finished item
+        void* pCustomInfo;             ///< Custom info passed to the DynamicSequence::Open function
+    } WWISEC_AkDynamicSequenceItemCallbackInfo;
+
+    typedef struct WWISEC_AkSpeakerVolumeMatrixCallbackInfo
+    {
+        WWISEC_AkEventCallbackInfo base;
+        WWISEC_AK_SpeakerVolumes_MatrixPtr pVolumes;    ///< Pointer to volume matrix describing the contribution of each source channel to destination channels. Use methods of AK::SpeakerVolumes::Matrix to interpret them.
+        WWISEC_AkChannelConfig inputConfig;             ///< Channel configuration of the voice/bus.
+        WWISEC_AkChannelConfig outputConfig;            ///< Channel configuration of the output bus.
+        AkReal32* pfBaseVolume;                         ///< Base volume, common to all channels.
+        AkReal32* pfEmitterListenerVolume;              ///< Emitter-listener pair-specific gain. When there are multiple emitter-listener pairs, this volume is set to that of the loudest pair, and the relative gain of other pairs is applied directly on the channel volume matrix pVolumes.
+        WWISEC_AK_IAkMixerInputContext* pContext;       ///< Context of the current voice/bus about to be mixed into the output bus with specified base volume and volume matrix.
+        WWISEC_AK_IAkMixerPluginContext* pMixerContext; ///< Output mixing bus context. Use it to access a few useful panning and mixing services, as well as the ID of the output bus. NULL if pContext is the master audio bus.
+    } WWISEC_AkSpeakerVolumeMatrixCallbackInfo;
+
+    typedef struct WWISEC_AkBusMeteringCallbackInfo
+    {
+        WWISEC_AkCallbackInfo base;
+        WWISEC_AK_AkMetering* pMetering;       ///< Struct containing metering information.
+        WWISEC_AkChannelConfig channelConfig;  ///< Channel configuration of the bus.
+        WWISEC_AkMeteringFlags eMeteringFlags; ///< Metering flags that were asked for in RegisterBusMeteringCallback(). You may only access corresponding meter values from in_pMeteringInfo. Others will fail.
+    } WWISEC_AkBusMeteringCallbackInfo;
+
+    typedef struct WWISEC_AkOutputDeviceMeteringCallbackInfo
+    {
+        WWISEC_AkCallbackInfo base;
+        WWISEC_AK_AkMetering* pMainMixMetering;             ///< Metering information for the main mix
+        WWISEC_AkChannelConfig mainMixConfig;               ///< Channel configuration of the main mix
+        WWISEC_AK_AkMetering* pPassthroughMetering;         ///< Metering information for the passthrough mix (if any; will be null otherwise)
+        WWISEC_AkChannelConfig passthroughMixConfig;        ///< Channel configuration of the passthrough mix (if any; will be invalid otherwise)
+        AkUInt32 uNumSystemAudioObjects;                    ///< Number of System Audio Objects going out of the output device
+        WWISEC_AK_AkMetering** ppSystemAudioObjectMetering; ///< Metering information for each System Audio Object (number of elements is equal to uNumSystemAudioObjects)
+        WWISEC_AkMeteringFlags eMeteringFlags;              ///< Metering flags that were asked for in RegisterOutputDeviceMeteringCallback(). You may only access corresponding meter values from the metering objects. Others will fail.
+    } WWISEC_AkOutputDeviceMeteringCallbackInfo;
+
+    typedef struct WWISEC_AkMusicPlaylistCallbackInfo
+    {
+        WWISEC_AkEventCallbackInfo base;
+        WWISEC_AkUniqueID playlistID; ///< ID of playlist node
+        AkUInt32 uNumPlaylistItems;   ///< Number of items in playlist node (may be segments or other playlists)
+        AkUInt32 uPlaylistSelection;  ///< Selection: set by sound engine, modifWWISEC_AkMusicPlaylistCallbackInfoied by callback function (if not in range 0 <= uPlaylistSelection < uNumPlaylistItems then ignored).
+        AkUInt32 uPlaylistItemDone;   ///< Playlist node done: set by sound engine, modified by callback function (if set to anything but 0 then the current playlist item is done, and uPlaylistSelection is ignored)
+    } WWISEC_AkMusicPlaylistCallbackInfo;
+
     typedef struct WWISEC_AkSegmentInfo
     {
         WWISEC_AkTimeMs iCurrentPosition;        ///< Current position of the segment, relative to the Entry Cue, in milliseconds. Range is [-iPreEntryDuration, iActiveDuration+iPostExitDuration].
@@ -251,11 +642,111 @@ extern "C"
         WWISEC_AkTimeMs iActiveDuration;         ///< Duration of the active region of the segment (between the Entry and Exit Cues), in milliseconds.
         WWISEC_AkTimeMs iPostExitDuration;       ///< Duration of the post-exit region of the segment, in milliseconds.
         WWISEC_AkTimeMs iRemainingLookAheadTime; ///< Number of milliseconds remaining in the "looking-ahead" state of the segment, when it is silent but streamed tracks are being prefetched.
-        AkReal32 fBeatDuration;           ///< Beat Duration in seconds.
-        AkReal32 fBarDuration;            ///< Bar Duration in seconds.
-        AkReal32 fGridDuration;           ///< Grid duration in seconds.
-        AkReal32 fGridOffset;             ///< Grid offset in seconds.
+        AkReal32 fBeatDuration;                  ///< Beat Duration in seconds.
+        AkReal32 fBarDuration;                   ///< Bar Duration in seconds.
+        AkReal32 fGridDuration;                  ///< Grid duration in seconds.
+        AkReal32 fGridOffset;                    ///< Grid offset in seconds.
     } WWISEC_AkSegmentInfo;
+
+    typedef struct WWISEC_AkMusicSyncCallbackInfo
+    {
+        WWISEC_AkCallbackInfo base;
+        WWISEC_AkPlayingID playingID;        ///< Playing ID of Event, returned by PostEvent()
+        WWISEC_AkSegmentInfo segmentInfo;    ///< Segment information corresponding to the segment triggering this callback.
+        WWISEC_AkCallbackType musicSyncType; ///< Would be either \ref AK_MusicSyncEntry, \ref AK_MusicSyncBeat, \ref AK_MusicSyncBar, \ref AK_MusicSyncExit, \ref AK_MusicSyncGrid, \ref AK_MusicSyncPoint or \ref AK_MusicSyncUserCue.
+        char* pszUserCueName;                ///< Cue name (UTF-8 string). Set for notifications AK_MusicSyncUserCue. NULL if cue has no name.
+    } WWISEC_AkMusicSyncCallbackInfo;
+
+    typedef struct WWISEC_AkResourceMonitorDataSummary
+    {
+        AkReal32 totalCPU;       ///< Pourcentage of the cpu time used for processing audio. Please note that the numbers may add up when using multiple threads.
+        AkReal32 pluginCPU;      ///< Pourcentage of the cpu time used by plugin processing. Please note that the numbers may add up when using multiple threads.
+        AkUInt32 physicalVoices; ///< Number of active physical voices
+        AkUInt32 virtualVoices;  ///< Number of active virtual voices
+        AkUInt32 totalVoices;    ///< Number of active physical and virtual voices
+        AkUInt32 nbActiveEvents; ///< Number of events triggered at a certain time
+    } WWISEC_AkResourceMonitorDataSummary;
+
+    AK_CALLBACK(void, WWISEC_AkCallbackFunc)
+    (
+        WWISEC_AkCallbackType in_eType,         ///< Callback type.
+        WWISEC_AkCallbackInfo* in_pCallbackInfo ///< Structure containing desired information. You can cast it to the proper sub-type, depending on the callback type.
+    );
+
+    AK_CALLBACK(void, WWISEC_AkBusCallbackFunc)
+    (
+        WWISEC_AkSpeakerVolumeMatrixCallbackInfo* in_pCallbackInfo ///< Structure containing desired bus information.
+    );
+
+    AK_CALLBACK(void, WWISEC_AkBusMeteringCallbackFunc)
+    (
+        WWISEC_AkBusMeteringCallbackInfo* in_pCallbackInfo ///< Structure containing desired bus information.
+    );
+
+    AK_CALLBACK(void, WWISEC_AkOutputDeviceMeteringCallbackFunc)
+    (
+        WWISEC_AkOutputDeviceMeteringCallbackInfo* in_pCallbackInfo ///< Structure containing desired output device information.
+    );
+
+    AK_CALLBACK(void, WWISEC_AkBankCallbackFunc)
+    (
+        AkUInt32 in_bankID,
+        const void* in_pInMemoryBankPtr,
+        WWISEC_AKRESULT in_eLoadResult,
+        void* in_pCookie);
+
+    typedef enum WWISEC_AkGlobalCallbackLocation
+    {
+        WWISEC_AkGlobalCallbackLocation_Register = (1 << 0),                        ///< Right after successful registration of callback/plugin. Typically used by plugins along with AkGlobalCallbackLocation_Term for allocating memory for the lifetime of the sound engine.
+        WWISEC_AkGlobalCallbackLocation_Begin = (1 << 1),                           ///< Start of audio processing. The number of frames about to be rendered depends on the sink/end-point and can be zero.
+        WWISEC_AkGlobalCallbackLocation_PreProcessMessageQueueForRender = (1 << 2), ///< Start of frame rendering, before having processed game messages.
+        WWISEC_AkGlobalCallbackLocation_PostMessagesProcessed = (1 << 3),           ///< After one or more messages have been processed, but before updating game object and listener positions internally.
+        WWISEC_AkGlobalCallbackLocation_BeginRender = (1 << 4),                     ///< Start of frame rendering, after having processed game messages.
+        WWISEC_AkGlobalCallbackLocation_EndRender = (1 << 5),                       ///< End of frame rendering.
+        WWISEC_AkGlobalCallbackLocation_End = (1 << 6),                             ///< End of audio processing.
+        WWISEC_AkGlobalCallbackLocation_Term = (1 << 7),                            ///< Sound engine termination.
+        WWISEC_AkGlobalCallbackLocation_Monitor = (1 << 8),                         ///< Send monitor data
+        WWISEC_AkGlobalCallbackLocation_MonitorRecap = (1 << 9),                    ///< Send monitor data connection to recap.
+        WWISEC_AkGlobalCallbackLocation_Init = (1 << 10),                           ///< Sound engine initialization.
+        WWISEC_AkGlobalCallbackLocation_Suspend = (1 << 11),                        ///< Sound engine suspension through \ref AK::SoundEngine::Suspend
+        WWISEC_AkGlobalCallbackLocation_WakeupFromSuspend = (1 << 12),              ///< Sound engine awakening through \ref AK::SoundEngine::WakeupFromSuspend
+        WWISEC_AkGlobalCallbackLocation_Num = 13                                    ///< Total number of global callback locations.
+    } WWISEC_AkGlobalCallbackLocation;
+
+    AK_CALLBACK(void, WWISEC_AkGlobalCallbackFunc)
+    (
+        WWISEC_AK_IAkGlobalPluginContext* in_pContext, ///< Engine context.
+        WWISEC_AkGlobalCallbackLocation in_eLocation,  ///< Location where this callback is fired.
+        void* in_pCookie                               ///< User cookie passed to AK::SoundEngine::RegisterGlobalCallback().
+    );
+
+    AK_CALLBACK(void, WWISEC_AkResourceMonitorCallbackFunc)
+    (
+        const WWISEC_AkResourceMonitorDataSummary* in_pdataSummary ///< Data summary passed to the function registered using AK::SoundEngine::RegisterResourceMonitorCallback().
+    );
+
+    typedef enum WWISEC_AK_AkAudioDeviceEvent
+    {
+        WWISEC_AK_AkAudioDeviceEvent_Initialization, ///< Sent after an Audio Device has initialized.  Initialization might have failed, check the AKRESULT.
+        WWISEC_AK_AkAudioDeviceEvent_Removal,        ///< Audio device was removed through explicit call (AK::SoundEngine::RemoveOutput or AK::SoundEngine::Term)
+        WWISEC_AK_AkAudioDeviceEvent_SystemRemoval   ///< Audio device was removed because of a system event (disconnection), hardware or driver problem. Check the AKRESULT when called through AkDeviceStatusCallbackFunc, it may give more context.
+    } WWISEC_AK_AkAudioDeviceEvent;
+
+    AK_CALLBACK(void, WWISEC_AK_AkDeviceStatusCallbackFunc)
+    (
+        WWISEC_AK_IAkGlobalPluginContext* in_pContext, ///< Engine context.
+        WWISEC_AkUniqueID in_idAudioDeviceShareset,    ///< The audio device shareset attached, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
+        AkUInt32 in_idDeviceID,                        ///< The audio device specific id, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
+        WWISEC_AK_AkAudioDeviceEvent in_idEvent,       ///< The event for which this callback was called.  See AK::AkAudioDeviceEvent.  AKRESULT may provide more information.
+        WWISEC_AKRESULT in_AkResult                    ///< Result of the last operation.
+    );
+
+    AK_CALLBACK(void, WWISEC_AkCaptureCallbackFunc)
+    (
+        WWISEC_AkAudioBuffer* in_CaptureBuffer, ///< Capture audio buffer. The data is always float interleaved.
+        WWISEC_AkOutputDeviceID in_idOutput,    ///< The audio device specific id, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
+        void* in_pCookie                        ///< Callback cookie that will be sent to the callback function along with additional information
+    );
     // END AkCallback
 
     // BEGIN AkMemoryMgr
@@ -455,10 +946,6 @@ extern "C"
     WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings);
     void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettings);
     // END AkModule
-
-    // BEGIN AkSpeakerConfig
-    typedef AkUInt32 WWISEC_AkChannelConfig;
-    // END AkSpeakerConfig
 
     // BEGIN Platform-specific (Ak*SoundEngine and AkPlatformFunc)
     typedef struct WWISEC_WIN_AkThreadProperties
@@ -926,7 +1413,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
 
     void WWISEC_AK_SoundEngine_Term();
-
     // END AkSoundEngine
 
 // BEGIN IAkStreamMgr

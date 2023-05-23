@@ -46,8 +46,156 @@ static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription))
 static_assert(WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT == AK_COMM_DEFAULT_DISCOVERY_PORT);
 // END AkTypes
 
+// BEGIN AkMidiTypes
+static_assert(sizeof(WWISEC_AkMIDIEvent_tGen) == sizeof(AkMIDIEvent::tGen));
+static_assert(sizeof(WWISEC_AkMIDIEvent_tNoteOnOff) == sizeof(AkMIDIEvent::tNoteOnOff));
+static_assert(sizeof(WWISEC_AkMIDIEvent_tCc) == sizeof(AkMIDIEvent::tCc));
+static_assert(sizeof(WWISEC_AkMIDIEvent_tPitchBend) == sizeof(AkMIDIEvent::tPitchBend));
+static_assert(sizeof(WWISEC_AkMIDIEvent_tNoteAftertouch) == sizeof(AkMIDIEvent::tNoteAftertouch));
+static_assert(sizeof(WWISEC_AkMIDIEvent_tChanAftertouch) == sizeof(AkMIDIEvent::tChanAftertouch));
+static_assert(sizeof(WWISEC_AkMIDIEvent_tProgramChange) == sizeof(AkMIDIEvent::tProgramChange));
+static_assert(sizeof(WWISEC_AkMIDIEvent_tWwiseCmd) == sizeof(AkMIDIEvent::tWwiseCmd));
+static_assert(sizeof(WWISEC_AkMIDIEvent) == sizeof(AkMIDIEvent));
+static_assert(sizeof(WWISEC_AkMIDIPost) == sizeof(AkMIDIPost));
+// END AkMidiTypes
+
+// BEGIN AkCommonDefs
+static_assert(sizeof(WWISEC_AK_AkMetering) == sizeof(AK::AkMetering));
+static_assert(sizeof(WWISEC_AkAudioBuffer) == sizeof(AkAudioBuffer));
+
+void WWISEC_AkAudioBuffer_ClearData(WWISEC_AkAudioBuffer* instance)
+{
+    reinterpret_cast<AkAudioBuffer*>(instance)->ClearData();
+}
+
+void WWISEC_AkAudioBuffer_Clear(WWISEC_AkAudioBuffer* instance)
+{
+    reinterpret_cast<AkAudioBuffer*>(instance)->Clear();
+}
+
+AkUInt32 WWISEC_AkAudioBuffer_NumChannels(const WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<const AkAudioBuffer*>(instance)->NumChannels();
+}
+
+bool WWISEC_AkAudioBufer_HasLFE(const WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<const AkAudioBuffer*>(instance)->HasLFE();
+}
+
+WWISEC_AkChannelConfig WWISEC_AkAudioBuffer_GetChannelConfig(const WWISEC_AkAudioBuffer* instance)
+{
+    return static_cast<WWISEC_AkChannelConfig>(reinterpret_cast<const AkAudioBuffer*>(instance)->GetChannelConfig().Serialize());
+}
+
+void* WWISEC_AkAudioBuffer_GetInterleavedData(WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<AkAudioBuffer*>(instance)->GetInterleavedData();
+}
+
+void WWISEC_AkAudioBuffer_AttachInterleavedData(WWISEC_AkAudioBuffer* instance, void* in_pData, AkUInt16 in_uMaxFrames, AkUInt16 in_uValidFrames)
+{
+    reinterpret_cast<AkAudioBuffer*>(instance)->AttachInterleavedData(in_pData, in_uMaxFrames, in_uValidFrames);
+}
+
+void WWISEC_AkAudioBuffer_AttachInterleavedData1(WWISEC_AkAudioBuffer* instance, void* in_pData, AkUInt16 in_uMaxFrames, AkUInt16 in_uValidFrames, WWISEC_AkChannelConfig in_channelConfig)
+{
+    AkChannelConfig converted_channel_config;
+    converted_channel_config.Deserialize(in_channelConfig);
+
+    reinterpret_cast<AkAudioBuffer*>(instance)->AttachInterleavedData(in_pData, in_uMaxFrames, in_uValidFrames, converted_channel_config);
+}
+
+bool WWISEC_AkAudioBuffer_HasData(const WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<const AkAudioBuffer*>(instance)->HasData();
+}
+
+AkUInt32 WWISEC_AkAudioBuffer_StandardToPipelineIndex(WWISEC_AkChannelConfig in_channelConfig, AkUInt32 in_uChannelIdx)
+{
+    AkChannelConfig converted_channel_config;
+    converted_channel_config.Deserialize(in_channelConfig);
+    return AkAudioBuffer::StandardToPipelineIndex(converted_channel_config, in_uChannelIdx);
+}
+
+WWISEC_AkSampleType* WWISEC_AkAudioBuffer_GetChannel(WWISEC_AkAudioBuffer* instance, AkUInt32 in_uIndex)
+{
+    return reinterpret_cast<WWISEC_AkSampleType*>(reinterpret_cast<AkAudioBuffer*>(instance)->GetChannel(in_uIndex));
+}
+
+WWISEC_AkSampleType* WWISEC_AkAudioBuffer_GetLFE(WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<WWISEC_AkSampleType*>(reinterpret_cast<AkAudioBuffer*>(instance)->GetLFE());
+}
+
+void WWISEC_AkAudioBuffer_ZeroPadToMaxFrames(WWISEC_AkAudioBuffer* instance)
+{
+    reinterpret_cast<AkAudioBuffer*>(instance)->ZeroPadToMaxFrames();
+}
+
+void WWISEC_AkAudioBuffer_AttachContiguousDeinterleavedData(WWISEC_AkAudioBuffer* instance, void* in_pData, AkUInt16 in_uMaxFrames, AkUInt16 in_uValidFrames, WWISEC_AkChannelConfig in_channelConfig)
+{
+    AkChannelConfig converted_channel_config;
+    converted_channel_config.Deserialize(in_channelConfig);
+
+    reinterpret_cast<AkAudioBuffer*>(instance)->AttachContiguousDeinterleavedData(in_pData, in_uMaxFrames, in_uValidFrames, converted_channel_config);
+}
+
+void* WWISEC_AkAudioBuffer_DetachContiguousDeinterleavedData(WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<AkAudioBuffer*>(instance)->DetachContiguousDeinterleavedData();
+}
+
+bool WWISEC_AkAudioBuffer_CheckValidSamples(WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<AkAudioBuffer*>(instance)->CheckValidSamples();
+}
+
+void WWISEC_AkAudioBuffer_RelocateMedia(WWISEC_AkAudioBuffer* instance, AkUInt8* in_pNewMedia, AkUInt8* in_pOldMedia)
+{
+    reinterpret_cast<AkAudioBuffer*>(instance)->RelocateMedia(in_pNewMedia, in_pOldMedia);
+}
+
+AkUInt16 WWISEC_AkAudioBuffer_MaxFrames(const WWISEC_AkAudioBuffer* instance)
+{
+    return reinterpret_cast<const AkAudioBuffer*>(instance)->MaxFrames();
+}
+// END AkCcommonDefs
+
 // BEGIN AkCallback
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_EndOfEvent);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_EndOfDynamicSequenceItem);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_Marker);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_Duration);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_SpeakerVolumeMatrix);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_Starvation);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicPlaylistSelect);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicPlayStarted);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncBeat);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncBar);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncEntry);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncExit);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncGrid);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncUserCue);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncPoint);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MusicSyncAll);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MIDIEvent);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_CallbackBits);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_EnableGetSourcePlayPosition);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_EnableGetMusicPlayPosition);
+WWISEC_ASSERT_ENUM_VALUE_SAME(AK_EnableGetSourceStreamBuffering);
+static_assert(sizeof(WWISEC_AkCallbackInfo) == sizeof(AkCallbackInfo));
+static_assert(sizeof(WWISEC_AkEventCallbackInfo) == sizeof(AkEventCallbackInfo));
+static_assert(sizeof(WWISEC_AkMarkerCallbackInfo) == sizeof(AkMarkerCallbackInfo));
+static_assert(sizeof(WWISEC_AkDurationCallbackInfo) == sizeof(AkDurationCallbackInfo));
+static_assert(sizeof(WWISEC_AkDynamicSequenceItemCallbackInfo) == sizeof(AkDynamicSequenceItemCallbackInfo));
+static_assert(sizeof(WWISEC_AkSpeakerVolumeMatrixCallbackInfo) == sizeof(AkSpeakerVolumeMatrixCallbackInfo));
+static_assert(sizeof(WWISEC_AkBusMeteringCallbackInfo) == sizeof(AkBusMeteringCallbackInfo));
+static_assert(sizeof(WWISEC_AkOutputDeviceMeteringCallbackInfo) == sizeof(AkOutputDeviceMeteringCallbackInfo));
+static_assert(sizeof(WWISEC_AkMusicPlaylistCallbackInfo) == sizeof(AkMusicPlaylistCallbackInfo));
 static_assert(sizeof(WWISEC_AkSegmentInfo) == sizeof(AkSegmentInfo));
+static_assert(sizeof(WWISEC_AkMusicSyncCallbackInfo) == sizeof(AkMusicSyncCallbackInfo));
+static_assert(sizeof(WWISEC_AkResourceMonitorDataSummary) == sizeof(AkResourceMonitorDataSummary));
 // END AkCallback
 
 // BEGIN AkMemoryMgr
