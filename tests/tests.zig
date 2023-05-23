@@ -29,20 +29,20 @@ test "AkSoundEngine init" {
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
 
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = undefined;
+    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
     var stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
-    var device_settings: AK.StreamMgr.AkDeviceSettings = undefined;
+    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
-    var init_settings: AK.AkInitSettings = undefined;
+    var init_settings: AK.AkInitSettings = .{};
     AK.SoundEngine.getDefaultInitSettings(&init_settings);
 
-    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
     init_settings.plugin_dll_path = "C:\\test";
@@ -93,20 +93,19 @@ test "CAkDefaultIOHookBlocking create" {
     }
 
     var memory_settings: AK.AkMemSettings = undefined;
-
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
 
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = undefined;
+    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
     var stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
-    var device_settings: AK.StreamMgr.AkDeviceSettings = undefined;
+    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
     var io_hook = try AK.IOHooks.CAkDefaultIOHookBlocking.create(std.testing.allocator);
@@ -117,10 +116,10 @@ test "CAkDefaultIOHookBlocking create" {
 
     try io_hook.setBasePath(std.testing.allocator, ".");
 
-    var init_settings: AK.AkInitSettings = undefined;
+    var init_settings: AK.AkInitSettings = .{};
     AK.SoundEngine.getDefaultInitSettings(&init_settings);
 
-    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
@@ -142,14 +141,14 @@ test "CAkDefaultIOHookDeferred create" {
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
 
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = undefined;
+    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
     var stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
-    var device_settings: AK.StreamMgr.AkDeviceSettings = undefined;
+    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
     device_settings.scheduler_type_flags = AK.StreamMgr.AK_SCHEDULER_DEFERRED_LINED_UP;
 
@@ -161,10 +160,10 @@ test "CAkDefaultIOHookDeferred create" {
 
     try io_hook.setBasePath(std.testing.allocator, ".");
 
-    var init_settings: AK.AkInitSettings = undefined;
+    var init_settings: AK.AkInitSettings = .{};
     AK.SoundEngine.getDefaultInitSettings(&init_settings);
 
-    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
@@ -186,14 +185,14 @@ test "CAkFilePackageLowLevelIOBlocking create" {
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
 
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = undefined;
+    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
     var stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
-    var device_settings: AK.StreamMgr.AkDeviceSettings = undefined;
+    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
     var io_hook = try AK.IOHooks.CAkFilePackageLowLevelIOBlocking.create(std.testing.allocator);
@@ -207,10 +206,10 @@ test "CAkFilePackageLowLevelIOBlocking create" {
     const no_package_error = io_hook.loadFilePackage(std.testing.allocator, "NoPackage.pck");
     try std.testing.expectError(AK.WwiseError.FileNotFound, no_package_error);
 
-    var init_settings: AK.AkInitSettings = undefined;
+    var init_settings: AK.AkInitSettings = .{};
     AK.SoundEngine.getDefaultInitSettings(&init_settings);
 
-    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
@@ -232,14 +231,14 @@ test "CAkFilePackageLowLevelIODeferred create" {
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
 
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = undefined;
+    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
     var stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
-    var device_settings: AK.StreamMgr.AkDeviceSettings = undefined;
+    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
     device_settings.scheduler_type_flags = AK.StreamMgr.AK_SCHEDULER_DEFERRED_LINED_UP;
 
@@ -254,10 +253,10 @@ test "CAkFilePackageLowLevelIODeferred create" {
     const no_package_error = io_hook.loadFilePackage(std.testing.allocator, "NoPackage.pck");
     try std.testing.expectError(AK.WwiseError.FileNotFound, no_package_error);
 
-    var init_settings: AK.AkInitSettings = undefined;
+    var init_settings: AK.AkInitSettings = .{};
     AK.SoundEngine.getDefaultInitSettings(&init_settings);
 
-    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
@@ -275,20 +274,20 @@ test "AkCommunication init" {
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
 
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = undefined;
+    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
     var stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
-    var device_settings: AK.StreamMgr.AkDeviceSettings = undefined;
+    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
-    var init_settings: AK.AkInitSettings = undefined;
+    var init_settings: AK.AkInitSettings = .{};
     AK.SoundEngine.getDefaultInitSettings(&init_settings);
 
-    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
@@ -317,20 +316,20 @@ test "AkMusicEngine init" {
     try AK.MemoryMgr.init(&memory_settings);
     defer AK.MemoryMgr.term();
 
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = undefined;
+    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
     var stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
-    var device_settings: AK.StreamMgr.AkDeviceSettings = undefined;
+    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
-    var init_settings: AK.AkInitSettings = undefined;
+    var init_settings: AK.AkInitSettings = .{};
     AK.SoundEngine.getDefaultInitSettings(&init_settings);
 
-    var platform_init_settings: AK.AkPlatformInitSettings = undefined;
+    var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
     init_settings.plugin_dll_path = "C:\\test";
@@ -338,7 +337,7 @@ test "AkMusicEngine init" {
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
     defer AK.SoundEngine.term();
 
-    var music_settings: AK.MusicEngine.AkMusicSettings = undefined;
+    var music_settings: AK.MusicEngine.AkMusicSettings = .{};
     AK.MusicEngine.getDefaultInitSettings(&music_settings);
 
     try AK.MusicEngine.init(&music_settings);

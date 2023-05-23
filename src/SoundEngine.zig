@@ -3,11 +3,9 @@ const c = @import("c.zig");
 const common = @import("common.zig");
 const settings = @import("settings.zig");
 
-pub fn addOutput(output_settings: settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
-    var raw_settings = output_settings.toC();
-
+pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_AddOutput(&raw_settings, @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
+        c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
     );
 }
 
@@ -19,10 +17,7 @@ pub fn getDefaultInitSettings(init_settings: *settings.AkInitSettings) void {
 }
 
 pub fn getDefaultPlatformInitSettings(platform_init_settings: *settings.AkPlatformInitSettings) void {
-    var native_settings: c.WWISEC_AkPlatformInitSettings = undefined;
-    c.WWISEC_AK_SoundEngine_GetDefaultPlatformInitSettings(&native_settings);
-
-    platform_init_settings.* = settings.AkPlatformInitSettings.fromC(native_settings);
+    c.WWISEC_AK_SoundEngine_GetDefaultPlatformInitSettings(@ptrCast(*c.WWISEC_AkPlatformInitSettings, platform_init_settings));
 }
 
 pub fn init(fallback_allocator: std.mem.Allocator, init_settings: settings.AkInitSettings, platform_init_settings: settings.AkPlatformInitSettings) common.WwiseError!void {
@@ -45,11 +40,9 @@ pub fn removeOutput(id_output: common.AkOutputDeviceID) common.WwiseError!void {
     );
 }
 
-pub fn replaceOutput(output_settings: settings.AkOutputSettings, in_device_id: common.AkOutputDeviceID, out_device_id: *?common.AkOutputDeviceID) common.WwiseError!void {
-    var raw_settings = output_settings.toC();
-
+pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_device_id: common.AkOutputDeviceID, out_device_id: *?common.AkOutputDeviceID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_ReplaceOutput(&raw_settings, in_device_id, @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id)),
+        c.WWISEC_AK_SoundEngine_ReplaceOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), in_device_id, @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id)),
     );
 }
 

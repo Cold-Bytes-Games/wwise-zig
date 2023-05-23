@@ -5,41 +5,33 @@ const common = @import("common.zig");
 const speaker_config = @import("speaker_config.zig");
 
 pub const AkJobWorkerFunc = c.WWISEC_AkJobWorkerFunc;
-pub const AkJobMgrSettings = struct {
-    fn_request_job_worker: FuncRequestJobWorker,
-    max_active_workers: [c.WWISEC_AK_NUM_JOB_TYPES]u32,
-    num_memory_slabs: u32,
-    memory_slab_size: u32,
-    p_client_data: ?*anyopaque,
+pub const AkJobMgrSettings = extern struct {
+    fn_request_job_worker: FuncRequestJobWorker = null,
+    max_active_workers: [common.AK_NUM_JOB_TYPES]u32 = [_]u32{0} ** common.AK_NUM_JOB_TYPES,
+    num_memory_slabs: u32 = 0,
+    memory_slab_size: u32 = 0,
+    p_client_data: ?*anyopaque = null,
 
     pub const FuncRequestJobWorker = c.WWISEC_AkJobMgrSettings_FuncRequestJobWorker;
 
-    pub fn fromC(job_mgr_settings: c.WWISEC_AkJobMgrSettings) AkJobMgrSettings {
-        return .{
-            .fn_request_job_worker = job_mgr_settings.fnRequestJobWorker,
-            .max_active_workers = job_mgr_settings.uMaxActiveWorkers,
-            .num_memory_slabs = job_mgr_settings.uNumMemorySlabs,
-            .memory_slab_size = job_mgr_settings.uMemorySlabSize,
-            .p_client_data = job_mgr_settings.pClientData,
-        };
+    pub inline fn fromC(value: c.WWISEC_AkJobMgrSettings) AkJobMgrSettings {
+        return @bitCast(AkJobMgrSettings, value);
     }
 
-    pub fn toC(self: AkJobMgrSettings) c.WWISEC_AkJobMgrSettings {
-        return .{
-            .fnRequestJobWorker = self.fn_request_job_worker,
-            .uMaxActiveWorkers = self.max_active_workers,
-            .uNumMemorySlabs = self.num_memory_slabs,
-            .uMemorySlabSize = self.memory_slab_size,
-            .pClientData = self.p_client_data,
-        };
+    pub inline fn toC(self: AkJobMgrSettings) c.WWISEC_AkJobMgrSettings {
+        return @bitCast(c.WWISEC_AkJobMgrSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkJobMgrSettings) == @sizeOf(c.WWISEC_AkJobMgrSettings));
     }
 };
 
-pub const AkOutputSettings = struct {
-    audio_device_shareset: common.AkUniqueID,
-    id_device: u32,
-    panning_rule: common.AkPanningRule,
-    channel_config: speaker_config.AkChannelConfig,
+pub const AkOutputSettings = extern struct {
+    audio_device_shareset: common.AkUniqueID = 0,
+    id_device: u32 = 0,
+    panning_rule: common.AkPanningRule = .speakers,
+    channel_config: speaker_config.AkChannelConfig = .{},
 
     pub fn init(fallback_allocator: std.mem.Allocator, device_shareset: []const u8, id_device: common.AkUniqueID, channel_config: speaker_config.AkChannelConfig, panning: common.AkPanningRule) !AkOutputSettings {
         var raw_output_settings: c.WWISEC_AkOutputSettings = undefined;
@@ -55,22 +47,16 @@ pub const AkOutputSettings = struct {
         return fromC(raw_output_settings);
     }
 
-    pub fn fromC(output_settings: c.WWISEC_AkOutputSettings) AkOutputSettings {
-        return .{
-            .audio_device_shareset = output_settings.audioDeviceShareset,
-            .id_device = output_settings.idDevice,
-            .panning_rule = @intToEnum(common.AkPanningRule, output_settings.ePanningRule),
-            .channel_config = speaker_config.AkChannelConfig.fromC(output_settings.channelConfig),
-        };
+    pub inline fn fromC(value: c.WWISEC_AkOutputSettings) AkOutputSettings {
+        return @bitCast(AkOutputSettings, value);
     }
 
-    pub fn toC(self: AkOutputSettings) c.WWISEC_AkOutputSettings {
-        return c.WWISEC_AkOutputSettings{
-            .audioDeviceShareset = self.audio_device_shareset,
-            .idDevice = self.id_device,
-            .ePanningRule = @enumToInt(self.panning_rule),
-            .channelConfig = self.channel_config.toC(),
-        };
+    pub inline fn toC(self: AkOutputSettings) c.WWISEC_AkOutputSettings {
+        return @bitCast(c.WWISEC_AkOutputSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkOutputSettings) == @sizeOf(c.WWISEC_AkOutputSettings));
     }
 };
 
@@ -89,30 +75,30 @@ pub const AkProfilerPopTimerFunc = c.WWISEC_AkProfilerPopTimerFunc;
 pub const AkProfilerPostMarkerFunc = c.WWISEC_AkProfilerPostMarkerFunc;
 
 pub const AkInitSettings = struct {
-    pfn_assert_hook: AkAssertHook,
-    max_num_paths: u32,
-    command_queue_size: u32,
-    enable_game_sync_preparation: bool,
-    continuous_playback_look_ahead: u32,
-    num_samples_per_frame: u32,
-    monitor_queue_pool_size: u32,
-    cpu_monitor_queue_max_size: u32,
-    settings_main_output: AkOutputSettings,
-    settings_job_manager: AkJobMgrSettings,
-    max_hardware_timeout_ms: u32,
-    use_sound_bank_mgr_thread: bool,
-    use_lengine_thread: bool,
-    bgm_callback: AkBackgroundMusicChangeCallbackFunc,
-    bgm_callback_cookie: ?*anyopaque,
-    plugin_dll_path: []const u8,
-    floor_plane: AkFloorPlane,
-    game_units_to_meters: f32,
-    bank_read_buffer_size: u32,
-    debug_out_of_range_limit: f32,
-    debug_out_of_range_check_enabled: bool,
-    fn_profiler_push_timer: AkProfilerPushTimerFunc,
-    fn_profiler_pop_timer: AkProfilerPopTimerFunc,
-    fn_profiler_post_marker: AkProfilerPostMarkerFunc,
+    pfn_assert_hook: AkAssertHook = null,
+    max_num_paths: u32 = 0,
+    command_queue_size: u32 = 0,
+    enable_game_sync_preparation: bool = false,
+    continuous_playback_look_ahead: u32 = 0,
+    num_samples_per_frame: u32 = 0,
+    monitor_queue_pool_size: u32 = 0,
+    cpu_monitor_queue_max_size: u32 = 0,
+    settings_main_output: AkOutputSettings = .{},
+    settings_job_manager: AkJobMgrSettings = .{},
+    max_hardware_timeout_ms: u32 = 0,
+    use_sound_bank_mgr_thread: bool = false,
+    use_lengine_thread: bool = false,
+    bgm_callback: AkBackgroundMusicChangeCallbackFunc = null,
+    bgm_callback_cookie: ?*anyopaque = null,
+    plugin_dll_path: []const u8 = "",
+    floor_plane: AkFloorPlane = .xz,
+    game_units_to_meters: f32 = 0.0,
+    bank_read_buffer_size: u32 = 0,
+    debug_out_of_range_limit: f32 = 0.0,
+    debug_out_of_range_check_enabled: bool = false,
+    fn_profiler_push_timer: AkProfilerPushTimerFunc = null,
+    fn_profiler_pop_timer: AkProfilerPopTimerFunc = null,
+    fn_profiler_post_marker: AkProfilerPostMarkerFunc = null,
 
     pub fn fromC(init_settings: c.WWISEC_AkInitSettings) AkInitSettings {
         return .{
@@ -187,50 +173,40 @@ pub const AkThreadProperties = blk: {
     }
 };
 
-pub const WIN_AkThreadProperties = struct {
-    priority: i32,
-    affinity_mask: u32,
-    stack_size: u32,
+pub const WIN_AkThreadProperties = extern struct {
+    priority: i32 = 0,
+    affinity_mask: u32 = 0,
+    stack_size: u32 = 0,
 
-    pub fn fromC(thread_properties: c.WWISEC_WIN_AkThreadProperties) WIN_AkThreadProperties {
-        return .{
-            .priority = thread_properties.nPriority,
-            .affinity_mask = thread_properties.dwAffinityMask,
-            .stack_size = thread_properties.uStackSize,
-        };
+    pub inline fn fromC(value: c.WWISEC_WIN_AkThreadProperties) WIN_AkThreadProperties {
+        return @bitCast(WIN_AkThreadProperties, value);
     }
 
-    pub fn toC(self: WIN_AkThreadProperties) c.WWISEC_WIN_AkThreadProperties {
-        return .{
-            .nPriority = self.priority,
-            .dwAffinityMask = self.affinity_mask,
-            .uStackSize = self.stack_size,
-        };
+    pub inline fn toC(self: WIN_AkThreadProperties) c.WWISEC_WIN_AkThreadProperties {
+        return @bitCast(c.WWISEC_WIN_AkThreadProperties, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(WIN_AkThreadProperties) == @sizeOf(c.WWISEC_WIN_AkThreadProperties));
     }
 };
 
-pub const POSIX_AkThreadProperties = struct {
-    priority: i32,
-    stack_size: usize,
-    sched_policy: i32,
-    affinity_mask: u32,
+pub const POSIX_AkThreadProperties = extern struct {
+    priority: i32 = 0,
+    stack_size: usize = 0,
+    sched_policy: i32 = 0,
+    affinity_mask: u32 = 0,
 
-    pub fn fromC(thread_properties: c.WWISEC_POSIX_AkThreadProperties) POSIX_AkThreadProperties {
-        return .{
-            .priority = thread_properties.nPriority,
-            .stack_size = thread_properties.uStackSize,
-            .sched_policy = thread_properties.uSchedPolicy,
-            .affinity_mask = thread_properties.dwAffinityMask,
-        };
+    pub inline fn fromC(value: c.WWISEC_POSIX_AkThreadProperties) POSIX_AkThreadProperties {
+        return @bitCast(POSIX_AkThreadProperties, value);
     }
 
-    pub fn toC(self: POSIX_AkThreadProperties) c.WWISEC_POSIX_AkThreadProperties {
-        return .{
-            .nPriority = self.priority,
-            .uStackSize = self.stack_size,
-            .uSchedPolicy = self.sched_policy,
-            .dwAffinityMask = self.affinity_mask,
-        };
+    pub inline fn toC(self: POSIX_AkThreadProperties) c.WWISEC_POSIX_AkThreadProperties {
+        return @bitCast(c.WWISEC_POSIX_AkThreadProperties, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(POSIX_AkThreadProperties) == @sizeOf(c.WWISEC_POSIX_AkThreadProperties));
     }
 };
 
@@ -258,43 +234,27 @@ pub const AkPlatformInitSettings = blk: {
     }
 };
 
-pub const WIN_AkPlatformInitSettings = struct {
-    hwnd: ?*anyopaque,
-    thread_l_engine: AkThreadProperties,
-    thread_output_mgr: AkThreadProperties,
-    thread_bank_manager: AkThreadProperties,
-    thread_monitor: AkThreadProperties,
-    num_refills_in_voice: u16,
-    sample_rate: u32,
-    enable_avx_support: bool,
-    max_system_audio_objects: u32,
+pub const WIN_AkPlatformInitSettings = extern struct {
+    hwnd: ?*anyopaque = null,
+    thread_l_engine: AkThreadProperties = .{},
+    thread_output_mgr: AkThreadProperties = .{},
+    thread_bank_manager: AkThreadProperties = .{},
+    thread_monitor: AkThreadProperties = .{},
+    num_refills_in_voice: u16 = 0,
+    sample_rate: u32 = 0,
+    enable_avx_support: bool = false,
+    max_system_audio_objects: u32 = 0,
 
-    pub fn fromC(init_settings: c.WWISEC_WIN_AkPlatformInitSettings) WIN_AkPlatformInitSettings {
-        return .{
-            .hwnd = init_settings.hWnd,
-            .thread_l_engine = AkThreadProperties.fromC(init_settings.threadLEngine),
-            .thread_output_mgr = AkThreadProperties.fromC(init_settings.threadOutputMgr),
-            .thread_bank_manager = AkThreadProperties.fromC(init_settings.threadBankManager),
-            .thread_monitor = AkThreadProperties.fromC(init_settings.threadMonitor),
-            .num_refills_in_voice = init_settings.uNumRefillsInVoice,
-            .sample_rate = init_settings.uSampleRate,
-            .enable_avx_support = init_settings.bEnableAvxSupport,
-            .max_system_audio_objects = init_settings.uMaxSystemAudioObjects,
-        };
+    pub inline fn fromC(value: c.WWISEC_WIN_AkPlatformInitSettings) WIN_AkPlatformInitSettings {
+        return @bitCast(WIN_AkPlatformInitSettings, value);
     }
 
-    pub fn toC(self: WIN_AkPlatformInitSettings) c.WWISEC_WIN_AkPlatformInitSettings {
-        return .{
-            .hWnd = self.hwnd,
-            .threadLEngine = self.thread_l_engine.toC(),
-            .threadOutputMgr = self.thread_output_mgr.toC(),
-            .threadBankManager = self.thread_bank_manager.toC(),
-            .threadMonitor = self.thread_monitor.toC(),
-            .uNumRefillsInVoice = self.num_refills_in_voice,
-            .uSampleRate = self.sample_rate,
-            .bEnableAvxSupport = self.enable_avx_support,
-            .uMaxSystemAudioObjects = self.max_system_audio_objects,
-        };
+    pub inline fn toC(self: WIN_AkPlatformInitSettings) c.WWISEC_WIN_AkPlatformInitSettings {
+        return @bitCast(c.WWISEC_WIN_AkPlatformInitSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(WIN_AkPlatformInitSettings) == @sizeOf(c.WWISEC_WIN_AkPlatformInitSettings));
     }
 };
 
@@ -314,83 +274,59 @@ pub const AkAudioAPILinux = packed struct(u32) {
     }
 };
 
-pub const LINUX_AkPlatformInitSettings = struct {
-    thread_l_engine: AkThreadProperties,
-    thread_output_mgr: AkThreadProperties,
-    thread_bank_manager: AkThreadProperties,
-    thread_monitor: AkThreadProperties,
-    sample_rate: u32,
-    num_refills_in_voice: u16,
+pub const LINUX_AkPlatformInitSettings = extern struct {
+    thread_l_engine: AkThreadProperties = .{},
+    thread_output_mgr: AkThreadProperties = .{},
+    thread_bank_manager: AkThreadProperties = .{},
+    thread_monitor: AkThreadProperties = .{},
+    sample_rate: u32 = 0,
+    num_refills_in_voice: u16 = 0,
     audio_api: AkAudioAPILinux = AkAudioAPILinux.Default,
-    sample_type: common.AkDataTypeID,
+    sample_type: common.AkDataTypeID = 0,
 
-    pub fn fromC(init_settings: c.WWISEC_LINUX_AkPlatformInitSettings) LINUX_AkPlatformInitSettings {
-        return .{
-            .thread_l_engine = AkThreadProperties.fromC(init_settings.threadLEngine),
-            .thread_output_mgr = AkThreadProperties.fromC(init_settings.threadOutputMgr),
-            .thread_bank_manager = AkThreadProperties.fromC(init_settings.threadBankManager),
-            .thread_monitor = AkThreadProperties.fromC(init_settings.threadMonitor),
-            .sample_rate = init_settings.uSampleRate,
-            .num_refills_in_voice = init_settings.uNumRefillsInVoice,
-            .audio_api = AkAudioAPILinux.fromC(init_settings.eAudioAPI),
-            .sample_type = init_settings.sampleType,
-        };
+    pub inline fn fromC(value: c.WWISEC_LINUX_AkPlatformInitSettings) LINUX_AkPlatformInitSettings {
+        return @bitCast(LINUX_AkPlatformInitSettings, value);
     }
 
-    pub fn toC(self: LINUX_AkPlatformInitSettings) c.WWISEC_LINUX_AkPlatformInitSettings {
-        return .{
-            .threadLEngine = self.thread_l_engine.toC(),
-            .threadOutputMgr = self.thread_output_mgr.toC(),
-            .threadBankManager = self.thread_bank_manager.toC(),
-            .threadMonitor = self.thread_monitor.toC(),
-            .uSampleRate = self.sample_rate,
-            .uNumRefillsInVoice = self.num_refills_in_voice,
-            .eAudioAPI = self.audio_api.toC(),
-            .sampleType = self.sample_type,
-        };
+    pub inline fn toC(self: LINUX_AkPlatformInitSettings) c.WWISEC_LINUX_AkPlatformInitSettings {
+        return @bitCast(c.WWISEC_LINUX_AkPlatformInitSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(LINUX_AkPlatformInitSettings) == @sizeOf(c.WWISEC_LINUX_AkPlatformInitSettings));
     }
 };
 
-pub const MACOSX_AkPlatformInitSettings = struct {
-    thread_l_engine: AkThreadProperties,
-    thread_output_mgr: AkThreadProperties,
-    thread_bank_manager: AkThreadProperties,
-    thread_monitor: AkThreadProperties,
+pub const MACOSX_AkPlatformInitSettings = extern struct {
+    thread_l_engine: AkThreadProperties = .{},
+    thread_output_mgr: AkThreadProperties = .{},
+    thread_bank_manager: AkThreadProperties = .{},
+    thread_monitor: AkThreadProperties = .{},
 
-    sample_rate: u32,
-    num_refills_in_voice: u16,
+    sample_rate: u32 = 0,
+    num_refills_in_voice: u16 = 0,
 
-    pub fn fromC(init_settings: c.WWISEC_MACOSX_AkPlatformInitSettings) MACOSX_AkPlatformInitSettings {
-        return .{
-            .thread_l_engine = AkThreadProperties.fromC(init_settings.threadLEngine),
-            .thread_output_mgr = AkThreadProperties.fromC(init_settings.threadOutputMgr),
-            .thread_bank_manager = AkThreadProperties.fromC(init_settings.threadBankManager),
-            .thread_monitor = AkThreadProperties.fromC(init_settings.threadMonitor),
-            .sample_rate = init_settings.uSampleRate,
-            .num_refills_in_voice = init_settings.uNumRefillsInVoice,
-        };
+    pub inline fn fromC(value: c.WWISEC_MACOSX_AkPlatformInitSettings) MACOSX_AkPlatformInitSettings {
+        return @bitCast(MACOSX_AkPlatformInitSettings, value);
     }
 
-    pub fn toC(self: MACOSX_AkPlatformInitSettings) c.WWISEC_MACOSX_AkPlatformInitSettings {
-        return .{
-            .threadLEngine = self.thread_l_engine.toC(),
-            .threadOutputMgr = self.thread_output_mgr.toC(),
-            .threadBankManager = self.thread_bank_manager.toC(),
-            .threadMonitor = self.thread_monitor.toC(),
-            .uSampleRate = self.sample_rate,
-            .uNumRefillsInVoice = self.num_refills_in_voice,
-        };
+    pub inline fn toC(self: MACOSX_AkPlatformInitSettings) c.WWISEC_MACOSX_AkPlatformInitSettings {
+        return @bitCast(c.WWISEC_MACOSX_AkPlatformInitSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(MACOSX_AkPlatformInitSettings) == @sizeOf(c.WWISEC_MACOSX_AkPlatformInitSettings));
     }
 };
 
-pub const IOS_AkAudioSessionCategory = enum(i32) {
+pub const IOS_AkAudioSessionCategory = enum(common.DefaultEnumType) {
     ambient = c.WWISEC_IOS_AkAudioSessionCategoryAmbient,
     solo_ambient = c.WWISEC_IOS_AkAudioSessionCategorySoloAmbient,
     play_and_record = c.WWISEC_IOS_AkAudioSessionCategoryPlayAndRecord,
     playback = c.WWISEC_IOS_AkAudioSessionCategoryPlayback,
 };
 
-pub const IOS_AkAudioSessionCategoryOptions = enum(i32) {
+pub const IOS_AkAudioSessionCategoryOptions = enum(common.DefaultEnumType) {
     mix_with_others = c.WWISEC_IOS_AkAudioSessionCategoryOptionMixWithOthers,
     duck_others = c.WWISEC_IOS_AkAudioSessionCategoryOptionDuckOthers,
     allow_bluetooth = c.WWISEC_IOS_AkAudioSessionCategoryOptionAllowBluetooth,
@@ -398,7 +334,7 @@ pub const IOS_AkAudioSessionCategoryOptions = enum(i32) {
     allow_bluetooth_a2dp = c.WWISEC_IOS_AkAudioSessionCategoryOptionAllowBluetoothA2DP,
 };
 
-pub const IOS_AkAudioSessionMode = enum(i32) {
+pub const IOS_AkAudioSessionMode = enum(common.DefaultEnumType) {
     default = c.WWISEC_IOS_AkAudioSessionModeDefault,
     voice_chat = c.WWISEC_IOS_AkAudioSessionModeVoiceChat,
     game_chat = c.WWISEC_IOS_AkAudioSessionModeGameChat,
@@ -408,107 +344,77 @@ pub const IOS_AkAudioSessionMode = enum(i32) {
     video_chat = c.WWISEC_IOS_AkAudioSessionModeVideoChat,
 };
 
-pub const IOS_AkAudioSessionSetActiveOptions = enum(i32) {
+pub const IOS_AkAudioSessionSetActiveOptions = enum(common.DefaultEnumType) {
     notify_others_on_deactivation = c.WWISEC_IOS_AkAudioSessionSetActiveOptionNotifyOthersOnDeactivation,
 };
 
-pub const IOS_AkAudioSessionBehaviorOptions = enum(i32) {
+pub const IOS_AkAudioSessionBehaviorOptions = enum(common.DefaultEnumType) {
     suspend_in_background = c.WWISEC_IOS_AkAudioSessionBehaviorSuspendInBackground,
 };
 
-pub const IOS_AkAudioSessionProperties = struct {
-    category: IOS_AkAudioSessionCategory,
-    category_options: IOS_AkAudioSessionCategoryOptions,
-    mode: IOS_AkAudioSessionMode,
-    set_activate_options: IOS_AkAudioSessionSetActiveOptions,
-    audio_session_behavior: IOS_AkAudioSessionBehaviorOptions,
+pub const IOS_AkAudioSessionProperties = extern struct {
+    category: IOS_AkAudioSessionCategory = .ambient,
+    category_options: IOS_AkAudioSessionCategoryOptions = .mix_with_others,
+    mode: IOS_AkAudioSessionMode = .default,
+    set_activate_options: IOS_AkAudioSessionSetActiveOptions = .notify_others_on_deactivation,
+    audio_session_behavior: IOS_AkAudioSessionBehaviorOptions = .suspend_in_background,
 
-    pub fn fromC(value: c.WWISEC_IOS_AkAudioSessionProperties) IOS_AkAudioSessionProperties {
-        return .{
-            .category = @intToEnum(IOS_AkAudioSessionCategory, value.eCategory),
-            .category_options = @intToEnum(IOS_AkAudioSessionCategoryOptions, value.eCategoryOptions),
-            .mode = @intToEnum(IOS_AkAudioSessionMode, value.eMode),
-            .set_activate_options = @intToEnum(IOS_AkAudioSessionSetActiveOptions, value.eSetActivateOptions),
-            .audio_session_behavior = @intToEnum(IOS_AkAudioSessionBehaviorOptions, value.eAudioSessionBehavior),
-        };
+    pub inline fn fromC(value: c.WWISEC_IOS_AkAudioSessionProperties) IOS_AkAudioSessionProperties {
+        return @bitCast(IOS_AkAudioSessionProperties, value);
     }
 
-    pub fn toC(self: IOS_AkAudioSessionProperties) c.WWISEC_IOS_AkAudioSessionProperties {
-        return .{
-            .eCategory = @enumToInt(self.category),
-            .categoeCategoryOptionsry_options = @enumToInt(self.category_options),
-            .eMode = @enumToInt(self.mode),
-            .eSetActivateOptions = @enumToInt(self.set_activate_options),
-            .eAudioSessionBehavior = @enumToInt(self.audio_session_behavior),
-        };
+    pub inline fn toC(self: IOS_AkAudioSessionProperties) c.WWISEC_IOS_AkAudioSessionProperties {
+        return @bitCast(c.WWISEC_IOS_AkAudioSessionProperties, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(IOS_AkAudioSessionProperties) == @sizeOf(c.WWISEC_IOS_AkAudioSessionProperties));
     }
 };
 
 pub const IOS_AudioInputCallbackFunc = c.WWISEC_IOS_AudioInputCallbackFunc;
 pub const IOS_AudioInterruptionCallbackFunc = c.WWISEC_IOS_AudioInterruptionCallbackFunc;
 
-pub const IOS_AkAudioCallbacks = struct {
-    input_callback: IOS_AudioInputCallbackFunc,
-    input_callback_cookie: ?*anyopaque,
-    interruption_callback: IOS_AudioInterruptionCallbackFunc,
-    interruption_callback_cookie: ?*anyopaque,
+pub const IOS_AkAudioCallbacks = extern struct {
+    input_callback: IOS_AudioInputCallbackFunc = null,
+    input_callback_cookie: ?*anyopaque = null,
+    interruption_callback: IOS_AudioInterruptionCallbackFunc = null,
+    interruption_callback_cookie: ?*anyopaque = null,
 
-    pub fn fromC(value: c.WWISEC_IOS_AkAudioCallbacks) IOS_AkAudioCallbacks {
-        return .{
-            .input_callback = value.inputCallback,
-            .input_callback_cookie = value.inputCallbackCookie,
-            .interruption_callback = value.interruptionCallback,
-            .interruption_callback_cookie = value.interruptionCallbackCookie,
-        };
+    pub inline fn fromC(value: c.WWISEC_IOS_AkAudioCallbacks) IOS_AkAudioCallbacks {
+        return @bitCast(IOS_AkAudioCallbacks, value);
     }
 
-    pub fn toC(self: IOS_AkAudioCallbacks) c.WWISEC_IOS_AkAudioCallbacks {
-        return .{
-            .inputCallback = self.input_callback,
-            .inputCallbackCookie = self.input_callback_cookie,
-            .interruptionCallback = self.interruption_callback,
-            .interruptionCallbackCookie = self.interruption_callback_cookie,
-        };
+    pub inline fn toC(self: IOS_AkAudioCallbacks) c.WWISEC_IOS_AkAudioCallbacks {
+        return @bitCast(c.WWISEC_IOS_AkAudioCallbacks, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(IOS_AkAudioCallbacks) == @sizeOf(c.WWISEC_IOS_AkAudioCallbacks));
     }
 };
 
-pub const IOS_AkPlatformInitSettings = struct {
-    thread_l_engine: AkThreadProperties,
-    thread_output_mgr: AkThreadProperties,
-    thread_bank_manager: AkThreadProperties,
-    thread_monitor: AkThreadProperties,
-    sample_rate: u32,
-    num_refills_in_voice: u16,
-    audio_session: IOS_AkAudioSessionProperties,
-    audio_callbacks: IOS_AkAudioCallbacks,
-    verbose_system_output: bool,
+pub const IOS_AkPlatformInitSettings = extern struct {
+    thread_l_engine: AkThreadProperties = .{},
+    thread_output_mgr: AkThreadProperties = .{},
+    thread_bank_manager: AkThreadProperties = .{},
+    thread_monitor: AkThreadProperties = .{},
+    sample_rate: u32 = 0,
+    num_refills_in_voice: u16 = 0,
+    audio_session: IOS_AkAudioSessionProperties = .{},
+    audio_callbacks: IOS_AkAudioCallbacks = .{},
+    verbose_system_output: bool = false,
 
-    pub fn fromC(init_settings: c.WWISEC_IOS_AkPlatformInitSettings) IOS_AkPlatformInitSettings {
-        return .{
-            .thread_l_engine = AkThreadProperties.fromC(init_settings.threadLEngine),
-            .thread_output_mgr = AkThreadProperties.fromC(init_settings.threadOutputMgr),
-            .thread_bank_manager = AkThreadProperties.fromC(init_settings.threadBankManager),
-            .thread_monitor = AkThreadProperties.fromC(init_settings.threadMonitor),
-            .sample_rate = init_settings.uSampleRate,
-            .num_refills_in_voice = init_settings.uNumRefillsInVoice,
-            .audio_session = IOS_AkAudioSessionProperties.fromC(init_settings.audioSession),
-            .audio_callbacks = IOS_AkAudioCallbacks.fromC(init_settings.audioCallbacks),
-            .verbose_system_output = init_settings.bVerboseSystemOutput,
-        };
+    pub inline fn fromC(value: c.WWISEC_IOS_AkPlatformInitSettings) IOS_AkPlatformInitSettings {
+        return @bitCast(IOS_AkPlatformInitSettings, value);
     }
 
-    pub fn toC(self: IOS_AkPlatformInitSettings) c.WWISEC_IOS_AkPlatformInitSettings {
-        return .{
-            .threadLEngine = self.thread_l_engine.toC(),
-            .threadOutputMgr = self.thread_output_mgr.toC(),
-            .threadBankManager = self.thread_bank_manager.toC(),
-            .threadMonitor = self.thread_monitor.toC(),
-            .uSampleRate = self.sample_rate,
-            .uNumRefillsInVoice = self.num_refills_in_voice,
-            .audioSession = self.audio_session.toC(),
-            .audioCallbacks = self.audio_callbacks.toC(),
-            .bVerboseSystemOutput = self.verbose_system_output,
-        };
+    pub inline fn toC(self: IOS_AkPlatformInitSettings) c.WWISEC_IOS_AkPlatformInitSettings {
+        return @bitCast(c.WWISEC_IOS_AkPlatformInitSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(IOS_AkPlatformInitSettings) == @sizeOf(c.WWISEC_IOS_AkPlatformInitSettings));
     }
 };
 
@@ -527,54 +433,30 @@ pub const AkAudioAPIAndroid = packed struct {
     }
 };
 
-pub const ANDROID_AkPlatformInitSettings = struct {
-    thread_l_engine: AkThreadProperties,
-    thread_output_mgr: AkThreadProperties,
-    thread_bank_manager: AkThreadProperties,
-    thread_monitor: AkThreadProperties,
-    audio_api: AkAudioAPIAndroid,
-    sample_rate: u32,
-    num_refills_in_voice: u16,
-    round_frame_size_to_hw_size: bool,
-    p_sl_engine: ?*anyopaque,
-    p_java_vm: ?*anyopaque,
-    j_activity: ?*anyopaque,
-    verbose_sink: bool,
-    enable_low_latency: bool,
+pub const ANDROID_AkPlatformInitSettings = extern struct {
+    thread_l_engine: AkThreadProperties = .{},
+    thread_output_mgr: AkThreadProperties = .{},
+    thread_bank_manager: AkThreadProperties = .{},
+    thread_monitor: AkThreadProperties = .{},
+    audio_api: AkAudioAPIAndroid = AkAudioAPIAndroid.Default,
+    sample_rate: u32 = 0,
+    num_refills_in_voice: u16 = 0,
+    round_frame_size_to_hw_size: bool = false,
+    p_sl_engine: ?*anyopaque = null,
+    p_java_vm: ?*anyopaque = null,
+    j_activity: ?*anyopaque = null,
+    verbose_sink: bool = false,
+    enable_low_latency: bool = false,
 
-    pub fn fromC(init_settings: c.WWISEC_ANDROID_AkPlatformInitSettings) ANDROID_AkPlatformInitSettings {
-        return .{
-            .thread_l_engine = AkThreadProperties.fromC(init_settings.threadLEngine),
-            .thread_output_mgr = AkThreadProperties.fromC(init_settings.threadOutputMgr),
-            .thread_bank_manager = AkThreadProperties.fromC(init_settings.threadBankManager),
-            .thread_monitor = AkThreadProperties.fromC(init_settings.threadMonitor),
-            .audio_api = AkAudioAPIAndroid.fromC(init_settings.eAudioAPI),
-            .sample_rate = init_settings.uSampleRate,
-            .num_refills_in_voice = init_settings.uNumRefillsInVoice,
-            .round_frame_size_to_hw_size = init_settings.bRoundFrameSizeToHWSize,
-            .p_sl_engine = init_settings.pSLEngine,
-            .p_java_vm = init_settings.pJavaVM,
-            .j_activity = init_settings.jActivity,
-            .verbose_sink = init_settings.bVerboseSink,
-            .enable_low_latency = init_settings.bEnableLowLatency,
-        };
+    pub inline fn fromC(value: c.WWISEC_ANDROID_AkPlatformInitSettings) ANDROID_AkPlatformInitSettings {
+        return @bitCast(ANDROID_AkPlatformInitSettings, value);
     }
 
-    pub fn toC(self: ANDROID_AkPlatformInitSettings) c.WWISEC_ANDROID_AkPlatformInitSettings {
-        return .{
-            .threadLEngine = self.thread_l_engine.toC(),
-            .threadOutputMgr = self.thread_output_mgr.toC(),
-            .threadBankManager = self.thread_bank_manager.toC(),
-            .threadMonitor = self.thread_monitor.toC(),
-            .eAudioAPI = self.audio_api.toC(),
-            .uSampleRate = self.sample_rate,
-            .uNumRefillsInVoice = self.num_refills_in_voice,
-            .bRoundFrameSizeToHWSize = self.round_frame_size_to_hw_size,
-            .pSLEngine = self.p_sl_engine,
-            .pJavaVM = self.p_java_vm,
-            .jActivity = self.j_activity,
-            .bVerboseSink = self.verbose_sink,
-            .bEnableLowLatency = self.enable_low_latency,
-        };
+    pub inline fn toC(self: ANDROID_AkPlatformInitSettings) c.WWISEC_ANDROID_AkPlatformInitSettings {
+        return @bitCast(c.WWISEC_ANDROID_AkPlatformInitSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(ANDROID_AkPlatformInitSettings) == @sizeOf(c.WWISEC_ANDROID_AkPlatformInitSettings));
     }
 };

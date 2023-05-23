@@ -20,17 +20,17 @@ pub const AkStreamMgrSettings = extern struct {
 };
 
 pub const AkDeviceSettings = struct {
-    io_memory: ?*anyopaque,
-    io_memory_size: u32,
-    io_memory_alignment: u32,
-    pool_attributes: u32,
-    granularity: u32,
-    scheduler_type_flags: u32,
-    thread_properties: settings.AkThreadProperties,
-    target_auto_stm_buffer_length: f32,
-    max_concurrent_io: u32,
-    use_stream_cache: bool,
-    max_cache_pinned_bytes: u32,
+    io_memory: ?*anyopaque = null,
+    io_memory_size: u32 = 0,
+    io_memory_alignment: u32 = 0,
+    pool_attributes: u32 = 0,
+    granularity: u32 = 0,
+    scheduler_type_flags: u32 = 0,
+    thread_properties: settings.AkThreadProperties = .{},
+    target_auto_stm_buffer_length: f32 = 0.0,
+    max_concurrent_io: u32 = 0,
+    use_stream_cache: bool = false,
+    max_cache_pinned_bytes: u32 = 0,
 
     pub fn fromC(device_settings: c.WWISEC_AkDeviceSettings) AkDeviceSettings {
         return .{
