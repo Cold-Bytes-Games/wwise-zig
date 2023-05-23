@@ -89,8 +89,8 @@ pub const AkIOTransferInfo = extern struct {
     }
 };
 
-pub const AkIOCallback = c.WWISEC_AkIOCallback;
-pub const AkBatchIOCallback = c.WWISEC_AkBatchIOCallback;
+pub const AkIOCallback = *const fn (in_transfer_info: *AkAsyncIOTransferInfo, in_result: common.AKRESULT) callconv(.C) void;
+pub const AkBatchIOCallback = *const fn (in_num_transfers: u32, in_transfer_info: [*]*AkAsyncIOTransferInfo, in_result: common.AKRESULT) callconv(.C) void;
 
 pub const AkAsyncIOTransferInfo = extern struct {
     base: AkIOTransferInfo = .{},
@@ -509,7 +509,7 @@ pub const IAkIOHookDeferred = extern struct {
             pub inline fn batchRead(
                 self: *T,
                 in_num_transfers: u32,
-                in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
+                in_transfer_items: [*]BatchIoTransferItem,
                 in_batch_io_callback: AkBatchIOCallback,
                 io_dispatch_results: [*]c.WWISEC_AKRESULT,
             ) common.WwiseError!void {
@@ -517,7 +517,7 @@ pub const IAkIOHookDeferred = extern struct {
                     @ptrCast(*const IAkIOHookDeferred.VTable, self.__v).batch_read(
                         @ptrCast(*IAkIOHookDeferred, self),
                         in_num_transfers,
-                        in_transfer_items,
+                        @ptrCast([*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem, in_transfer_items),
                         in_batch_io_callback,
                         io_dispatch_results,
                     ),
@@ -527,7 +527,7 @@ pub const IAkIOHookDeferred = extern struct {
             pub inline fn batchWrite(
                 self: *T,
                 in_num_transfers: u32,
-                in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
+                in_transfer_items: [*]BatchIoTransferItem,
                 in_batch_io_callback: AkBatchIOCallback,
                 io_dispatch_results: [*]c.WWISEC_AKRESULT,
             ) common.WwiseError!void {
@@ -535,7 +535,7 @@ pub const IAkIOHookDeferred = extern struct {
                     @ptrCast(*const IAkIOHookDeferredBatch.VTable, self.__v).batch_write(
                         @ptrCast(*IAkIOHookDeferredBatch, self),
                         in_num_transfers,
-                        in_transfer_items,
+                        @ptrCast([*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem, in_transfer_items),
                         in_batch_io_callback,
                         io_dispatch_results,
                     ),
@@ -545,13 +545,13 @@ pub const IAkIOHookDeferred = extern struct {
             pub inline fn batchCancel(
                 self: *T,
                 in_num_transfers: u32,
-                in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
+                in_transfer_items: [*]BatchIoTransferItem,
                 io_cancel_all_transfers_for_this_file: [*]*bool,
             ) void {
                 @ptrCast(*const IAkIOHookDeferred.VTable, self.__v).batch_cancel(
                     @ptrCast(*IAkIOHookDeferred, self),
                     in_num_transfers,
-                    in_transfer_items,
+                    @ptrCast([*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem, in_transfer_items),
                     io_cancel_all_transfers_for_this_file,
                 );
             }
@@ -620,7 +620,23 @@ pub const IAkIOHookDeferred = extern struct {
         };
     }
 
-    pub const BatchIoTransferItem = c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem;
+    pub const BatchIoTransferItem = extern struct {
+        file_desc: ?*AkFileDesc,
+        io_heuristics: AkIoHeuristics,
+        transfer_info: ?*AkAsyncIOTransferInfo,
+
+        pub inline fn fromC(value: c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem) BatchIoTransferItem {
+            return @bitCast(BatchIoTransferItem, value);
+        }
+
+        pub inline fn toC(self: BatchIoTransferItem) c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem {
+            return @bitCast(c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem, self);
+        }
+
+        comptime {
+            std.debug.assert(@sizeOf(BatchIoTransferItem) == @sizeOf(c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem));
+        }
+    };
 
     pub usingnamespace Methods(@This());
     pub usingnamespace common.CastMethods(@This());
