@@ -506,9 +506,9 @@ void WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(void* in_ioHook)
 #endif
 }
 
-WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
 {
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
 }
 
 void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook)
@@ -538,9 +538,9 @@ void WWISEC_AK_CAkDefaultIOHookDeferred_Destroy(void* in_ioHook)
 #endif
 }
 
-WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
 {
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
 }
 
 void WWISEC_AK_CAkDefaultIOHookDeferred_Term(void* in_ioHook)
@@ -570,9 +570,9 @@ void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(void* in_ioHook)
 #endif
 }
 
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
 {
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
 }
 
 void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(void* in_ioHook)
@@ -622,9 +622,9 @@ void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Destroy(void* in_ioHook)
 #endif
 }
 
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
 {
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->Init(*reinterpret_cast<AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
 }
 
 void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Term(void* in_ioHook)

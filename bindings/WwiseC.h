@@ -1724,7 +1724,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     size_t WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof();
     void* WWISEC_AK_CAkDefaultIOHookBlocking_Create(char* in_ioHookBuffer);
     void WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook);
 #endif
 
@@ -1732,7 +1732,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     size_t WWISEC_AK_CAkDefaultIOHookDeferred_Sizeof();
     void* WWISEC_AK_CAkDefaultIOHookDeferred_Create(char* in_ioHookBuffer);
     void WWISEC_AK_CAkDefaultIOHookDeferred_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkDefaultIOHookDeferred_Term(void* in_ioHook);
 #endif
 
@@ -1740,7 +1740,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     size_t WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof();
     void* WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Create(char* in_ioHookBuffer);
     void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePacakgeName, AkUInt32* out_uPackageID);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID);
@@ -1752,7 +1752,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     size_t WWISEC_AK_CAkFilePackageLowLevelIODeferred_Sizeof();
     void* WWISEC_AK_CAkFilePackageLowLevelIODeferred_Create(char* in_ioHookBuffer);
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Term(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePackageName, AkUInt32* out_uPackageID);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID);

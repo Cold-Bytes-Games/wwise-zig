@@ -59,11 +59,9 @@ pub const CAkDefaultIOHookBlocking = if (wwise_options.include_default_io_hook_b
         allocator.free(buffer[0..instance_size_of]);
     }
 
-    pub fn init(self: *CAkDefaultIOHookBlocking, in_device_settings: StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
-        var raw_device_settings = in_device_settings.toC();
-
+    pub fn init(self: *CAkDefaultIOHookBlocking, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookBlocking_Init(self, &raw_device_settings, in_async_open),
+            c.WWISEC_AK_CAkDefaultIOHookBlocking_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
         );
     }
 
@@ -91,11 +89,9 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
         allocator.free(buffer[0..instance_size_of]);
     }
 
-    pub fn init(self: *CAkDefaultIOHookDeferred, in_device_settings: StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
-        var raw_device_settings = in_device_settings.toC();
-
+    pub fn init(self: *CAkDefaultIOHookDeferred, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookDeferred_Init(self, &raw_device_settings, in_async_open),
+            c.WWISEC_AK_CAkDefaultIOHookDeferred_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
         );
     }
 
@@ -123,11 +119,9 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         allocator.free(buffer[0..instance_size_of]);
     }
 
-    pub fn init(self: *CAkFilePackageLowLevelIOBlocking, in_device_settings: StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
-        var raw_device_settings = in_device_settings.toC();
-
+    pub fn init(self: *CAkFilePackageLowLevelIOBlocking, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(self, &raw_device_settings, in_async_open),
+            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
         );
     }
 
@@ -187,11 +181,9 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
         allocator.free(buffer[0..instance_size_of]);
     }
 
-    pub fn init(self: *CAkFilePackageLowLevelIODeferred, in_device_settings: StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
-        var raw_device_settings = in_device_settings.toC();
-
+    pub fn init(self: *CAkFilePackageLowLevelIODeferred, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(self, &raw_device_settings, in_async_open),
+            c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
         );
     }
 

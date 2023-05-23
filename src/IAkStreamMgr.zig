@@ -587,14 +587,11 @@ pub const IAkAutoStream = extern struct {
             }
 
             pub inline fn getHeuristics(self: *T, out_heuristics: *AkAutoStmHeuristics) void {
-                var raw_heuristics: c.WWISEC_AkAutoStmHeuristics = undefined;
-                @ptrCast(*const IAkAutoStream.VTable, self.__v).get_heuristics(@ptrCast(*IAkAutoStream, self), &raw_heuristics);
-                out_heuristics.* = AkAutoStmHeuristics.fromC(raw_heuristics);
+                @ptrCast(*const IAkAutoStream.VTable, self.__v).get_heuristics(@ptrCast(*IAkAutoStream, self), @ptrCast(*c.WWISEC_AkAutoStmHeuristics, out_heuristics));
             }
 
             pub inline fn setHeuristics(self: *T, in_heuristics: *AkAutoStmHeuristics) void {
-                var raw_heuristics = in_heuristics.toC();
-                @ptrCast(*const IAkAutoStream.VTable, self.__v).set_heuristics(@ptrCast(*IAkAutoStream, self), &raw_heuristics);
+                @ptrCast(*const IAkAutoStream.VTable, self.__v).set_heuristics(@ptrCast(*IAkAutoStream, self), @ptrCast(*c.WWISEC_AkAutoStmHeuristics, in_heuristics));
             }
 
             pub inline fn setMinimalBufferSize(self: *T, in_min_buffer_size: u32) void {

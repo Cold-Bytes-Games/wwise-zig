@@ -111,7 +111,7 @@ test "CAkDefaultIOHookBlocking create" {
     var io_hook = try AK.IOHooks.CAkDefaultIOHookBlocking.create(std.testing.allocator);
     defer io_hook.destroy(std.testing.allocator);
 
-    try io_hook.init(device_settings, false);
+    try io_hook.init(&device_settings, false);
     defer io_hook.term();
 
     try io_hook.setBasePath(std.testing.allocator, ".");
@@ -155,7 +155,7 @@ test "CAkDefaultIOHookDeferred create" {
     var io_hook = try AK.IOHooks.CAkDefaultIOHookDeferred.create(std.testing.allocator);
     defer io_hook.destroy(std.testing.allocator);
 
-    try io_hook.init(device_settings, false);
+    try io_hook.init(&device_settings, false);
     defer io_hook.term();
 
     try io_hook.setBasePath(std.testing.allocator, ".");
@@ -198,7 +198,7 @@ test "CAkFilePackageLowLevelIOBlocking create" {
     var io_hook = try AK.IOHooks.CAkFilePackageLowLevelIOBlocking.create(std.testing.allocator);
     defer io_hook.destroy(std.testing.allocator);
 
-    try io_hook.init(device_settings, false);
+    try io_hook.init(&device_settings, false);
     defer io_hook.term();
 
     try io_hook.setBasePath(std.testing.allocator, ".");
@@ -245,7 +245,7 @@ test "CAkFilePackageLowLevelIODeferred create" {
     var io_hook = try AK.IOHooks.CAkFilePackageLowLevelIODeferred.create(std.testing.allocator);
     defer io_hook.destroy(std.testing.allocator);
 
-    try io_hook.init(device_settings, false);
+    try io_hook.init(&device_settings, false);
     defer io_hook.term();
 
     try io_hook.setBasePath(std.testing.allocator, ".");
