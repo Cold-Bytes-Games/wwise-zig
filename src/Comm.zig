@@ -42,11 +42,11 @@ pub const AkCommSettings = extern struct {
         std.mem.copyForwards(u8, self.app_network_name[0..], comm_proxy_server_url);
     }
 
-    pub fn fromC(value: c.WWISEC_AkCommSettings) AkCommSettings {
+    pub inline fn fromC(value: c.WWISEC_AkCommSettings) AkCommSettings {
         return @bitCast(AkCommSettings, value);
     }
 
-    pub fn toC(self: AkCommSettings) c.WWISEC_AkCommSettings {
+    pub inline fn toC(self: AkCommSettings) c.WWISEC_AkCommSettings {
         return @bitCast(c.WWWISEC_AkCommSettings, self);
     }
 
