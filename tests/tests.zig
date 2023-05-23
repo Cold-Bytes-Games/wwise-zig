@@ -294,13 +294,20 @@ test "AkCommunication init" {
     try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
     defer AK.SoundEngine.term();
 
-    var comm_settings: AK.Comm.AkCommSettings = undefined;
+    var comm_settings: AK.Comm.AkCommSettings = .{};
     try AK.Comm.getDefaultInitSettings(&comm_settings);
 
     comm_settings.setAppNetworkName("wwise-zig test");
 
-    try AK.Comm.init(comm_settings);
+    try AK.Comm.init(&comm_settings);
     defer AK.Comm.term();
+
+    const current_comm_settings = AK.Comm.getCurrentSettings();
+    try std.testing.expectEqual(comm_settings.ports, current_comm_settings.ports);
+    try std.testing.expectEqual(comm_settings.comm_system, current_comm_settings.comm_system);
+    try std.testing.expectEqual(comm_settings.init_system_lib, current_comm_settings.init_system_lib);
+    try std.testing.expectEqualSlices(u8, comm_settings.app_network_name[0..], current_comm_settings.app_network_name[0..]);
+    try std.testing.expectEqualSlices(u8, comm_settings.comm_proxy_server_url[0..], current_comm_settings.comm_proxy_server_url[0..]);
 }
 
 test "AkMusicEngine init" {

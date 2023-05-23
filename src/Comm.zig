@@ -7,7 +7,7 @@ pub const AK_COMM_DEFAULT_DISCOVERY_PORT = c.WWISEC_AK_COMM_DEFAULT_DISCOVERY_PO
 const AK_COMM_SETTINGS_MAX_STRING_SIZE = c.WWISEC_AK_COMM_SETTINGS_MAX_STRING_SIZE;
 const AK_COMM_SETTINGS_MAX_URL_SIZE = c.WWISEC_AK_COMM_SETTINGS_MAX_URL_SIZE;
 
-pub const AkCommSettings = struct {
+pub const AkCommSettings = extern struct {
     ports: Ports = .{},
     comm_system: AkCommSystem = .socket,
     init_system_lib: bool = false,
@@ -19,22 +19,16 @@ pub const AkCommSettings = struct {
         htcs,
     };
 
-    pub const Ports = struct {
+    pub const Ports = extern struct {
         discovery_broadcast: u16 = AK_COMM_DEFAULT_DISCOVERY_PORT,
         command: u16 = AK_COMM_DEFAULT_DISCOVERY_PORT + 1,
 
         pub fn fromC(value: c.WWISEC_AkCommSettings_Ports) Ports {
-            return .{
-                .discovery_broadcast = value.uDiscoveryBroadcast,
-                .command = value.uCommand,
-            };
+            return @bitCast(Ports, value);
         }
 
         pub fn toC(self: Ports) c.WWISEC_AkCommSettings_Ports {
-            return .{
-                .uDiscoveryBroadcast = self.discovery_broadcast,
-                .uCommand = self.command,
-            };
+            return @bitCast(c.WWISEC_AkCommSettings_Ports, self);
         }
     };
 
@@ -49,42 +43,27 @@ pub const AkCommSettings = struct {
     }
 
     pub fn fromC(value: c.WWISEC_AkCommSettings) AkCommSettings {
-        var result: AkCommSettings = .{};
-        result.ports = Ports.fromC(value.ports);
-        result.comm_system = @intToEnum(AkCommSystem, value.commSystem);
-        result.init_system_lib = value.bInitSystemLib;
-
-        @memcpy(result.app_network_name[0..], value.szAppNetworkName[0..]);
-        @memcpy(result.comm_proxy_server_url[0..], value.szCommProxyServerUrl[0..]);
-        return result;
+        return @bitCast(AkCommSettings, value);
     }
 
     pub fn toC(self: AkCommSettings) c.WWISEC_AkCommSettings {
-        var result = std.mem.zeroes(c.WWISEC_AkCommSettings);
+        return @bitCast(c.WWWISEC_AkCommSettings, self);
+    }
 
-        result.ports = self.ports.toC();
-        result.commSystem = @enumToInt(self.comm_system);
-        result.bInitSystemLib = self.init_system_lib;
-
-        @memcpy(result.szAppNetworkName[0..], self.app_network_name[0..]);
-        @memcpy(result.szCommProxyServerUrl[0..], self.comm_proxy_server_url[0..]);
-
-        return result;
+    comptime {
+        std.debug.assert(@sizeOf(AkCommSettings) == @sizeOf(c.WWISEC_AkCommSettings));
+        std.debug.assert(@offsetOf(AkCommSettings, "init_system_lib") == @offsetOf(c.WWISEC_AkCommSettings, "bInitSystemLib"));
     }
 };
 
-pub fn init(in_settings: AkCommSettings) common.WwiseError!void {
-    var raw_settings = in_settings.toC();
-
+pub fn init(in_settings: *const AkCommSettings) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_Comm_Init(&raw_settings),
+        c.WWISEC_AK_Comm_Init(@ptrCast(*const c.WWISEC_AkCommSettings, in_settings)),
     );
 }
 
 pub fn getDefaultInitSettings(out_settings: *AkCommSettings) !void {
-    var raw_settings: c.WWISEC_AkCommSettings = std.mem.zeroes(c.WWISEC_AkCommSettings);
-    c.WWISEC_AK_Comm_GetDefaultInitSettings(&raw_settings);
-    out_settings.* = AkCommSettings.fromC(raw_settings);
+    c.WWISEC_AK_Comm_GetDefaultInitSettings(@ptrCast(*c.WWISEC_AkCommSettings, out_settings));
 }
 
 pub fn term() void {
@@ -97,7 +76,6 @@ pub fn reset() common.WwiseError!void {
     );
 }
 
-pub fn getCurrentSettings() AkCommSettings {
-    var raw_settings = c.WWISEC_AK_Comm_GetCurrentSettings();
-    return AkCommSettings.fromC(raw_settings);
+pub fn getCurrentSettings() *const AkCommSettings {
+    return @ptrCast(*const AkCommSettings, c.WWISEC_AK_Comm_GetCurrentSettings());
 }

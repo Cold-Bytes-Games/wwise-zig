@@ -1711,7 +1711,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         char szCommProxyServerUrl[WWISEC_AK_COMM_SETTINGS_MAX_URL_SIZE];
     } WWISEC_AkCommSettings;
 
-    WWISEC_AKRESULT WWISEC_AK_Comm_Init(WWISEC_AkCommSettings* in_settings);
+    WWISEC_AKRESULT WWISEC_AK_Comm_Init(const WWISEC_AkCommSettings* in_settings);
     void WWISEC_AK_Comm_GetDefaultInitSettings(WWISEC_AkCommSettings* out_settings);
     void WWISEC_AK_Comm_Term();
     WWISEC_AKRESULT WWISEC_AK_Comm_Reset();

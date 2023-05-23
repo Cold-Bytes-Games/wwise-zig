@@ -458,9 +458,9 @@ static_assert(sizeof(WWISEC_AkCommSettings) == sizeof(AkCommSettings));
 static_assert(WWISEC_AK_COMM_SETTINGS_MAX_STRING_SIZE == AK_COMM_SETTINGS_MAX_STRING_SIZE);
 static_assert(WWISEC_AK_COMM_SETTINGS_MAX_URL_SIZE == AK_COMM_SETTINGS_MAX_URL_SIZE);
 
-WWISEC_AKRESULT WWISEC_AK_Comm_Init(WWISEC_AkCommSettings* in_settings)
+WWISEC_AKRESULT WWISEC_AK_Comm_Init(const WWISEC_AkCommSettings* in_settings)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::Comm::Init(*reinterpret_cast<AkCommSettings*>(in_settings)));
+    return static_cast<WWISEC_AKRESULT>(AK::Comm::Init(*reinterpret_cast<const AkCommSettings*>(in_settings)));
 }
 
 void WWISEC_AK_Comm_GetDefaultInitSettings(WWISEC_AkCommSettings* out_settings)
