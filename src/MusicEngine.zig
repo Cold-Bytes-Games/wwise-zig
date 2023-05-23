@@ -13,6 +13,10 @@ pub const AkMusicSettings = extern struct {
     pub inline fn toC(self: AkMusicSettings) c.WWISEC_AkMusicSettings {
         return @bitCast(c.WWISEC_AkMusicSettings, self);
     }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkMusicSettings) == @sizeOf(c.WWISEC_AkMusicSettings));
+    }
 };
 
 pub fn init(in_settings: ?*AkMusicSettings) common.WwiseError!void {
