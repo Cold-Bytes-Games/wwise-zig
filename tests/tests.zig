@@ -88,10 +88,6 @@ test "CAkDefaultIOHookBlocking create" {
         return error.SkipZigTest;
     }
 
-    if (builtin.os.tag == .linux) {
-        return error.SkipZigTest;
-    }
-
     var memory_settings: AK.AkMemSettings = undefined;
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
@@ -128,10 +124,6 @@ test "CAkDefaultIOHookBlocking create" {
 
 test "CAkDefaultIOHookDeferred create" {
     if (AK.IOHooks.CAkDefaultIOHookDeferred == void) {
-        return error.SkipZigTest;
-    }
-
-    if (builtin.os.tag == .linux) {
         return error.SkipZigTest;
     }
 
