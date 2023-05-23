@@ -2,7 +2,7 @@
 
 This package implement a native [Zig](https://ziglang.org/) binding for [Audiokinetic Wwise](https://www.audiokinetic.com/en/products/wwise). The included C binding is designed only to be used by the Zig binding. If you want to expand the C binding to be fully functional please submit any pull requests.
 
-Each function name has been renamed to fit the Zig coding style. It should be easy to map to the [Wwise SDK documentation](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=index.html).
+Each function name, structs and enums has been renamed to fit the Zig coding style. It should be easy to map to the [Wwise SDK documentation](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=index.html).
 
 Each major version of Wwise is contained within a branch. Select the correct branch and tag when importing the library with the Zig package manager.
 
@@ -10,25 +10,12 @@ The library assumes that you installed Wwise using the Wwise Launcher. We do not
 
 This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
-## Versioning info
-
-This binding mimic the versioning of Wwise but add the Zig binding version at the end.
-
-Example:
-
-2022.1.4-zig0
-
-* 2022 = year
-* 1 = major Wwise version
-* 4 = minor Wwise version
-* -zig0 = Zig binding version
-
 ## Usage
 
 Available options:
 | Option | Values | Description |
 | -- | -- | -- |
-| `wwise_sdk` | `[]const u8` | Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK") |
+| `wwise_sdk` | `[]const u8` | Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK |
 | `configuration` | debug, profile, release | Which library configuration of Wwise to use |
 | `use_static_crt` | `bool` | On Windows, do you want to use the StaticCRT build of Wwise |
 | `use_communication` | `bool` | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time |
@@ -41,7 +28,7 @@ Available options:
 We recommend using `AK` as your import name to match closely with the C++ API.
 
 ```zig
-const AK = @import("wwise-zig);
+const AK = @import("wwise-zig");
 
 pub fn main() !void {
     var memory_settings: AK.AkMemSettings = undefined;
@@ -52,13 +39,13 @@ pub fn main() !void {
 }
 ```
 
-### Handling AkOsChar and null-terminated strings
+### Handling AkOsChar and C null-terminated strings
 
-`wwise-zig` is trying to save allocations by using stack-allocated space to convert to AkOsChar or null-terminated strings and use a fallback allocator if the string is bigger than the stack size.
+`wwise-zig` is trying to save allocations when calling functions that accepts strings by using stack-allocated space to convert to `const AkOsChar*`/`const char*` or use a fallback allocator if the string is bigger than the stack size.
 
 You can customize the size allocated by modifying the `string_stack_size` when importing the dependency.
 
-Each function that handle string looks similar to this: 
+Each function that handle strings looks similar to this: 
 ```zig
 pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !void {
     var os_string_allocator = common.osCharAllocator(fallback_allocator);
@@ -120,8 +107,22 @@ pub fn main() !void {
 
 - On Windows, the default GNU ABI is not supported, always use MSVC ABI
 - On Windows, we always use the latest supported Visual Studio (currently 2022)
+- On Linux, the default I/O hooks are currently not supported (see #1)
 - UWP is gonna be deprecated so it is not supported
 - No support for consoles yet
+
+## Versioning info
+
+This binding mimic the versioning of Wwise but add the Zig binding version at the end.
+
+Example:
+
+2022.1.4-zig0
+
+* 2022 = year
+* 1 = major Wwise version
+* 4 = minor Wwise version
+* -zig0 = Zig binding version
 
 ## License
 
