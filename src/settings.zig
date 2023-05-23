@@ -4,7 +4,8 @@ const c = @import("c.zig");
 const common = @import("common.zig");
 const speaker_config = @import("speaker_config.zig");
 
-pub const AkJobWorkerFunc = c.WWISEC_AkJobWorkerFunc;
+pub const AkJobWorkerFunc = ?*const fn (in_job_type: common.AkJobType, in_execution_time_usec: u32) callconv(.C) void;
+
 pub const AkJobMgrSettings = extern struct {
     fn_request_job_worker: FuncRequestJobWorker = null,
     max_active_workers: [common.AK_NUM_JOB_TYPES]u32 = [_]u32{0} ** common.AK_NUM_JOB_TYPES,
@@ -68,11 +69,11 @@ pub const AkFloorPlane = enum(common.DefaultEnumType) {
     pub const Default = AkFloorPlane.xz;
 };
 
-pub const AkAssertHook = c.WWISEC_AkAssertHook;
-pub const AkBackgroundMusicChangeCallbackFunc = c.WWISEC_AkBackgroundMusicChangeCallbackFunc;
-pub const AkProfilerPushTimerFunc = c.WWISEC_AkProfilerPushTimerFunc;
-pub const AkProfilerPopTimerFunc = c.WWISEC_AkProfilerPopTimerFunc;
-pub const AkProfilerPostMarkerFunc = c.WWISEC_AkProfilerPostMarkerFunc;
+pub const AkAssertHook = ?*const fn (in_expression: ?[*:0]const u8, in_filename: ?[*:0]const u8, in_line_number: i32) callconv(.C) void;
+pub const AkBackgroundMusicChangeCallbackFunc = ?*const fn (in_background_music_muted: bool, in_cookie: ?*anyopaque) callconv(.C) common.AKRESULT;
+pub const AkProfilerPushTimerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_zone_name: ?[*:0]const u8) callconv(.C) void;
+pub const AkProfilerPopTimerFunc = ?*const fn () callconv(.C) void;
+pub const AkProfilerPostMarkerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_marker_name: ?[*:0]const u8) callconv(.C) void;
 
 pub const AkInitSettings = struct {
     pfn_assert_hook: AkAssertHook = null,
@@ -100,32 +101,32 @@ pub const AkInitSettings = struct {
     fn_profiler_pop_timer: AkProfilerPopTimerFunc = null,
     fn_profiler_post_marker: AkProfilerPostMarkerFunc = null,
 
-    pub fn fromC(init_settings: c.WWISEC_AkInitSettings) AkInitSettings {
+    pub fn fromC(value: c.WWISEC_AkInitSettings) AkInitSettings {
         return .{
-            .pfn_assert_hook = init_settings.pfnAssertHook,
-            .max_num_paths = init_settings.uMaxNumPaths,
-            .command_queue_size = init_settings.uCommandQueueSize,
-            .enable_game_sync_preparation = init_settings.bEnableGameSyncPreparation,
-            .continuous_playback_look_ahead = init_settings.uContinuousPlaybackLookAhead,
-            .num_samples_per_frame = init_settings.uNumSamplesPerFrame,
-            .monitor_queue_pool_size = init_settings.uMonitorQueuePoolSize,
-            .cpu_monitor_queue_max_size = init_settings.uCpuMonitorQueueMaxSize,
-            .settings_main_output = AkOutputSettings.fromC(init_settings.settingsMainOutput),
-            .settings_job_manager = AkJobMgrSettings.fromC(init_settings.settingsJobManager),
-            .max_hardware_timeout_ms = init_settings.uMaxHardwareTimeoutMs,
-            .use_sound_bank_mgr_thread = init_settings.bUseSoundBankMgrThread,
-            .use_lengine_thread = init_settings.bUseLEngineThread,
-            .bgm_callback = init_settings.BGMCallback,
-            .bgm_callback_cookie = init_settings.BGMCallbackCookie,
+            .pfn_assert_hook = value.pfnAssertHook,
+            .max_num_paths = value.uMaxNumPaths,
+            .command_queue_size = value.uCommandQueueSize,
+            .enable_game_sync_preparation = value.bEnableGameSyncPreparation,
+            .continuous_playback_look_ahead = value.uContinuousPlaybackLookAhead,
+            .num_samples_per_frame = value.uNumSamplesPerFrame,
+            .monitor_queue_pool_size = value.uMonitorQueuePoolSize,
+            .cpu_monitor_queue_max_size = value.uCpuMonitorQueueMaxSize,
+            .settings_main_output = AkOutputSettings.fromC(value.settingsMainOutput),
+            .settings_job_manager = AkJobMgrSettings.fromC(value.settingsJobManager),
+            .max_hardware_timeout_ms = value.uMaxHardwareTimeoutMs,
+            .use_sound_bank_mgr_thread = value.bUseSoundBankMgrThread,
+            .use_lengine_thread = value.bUseLEngineThread,
+            .bgm_callback = @ptrCast(AkBackgroundMusicChangeCallbackFunc, value.BGMCallback),
+            .bgm_callback_cookie = value.BGMCallbackCookie,
             .plugin_dll_path = "", // NOTE: mlarouche: the plugin_dll_path is meant to be overriden by the user, the default init settings does not supply DLL path.
-            .floor_plane = @intToEnum(AkFloorPlane, init_settings.eFloorPlane),
-            .game_units_to_meters = init_settings.fGameUnitsToMeters,
-            .bank_read_buffer_size = init_settings.uBankReadBufferSize,
-            .debug_out_of_range_limit = init_settings.fDebugOutOfRangeLimit,
-            .debug_out_of_range_check_enabled = init_settings.bDebugOutOfRangeCheckEnabled,
-            .fn_profiler_push_timer = init_settings.fnProfilerPushTimer,
-            .fn_profiler_pop_timer = init_settings.fnProfilerPopTimer,
-            .fn_profiler_post_marker = init_settings.fnProfilerPostMarker,
+            .floor_plane = @intToEnum(AkFloorPlane, value.eFloorPlane),
+            .game_units_to_meters = value.fGameUnitsToMeters,
+            .bank_read_buffer_size = value.uBankReadBufferSize,
+            .debug_out_of_range_limit = value.fDebugOutOfRangeLimit,
+            .debug_out_of_range_check_enabled = value.bDebugOutOfRangeCheckEnabled,
+            .fn_profiler_push_timer = value.fnProfilerPushTimer,
+            .fn_profiler_pop_timer = @ptrCast(AkProfilerPopTimerFunc, value.fnProfilerPopTimer),
+            .fn_profiler_post_marker = value.fnProfilerPostMarker,
         };
     }
 
@@ -144,7 +145,7 @@ pub const AkInitSettings = struct {
             .uMaxHardwareTimeoutMs = self.max_hardware_timeout_ms,
             .bUseSoundBankMgrThread = self.use_sound_bank_mgr_thread,
             .bUseLEngineThread = self.use_lengine_thread,
-            .BGMCallback = self.bgm_callback,
+            .BGMCallback = @ptrCast(c.WWISEC_AkBackgroundMusicChangeCallbackFunc, self.bgm_callback),
             .BGMCallbackCookie = self.bgm_callback_cookie,
             .szPluginDLLPath = try common.toOSChar(allocator, self.plugin_dll_path),
             .eFloorPlane = @enumToInt(self.floor_plane),
@@ -153,7 +154,7 @@ pub const AkInitSettings = struct {
             .fDebugOutOfRangeLimit = self.debug_out_of_range_limit,
             .bDebugOutOfRangeCheckEnabled = self.debug_out_of_range_check_enabled,
             .fnProfilerPushTimer = self.fn_profiler_push_timer,
-            .fnProfilerPopTimer = self.fn_profiler_pop_timer,
+            .fnProfilerPopTimer = @ptrCast(c.WWISEC_AkProfilerPopTimerFunc, self.fn_profiler_pop_timer),
             .fnProfilerPostMarker = self.fn_profiler_post_marker,
         };
     }
