@@ -23,12 +23,16 @@ pub const AkCommSettings = extern struct {
         discovery_broadcast: u16 = AK_COMM_DEFAULT_DISCOVERY_PORT,
         command: u16 = AK_COMM_DEFAULT_DISCOVERY_PORT + 1,
 
-        pub fn fromC(value: c.WWISEC_AkCommSettings_Ports) Ports {
+        pub inline fn fromC(value: c.WWISEC_AkCommSettings_Ports) Ports {
             return @bitCast(Ports, value);
         }
 
-        pub fn toC(self: Ports) c.WWISEC_AkCommSettings_Ports {
+        pub inline fn toC(self: Ports) c.WWISEC_AkCommSettings_Ports {
             return @bitCast(c.WWISEC_AkCommSettings_Ports, self);
+        }
+
+        comptime {
+            std.debug.assert(@sizeOf(Ports) == @sizeOf(c.WWISEC_AkCommSettings_Ports));
         }
     };
 
