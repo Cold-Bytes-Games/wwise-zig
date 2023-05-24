@@ -20,17 +20,34 @@ pub fn getDefaultPlatformInitSettings(platform_init_settings: *settings.AkPlatfo
     c.WWISEC_AK_SoundEngine_GetDefaultPlatformInitSettings(@ptrCast(*c.WWISEC_AkPlatformInitSettings, platform_init_settings));
 }
 
-pub fn init(fallback_allocator: std.mem.Allocator, init_settings: settings.AkInitSettings, platform_init_settings: settings.AkPlatformInitSettings) common.WwiseError!void {
+pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings.AkInitSettings, platform_init_settings_opt: ?*settings.AkPlatformInitSettings) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var native_init_settings = init_settings.toC(allocator) catch return common.WwiseError.Fail;
-    defer allocator.free(native_init_settings.szPluginDLLPath[0..init_settings.plugin_dll_path.len]);
+    var native_init_settings_ptr = blk: {
+        if (init_settings_opt) |init_settings| {
+            var native_init_settings = init_settings.toC(allocator) catch return common.WwiseError.Fail;
+            break :blk &native_init_settings;
+        }
 
-    var native_platform_init_settings = platform_init_settings.toC();
+        break :blk @as(?*c.WWISEC_AkInitSettings, null);
+    };
+
+    defer {
+        if (native_init_settings_ptr) |native_init_settings| {
+            allocator.free(native_init_settings.szPluginDLLPath[0..std.mem.len(native_init_settings.szPluginDLLPath)]);
+        }
+    }
+
+    var native_platform_init_settings_ptr = blk: {
+        if (platform_init_settings_opt) |platform_init_settings| {
+            break :blk @ptrCast(?*c.WWISEC_AkPlatformInitSettings, platform_init_settings);
+        }
+        break :blk @as(?*c.WWISEC_AkPlatformInitSettings, null);
+    };
 
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_Init(&native_init_settings, &native_platform_init_settings),
+        c.WWISEC_AK_SoundEngine_Init(native_init_settings_ptr, native_platform_init_settings_ptr),
     );
 }
 

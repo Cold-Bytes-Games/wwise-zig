@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 const AK = @import("wwise-zig");
 
 test "MemoryMgr init" {
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -13,7 +13,7 @@ test "MemoryMgr init" {
 }
 
 test "MemoryMgr dump to file" {
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -23,7 +23,7 @@ test "MemoryMgr dump to file" {
 }
 
 test "AkSoundEngine init" {
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -47,7 +47,7 @@ test "AkSoundEngine init" {
 
     init_settings.plugin_dll_path = "C:\\test";
 
-    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
     defer AK.SoundEngine.term();
 }
 
@@ -88,7 +88,7 @@ test "CAkDefaultIOHookBlocking create" {
         return error.SkipZigTest;
     }
 
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -118,7 +118,7 @@ test "CAkDefaultIOHookBlocking create" {
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
-    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
     defer AK.SoundEngine.term();
 }
 
@@ -127,7 +127,7 @@ test "CAkDefaultIOHookDeferred create" {
         return error.SkipZigTest;
     }
 
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -158,7 +158,7 @@ test "CAkDefaultIOHookDeferred create" {
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
-    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
     defer AK.SoundEngine.term();
 }
 
@@ -171,7 +171,7 @@ test "CAkFilePackageLowLevelIOBlocking create" {
         return error.SkipZigTest;
     }
 
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -204,7 +204,7 @@ test "CAkFilePackageLowLevelIOBlocking create" {
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
-    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
     defer AK.SoundEngine.term();
 }
 
@@ -217,7 +217,7 @@ test "CAkFilePackageLowLevelIODeferred create" {
         return error.SkipZigTest;
     }
 
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -251,7 +251,7 @@ test "CAkFilePackageLowLevelIODeferred create" {
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
-    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
     defer AK.SoundEngine.term();
 }
 
@@ -260,7 +260,7 @@ test "AkCommunication init" {
         return error.SkipZigTest;
     }
 
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -282,7 +282,7 @@ test "AkCommunication init" {
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
 
-    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
     defer AK.SoundEngine.term();
 
     var comm_settings: AK.Comm.AkCommSettings = .{};
@@ -302,7 +302,7 @@ test "AkCommunication init" {
 }
 
 test "AkMusicEngine init" {
-    var memory_settings: AK.AkMemSettings = undefined;
+    var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
     try AK.MemoryMgr.init(&memory_settings);
@@ -326,7 +326,7 @@ test "AkMusicEngine init" {
 
     init_settings.plugin_dll_path = "C:\\test";
 
-    try AK.SoundEngine.init(std.testing.allocator, init_settings, platform_init_settings);
+    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
     defer AK.SoundEngine.term();
 
     var music_settings: AK.MusicEngine.AkMusicSettings = .{};
