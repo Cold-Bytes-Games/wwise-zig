@@ -215,6 +215,16 @@ pub fn unregisterAudioDeviceStatusCallback() common.WwiseError!void {
     );
 }
 
+pub fn getIDFromString(fallback_allocator: std.mem.Allocator, string: []const u8) !u32 {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_string = try common.toCString(allocator, string);
+    defer allocator.free(raw_string);
+
+    return c.WWISEC_AK_SoundEngine_GetIDFromString(raw_string);
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),

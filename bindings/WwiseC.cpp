@@ -419,6 +419,11 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAudioDeviceStatusCallback()
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterAudioDeviceStatusCallback());
 }
 
+AkUInt32 WWISEC_AK_SoundEngine_GetIDFromString(const char* in_pszString)
+{
+    return AK::SoundEngine::GetIDFromString(in_pszString);
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
