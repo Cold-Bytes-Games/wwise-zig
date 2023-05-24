@@ -268,6 +268,21 @@ extern "C"
         WWISEC_AkPluginTypeMetadata = 9,        ///< Metadata plug-in: applies object-based processing to audio data
         WWISEC_AkPluginTypeMask = 0xf           ///< Plug-in type mask is 4 bits.
     } WWISEC_AkPluginType;
+
+    typedef enum WWISEC_AkCurveInterpolation
+    {
+        WWISEC_AkCurveInterpolation_Log3 = 0,          ///< Log3
+        WWISEC_AkCurveInterpolation_Sine = 1,          ///< Sine
+        WWISEC_AkCurveInterpolation_Log1 = 2,          ///< Log1
+        WWISEC_AkCurveInterpolation_InvSCurve = 3,     ///< Inversed S Curve
+        WWISEC_AkCurveInterpolation_Linear = 4,        ///< Linear (Default)
+        WWISEC_AkCurveInterpolation_SCurve = 5,        ///< S Curve
+        WWISEC_AkCurveInterpolation_Exp1 = 6,          ///< Exp1
+        WWISEC_AkCurveInterpolation_SineRecip = 7,     ///< Reciprocal of sine curve
+        WWISEC_AkCurveInterpolation_Exp3 = 8,          ///< Exp3
+        WWISEC_AkCurveInterpolation_LastFadeCurve = 8, ///< Update this value to reflect last curve available for fades
+        WWISEC_AkCurveInterpolation_Constant = 9       ///< Constant ( not valid for fading values )
+    } WWISEC_AkCurveInterpolation;
     // END AkTypes
 
     // BEGIN AkSpeakerConfig
@@ -1448,6 +1463,15 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AkProfilerPostMarkerFunc fnProfilerPostMarker; ///< External (optional) function for tracking significant events in the sound engine, to act as a marker or bookmark. (only called in Debug and Profile binaries; this is not called in Release)
     } WWISEC_AkInitSettings;
 
+    typedef enum WWISEC_AkActionOnEventType
+    {
+        WWISEC_AkActionOnEventType_Stop = 0,           ///< Stop
+        WWISEC_AkActionOnEventType_Pause = 1,          ///< Pause
+        WWISEC_AkActionOnEventType_Resume = 2,         ///< Resume
+        WWISEC_AkActionOnEventType_Break = 3,          ///< Break
+        WWISEC_AkActionOnEventType_ReleaseEnvelope = 4 ///< Release envelope
+    } WWISEC_AkActionOnEventType;
+
     bool WWISEC_AK_SoundEngine_IsInitialized();
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Init(WWISEC_AkInitSettings* in_pSettings, WWISEC_AkPlatformInitSettings* in_pPlatformSettings);
@@ -1504,12 +1528,15 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID);
 
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEventName, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID);
+
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
-
     // END AkSoundEngine
 
 // BEGIN IAkStreamMgr

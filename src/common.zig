@@ -264,6 +264,19 @@ pub const AKRESULT = enum(DefaultEnumType) {
     unknown_file_error = 104,
 };
 
+pub const AkCurveInterpolation = enum(DefaultEnumType) {
+    log3 = c.WWISEC_AkCurveInterpolation_Log3,
+    sine = c.WWISEC_AkCurveInterpolation_Sine,
+    log1 = c.WWISEC_AkCurveInterpolation_Log1,
+    inv_scurve = c.WWISEC_AkCurveInterpolation_InvSCurve,
+    linear = c.WWISEC_AkCurveInterpolation_Linear,
+    scurve = c.WWISEC_AkCurveInterpolation_SCurve,
+    exp1 = c.WWISEC_AkCurveInterpolation_Exp1,
+    sine_recip = c.WWISEC_AkCurveInterpolation_SineRecip,
+    exp3 = c.WWISEC_AkCurveInterpolation_Exp3,
+    constant = c.WWISEC_AkCurveInterpolation_Constant,
+};
+
 pub const AkAudioSettings = extern struct {
     num_samples_per_frame: u32 = 0,
     num_samples_per_second: u32 = 0,

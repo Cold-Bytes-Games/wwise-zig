@@ -451,6 +451,28 @@ WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEven
         in_PlayingID);
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ExecuteActionOnEvent(
+        in_eventID,
+        static_cast<AK::SoundEngine::AkActionOnEventType>(in_ActionType),
+        in_gameObjectID,
+        in_uTransitionDuration,
+        static_cast<AkCurveInterpolation>(in_eFadeCurve),
+        in_PlayingID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEventName, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ExecuteActionOnEvent(
+        in_pszEventName,
+        static_cast<AK::SoundEngine::AkActionOnEventType>(in_ActionType),
+        in_gameObjectID,
+        in_uTransitionDuration,
+        static_cast<AkCurveInterpolation>(in_eFadeCurve),
+        in_PlayingID));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));

@@ -147,11 +147,14 @@ pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []c
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_in_dll_name = common.toOSChar(allocator, in_dll_name) catch return common.WwiseError.Fail;
+    var area_allocator = std.heap.ArenaAllocator.init(allocator);
+    defer area_allocator.deinit();
+
+    var raw_in_dll_name = common.toOSChar(area_allocator.allocator(), in_dll_name) catch return common.WwiseError.Fail;
 
     var raw_in_dll_path = blk: {
         if (in_dll_path_opt) |in_dll_path| {
-            break :blk common.toOSChar(allocator, in_dll_path) catch return common.WwiseError.Fail;
+            break :blk common.toOSChar(area_allocator.allocator(), in_dll_path) catch return common.WwiseError.Fail;
         }
 
         break :blk @as([*c]const c.AkOSChar, null);
@@ -288,6 +291,7 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
     var char_allocator = stack_char_allocator.get();
 
     var raw_event_name = try common.toCString(char_allocator, in_event_name);
+    defer char_allocator.free(raw_event_name);
 
     var num_external_sources: u32 = 0;
 
@@ -334,6 +338,53 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
         num_external_sources,
         external_sources_ptr,
         optional_args.playing_id,
+    );
+}
+
+pub const AkActionOnEventType = enum(common.DefaultEnumType) {
+    stop = c.WWISEC_AkActionOnEventType_Stop,
+    pause = c.WWISEC_AkActionOnEventType_Pause,
+    @"resume" = c.WWISEC_AkActionOnEventType_Resume,
+    @"break" = c.WWISEC_AkActionOnEventType_Break,
+    release_envelope = c.WWISEC_AkActionOnEventType_ReleaseEnvelope,
+};
+
+pub const ExecuteActionOnEventOptionalArgs = struct {
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    transition_duration: common.AkTimeMs = 0,
+    fade_curve: common.AkCurveInterpolation = .linear,
+    playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+};
+
+pub fn executeActionOnEventID(in_event_id: common.AkUniqueID, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(
+            in_event_id,
+            @enumToInt(in_action_type),
+            optional_args.game_object_id,
+            optional_args.transition_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.playing_id,
+        ),
+    );
+}
+
+pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_event_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(
+            raw_event_name,
+            @enumToInt(in_action_type),
+            optional_args.game_object_id,
+            optional_args.transition_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.playing_id,
+        ),
     );
 }
 
