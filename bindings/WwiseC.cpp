@@ -43,6 +43,7 @@ WWISEC_ASSERT_ENUM_VALUE_SAME(AK_NUM_JOB_TYPES);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AkDeviceState_All);
 static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
+static_assert(sizeof(WWISEC_AkExternalSourceInfo) == sizeof(AkExternalSourceInfo));
 static_assert(WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT == AK_COMM_DEFAULT_DISCOVERY_PORT);
 // END AkTypes
 
@@ -422,6 +423,32 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAudioDeviceStatusCallback()
 AkUInt32 WWISEC_AK_SoundEngine_GetIDFromString(const char* in_pszString)
 {
     return AK::SoundEngine::GetIDFromString(in_pszString);
+}
+
+WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID)
+{
+    return AK::SoundEngine::PostEvent(
+        in_eventID,
+        in_gameObjectID,
+        in_uFlags,
+        reinterpret_cast<AkCallbackFunc>(in_pfnCallback),
+        in_pCookie,
+        in_cExternals,
+        reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources),
+        in_PlayingID);
+}
+
+WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID)
+{
+    return AK::SoundEngine::PostEvent(
+        in_pszEventName,
+        in_gameObjectID,
+        in_uFlags,
+        reinterpret_cast<AkCallbackFunc>(in_pfnCallback),
+        in_pCookie,
+        in_cExternals,
+        reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources),
+        in_PlayingID);
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)

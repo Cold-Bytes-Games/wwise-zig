@@ -131,6 +131,37 @@ pub const AkDeviceDescription = struct {
     }
 };
 
+pub const AkExternalSourceInfo = struct {
+    external_src_cookie: u32 = 0,
+    id_codec: AkCodecID = 0,
+    file: ?[]const u8 = null,
+    in_memory: ?*anyopaque = null,
+    memory_size: u32 = 0,
+    id_file: AkFileID = 0,
+
+    pub fn fromC(allocator: std.mem.Allocator, value: c.WWISEC_AkExternalSourceInfo) !AkExternalSourceInfo {
+        return .{
+            .external_src_cookie = value.iExternalSrcCookie,
+            .id_codec = value.idCodec,
+            .file = if (value.szFile != null) try fromOSChar(allocator, value.szFile) else null,
+            .in_memory = value.pInMemory,
+            .memory_size = value.uiMemorySize,
+            .id_file = value.idFile,
+        };
+    }
+
+    pub fn toC(self: AkExternalSourceInfo, allocator: std.mem.Allocator) !c.WWISEC_AkExternalSourceInfo {
+        return .{
+            .iExternalSrcCookie = self.external_src_cookie,
+            .idCodec = self.id_codec,
+            .szFile = if (self.file) |file| try toOSChar(allocator, file) else null,
+            .pInMemory = self.in_memory,
+            .uiMemorySize = self.memory_size,
+            .idFile = self.id_file,
+        };
+    }
+};
+
 pub const AkPanningRule = enum(u8) {
     speakers = c.WWISEC_AkPanningRule_Speakers,
     headphones = c.WWISEC_AkPanningRule_Headphones,

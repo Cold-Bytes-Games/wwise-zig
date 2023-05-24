@@ -225,6 +225,118 @@ pub fn getIDFromString(fallback_allocator: std.mem.Allocator, string: []const u8
     return c.WWISEC_AK_SoundEngine_GetIDFromString(raw_string);
 }
 
+pub const PostEventOptionalArgs = struct {
+    flags: callback.AkCallbackType = .{},
+    callback_func: callback.AkCallbackFunc = null,
+    cookie: ?*anyopaque = null,
+    allocator: ?std.mem.Allocator = null,
+    external_sources: ?[]const common.AkExternalSourceInfo = null,
+    playing_id: common.AkPlayingID = 0,
+};
+
+pub fn postEventID(in_eventID: common.AkUniqueID, game_object_id: common.AkGameObjectID, optional_args: PostEventOptionalArgs) !common.AkPlayingID {
+    var num_external_sources: u32 = 0;
+
+    var area_allocator_opt: ?std.heap.ArenaAllocator = null;
+    defer {
+        if (area_allocator_opt) |area_allocator| {
+            area_allocator.deinit();
+        }
+    }
+
+    const external_sources = blk: {
+        if (optional_args.allocator) |allocator| {
+            area_allocator_opt = std.heap.ArenaAllocator.init(allocator);
+            if (optional_args.external_sources) |external_sources| {
+                num_external_sources = @truncate(u32, external_sources.len);
+
+                const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.WWISEC_AkExternalSourceInfo, num_external_sources);
+
+                for (external_sources, 0..) |external_source, index| {
+                    raw_external_sources[index] = try external_source.toC(area_allocator_opt.?.allocator());
+                }
+
+                break :blk raw_external_sources;
+            }
+        }
+
+        break :blk &[0]c.WWISEC_AkExternalSourceInfo{};
+    };
+
+    const external_sources_ptr = blk: {
+        if (external_sources.len > 0) {
+            break :blk @ptrCast(?[*]c.WWISEC_AkExternalSourceInfo, @constCast(external_sources));
+        }
+
+        break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, null);
+    };
+
+    return c.WWISEC_AK_SoundEngine_PostEvent_ID(
+        in_eventID,
+        game_object_id,
+        @intCast(u32, optional_args.flags.toC()),
+        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback_func),
+        optional_args.cookie,
+        num_external_sources,
+        external_sources_ptr,
+        optional_args.playing_id,
+    );
+}
+
+pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, game_object_id: common.AkGameObjectID, optional_args: PostEventOptionalArgs) !common.AkPlayingID {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var char_allocator = stack_char_allocator.get();
+
+    var raw_event_name = try common.toCString(char_allocator, in_event_name);
+
+    var num_external_sources: u32 = 0;
+
+    var area_allocator_opt: ?std.heap.ArenaAllocator = null;
+    defer {
+        if (area_allocator_opt) |area_allocator| {
+            area_allocator.deinit();
+        }
+    }
+
+    const external_sources = blk: {
+        if (optional_args.allocator) |allocator| {
+            area_allocator_opt = std.heap.ArenaAllocator.init(allocator);
+            if (optional_args.external_sources) |external_sources| {
+                num_external_sources = @truncate(u32, external_sources.len);
+
+                const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.WWISEC_AkExternalSourceInfo, num_external_sources);
+
+                for (external_sources, 0..) |external_source, index| {
+                    raw_external_sources[index] = try external_source.toC(area_allocator_opt.?.allocator());
+                }
+
+                break :blk raw_external_sources;
+            }
+        }
+
+        break :blk &[0]c.WWISEC_AkExternalSourceInfo{};
+    };
+
+    const external_sources_ptr = blk: {
+        if (external_sources.len > 0) {
+            break :blk @ptrCast(?[*]c.WWISEC_AkExternalSourceInfo, @constCast(external_sources));
+        }
+
+        break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, null);
+    };
+
+    return c.WWISEC_AK_SoundEngine_PostEvent_String(
+        raw_event_name,
+        game_object_id,
+        @intCast(u32, optional_args.flags.toC()),
+        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback_func),
+        optional_args.cookie,
+        num_external_sources,
+        external_sources_ptr,
+        optional_args.playing_id,
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
