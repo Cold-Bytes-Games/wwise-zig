@@ -151,11 +151,11 @@ pub fn termForThread() void {
     c.WWISEC_AK_MemoryMgr_TermForThread();
 }
 
-pub fn malloc(in_poolId: AkMemPoolId, in_uSize: usize) *anyopaque {
+pub fn malloc(in_poolId: AkMemPoolId, in_uSize: usize) ?*anyopaque {
     return c.WWISEC_AK_MemoryMgr_Malloc(in_poolId, in_uSize);
 }
 
-pub fn reallocAligned(in_poolId: AkMemPoolId, in_pAlloc: *anyopaque, in_uSize: usize, in_uAlignment: u32) *anyopaque {
+pub fn reallocAligned(in_poolId: AkMemPoolId, in_pAlloc: *anyopaque, in_uSize: usize, in_uAlignment: u32) ?*anyopaque {
     return c.WWISEC_AK_MemoryMgr_ReallocAligned(in_poolId, in_pAlloc, in_uSize, in_uAlignment);
 }
 
@@ -163,20 +163,20 @@ pub fn free(in_poolId: AkMemPoolId, in_pMemAddress: *anyopaque) void {
     c.WWISEC_AK_MemoryMgr_Free(in_poolId, in_pMemAddress);
 }
 
-pub fn malign(in_poolId: AkMemPoolId, in_USize: usize, in_uAlignment: u32) *anyopaque {
+pub fn malign(in_poolId: AkMemPoolId, in_USize: usize, in_uAlignment: u32) ?*anyopaque {
     return c.WWISEC_AK_MemoryMgr_Malign(in_poolId, in_USize, in_uAlignment);
 }
 
 pub fn getCategoryStats(in_poolId: AkMemPoolId) CategoryStats {
-    var raw_result: CategoryStats = undefined;
-    c.WWISEC_AK_MemoryMgr_GetCategoryStats(in_poolId, &raw_result);
-    return CategoryStats.fromC(raw_result);
+    var result: CategoryStats = undefined;
+    c.WWISEC_AK_MemoryMgr_GetCategoryStats(in_poolId, @ptrCast(?*c.WWISEC_AK_MemoryMgr_CategoryStats, &result));
+    return result;
 }
 
 pub fn getGlobalStats() GlobalStats {
-    var raw_result: GlobalStats = undefined;
-    c.WWISEC_AK_MemoryMgr_GetGlobalStats(&raw_result);
-    return GlobalStats.fromC(raw_result);
+    var result: GlobalStats = undefined;
+    c.WWISEC_AK_MemoryMgr_GetGlobalStats(@ptrCast(?*c.WWISEC_AK_MemoryMgr_GlobalStats, &result));
+    return result;
 }
 
 pub fn startProfileThreadUsage() void {

@@ -30,16 +30,16 @@ pub const Ak3DAudioSinkCapabilities = extern struct {
     passthrough: bool = false,
     multi_channel_objects: bool = false,
 
-    pub inline fn fromC(value: c.WWISEC_AK_Ak3DAudioSinkCapabilities) Ak3DAudioSinkCapabilities {
+    pub inline fn fromC(value: c.WWISEC_Ak3DAudioSinkCapabilities) Ak3DAudioSinkCapabilities {
         return @bitCast(Ak3DAudioSinkCapabilities, value);
     }
 
-    pub inline fn toC(self: Ak3DAudioSinkCapabilities) c.WWISEC_AK_Ak3DAudioSinkCapabilities {
-        return @bitCast(c.WWISEC_AK_Ak3DAudioSinkCapabilities, self);
+    pub inline fn toC(self: Ak3DAudioSinkCapabilities) c.WWISEC_Ak3DAudioSinkCapabilities {
+        return @bitCast(c.WWISEC_Ak3DAudioSinkCapabilities, self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(Ak3DAudioSinkCapabilities) == @sizeOf(c.WWISEC_AK_Ak3DAudioSinkCapabilities));
+        std.debug.assert(@sizeOf(Ak3DAudioSinkCapabilities) == @sizeOf(c.WWISEC_Ak3DAudioSinkCapabilities));
     }
 };
 
@@ -61,7 +61,7 @@ pub const AkAudioBuffer = extern struct {
     }
 
     pub fn numChannels(self: *const AkAudioBuffer) u32 {
-        return c.WISEC_AkAudioBuffer_NumChannels(@ptrCast(*const c.WWISEC_AkAudioBuffer, self));
+        return c.WWISEC_AkAudioBuffer_NumChannels(@ptrCast(*const c.WWISEC_AkAudioBuffer, self));
     }
 
     pub fn hasLFE(self: *const AkAudioBuffer) bool {

@@ -237,10 +237,10 @@ pub const AkPlatformInitSettings = blk: {
 
 pub const WIN_AkPlatformInitSettings = extern struct {
     hwnd: ?*anyopaque = null,
-    thread_l_engine: AkThreadProperties = .{},
-    thread_output_mgr: AkThreadProperties = .{},
-    thread_bank_manager: AkThreadProperties = .{},
-    thread_monitor: AkThreadProperties = .{},
+    thread_l_engine: WIN_AkThreadProperties = .{},
+    thread_output_mgr: WIN_AkThreadProperties = .{},
+    thread_bank_manager: WIN_AkThreadProperties = .{},
+    thread_monitor: WIN_AkThreadProperties = .{},
     num_refills_in_voice: u16 = 0,
     sample_rate: u32 = 0,
     enable_avx_support: bool = false,
@@ -259,7 +259,7 @@ pub const WIN_AkPlatformInitSettings = extern struct {
     }
 };
 
-pub const AkAudioAPILinux = packed struct(u32) {
+pub const AkAudioAPILinux = packed struct(common.DefaultEnumType) {
     pulse_audio: bool = false,
     alsa: bool = false,
     padding: u30 = 0,
@@ -276,10 +276,10 @@ pub const AkAudioAPILinux = packed struct(u32) {
 };
 
 pub const LINUX_AkPlatformInitSettings = extern struct {
-    thread_l_engine: AkThreadProperties = .{},
-    thread_output_mgr: AkThreadProperties = .{},
-    thread_bank_manager: AkThreadProperties = .{},
-    thread_monitor: AkThreadProperties = .{},
+    thread_l_engine: POSIX_AkThreadProperties = .{},
+    thread_output_mgr: POSIX_AkThreadProperties = .{},
+    thread_bank_manager: POSIX_AkThreadProperties = .{},
+    thread_monitor: POSIX_AkThreadProperties = .{},
     sample_rate: u32 = 0,
     num_refills_in_voice: u16 = 0,
     audio_api: AkAudioAPILinux = AkAudioAPILinux.Default,
@@ -299,10 +299,10 @@ pub const LINUX_AkPlatformInitSettings = extern struct {
 };
 
 pub const MACOSX_AkPlatformInitSettings = extern struct {
-    thread_l_engine: AkThreadProperties = .{},
-    thread_output_mgr: AkThreadProperties = .{},
-    thread_bank_manager: AkThreadProperties = .{},
-    thread_monitor: AkThreadProperties = .{},
+    thread_l_engine: POSIX_AkThreadProperties = .{},
+    thread_output_mgr: POSIX_AkThreadProperties = .{},
+    thread_bank_manager: POSIX_AkThreadProperties = .{},
+    thread_monitor: POSIX_AkThreadProperties = .{},
 
     sample_rate: u32 = 0,
     num_refills_in_voice: u16 = 0,
@@ -396,10 +396,10 @@ pub const IOS_AkAudioCallbacks = extern struct {
 };
 
 pub const IOS_AkPlatformInitSettings = extern struct {
-    thread_l_engine: AkThreadProperties = .{},
-    thread_output_mgr: AkThreadProperties = .{},
-    thread_bank_manager: AkThreadProperties = .{},
-    thread_monitor: AkThreadProperties = .{},
+    thread_l_engine: POSIX_AkThreadProperties = .{},
+    thread_output_mgr: POSIX_AkThreadProperties = .{},
+    thread_bank_manager: POSIX_AkThreadProperties = .{},
+    thread_monitor: POSIX_AkThreadProperties = .{},
     sample_rate: u32 = 0,
     num_refills_in_voice: u16 = 0,
     audio_session: IOS_AkAudioSessionProperties = .{},
@@ -419,26 +419,27 @@ pub const IOS_AkPlatformInitSettings = extern struct {
     }
 };
 
-pub const AkAudioAPIAndroid = packed struct {
+pub const AkAudioAPIAndroid = packed struct(common.DefaultEnumType) {
     aaudio: bool = false,
     opensl_es: bool = false,
+    pad: u30 = 0,
 
     pub const Default = .{ .aaudio = true, .opensl_es = true };
 
-    pub fn fromC(value: c.WWISEC_AkAudioAPIAndroid) AkAudioAPIAndroid {
+    pub inline fn fromC(value: c.WWISEC_AkAudioAPIAndroid) AkAudioAPIAndroid {
         return @bitCast(AkAudioAPIAndroid, value);
     }
 
-    pub fn toC(self: AkAudioAPIAndroid) c.WWISEC_AkAudioAPIAndroid {
+    pub inline fn toC(self: AkAudioAPIAndroid) c.WWISEC_AkAudioAPIAndroid {
         return @bitCast(c.WWISEC_AkAudioAPIAndroid, self);
     }
 };
 
 pub const ANDROID_AkPlatformInitSettings = extern struct {
-    thread_l_engine: AkThreadProperties = .{},
-    thread_output_mgr: AkThreadProperties = .{},
-    thread_bank_manager: AkThreadProperties = .{},
-    thread_monitor: AkThreadProperties = .{},
+    thread_l_engine: POSIX_AkThreadProperties = .{},
+    thread_output_mgr: POSIX_AkThreadProperties = .{},
+    thread_bank_manager: POSIX_AkThreadProperties = .{},
+    thread_monitor: POSIX_AkThreadProperties = .{},
     audio_api: AkAudioAPIAndroid = AkAudioAPIAndroid.Default,
     sample_rate: u32 = 0,
     num_refills_in_voice: u16 = 0,

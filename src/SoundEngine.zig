@@ -70,14 +70,18 @@ pub fn getSpeakerConfiguration(in_id_output: common.AkOutputDeviceID) speaker_co
 
 pub fn getOutputDeviceConfiguration(in_id_output: common.AkOutputDeviceID, io_channel_config: *speaker_config.AkChannelConfig, io_capabilities: *common_defs.Ak3DAudioSinkCapabilities) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(in_id_output, @ptrCast(*c.WWISEC_AkChannelConfig, io_channel_config), @ptrCast(*c.WWISEC_AK_Ak3DAudioSinkCapabilities, io_capabilities)),
+        c.WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(in_id_output, @ptrCast(*c.WWISEC_AkChannelConfig, io_channel_config), @ptrCast(*c.WWISEC_Ak3DAudioSinkCapabilities, io_capabilities)),
     );
 }
 
-pub fn getPanningRule(out_panning_rule: *common.AkPanningRule, in_id_output: common.AkOutputDeviceID) common.WwiseError!void {
-    return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_GetPanningRule(@ptrCast(*c.WWISEC_AkPanningRule, out_panning_rule), in_id_output),
+pub fn getPanningRule(in_id_output: common.AkOutputDeviceID) common.WwiseError!common.AkPanningRule {
+    var raw_panning_rule: c.WWISEC_AkPanningRule = undefined;
+
+    try common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetPanningRule(&raw_panning_rule, in_id_output),
     );
+
+    return @intToEnum(common.AkPanningRule, raw_panning_rule);
 }
 
 pub fn setPanningRule(in_panning_rule: common.AkPanningRule, in_id_output: common.AkOutputDeviceID) common.WwiseError!void {

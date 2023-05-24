@@ -25,10 +25,11 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     music_sync_point: bool = false,
     pad0: bool = false,
     midi_event: bool = false,
-    pad1: u4 = 0,
+    pad1: u3 = 0,
     enable_get_source_play_position: bool = false,
     enable_get_music_play_position: bool = false,
     enable_get_source_stream_buffering: bool = false,
+    pad2: u9 = 0,
 
     pub const MusicSyncAll = @bitCast(AkCallbackType, c.WWISEC_AK_MusicSyncAll);
     pub const CallbackBits = @bitCast(AkCallbackType, c.WWISEC_AK_CallbackBits);
@@ -185,7 +186,7 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
 
 pub const AkBusMeteringCallbackInfo = extern struct {
     base: AkCallbackInfo = .{},
-    metering: ?*common_defs.AK_AkMetering = null,
+    metering: ?*common_defs.AkMetering = null,
     channel_config: speaker_config.AkChannelConfig = .{},
     metering_flags: common.AkMeteringFlags = .{},
 
@@ -330,6 +331,7 @@ pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
     init: bool = false,
     @"suspend": bool = false,
     wakeup_from_suspend: bool = false,
+    pad: u19 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkGlobalCallbackLocation) AkGlobalCallbackLocation {
         return @bitCast(AkGlobalCallbackLocation, value);

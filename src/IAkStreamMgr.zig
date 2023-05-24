@@ -77,7 +77,7 @@ pub const AkAutoStmHeuristics = extern struct {
     throughput: f32 = 0.0,
     loop_start: u32 = 0,
     loop_end: u32 = 0,
-    min_num_buffers: u32 = 0,
+    min_num_buffers: u8 = 0,
     priority: common.AkPriority = 0,
 
     pub fn fromC(value: c.WWISEC_AkAutoStmHeuristics) AkAutoStmHeuristics {
@@ -186,7 +186,7 @@ pub const AkStreamRecord = struct {
         return .{
             .stream_id = value.uStreamID,
             .device_id = value.deviceID,
-            .stream_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.szStreamName),
+            .stream_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.szStreamName[0..]),
             .file_size = value.uFileSize,
             .custom_param_size = value.uCustomParamSize,
             .custom_param = value.uCustomParam,

@@ -89,8 +89,8 @@ pub const AkIOTransferInfo = extern struct {
     }
 };
 
-pub const AkIOCallback = *const fn (in_transfer_info: *AkAsyncIOTransferInfo, in_result: common.AKRESULT) callconv(.C) void;
-pub const AkBatchIOCallback = *const fn (in_num_transfers: u32, in_transfer_info: [*]*AkAsyncIOTransferInfo, in_result: common.AKRESULT) callconv(.C) void;
+pub const AkIOCallback = ?*const fn (in_transfer_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.C) void;
+pub const AkBatchIOCallback = ?*const fn (in_num_transfers: u32, in_transfer_info: [*]*AkAsyncIOTransferInfo, in_result: common.AKRESULT) callconv(.C) void;
 
 pub const AkAsyncIOTransferInfo = extern struct {
     base: AkIOTransferInfo = .{},
@@ -198,7 +198,7 @@ pub const IAkIOHookBlocking = extern struct {
             in_heuristics: *c.WWISEC_AkIoHeuristics,
             out_pBuffer: ?*anyopaque,
             in_transferInfo: *c.WWISEC_AkIOTransferInfo,
-        ) callconv(.C) c.WWWISEC_AKRESULT,
+        ) callconv(.C) c.WWISEC_AKRESULT,
         write: *const fn (
             iself: *IAkIOHookBlocking,
             in_fileDesc: *c.WWISEC_AkFileDesc,
@@ -455,7 +455,7 @@ pub const IAkIOHookDeferred = extern struct {
             in_fileDesc: *c.WWISEC_AkFileDesc,
             in_heuristics: *c.WWISEC_AkIoHeuristics,
             io_transferInfo: *c.WWISEC_AkAsyncIOTransferInfo,
-        ) callconv(.C) c.WWWISEC_AKRESULT,
+        ) callconv(.C) c.WWISEC_AKRESULT,
         write: *const fn (
             iself: *IAkIOHookDeferred,
             in_fileDesc: *c.WWISEC_AkFileDesc,
@@ -649,7 +649,7 @@ pub const IAkFileLocationResolver = extern struct {
         virtual_destructor: common.VirtualDestructor(IAkFileLocationResolver) = .{},
         open_string: *const fn (
             iself: *IAkFileLocationResolver,
-            in_file_name: [*]const c.AkOsChar,
+            in_file_name: [*]const c.AkOSChar,
             in_openMode: c.WWISEC_AkOpenMode,
             in_flags: ?*c.WWISEC_AkFileSystemFlags,
             io_syncOpen: *bool,
@@ -666,10 +666,10 @@ pub const IAkFileLocationResolver = extern struct {
         output_searched_paths_string: *const fn (
             iself: *IAkFileLocationResolver,
             in_result: *c.WWISEC_AKRESULT,
-            in_file_name: [*]const c.AkOsChar,
+            in_file_name: [*]const c.AkOSChar,
             in_flags: ?*c.WWISEC_AkFileSystemFlags,
             in_open_mode: c.WWISEC_AkOpenMode,
-            out_searched_path: *[*]const c.AkOsChar,
+            out_searched_path: *[*]const c.AkOSChar,
             in_path_size: i32,
         ) callconv(.C) c.WWISEC_AKRESULT,
         output_searched_paths_id: *const fn (
@@ -678,7 +678,7 @@ pub const IAkFileLocationResolver = extern struct {
             in_file_id: c.WWISEC_AkFileID,
             in_flags: ?*c.WWISEC_AkFileSystemFlags,
             in_open_mode: c.WWISEC_AkOpenMode,
-            out_searched_path: *[*]const c.AkOsChar,
+            out_searched_path: *[*]const c.AkOSChar,
             in_path_size: i32,
         ) callconv(.C) c.WWISEC_AKRESULT,
     };
@@ -790,7 +790,7 @@ pub fn getDefaultSettings(out_settings: *AkStreamMgrSettings) void {
 }
 
 pub fn getFileLocationResolver() ?*IAkFileLocationResolver {
-    return @ptrCast(?*IAkFileLocationResolver, c.WWISEC_AK_StreamMgr_GetFileLocationResolver());
+    return @ptrCast(?*IAkFileLocationResolver, @alignCast(@alignOf(?*IAkFileLocationResolver), c.WWISEC_AK_StreamMgr_GetFileLocationResolver()));
 }
 
 pub fn setFileLocationResolver(in_file_location_resolver: ?*IAkFileLocationResolver) void {

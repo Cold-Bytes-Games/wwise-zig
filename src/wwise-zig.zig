@@ -16,3 +16,8 @@ pub usingnamespace @import("IAkStreamMgr.zig");
 pub usingnamespace @import("midi_types.zig");
 pub usingnamespace @import("settings.zig");
 pub usingnamespace @import("speaker_config.zig");
+
+comptime {
+    @setEvalBranchQuota(5000);
+    @import("std").testing.refAllDeclsRecursive(@This());
+}

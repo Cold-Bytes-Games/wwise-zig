@@ -160,7 +160,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
-        .height_Back_right = true,
+        .height_back_right = true,
         .height_front_center = true,
         .height_back_center = true,
     };
@@ -169,7 +169,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
-        .height_Back_right = true,
+        .height_back_right = true,
         .height_top = true,
     };
 
@@ -177,7 +177,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
-        .height_Back_right = true,
+        .height_back_right = true,
         .height_front_center = true,
         .height_top = true,
     };
