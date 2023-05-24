@@ -384,6 +384,41 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterPlugin(WWISEC_AkPluginType in_eTyp
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterPlugin(static_cast<AkPluginType>(in_eType), in_ulCompanyID, in_ulPluginID, reinterpret_cast<AkCreatePluginCallback>(in_pCreateFunc), reinterpret_cast<AkCreateParamCallback>(in_pCreateParamFunc)));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterPluginDLL(const AkOSChar* in_DllName, const AkOSChar* in_DllPath)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterPluginDLL(in_DllName, in_DllPath));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGlobalCallback(WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation, void* in_pCookie, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterGlobalCallback(reinterpret_cast<AkGlobalCallbackFunc>(in_pCallback), in_eLocation, in_pCookie, static_cast<AkPluginType>(in_eType), in_ulCompanyID, in_ulPluginID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterGlobalCallback(WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterGlobalCallback(reinterpret_cast<AkGlobalCallbackFunc>(in_pCallback), in_eLocation));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterResourceMonitorCallback(WWISEC_AkResourceMonitorCallbackFunc in_pCallback)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterResourceMonitorCallback(reinterpret_cast<AkResourceMonitorCallbackFunc>(in_pCallback)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterResourceMonitorCallback(WWISEC_AkResourceMonitorCallbackFunc in_pCallback)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterResourceMonitorCallback(reinterpret_cast<AkResourceMonitorCallbackFunc>(in_pCallback)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterAudioDeviceStatusCallback(WWISEC_AK_AkDeviceStatusCallbackFunc in_pCallback)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterAudioDeviceStatusCallback(reinterpret_cast<AK::AkDeviceStatusCallbackFunc>(in_pCallback)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAudioDeviceStatusCallback()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterAudioDeviceStatusCallback());
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));

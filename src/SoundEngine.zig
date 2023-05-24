@@ -2,6 +2,7 @@ const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
 const common_defs = @import("common_defs.zig");
+const callback = @import("callback.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
@@ -139,6 +140,78 @@ pub fn registerPlugin(in_type: common.AkPluginType, in_company_id: u32, in_plugi
             @ptrCast(c.WWISEC_AkCreatePluginCallback, in_create_func),
             @ptrCast(c.WWISEC_AkCreateParamCallback, in_create_param_func),
         ),
+    );
+}
+
+pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []const u8, in_dll_path_opt: ?[]const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_in_dll_name = common.toOSChar(allocator, in_dll_name) catch return common.WwiseError.Fail;
+
+    var raw_in_dll_path = blk: {
+        if (in_dll_path_opt) |in_dll_path| {
+            break :blk common.toOSChar(allocator, in_dll_path) catch return common.WwiseError.Fail;
+        }
+
+        break :blk @as([*c]const c.AkOSChar, null);
+    };
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterPluginDLL(raw_in_dll_name, raw_in_dll_path),
+    );
+}
+
+pub fn registerGlobalCallback(
+    in_callback: callback.AkGlobalCallbackFunc,
+    in_location: callback.AkGlobalCallbackLocation,
+    in_cookie: ?*anyopaque,
+    in_type: common.AkPluginType,
+    in_company_id: u32,
+    in_plugin_id: u32,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterGlobalCallback(
+            @ptrCast(c.WWISEC_AkGlobalCallbackFunc, in_callback),
+            @intCast(u32, in_location.toC()),
+            in_cookie,
+            @enumToInt(in_type),
+            in_company_id,
+            in_plugin_id,
+        ),
+    );
+}
+
+pub fn unregisterGlobalCallback(in_callback: callback.AkGlobalCallbackFunc, in_location: callback.AkGlobalCallbackLocation) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnregisterGlobalCallback(
+            @ptrCast(c.WWISEC_AkGlobalCallbackFunc, in_callback),
+            @intCast(u32, in_location.toC()),
+        ),
+    );
+}
+
+pub fn registerResourceMonitorCallback(in_callback: callback.AkResourceMonitorCallbackFunc) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterResourceMonitorCallback(@ptrCast(c.WWISEC_AkResourceMonitorCallbackFunc, in_callback)),
+    );
+}
+
+pub fn unregisterResourceMonitorCallback(in_callback: callback.AkResourceMonitorCallbackFunc) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnregisterResourceMonitorCallback(@ptrCast(c.WWISEC_AkResourceMonitorCallbackFunc, in_callback)),
+    );
+}
+
+pub fn registerAudioDeviceStatusCallback(in_callback: callback.AkDeviceStatusCallbackFunc) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterAudioDeviceStatusCallback(@ptrCast(c.WWISEC_AK_AkDeviceStatusCallbackFunc, in_callback)),
+    );
+}
+
+pub fn unregisterAudioDeviceStatusCallback() common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnregisterAudioDeviceStatusCallback(),
     );
 }
 
