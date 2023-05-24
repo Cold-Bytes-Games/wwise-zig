@@ -243,6 +243,21 @@ extern "C"
     } WWISEC_AkPanningRule;
 
     typedef AkUInt8 WWISEC_AkMeteringFlags;
+
+    typedef enum WWISEC_AkPluginType
+    {
+        WWISEC_AkPluginTypeNone = 0,   ///< Unknown/invalid plug-in type.
+        WWISEC_AkPluginTypeCodec = 1,  ///< Compressor/decompressor plug-in (allows support for custom audio file types).
+        WWISEC_AkPluginTypeSource = 2, ///< Source plug-in: creates sound by synthesis method (no input, just output).
+        WWISEC_AkPluginTypeEffect = 3, ///< Effect plug-in: applies processing to audio data.
+        // WWISEC_AkPluginTypeMotionDevice = 4,	///< Motion Device plug-in: feeds movement data to devices. Deprecated by Motion refactor.
+        // WWISEC_AkPluginTypeMotionSource = 5,	///< Motion Device source plug-in: feeds movement data to device busses. Deprecated by Motion refactor.
+        WWISEC_AkPluginTypeMixer = 6,           ///< Mixer plug-in: mix voices at the bus level.
+        WWISEC_AkPluginTypeSink = 7,            ///< Sink plug-in: implement custom sound engine end point.
+        WWISEC_AkPluginTypeGlobalExtension = 8, ///< Global Extension plug-in: (e.g. Spatial Audio, Interactive Music)
+        WWISEC_AkPluginTypeMetadata = 9,        ///< Metadata plug-in: applies object-based processing to audio data
+        WWISEC_AkPluginTypeMask = 0xf           ///< Plug-in type mask is 4 bits.
+    } WWISEC_AkPluginType;
     // END AkTypes
 
     // BEGIN AkSpeakerConfig
@@ -470,6 +485,20 @@ extern "C"
     typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
     typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
     typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
+    typedef struct WWISEC_AK_IAkPlugin WWISEC_AK_IAkPlugin;
+    typedef struct WWISEC_AK_IAkPluginParam WWISEC_AK_IAkPluginParam;
+    typedef struct WWISEC_AK_IAkPluginMemAlloc WWISEC_AK_IAkPluginMemAlloc;
+
+    AK_CALLBACK(WWISEC_AK_IAkPlugin*, WWISEC_AkCreatePluginCallback)
+    (WWISEC_AK_IAkPluginMemAlloc* in_pAllocator);
+    AK_CALLBACK(WWISEC_AK_IAkPluginParam*, WWISEC_AkCreateParamCallback)
+    (WWISEC_AK_IAkPluginMemAlloc* in_pAllocator);
+    /// Registered plugin device enumeration function prototype, used for providing lists of devices by plug-ins.
+    AK_CALLBACK(WWISEC_AKRESULT, WWISEC_AkGetDeviceListCallback)
+    (
+        AkUInt32* io_maxNumDevices,                        ///< In: The length of the out_deviceDescriptions array, or zero is out_deviceDescriptions is null. Out: If out_deviceDescriptions is not-null, this should be set to the number of entries in out_deviceDescriptions that was populated (and should be less-than-or-equal to the initial value). If out_deviceDescriptions is null, this should be set to the maximum number of devices that may be returned by this callback.
+        WWISEC_AkDeviceDescription* out_deviceDescriptions ///< The output array of device descriptions. If this is not-null, there will be a number of entries equal to the input value of io_maxNumDevices.
+    );
     // END IAkPlugin
 
     // BEGIN AkCommonDefs
@@ -491,6 +520,15 @@ extern "C"
         /// Total linear k-weighted power of all channels. 0 if AK_EnableBusMeter_KPower is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
         AkReal32 fMeanPowerK;
     } WWISEC_AK_AkMetering;
+
+    typedef struct WWISEC_Ak3DAudioSinkCapabilities
+    {
+        WWISEC_AkChannelConfig channelConfig;  /// Channel configuration of the main mix.
+        AkUInt32 uMaxSystemAudioObjects;       /// Maximum number of System Audio Objects that can be active concurrently. A value of zero indicates the system does not support this feature.
+        AkUInt32 uAvailableSystemAudioObjects; /// How many System Audio Objects can currently be sent to the sink. This value can change at runtime depending on what is playing. Can never be higher than uMaxSystemAudioObjects.
+        bool bPassthrough;                     /// Separate  pass-through mix is supported.
+        bool bMultiChannelObjects;             /// Can handle multi-channel objects
+    } WWISEC_Ak3DAudioSinkCapabilities;
 
     typedef AkReal32 WWISEC_AkSampleType; ///< Audio sample data type (32 bit floating point)
 
@@ -1400,19 +1438,48 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AkProfilerPostMarkerFunc fnProfilerPostMarker; ///< External (optional) function for tracking significant events in the sound engine, to act as a marker or bookmark. (only called in Debug and Profile binaries; this is not called in Release)
     } WWISEC_AkInitSettings;
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
+    bool WWISEC_AK_SoundEngine_IsInitialized();
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Init(WWISEC_AkInitSettings* in_pSettings, WWISEC_AkPlatformInitSettings* in_pPlatformSettings);
 
     void WWISEC_AK_SoundEngine_GetDefaultInitSettings(WWISEC_AkInitSettings* out_settings);
 
     void WWISEC_AK_SoundEngine_GetDefaultPlatformInitSettings(WWISEC_AkPlatformInitSettings* out_platformSettings);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Init(WWISEC_AkInitSettings* in_pSettings, WWISEC_AkPlatformInitSettings* in_pPlatformSettings);
+    void WWISEC_AK_SoundEngine_Term();
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetAudioSettings(WWISEC_AkAudioSettings* out_audioSettings);
+
+    WWISEC_AkChannelConfig WWISEC_AK_SoundEngine_GetSpeakerConfiguration(WWISEC_AkOutputDeviceID in_idOutput);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(WWISEC_AkOutputDeviceID in_idOutput, WWISEC_AkChannelConfig* io_channelConfig, WWISEC_Ak3DAudioSinkCapabilities* io_capabilities);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetPanningRule(WWISEC_AkPanningRule* out_ePanningRule, WWISEC_AkOutputDeviceID in_idOutput);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPanningRule(WWISEC_AkPanningRule in_ePanningRule, WWISEC_AkOutputDeviceID in_idOutput);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSpeakerAngles(AkReal32* io_pfSpeakerAngles, AkUInt32* io_uNumAngles, AkReal32* out_fHeightAngle, WWISEC_AkOutputDeviceID in_idOutput);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSpeakerAngles(const AkReal32* in_pfSpeakerAngles, AkUInt32 in_uNumAngles, AkReal32 in_fHeightAngle, WWISEC_AkOutputDeviceID in_idOutput);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetVolumeThreshold(AkReal32 in_fVolumeThresholdDB);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMaxNumVoicesLimit(AkUInt16 in_maxNumberVoices);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetJobMgrMaxActiveWorkers(WWISEC_AkJobType in_jobType, AkUInt32 in_uNewMaxActiveWorkers);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RenderAudio(bool in_bAllowSyncRender);
+
+    WWISEC_AK_IAkGlobalPluginContext* WWISEC_AK_SoundEngine_GetGlobalPluginContext();
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterPlugin(WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkCreatePluginCallback in_pCreateFunc, WWISEC_AkCreateParamCallback in_pCreateParamFunc);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
 
-    void WWISEC_AK_SoundEngine_Term();
     // END AkSoundEngine
 
 // BEGIN IAkStreamMgr

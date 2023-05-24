@@ -69,8 +69,67 @@ pub const AkJobType_Generic = c.WWISEC_AkJobType_Generic;
 pub const AkJobType_AudioProcessing = c.WWISEC_AkJobType_AudioProcessing;
 pub const AkJobType_SpatialAudio = c.WWISEC_AkJobType_SpatialAudio;
 pub const AK_NUM_JOB_TYPES = c.WWISEC_AK_NUM_JOB_TYPES;
+pub const AK_MAX_PATH = c.AK_MAX_PATH;
 
 pub const AkFileHandle = ?*anyopaque;
+
+pub const AkAudioDeviceState = packed struct(DefaultEnumType) {
+    active: bool = false,
+    disabled: bool = false,
+    not_present: bool = false,
+    unplugged: bool = false,
+    pad: u28 = 0,
+
+    pub const All = AkAudioDeviceState{
+        .active = true,
+        .disabled = true,
+        .not_present = true,
+        .unplugged = true,
+    };
+
+    pub inline fn fromC(value: c.WWISEC_AkAudioDeviceState) AkAudioDeviceState {
+        return @bitCast(AkAudioDeviceState, value);
+    }
+
+    pub inline fn toC(self: AkAudioDeviceState) c.WWISEC_AkAudioDeviceState {
+        return @bitCast(c.WWISEC_AkAudioDeviceState, self);
+    }
+
+    comptime {
+        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .active = true }) == c.WWISEC_AkDeviceState_Active);
+        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .disabled = true }) == c.WWISEC_AkDeviceState_Disabled);
+        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .not_present = true }) == c.WWISEC_AkDeviceState_NotPresent);
+        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .unplugged = true }) == c.WWISEC_AkDeviceState_Unplugged);
+    }
+};
+
+pub const AkDeviceDescription = struct {
+    id_device: u32 = 0,
+    device_name: []const u8 = "",
+    device_state_mask: AkAudioDeviceState = .{},
+    is_default_device: bool = false,
+
+    pub fn fromC(allocator: std.mem.Allocator, value: c.WWISEC_AkDeviceDescription) !AkDeviceDescription {
+        return .{
+            .id_device = value.idDevice,
+            .device_name = try fromOSChar(allocator, value.deviceName),
+            .device_state_mask = AkAudioDeviceState.fromC(value.deviceStateMask),
+            .is_default_device = value.isDefaultDevice,
+        };
+    }
+
+    pub fn toC(self: AkDeviceDescription) !c.WWISEC_AkDeviceDescription {
+        var result: c.WWISEC_AkDeviceDescription = undefined;
+        result.idDevice = self.id_device;
+        result.deviceStateMask = self.device_state_mask.toC();
+        result.isDefaultDevice = self.is_default_device;
+
+        @memset(result.deviceName[0..], 0);
+        try std.unicode.utf8ToUtf16Le(result.deviceName[0..], self.device_name);
+
+        return result;
+    }
+};
 
 pub const AkPanningRule = enum(u8) {
     speakers = c.WWISEC_AkPanningRule_Speakers,
@@ -85,6 +144,17 @@ pub const AkMeteringFlags = packed struct(u8) {
     enable_bus_meter_kpower: bool = false,
     enable_bus_meter_3d_meter: bool = false,
     reserved1: u2 = 0,
+};
+
+pub const AkPluginType = enum(u8) {
+    none = c.WWISEC_AkPluginTypeNone,
+    codec = c.WWISEC_AkPluginTypeCodec,
+    source = c.WWISEC_AkPluginTypeSource,
+    effect = c.WWISEC_AkPluginTypeEffect,
+    mixer = c.WWISEC_AkPluginTypeMixer,
+    sink = c.WWISEC_AkPluginTypeSink,
+    global_extension = c.WWISEC_AkPluginTypeGlobalExtension,
+    metadata = c.WWISEC_AkPluginTypeMetadata,
 };
 
 pub const AKRESULT = enum(DefaultEnumType) {
@@ -161,6 +231,22 @@ pub const AKRESULT = enum(DefaultEnumType) {
     not_initialized = 102,
     file_permission_error = 103,
     unknown_file_error = 104,
+};
+
+pub const AkAudioSettings = extern struct {
+    num_samples_per_frame: u32 = 0,
+    num_samples_per_second: u32 = 0,
+    pub inline fn fromC(value: c.WWISEC_AkAudioSettings) AkAudioSettings {
+        return @bitCast(AkAudioSettings, value);
+    }
+
+    pub inline fn toC(self: AkAudioSettings) c.WWISEC_AkAudioSettings {
+        return @bitCast(c.WWISEC_AkAudioSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkAudioSettings) == @sizeOf(c.WWISEC_AkAudioSettings));
+    }
 };
 
 pub const WwiseError = error{
