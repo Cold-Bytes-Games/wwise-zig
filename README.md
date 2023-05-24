@@ -93,7 +93,7 @@ pub fn main() !void {
 
 | Platform | Architecture           |  Tested |
 | --       | --                     | --      |
-| Windows  | x86 (msvc ABI only)    | ✅      |
+| Windows  | x86 (msvc ABI only)    | ❌      |
 | Windows  | x86-64 (msvc ABI only) | ✅      |
 | Linux    | x86-64                 | ✅      |
 | Linux    | aarch64                | ❌      |
