@@ -625,6 +625,41 @@ pub fn getSourceStreamBuffering(in_playing_id: common.AkPlayingID, out_buffering
     );
 }
 
+pub const StopAllOptionalArgs = struct {
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+};
+
+pub fn stopAll(optional_args: StopAllOptionalArgs) void {
+    return c.WWISEC_AK_SoundEngine_StopAll(optional_args.game_object_id);
+}
+
+pub const StopPlayingIDOptionalArgs = struct {
+    transition_duration: common.AkTimeMs = 0,
+    fade_curve: common.AkCurveInterpolation = .linear,
+};
+
+pub fn stopPlayingID(in_playing_id: common.AkPlayingID, optional_args: StopPlayingIDOptionalArgs) void {
+    return c.WWISEC_AK_SoundEngine_StopPlayingID(
+        in_playing_id,
+        optional_args.transition_duration,
+        @enumToInt(optional_args.fade_curve),
+    );
+}
+
+pub const ExecuteActionOnPlayingIDOptionalArgs = struct {
+    transition_duration: common.AkTimeMs = 0,
+    fade_curve: common.AkCurveInterpolation = .linear,
+};
+
+pub fn executeActionOnPlayingID(in_action_type: AkActionOnEventType, in_playing_id: common.AkPlayingID, optional_args: ExecuteActionOnPlayingIDOptionalArgs) void {
+    c.WWISEC_AK_SoundEngine_ExecuteActionOnPlayingID(
+        @enumToInt(in_action_type),
+        in_playing_id,
+        optional_args.transition_duration,
+        @enumToInt(optional_args.fade_curve),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
