@@ -1,11 +1,12 @@
 const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
-const common_defs = @import("common_defs.zig");
 const callback = @import("callback.zig");
+const common_defs = @import("common_defs.zig");
+const IAkPlugin = @import("IAkPlugin.zig");
+const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
-const IAkPlugin = @import("IAkPlugin.zig");
 
 pub fn isInitialized() bool {
     return c.WWISEC_AK_SoundEngine_IsInitialized();
@@ -383,6 +384,44 @@ pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_even
             optional_args.game_object_id,
             optional_args.transition_duration,
             @enumToInt(optional_args.fade_curve),
+            optional_args.playing_id,
+        ),
+    );
+}
+
+pub const PostMIDIOnEventOptionalArgs = struct {
+    absolute_offsets: bool = false,
+    flags: callback.AkCallbackType = .{},
+    callback: callback.AkCallbackFunc = null,
+    cookie: ?*anyopaque = null,
+    playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+};
+
+pub fn postMIDIOnEvent(in_event_id: common.AkUniqueID, in_game_object_id: common.AkGameObjectID, in_midi_posts: []const midi_types.AkMIDIPost, optional_args: PostMIDIOnEventOptionalArgs) common.AkPlayingID {
+    return c.WWISEC_AK_SoundEngine_PostMIDIOnEvent(
+        in_event_id,
+        in_game_object_id,
+        @ptrCast([*]c.WWISEC_AkMIDIPost, @constCast(in_midi_posts)),
+        @truncate(u16, in_midi_posts.len),
+        optional_args.absolute_offsets,
+        @intCast(u32, optional_args.flags.toC()),
+        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback),
+        optional_args.cookie,
+        optional_args.playing_id,
+    );
+}
+
+pub const StopMIDIOnEventOptionalArgs = struct {
+    event_id: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+};
+
+pub fn stopMIDIOnEvent(optional_args: StopMIDIOnEventOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_StopMIDIOnEvent(
+            optional_args.event_id,
+            optional_args.game_object_id,
             optional_args.playing_id,
         ),
     );

@@ -473,6 +473,25 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in
         in_PlayingID));
 }
 
+WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AkPlayingID in_playingID)
+{
+    return AK::SoundEngine::PostMIDIOnEvent(
+        in_eventID,
+        in_gameObjectID,
+        reinterpret_cast<AkMIDIPost*>(in_pPosts),
+        in_uNumPosts,
+        in_bAbsoluteOffsets,
+        in_uFlags,
+        reinterpret_cast<AkCallbackFunc>(in_pfnCallback),
+        in_pCookie,
+        in_playingID);
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopMIDIOnEvent(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::StopMIDIOnEvent(in_eventID, in_gameObjectID, in_playingID));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
