@@ -607,6 +607,26 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SendPluginCustomGameData(WWISEC_AkUniqueID
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SendPluginCustomGameData(in_busID, in_busObjectID, static_cast<AkPluginType>(in_eType), in_uCompanyID, in_uPluginID, in_pData, in_uSizeInBytes));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObj(WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterGameObj(in_gameObjectID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObjWithName(WWISEC_AkGameObjectID in_gameObjectID, const char* in_pszObjName)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterGameObj(in_gameObjectID, in_pszObjName));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterGameObj(WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterGameObj(in_gameObjectID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAllGameObj()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterAllGameObj());
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));

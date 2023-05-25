@@ -694,6 +694,36 @@ pub fn sendPluginCustomGameData(
     );
 }
 
+pub fn registerGameObj(in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterGameObj(in_game_object_id),
+    );
+}
+
+pub fn registerGameObjWithName(fallback_allocator: std.mem.Allocator, in_game_object_id: common.AkGameObjectID, in_name: []const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_name = common.toCString(allocator, in_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterGameObjWithName(in_game_object_id, raw_name),
+    );
+}
+
+pub fn unregisterGameObj(in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnregisterGameObj(in_game_object_id),
+    );
+}
+
+pub fn unregisterAllGameObj() common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnregisterAllGameObj(),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
