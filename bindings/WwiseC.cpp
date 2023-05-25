@@ -512,6 +512,16 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnpinEventInStreamCache_String(const char*
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnpinEventInStreamCache(in_pszEventName));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_ID(WWISEC_AkUniqueID in_eventID, AkReal32* out_fPercentBuffered, bool* out_bCachePinnedMemoryFull)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetBufferStatusForPinnedEvent(in_eventID, *out_fPercentBuffered, *out_bCachePinnedMemoryFull));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_String(const char* in_pszEventName, AkReal32* out_fPercentBuffered, bool* out_bCachePinnedMemoryFull)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetBufferStatusForPinnedEvent(in_pszEventName, *out_fPercentBuffered, *out_bCachePinnedMemoryFull));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));

@@ -471,6 +471,32 @@ pub fn unpinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_e
     );
 }
 
+pub fn getBufferStatusForPinnedEventID(in_event_id: common.AkUniqueID, out_percent_buffered: *f32, out_cache_pinned_memory_full: *bool) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_ID(
+            in_event_id,
+            out_percent_buffered,
+            out_cache_pinned_memory_full,
+        ),
+    );
+}
+
+pub fn getBufferStatusForPinnedEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, out_percent_buffered: *f32, out_cache_pinned_memory_full: *bool) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_event_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_String(
+            raw_event_name,
+            out_percent_buffered,
+            out_cache_pinned_memory_full,
+        ),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
