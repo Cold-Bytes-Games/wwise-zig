@@ -562,6 +562,18 @@ pub fn seekOnEventPercentString(fallback_allocator: std.mem.Allocator, in_event_
     );
 }
 
+pub fn cancelEventCallbackCookie(in_cookie: ?*anyopaque) void {
+    c.WWISEC_AK_SoundEngine_CancelEventCallbackCookie(in_cookie);
+}
+
+pub fn cancelEventCallbackGameObject(in_game_object_id: common.AkGameObjectID) void {
+    c.WWISEC_AK_SoundEngine_CancelEventCallbackGameObject(in_game_object_id);
+}
+
+pub fn cancelEventCallback(in_playing_id: common.AkPlayingID) void {
+    c.WWISEC_AK_SoundEngine_CancelEventCallback(in_playing_id);
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
