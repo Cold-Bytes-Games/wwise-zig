@@ -1472,6 +1472,15 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AkActionOnEventType_ReleaseEnvelope = 4 ///< Release envelope
     } WWISEC_AkActionOnEventType;
 
+    typedef struct WWISEC_AkSourcePosition
+    {
+        WWISEC_AkUniqueID audioNodeID; ///< Audio Node ID of playing item
+        WWISEC_AkUniqueID mediaID;     ///< Media ID of playing item. (corresponds to 'ID' attribute of 'File' element in SoundBank metadata file)
+        WWISEC_AkTimeMs msTime;        ///< Position of the source (in ms) associated with that playing item
+        AkUInt32 samplePosition;       ///< Position of the source (in samples) associated with that playing item
+        AkUInt32 updateBufferTick;     ///< Value of GetBufferTick() at the time the position was updated
+    } WWISEC_AkSourcePosition;
+
     bool WWISEC_AK_SoundEngine_IsInitialized();
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Init(WWISEC_AkInitSettings* in_pSettings, WWISEC_AkPlatformInitSettings* in_pPlatformSettings);
@@ -1561,6 +1570,12 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_SoundEngine_CancelEventCallbackGameObject(WWISEC_AkGameObjectID in_gameObjectID);
 
     void WWISEC_AK_SoundEngine_CancelEventCallback(WWISEC_AkPlayingID in_playingID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPosition(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_puPosition, bool in_bExtrapolate);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPositions(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSourcePosition* out_puPositions, AkUInt32* io_pcPositions, bool in_bExtrapolate);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourceStreamBuffering(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_buffering, bool* out_bIsBuffering);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 

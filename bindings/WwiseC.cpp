@@ -557,6 +557,21 @@ void WWISEC_AK_SoundEngine_CancelEventCallback(WWISEC_AkPlayingID in_playingID)
     AK::SoundEngine::CancelEventCallback(in_playingID);
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPosition(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_puPosition, bool in_bExtrapolate)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetSourcePlayPosition(in_PlayingID, reinterpret_cast<AkTimeMs*>(out_puPosition), in_bExtrapolate));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPositions(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSourcePosition* out_puPositions, AkUInt32* io_pcPositions, bool in_bExtrapolate)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetSourcePlayPositions(in_PlayingID, reinterpret_cast<AkSourcePosition*>(out_puPositions), io_pcPositions, in_bExtrapolate));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourceStreamBuffering(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_buffering, bool* out_bIsBuffering)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetSourceStreamBuffering(in_PlayingID, *out_buffering, *out_bIsBuffering));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));

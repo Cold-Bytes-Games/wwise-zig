@@ -8,6 +8,26 @@ const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 
+pub const AkSourcePosition = extern struct {
+    audio_node_id: common.AkUniqueID = 0,
+    media_id: common.AkUniqueID = 0,
+    ms_time: common.AkTimeMs = 0,
+    sample_position: u32 = 0,
+    update_buffer_tick: u32 = 0,
+
+    pub inline fn fromC(value: c.WWISEC_AkSourcePosition) AkSourcePosition {
+        return @bitCast(AkSourcePosition, value);
+    }
+
+    pub inline fn toC(self: AkSourcePosition) c.WWISEC_AkSourcePosition {
+        return @bitCast(c.WWISEC_AkSourcePosition, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkSourcePosition) == @sizeOf(c.WWISEC_AkSourcePosition));
+    }
+};
+
 pub fn isInitialized() bool {
     return c.WWISEC_AK_SoundEngine_IsInitialized();
 }
@@ -572,6 +592,37 @@ pub fn cancelEventCallbackGameObject(in_game_object_id: common.AkGameObjectID) v
 
 pub fn cancelEventCallback(in_playing_id: common.AkPlayingID) void {
     c.WWISEC_AK_SoundEngine_CancelEventCallback(in_playing_id);
+}
+
+pub fn getSourcePlayPosition(in_playing_id: common.AkPlayingID, out_position: *common.AkTimeMs, extrapolate: bool) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetSourcePlayPosition(
+            in_playing_id,
+            out_position,
+            extrapolate,
+        ),
+    );
+}
+
+pub fn getSourcePlayPositions(in_playing_id: common.AkPlayingID, out_positions: ?[*]AkSourcePosition, io_positions_count: *u32, in_extrapolate: bool) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetSourcePlayPositions(
+            in_playing_id,
+            @ptrCast([*c]c.WWISEC_AkSourcePosition, out_positions),
+            io_positions_count,
+            in_extrapolate,
+        ),
+    );
+}
+
+pub fn getSourceStreamBuffering(in_playing_id: common.AkPlayingID, out_buffering: *common.AkTimeMs, out_is_buffering: *bool) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetSourceStreamBuffering(
+            in_playing_id,
+            out_buffering,
+            out_is_buffering,
+        ),
+    );
 }
 
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
