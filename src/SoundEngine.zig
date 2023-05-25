@@ -660,6 +660,40 @@ pub fn executeActionOnPlayingID(in_action_type: AkActionOnEventType, in_playing_
     );
 }
 
+pub fn setRandomSeed(in_seed: u32) void {
+    c.WWISEC_AK_SoundEngine_SetRandomSeed(in_seed);
+}
+
+pub fn muteBackgroundMusic(in_mute: bool) void {
+    c.WWISEC_AK_SoundEngine_MuteBackgroundMusic(in_mute);
+}
+
+pub fn getBackgroundMusicMute() bool {
+    return c.WWISEC_AK_SoundEngine_GetBackgroundMusicMute();
+}
+
+pub fn sendPluginCustomGameData(
+    in_bus_id: common.AkUniqueID,
+    in_bus_object_id: common.AkUniqueID,
+    in_type: common.AkPluginType,
+    in_company_id: u32,
+    in_plugin_id: u32,
+    in_data: ?*anyopaque,
+    in_size_in_bytes: u32,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SendPluginCustomGameData(
+            in_bus_id,
+            in_bus_object_id,
+            @enumToInt(in_type),
+            in_company_id,
+            in_plugin_id,
+            in_data,
+            in_size_in_bytes,
+        ),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
