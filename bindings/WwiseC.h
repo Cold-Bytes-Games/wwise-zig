@@ -246,6 +246,21 @@ extern "C"
         WWISEC_AkFileID idFile;      ///< File ID.  If not zero, the source will be streaming from disk.  This ID can be anything.  Note that you must override the low-level IO to resolve this ID to a real file.  See \ref streamingmanager_lowlevel for more information on overriding the Low Level IO.
     } WWISEC_AkExternalSourceInfo;
 
+    typedef enum WWISEC_AK_SoundEngine_MultiPositionType
+    {
+        WWISEC_AK_SoundEngine_MultiPositionType_SingleSource,   ///< Used for normal sounds, not expected to pass to AK::SoundEngine::SetMultiplePosition() (if done, only the first position will be used).
+        WWISEC_AK_SoundEngine_MultiPositionType_MultiSources,   ///< Simulate multiple sources in one sound playing, adding volumes. For instance, all the torches on your level emitting using only one sound.
+        WWISEC_AK_SoundEngine_MultiPositionType_MultiDirections ///< Simulate one sound coming from multiple directions. Useful for repositionning sounds based on wall openings or to simulate areas like forest or rivers ( in combination with spreading in the attenuation of the sounds ).
+    } WWISEC_AK_SoundEngine_MultiPositionType;
+
+    typedef enum WWISEC_AkSetPositionFlags
+    {
+        WWISEC_AkSetPositionFlags_Emitter = 1 << 0,  // Only set the emitter component position.
+        WWISEC_AkSetPositionFlags_Listener = 1 << 1, // Only set the listener component position.
+
+        WWISEC_AkSetPositionFlags_Default = (WWISEC_AkSetPositionFlags_Emitter | WWISEC_AkSetPositionFlags_Listener) // Default: set both emitter and listener component positions.
+    } WWISEC_AkSetPositionFlags;
+
     typedef enum WWISEC_AkPanningRule
     {
         WWISEC_AkPanningRule_Speakers = 0,  ///< Left and right positioned 60 degrees apart (by default - see AK::SoundEngine::GetSpeakerAngles()).
@@ -283,6 +298,44 @@ extern "C"
         WWISEC_AkCurveInterpolation_LastFadeCurve = 8, ///< Update this value to reflect last curve available for fades
         WWISEC_AkCurveInterpolation_Constant = 9       ///< Constant ( not valid for fading values )
     } WWISEC_AkCurveInterpolation;
+
+    typedef struct WWISEC_AkVector64
+    {
+        AkReal64 X; ///< X Position
+        AkReal64 Y; ///< Y Position
+        AkReal64 Z; ///< Z Position
+    } WWISEC_AkVector64;
+
+    typedef struct WWISEC_AkVector
+    {
+        AkReal32 X; ///< X Position
+        AkReal32 Y; ///< Y Position
+        AkReal32 Z; ///< Z Position
+    } WWISEC_AkVector;
+
+    typedef struct WWISEC_AkWorldTransform
+    {
+        WWISEC_AkVector orientationFront; ///< Orientation of the listener
+        WWISEC_AkVector orientationTop;   ///< Top orientation of the listener
+        WWISEC_AkVector64 position;       ///< Position of the listener
+    } WWISEC_AkWorldTransform;
+
+    typedef struct WWISEC_AkTransform
+    {
+        WWISEC_AkVector orientationFront; ///< Orientation of the listener
+        WWISEC_AkVector orientationTop;   ///< Top orientation of the listener
+        WWISEC_AkVector position;         ///< Position of the listener
+    } WWISEC_AkTransform;
+
+    typedef WWISEC_AkWorldTransform WWISEC_AkSoundPosition;
+    typedef WWISEC_AkWorldTransform WWISEC_AkListenerPosition;
+
+    typedef struct WWISEC_AkChannelEmitter
+    {
+        WWISEC_AkWorldTransform position;    ///< Emitter position.
+        WWISEC_AkChannelMask uInputChannels; ///< Channels to which the above position applies.
+        char padding[4];                     ///< In order to preserve consistent struct size across archs, we need some padding
+    } WWISEC_AkChannelEmitter;
     // END AkTypes
 
     // BEGIN AkSpeakerConfig
@@ -1599,12 +1652,22 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAllGameObj();
 
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, WWISEC_AkSetPositionFlags in_eFlags);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(WWISEC_AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDistanceProbe(WWISEC_AkGameObjectID in_listenerGameObjectID, WWISEC_AkGameObjectID in_distanceProbeGameObjectID);
+
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
-    // END AkSoundEngine
+// END AkSoundEngine
 
 // BEGIN IAkStreamMgr
 #define WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH (64)
@@ -1874,9 +1937,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_MusicEngine_GetDefaultInitSettings(WWISEC_AkMusicSettings* out_settings);
     void WWISEC_AK_MusicEngine_Term();
     WWISEC_AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate);
-    // END AkMusicEngine
+// END AkMusicEngine
 
-    // BEGIN AkCommunication
+// BEGIN AkCommunication
 #if defined(WWISEC_USE_COMMUNICATION)
 #define WWISEC_AK_COMM_SETTINGS_MAX_STRING_SIZE 64
 #define WWISEC_AK_COMM_SETTINGS_MAX_URL_SIZE 128
@@ -1908,7 +1971,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_Comm_Reset();
     const WWISEC_AkCommSettings* WWISEC_AK_Comm_GetCurrentSettings();
 #endif
-    // END AkCommunication
+// END AkCommunication
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
@@ -1957,7 +2020,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_CAkMultipleFileLocation_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
 #endif
 
-    // END IO Hooks
+// END IO Hooks
 #ifdef __cplusplus
 }
 #endif

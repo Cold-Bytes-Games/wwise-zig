@@ -162,6 +162,153 @@ pub const AkExternalSourceInfo = struct {
     }
 };
 
+pub const AkVector64 = extern struct {
+    x: f64 = 0.0,
+    y: f64 = 0.0,
+    z: f64 = 0.0,
+
+    pub inline fn toAkVector(self: AkVector64) AkVector {
+        return .{
+            .x = @truncate(f32, self.x),
+            .y = @truncate(f32, self.y),
+            .z = @truncate(f32, self.z),
+        };
+    }
+
+    pub inline fn fromC(value: c.WWISEC_AkVector64) AkVector64 {
+        return @bitCast(AkVector64, value);
+    }
+
+    pub inline fn toC(self: AkVector64) c.WWISEC_AkVector64 {
+        return @bitCast(c.WWISEC_AkVector64, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkVector64) == @sizeOf(c.WWISEC_AkVector64));
+    }
+};
+
+pub const AkVector = extern struct {
+    x: f32 = 0.0,
+    y: f32 = 0.0,
+    z: f32 = 0.0,
+
+    pub inline fn toAkVector64(self: AkVector) AkVector64 {
+        return .{
+            .x = self.x,
+            .y = self.y,
+            .z = self.z,
+        };
+    }
+
+    pub inline fn fromC(value: c.WWISEC_AkVector) AkVector {
+        return @bitCast(AkVector, value);
+    }
+
+    pub inline fn toC(self: AkVector) c.WWISEC_AkVector {
+        return @bitCast(c.WWISEC_AkVector, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkVector) == @sizeOf(c.WWISEC_AkVector));
+    }
+};
+
+pub const AkWorldTransform = extern struct {
+    orientation_front: AkVector = .{},
+    orientation_top: AkVector = .{},
+    position: AkVector64 = .{},
+
+    pub inline fn toAkTransform(self: AkWorldTransform) AkTransform {
+        return .{
+            .orientation_front = self.orientation_front,
+            .orientation_top = self.orientation_top,
+            .position = self.position.toAkVector(),
+        };
+    }
+
+    pub inline fn fromC(value: c.WWISEC_AkWorldTransform) AkWorldTransform {
+        return @bitCast(AkWorldTransform, value);
+    }
+
+    pub inline fn toC(self: AkWorldTransform) c.WWISEC_AkWorldTransform {
+        return @bitCast(c.WWISEC_AkVector64, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkWorldTransform) == @sizeOf(c.WWISEC_AkWorldTransform));
+    }
+};
+
+pub const AkTransform = extern struct {
+    orientation_front: AkVector = .{},
+    orientation_top: AkVector = .{},
+    position: AkVector = .{},
+
+    pub inline fn toAkWorldTransform(self: AkTransform) AkWorldTransform {
+        return .{
+            .orientation_front = self.orientation_front,
+            .orientation_top = self.orientation_top,
+            .position = self.position.toAkVector64(),
+        };
+    }
+
+    pub inline fn fromC(value: c.WWISEC_AkTransform) AkTransform {
+        return @bitCast(AkTransform, value);
+    }
+
+    pub inline fn toC(self: AkTransform) c.WWISEC_AkTransform {
+        return @bitCast(c.WWISEC_AkTransform, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkTransform) == @sizeOf(c.WWISEC_AkTransform));
+    }
+};
+
+pub const AkSoundPosition = AkWorldTransform;
+pub const AkListenerPosition = AkWorldTransform;
+
+pub const AkChannelEmitter = extern struct {
+    position: AkWorldTransform = .{},
+    input_channels: AkChannelMask = 0,
+    padding: [4]u8 = [_]u8{0} ** 4,
+
+    pub inline fn fromC(value: c.WWISEC_AkChannelEmitter) AkChannelEmitter {
+        return @bitCast(AkChannelEmitter, value);
+    }
+
+    pub inline fn toC(self: AkChannelEmitter) c.WWISEC_AkChannelEmitter {
+        return @bitCast(c.WWISEC_AkChannelEmitter, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkChannelEmitter) == @sizeOf(c.WWISEC_AkChannelEmitter));
+    }
+};
+
+pub const AkSetPositionFlags = packed struct(u8) {
+    emitter: bool = false,
+    listener: bool = false,
+    pad: u6 = 0,
+
+    pub const Default = AkSetPositionFlags{ .emitter = true, .listener = true };
+
+    pub inline fn fromC(value: c.WWISEC_AkSetPositionFlags) AkSetPositionFlags {
+        return @bitCast(AkSetPositionFlags, value);
+    }
+
+    pub inline fn toC(self: AkSetPositionFlags) c.WWISEC_AkSetPositionFlags {
+        return @bitCast(u8, self);
+    }
+
+    comptime {
+        std.debug.assert(@bitCast(u8, AkSetPositionFlags{ .emitter = true }) == c.WWISEC_AkSetPositionFlags_Emitter);
+        std.debug.assert(@bitCast(u8, AkSetPositionFlags{ .listener = true }) == c.WWISEC_AkSetPositionFlags_Listener);
+        std.debug.assert(Default.toC() == c.WWISEC_AkSetPositionFlags_Default);
+    }
+};
+
 pub const AkPanningRule = enum(u8) {
     speakers = c.WWISEC_AkPanningRule_Speakers,
     headphones = c.WWISEC_AkPanningRule_Headphones,

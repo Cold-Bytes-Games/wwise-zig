@@ -45,6 +45,11 @@ static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 static_assert(sizeof(WWISEC_AkExternalSourceInfo) == sizeof(AkExternalSourceInfo));
 static_assert(WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT == AK_COMM_DEFAULT_DISCOVERY_PORT);
+static_assert(sizeof(WWISEC_AkVector64) == sizeof(AkVector64));
+static_assert(sizeof(WWISEC_AkVector) == sizeof(AkVector));
+static_assert(sizeof(WWISEC_AkWorldTransform) == sizeof(AkWorldTransform));
+static_assert(sizeof(WWISEC_AkTransform) == sizeof(AkTransform));
+static_assert(sizeof(WWISEC_AkChannelEmitter) == sizeof(AkChannelEmitter));
 // END AkTypes
 
 // BEGIN AkMidiTypes
@@ -625,6 +630,31 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterGameObj(WWISEC_AkGameObjectID in
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAllGameObj()
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterAllGameObj());
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, WWISEC_AkSetPositionFlags in_eFlags)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetPosition(in_GameObjectID, *reinterpret_cast<const AkSoundPosition*>(in_Position), static_cast<AkSetPositionFlags>(in_eFlags)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMultiplePositions(in_GameObjectID, reinterpret_cast<const AkSoundPosition*>(in_pPositions), in_NumPositions, static_cast<AK::SoundEngine::MultiPositionType>(in_eMultiPositionType), static_cast<AkSetPositionFlags>(in_eFlags)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMultiplePositions(in_GameObjectID, reinterpret_cast<const AkChannelEmitter*>(in_pPositions), in_NumPositions, static_cast<AK::SoundEngine::MultiPositionType>(in_eMultiPositionType), static_cast<AkSetPositionFlags>(in_eFlags)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(WWISEC_AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetScalingFactor(in_GameObjectID, in_fAttenuationScalingFactor));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDistanceProbe(WWISEC_AkGameObjectID in_listenerGameObjectID, WWISEC_AkGameObjectID in_distanceProbeGameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetDistanceProbe(in_listenerGameObjectID, in_distanceProbeGameObjectID));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)

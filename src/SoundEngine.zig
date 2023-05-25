@@ -28,6 +28,12 @@ pub const AkSourcePosition = extern struct {
     }
 };
 
+pub const MultiPositionType = enum(common.DefaultEnumType) {
+    single_source = c.WWISEC_AK_SoundEngine_MultiPositionType_SingleSource,
+    multi_sources = c.WWISEC_AK_SoundEngine_MultiPositionType_MultiSources,
+    multi_directions = c.WWISEC_AK_SoundEngine_MultiPositionType_MultiDirections,
+};
+
 pub fn isInitialized() bool {
     return c.WWISEC_AK_SoundEngine_IsInitialized();
 }
@@ -721,6 +727,61 @@ pub fn unregisterGameObj(in_game_object_id: common.AkGameObjectID) common.WwiseE
 pub fn unregisterAllGameObj() common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterAllGameObj(),
+    );
+}
+
+pub const SetPositionOptionalArgs = struct {
+    flags: common.AkSetPositionFlags = common.AkSetPositionFlags.Default,
+};
+
+pub fn setPosition(in_game_object_id: common.AkGameObjectID, in_position: common.AkSoundPosition, optional_args: SetPositionOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetPosition(
+            in_game_object_id,
+            @ptrCast(?*const c.WWISEC_AkSoundPosition, &in_position),
+            optional_args.flags.toC(),
+        ),
+    );
+}
+
+pub const SetMultiplePositionOptionalArgs = struct {
+    multi_position_type: MultiPositionType = .multi_directions,
+    flags: common.AkSetPositionFlags = common.AkSetPositionFlags.Default,
+};
+
+pub fn setMultiplePositionsSoundPosition(in_game_object: common.AkGameObjectID, positions: []const common.AkSoundPosition, optional_args: SetMultiplePositionOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(
+            in_game_object,
+            @ptrCast([*]const c.WWISEC_AkSoundPosition, positions),
+            @truncate(u16, positions.len),
+            @enumToInt(optional_args.multi_position_type),
+            optional_args.flags.toC(),
+        ),
+    );
+}
+
+pub fn setMultiplePositionChannelEmitter(in_game_object: common.AkGameObjectID, positions: []const common.AkChannelEmitter, optional_args: SetMultiplePositionOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(
+            in_game_object,
+            @ptrCast([*]const c.WWISEC_AkChannelEmitter, positions),
+            @truncate(u16, positions.len),
+            @enumToInt(optional_args.multi_position_type),
+            optional_args.flags.toC(),
+        ),
+    );
+}
+
+pub fn setScalingFactor(in_game_object_id: common.AkGameObjectID, in_attenuation_scaling_factor: f32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetScalingFactor(in_game_object_id, in_attenuation_scaling_factor),
+    );
+}
+
+pub fn setDistanceProbe(in_listener_game_object_id: common.AkGameObjectID, in_distance_probe_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetDistanceProbe(in_listener_game_object_id, in_distance_probe_game_object_id),
     );
 }
 
