@@ -427,6 +427,50 @@ pub fn stopMIDIOnEvent(optional_args: StopMIDIOnEventOptionalArgs) common.WwiseE
     );
 }
 
+pub fn pinEventInStreamCacheID(in_event_id: common.AkUniqueID, in_active_priority: common.AkPriority, in_inactive_priority: common.AkPriority) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PinEventInStreamCache_ID(
+            in_event_id,
+            in_active_priority,
+            in_inactive_priority,
+        ),
+    );
+}
+
+pub fn pinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_active_priority: common.AkPriority, in_inactive_priority: common.AkPriority) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_event_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PinEventInStreamCache_String(
+            raw_event_name,
+            in_active_priority,
+            in_inactive_priority,
+        ),
+    );
+}
+
+pub fn unpinEventInStreamCacheID(in_event_id: common.AkUniqueID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnpinEventInStreamCache_ID(in_event_id),
+    );
+}
+
+pub fn unpinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_event_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnpinEventInStreamCache_String(raw_event_name),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
