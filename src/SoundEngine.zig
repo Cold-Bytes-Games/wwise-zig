@@ -497,6 +497,71 @@ pub fn getBufferStatusForPinnedEventString(fallback_allocator: std.mem.Allocator
     );
 }
 
+pub const SeekOnEventOptionalArgs = struct {
+    seek_to_nearest_marker: bool = false,
+    playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+};
+
+pub fn seekOnEventTimeID(in_event_id: common.AkUniqueID, in_game_object: common.AkGameObjectID, in_position: common.AkTimeMs, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SeekOnEvent_Time_ID(
+            in_event_id,
+            in_game_object,
+            in_position,
+            optional_args.seek_to_nearest_marker,
+            optional_args.playing_id,
+        ),
+    );
+}
+
+pub fn seekOnEventTimeString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: common.AkGameObjectID, in_position: common.AkTimeMs, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_event_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SeekOnEvent_Time_String(
+            raw_event_name,
+            in_game_object,
+            in_position,
+            optional_args.seek_to_nearest_marker,
+            optional_args.playing_id,
+        ),
+    );
+}
+
+pub fn seekOnEventPercentID(in_event_id: common.AkUniqueID, in_game_object: common.AkGameObjectID, in_percent: f32, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SeekOnEvent_Percent_ID(
+            in_event_id,
+            in_game_object,
+            in_percent,
+            optional_args.seek_to_nearest_marker,
+            optional_args.playing_id,
+        ),
+    );
+}
+
+pub fn seekOnEventPercentString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: common.AkGameObjectID, in_percent: f32, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_event_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SeekOnEvent_Percent_String(
+            raw_event_name,
+            in_game_object,
+            in_percent,
+            optional_args.seek_to_nearest_marker,
+            optional_args.playing_id,
+        ),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
