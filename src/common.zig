@@ -187,7 +187,7 @@ pub const AkDeviceDescription = struct {
     pub fn fromC(allocator: std.mem.Allocator, value: c.WWISEC_AkDeviceDescription) !AkDeviceDescription {
         return .{
             .id_device = value.idDevice,
-            .device_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.deviceName[0..]),
+            .device_name = try fromOSChar(allocator, @ptrCast(?[*:0]const c.AkOSChar, value.deviceName[0..])),
             .device_state_mask = AkAudioDeviceState.fromC(value.deviceStateMask),
             .is_default_device = value.isDefaultDevice,
         };
@@ -200,7 +200,11 @@ pub const AkDeviceDescription = struct {
         result.isDefaultDevice = self.is_default_device;
 
         @memset(result.deviceName[0..], 0);
-        _ = try std.unicode.utf8ToUtf16Le(result.deviceName[0..], self.device_name);
+        if (builtin.os.tag == .windows) {
+            _ = try std.unicode.utf8ToUtf16Le(result.deviceName[0..], self.device_name);
+        } else {
+            @memcpy(result.deviceName[0..], self.device_name);
+        }
 
         return result;
     }
