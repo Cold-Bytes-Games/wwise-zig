@@ -91,6 +91,9 @@ pub fn build(b: *std.Build) !void {
 
     try handleDefaultIOHooks(wwise_c, wwise_build_options);
 
+    // TODO: mlarouche: Remove when https://github.com/ziglang/zig/issues/14719 is fixed
+    b.installArtifact(wwise_c);
+
     const option_step = b.addOptions();
     option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 512);
     option_step.addOption(bool, "use_communication", wwise_build_options.use_communication);
