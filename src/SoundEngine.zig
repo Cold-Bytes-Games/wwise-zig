@@ -7,6 +7,7 @@ const IAkPlugin = @import("IAkPlugin.zig");
 const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
+const SpeakerVolumes = @import("SpeakerVolumes.zig");
 
 pub const AkSourceSettings = extern struct {
     source_id: common.AkUniqueID = 0,
@@ -1358,6 +1359,71 @@ pub fn prepareGameSyncsAsyncID(
             @truncate(u32, in_game_sync_ids.len),
             @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
             in_cookie,
+        ),
+    );
+}
+
+pub fn setListeners(in_emitter_game_obj: common.AkGameObjectID, in_listener_game_objs: []const common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetListeners(
+            in_emitter_game_obj,
+            @ptrCast([*]const c.WWISEC_AkGameObjectID, in_listener_game_objs),
+            @truncate(u32, in_listener_game_objs.len),
+        ),
+    );
+}
+
+pub fn addListener(in_emitter_game_obj: common.AkGameObjectID, in_listener_game_obj: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_AddListener(in_emitter_game_obj, in_listener_game_obj),
+    );
+}
+
+pub fn removeListener(in_emitter_game_obj: common.AkGameObjectID, in_listener_game_obj: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RemoveListener(in_emitter_game_obj, in_listener_game_obj),
+    );
+}
+
+pub fn setDefaultListeners(in_listener_game_objs: []const common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetDefaultListeners(
+            @ptrCast([*]const c.WWISEC_AkGameObjectID, in_listener_game_objs),
+            @truncate(u32, in_listener_game_objs.len),
+        ),
+    );
+}
+
+pub fn addDefaultListener(in_listener_game_obj: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_AddDefaultListener(in_listener_game_obj),
+    );
+}
+
+pub fn removeDefaultListener(in_listener_game_obj: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RemoveDefaultListener(in_listener_game_obj),
+    );
+}
+
+pub fn resetListenersToDefault(in_emitter_game_obj: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ResetListenersToDefault(in_emitter_game_obj),
+    );
+}
+
+pub fn setListenerSpatialization(
+    in_listener_id: common.AkGameObjectID,
+    in_spatialized: bool,
+    in_channel_config: speaker_config.AkChannelConfig,
+    in_volume_offsets: SpeakerVolumes.VectorPtr,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetListenerSpatialization(
+            in_listener_id,
+            in_spatialized,
+            in_channel_config.toC(),
+            in_volume_offsets,
         ),
     );
 }
