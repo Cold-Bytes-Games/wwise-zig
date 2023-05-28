@@ -39,7 +39,7 @@ pub fn build(b: *std.Build) !void {
     const wwise_configuration_option = b.option(WwiseConfiguration, "configuration", "Which library of Wwise to use");
     const wwise_use_static_crt_option = b.option(bool, "use_static_crt", "On Windows, use the static CRT version of the library");
     const wwise_use_communication_option = b.option(bool, "use_communication", "Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time");
-    const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 512)");
+    const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 256)");
 
     const wwise_include_default_io_hook_blocking_option = b.option(bool, "include_default_io_hook_blocking", "Include the Default IO Hook Blocking");
     const wwise_include_default_io_hook_deferred_option = b.option(bool, "include_default_io_hook_deferred", "Include the Default IO Hook Deferred");
@@ -95,7 +95,7 @@ pub fn build(b: *std.Build) !void {
     b.installArtifact(wwise_c);
 
     const option_step = b.addOptions();
-    option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 512);
+    option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 256);
     option_step.addOption(bool, "use_communication", wwise_build_options.use_communication);
     option_step.addOption(bool, "include_default_io_hook_blocking", wwise_build_options.include_default_io_hook_blocking);
     option_step.addOption(bool, "include_default_io_hook_deferred", wwise_build_options.include_default_io_hook_deferred);

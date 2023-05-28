@@ -19,7 +19,7 @@ Available options:
 | `configuration` | debug, profile, release | Which library configuration of Wwise to use |
 | `use_static_crt` | `bool` | On Windows, do you want to use the StaticCRT build of Wwise |
 | `use_communication` | `bool` | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time |
-| `string_stack_size` | `usize` | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 512) |
+| `string_stack_size` | `usize` | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 256) |
 | `include_default_io_hook_blocking` | `bool` | Include the Default IO Hook Blocking |
 | `include_default_io_hook_deferred` | `bool` | Include the Default IO Hook Deferred |
 | `include_file_package_io_blocking` | `bool` | Include the File Package IO Hook Blocking |
