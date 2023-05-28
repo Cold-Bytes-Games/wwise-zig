@@ -1,12 +1,22 @@
 const std = @import("std");
 
-const WwiseConfiguration = enum {
+pub const WwiseConfiguration = enum {
     debug,
     profile,
     release,
 };
 
-const WwiseBuildOptions = struct {
+pub const WwiseConfigOptions = struct {
+    use_communication: bool = true,
+    wwise_sdk_path: ?[]const u8 = null,
+    configuration: WwiseConfiguration = .profile,
+    include_default_io_hook_blocking: bool = false,
+    include_default_io_hook_deferred: bool = false,
+    include_file_package_io_blocking: bool = false,
+    include_file_package_io_deferred: bool = false,
+};
+
+pub const WwiseBuildOptions = struct {
     wwise_sdk_path: []const u8,
     configuration: WwiseConfiguration,
     use_static_crt: bool,
@@ -15,6 +25,7 @@ const WwiseBuildOptions = struct {
     include_default_io_hook_deferred: bool,
     include_file_package_io_blocking: bool,
     include_file_package_io_deferred: bool,
+    string_stack_size: usize = 0,
 
     pub fn useDefaultIoHooks(self: WwiseBuildOptions) bool {
         return self.include_default_io_hook_blocking or self.include_default_io_hook_deferred or self.include_file_package_io_blocking or self.include_default_io_hook_deferred;
@@ -25,12 +36,45 @@ const WwiseBuildOptions = struct {
     }
 };
 
+pub const WwisePackage = struct {
+    options: WwiseBuildOptions,
+    module: *std.build.Module,
+    c_library: *std.build.Step.Compile,
+};
+
 const CppFlags: []const []const u8 = &.{ "-std=c++17", "-Wall", "-Wpedantic" };
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const wwise_package = try package(b, target, optimize, .{});
+
+    const wwise_test = b.addTest(.{
+        .name = "wwise_zig_test",
+        .root_source_file = .{
+            .path = thisDir() ++ "/tests/tests.zig",
+        },
+        .target = target,
+        .optimize = optimize,
+    });
+    try wwiseLink(wwise_test, wwise_package.options);
+    wwise_test.linkLibrary(wwise_package.c_library);
+    wwise_test.addModule("wwise-zig", wwise_package.module);
+    b.installArtifact(wwise_test);
+
+    const run_test_cmd = b.addRunArtifact(wwise_test);
+    run_test_cmd.step.dependOn(b.getInstallStep());
+
+    const test_step = b.step("test", "Run library tests");
+    test_step.dependOn(&run_test_cmd.step);
+
+    const build_only_test_step = b.step("test_build_only", "Build the tests but does not run it");
+    build_only_test_step.dependOn(&wwise_test.step);
+    build_only_test_step.dependOn(b.getInstallStep());
+}
+
+pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin.Mode, config_options: WwiseConfigOptions) !WwisePackage {
     if (target.getOsTag() == .windows and target.getAbi() == .gnu) {
         return error.GnuAbiNotSupported;
     }
@@ -46,7 +90,7 @@ pub fn build(b: *std.Build) !void {
     const wwise_include_file_package_io_blocking_option = b.option(bool, "include_file_package_io_blocking", "Include the File Package IO Hook Blocking");
     const wwise_include_file_package_io_deferred_option = b.option(bool, "include_file_package_io_deferred", "Include the File Package IO Hook Deferred");
 
-    const wwise_configuration = wwise_configuration_option orelse .profile;
+    const wwise_configuration = wwise_configuration_option orelse config_options.configuration;
 
     const wwise_build_options = WwiseBuildOptions{
         .wwise_sdk_path = getWwiseSDKPath(b, override_wwise_sdk_path_option),
@@ -57,12 +101,13 @@ pub fn build(b: *std.Build) !void {
                 break :blk false;
             }
 
-            break :blk wwise_use_communication_option orelse false;
+            break :blk wwise_use_communication_option orelse config_options.use_communication;
         },
-        .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null,
-        .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null,
-        .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse false,
-        .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse false,
+        .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null or config_options.include_default_io_hook_blocking or config_options.include_file_package_io_blocking,
+        .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null or config_options.include_default_io_hook_deferred or config_options.include_file_package_io_deferred,
+        .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse config_options.include_file_package_io_blocking,
+        .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse config_options.include_file_package_io_deferred,
+        .string_stack_size = wwise_string_stack_size_option orelse 256,
     };
 
     const wwise_c = b.addStaticLibrary(.{
@@ -70,7 +115,9 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    wwise_c.addCSourceFile("bindings/WwiseC.cpp", CppFlags);
+    wwise_c.addCSourceFile(thisDir() ++ "/bindings/WwiseC.cpp", CppFlags);
+    wwise_c.addIncludePath(thisDir() ++ "/bindings");
+
     try wwiseLink(wwise_c, wwise_build_options);
     wwise_c.linkLibC();
     if (target.getOsTag() != .windows) {
@@ -91,9 +138,6 @@ pub fn build(b: *std.Build) !void {
 
     try handleDefaultIOHooks(wwise_c, wwise_build_options);
 
-    // TODO: mlarouche: Remove when https://github.com/ziglang/zig/issues/14719 is fixed
-    b.installArtifact(wwise_c);
-
     const option_step = b.addOptions();
     option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 256);
     option_step.addOption(bool, "use_communication", wwise_build_options.use_communication);
@@ -106,42 +150,25 @@ pub fn build(b: *std.Build) !void {
 
     const wwise_zig_module = b.addModule("wwise-zig", .{
         .source_file = .{
-            .path = "src/wwise-zig.zig",
+            .path = thisDir() ++ "/src/wwise-zig.zig",
         },
         .dependencies = &.{
             .{ .name = "wwise_options", .module = wwise_compile_options },
         },
     });
 
-    const wwise_test = b.addTest(.{
-        .name = "wwise_zig_test",
-        .root_source_file = .{
-            .path = "tests/tests.zig",
-        },
-        .target = target,
-        .optimize = optimize,
-    });
-    try wwiseLink(wwise_test, wwise_build_options);
-    wwise_test.linkLibrary(wwise_c);
-    wwise_test.addModule("wwise-zig", wwise_zig_module);
-    b.installArtifact(wwise_test);
-
-    const run_test_cmd = b.addRunArtifact(wwise_test);
-    run_test_cmd.step.dependOn(b.getInstallStep());
-
-    const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&run_test_cmd.step);
-
-    const build_only_test_step = b.step("test_build_only", "Build the tests but does not run it");
-    build_only_test_step.dependOn(&wwise_test.step);
-    build_only_test_step.dependOn(b.getInstallStep());
+    return .{
+        .options = wwise_build_options,
+        .module = wwise_zig_module,
+        .c_library = wwise_c,
+    };
 }
 
-fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
+pub fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
     const wwise_library_relative_path = try getWwiseLibraryPath(compile_step.step.owner, compile_step.target, wwise_build_options);
 
     compile_step.addSystemIncludePath(compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" }));
-    compile_step.addIncludePath("bindings");
+    compile_step.addIncludePath(thisDir() ++ "/bindings");
     compile_step.addLibraryPath(compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path }));
 
     if (wwise_build_options.use_communication) {
@@ -295,4 +322,8 @@ fn handleDefaultIOHooks(compile_step: *std.Build.CompileStep, wwise_build_option
         compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackage.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
         compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackageLUT.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
     }
+}
+
+inline fn thisDir() []const u8 {
+    return comptime std.fs.path.dirname(@src().file) orelse ".";
 }
