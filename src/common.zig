@@ -490,6 +490,11 @@ pub const AKRESULT = enum(DefaultEnumType) {
     unknown_file_error = 104,
 };
 
+pub const AkGroupType = enum(DefaultEnumType) {
+    @"switch" = c.WWISEC_AkGroupType_Switch,
+    state = c.WWISEC_AkGroupType_State,
+};
+
 pub const AkCurveInterpolation = enum(DefaultEnumType) {
     log3 = c.WWISEC_AkCurveInterpolation_Log3,
     sine = c.WWISEC_AkCurveInterpolation_Sine,

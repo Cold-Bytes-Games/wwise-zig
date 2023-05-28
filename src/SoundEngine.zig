@@ -1248,6 +1248,120 @@ pub fn tryUnsetMedia(in_source_settings: []const AkSourceSettings, unset_results
     );
 }
 
+pub fn prepareGameSyncsString(
+    fallback_allocator: std.mem.Allocator,
+    in_game_sync_type: common.AkGroupType,
+    in_preparation_type: PreparationType,
+    in_group_name: []const u8,
+    in_game_sync_names: [][]const u8,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var char_allocator = stack_char_allocator.get();
+
+    var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+    defer area_allocator.deinit();
+
+    var allocator = area_allocator.allocator();
+
+    var raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
+
+    var raw_game_sync_names_list = std.ArrayList([*:0]const u8).init(allocator);
+    defer raw_game_sync_names_list.deinit();
+
+    for (in_game_sync_names) |game_sync_name| {
+        var raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
+        raw_game_sync_names_list.append(raw_game_sync_name) catch return common.WwiseError.Fail;
+    }
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareGameSyncs_String(
+            @enumToInt(in_preparation_type),
+            @enumToInt(in_game_sync_type),
+            raw_group_name,
+            @ptrCast([*c][*c]const u8, raw_game_sync_names_list.items),
+            @truncate(u32, raw_game_sync_names_list.items.len),
+        ),
+    );
+}
+
+pub fn prepareGameSyncsID(
+    in_preparation_type: PreparationType,
+    in_game_sync_type: common.AkGroupType,
+    in_group_id: u32,
+    in_game_sync_ids: []const u32,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareGameSyncs_ID(
+            @enumToInt(in_preparation_type),
+            @enumToInt(in_game_sync_type),
+            in_group_id,
+            @ptrCast([*c]u32, @constCast(in_game_sync_ids)),
+            @truncate(u32, in_game_sync_ids.len),
+        ),
+    );
+}
+
+pub fn prepareGameSyncsAsyncString(
+    fallback_allocator: std.mem.Allocator,
+    in_preparation_type: PreparationType,
+    in_game_sync_type: common.AkGroupType,
+    in_group_name: []const u8,
+    in_game_sync_names: [][]const u8,
+    in_bank_callback: callback.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var char_allocator = stack_char_allocator.get();
+
+    var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+    defer area_allocator.deinit();
+
+    var allocator = area_allocator.allocator();
+
+    var raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
+
+    var raw_game_sync_names_list = std.ArrayList([*:0]const u8).init(allocator);
+    defer raw_game_sync_names_list.deinit();
+
+    for (in_game_sync_names) |game_sync_name| {
+        var raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
+        raw_game_sync_names_list.append(raw_game_sync_name) catch return common.WwiseError.Fail;
+    }
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_String(
+            @enumToInt(in_preparation_type),
+            @enumToInt(in_game_sync_type),
+            raw_group_name,
+            @ptrCast([*c][*c]const u8, raw_game_sync_names_list.items),
+            @truncate(u32, raw_game_sync_names_list.items.len),
+            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            in_cookie,
+        ),
+    );
+}
+
+pub fn prepareGameSyncsAsyncID(
+    in_preparation_type: PreparationType,
+    in_game_sync_type: common.AkGroupType,
+    in_group_id: u32,
+    in_game_sync_ids: []const u32,
+    in_bank_callback: callback.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_ID(
+            @enumToInt(in_preparation_type),
+            @enumToInt(in_game_sync_type),
+            in_group_id,
+            @ptrCast([*c]u32, @constCast(in_game_sync_ids)),
+            @truncate(u32, in_game_sync_ids.len),
+            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            in_cookie,
+        ),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),

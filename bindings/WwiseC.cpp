@@ -836,6 +836,50 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_TryUnsetMedia(WWISEC_AkSourceSettings* in_
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::TryUnsetMedia(reinterpret_cast<AkSourceSettings*>(in_pSourceSettings), in_uNumSourceSettings, reinterpret_cast<AKRESULT*>(out_pUnsetResults)));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareGameSyncs_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkGroupType in_eGameSyncType, const char* in_pszGroupName, const char** in_ppszGameSyncName, AkUInt32 in_uNumGameSyncs)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareGameSyncs(
+        static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+        static_cast<AkGroupType>(in_eGameSyncType),
+        in_pszGroupName,
+        in_ppszGameSyncName,
+        in_uNumGameSyncs));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareGameSyncs_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkGroupType in_eGameSyncType, AkUInt32 in_GroupID, AkUInt32* in_paGameSyncID, AkUInt32 in_uNumGameSyncs)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareGameSyncs(
+        static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+        static_cast<AkGroupType>(in_eGameSyncType),
+        in_GroupID,
+        in_paGameSyncID,
+        in_uNumGameSyncs));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkGroupType in_eGameSyncType, const char* in_pszGroupName, const char** in_ppszGameSyncName, AkUInt32 in_uNumGameSyncs, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareGameSyncs(
+        static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+        static_cast<AkGroupType>(in_eGameSyncType),
+        in_pszGroupName,
+        in_ppszGameSyncName,
+        in_uNumGameSyncs,
+        reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback),
+        in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkGroupType in_eGameSyncType, AkUInt32 in_GroupID, AkUInt32* in_paGameSyncID, AkUInt32 in_uNumGameSyncs, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareGameSyncs(
+        static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+        static_cast<AkGroupType>(in_eGameSyncType),
+        in_GroupID,
+        in_paGameSyncID,
+        in_uNumGameSyncs,
+        reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback),
+        in_pCookie));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
