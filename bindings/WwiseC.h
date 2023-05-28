@@ -1625,6 +1625,19 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUInt32 updateBufferTick;     ///< Value of GetBufferTick() at the time the position was updated
     } WWISEC_AkSourcePosition;
 
+    typedef enum WWISEC_AK_SoundEngine_PreparationType
+    {
+        WWISEC_AK_SoundEngine_Preparation_Load,         ///< \c PrepareEvent() will load required information to play the specified event.
+        WWISEC_AK_SoundEngine_Preparation_Unload,       ///< \c PrepareEvent() will unload required information to play the specified event.
+        WWISEC_AK_SoundEngine_Preparation_LoadAndDecode ///< Vorbis media is decoded when loading, and an uncompressed PCM version is used for playback.
+    } WWISEC_AK_SoundEngine_PreparationType;
+
+    typedef enum WWISEC_AK_SoundEngine_AkBankContent
+    {
+        WWISEC_AK_SoundEngine_AkBankContent_StructureOnly, ///< Use AkBankContent_StructureOnly to load only the structural content, including Events, and then later use the PrepareEvent() functions to load media on demand from loose files on the disk.
+        WWISEC_AK_SoundEngine_AkBankContent_All            ///< Use AkBankContent_All to load both the media and structural content.
+    } WWISEC_AK_SoundEngine_AkBankContent;
+
     bool WWISEC_AK_SoundEngine_IsInitialized();
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Init(WWISEC_AkInitSettings* in_pSettings, WWISEC_AkPlatformInitSettings* in_pPlatformSettings);
@@ -1790,6 +1803,14 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_ID(WWISEC_AkBankID in_bankID, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankType in_bankType);
 
     void WWISEC_AK_SoundEngine_CancelBankCallbackCookie(void* in_pCookie);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkBankID in_bankID, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 

@@ -34,6 +34,17 @@ pub const MultiPositionType = enum(common.DefaultEnumType) {
     multi_directions = c.WWISEC_AK_SoundEngine_MultiPositionType_MultiDirections,
 };
 
+pub const PreparationType = enum(common.DefaultEnumType) {
+    load = c.WWISEC_AK_SoundEngine_Preparation_Load,
+    unload = c.WWISEC_AK_SoundEngine_Preparation_Unload,
+    load_and_decode = c.WWISEC_AK_SoundEngine_Preparation_LoadAndDecode,
+};
+
+pub const AkBankContent = enum(common.DefaultEnumType) {
+    structure_only = c.WWISEC_AK_SoundEngine_AkBankContent_StructureOnly,
+    all = c.WWISEC_AK_SoundEngine_AkBankContent_All,
+};
+
 pub fn isInitialized() bool {
     return c.WWISEC_AK_SoundEngine_IsInitialized();
 }
@@ -1009,6 +1020,93 @@ pub fn unloadBankAsyncID(in_bank_id: common.AkBankID, in_memory_bank: ?*const an
 
 pub fn cancelBankCallbackCookie(in_cookie: ?*anyopaque) void {
     c.WWISEC_AK_SoundEngine_CancelBankCallbackCookie(in_cookie);
+}
+
+pub const PrepareBankOptionalArgs = struct {
+    flags: AkBankContent = .all,
+    bank_type: common.AkBankType = .user,
+};
+
+pub fn prepareBankString(
+    fallback_allocator: std.mem.Allocator,
+    in_preparation_type: PreparationType,
+    in_bank_name: []const u8,
+    optional_args: PrepareBankOptionalArgs,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_bank_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareBank_String(
+            @enumToInt(in_preparation_type),
+            raw_bank_name,
+            @enumToInt(optional_args.flags),
+            @enumToInt(optional_args.bank_type),
+        ),
+    );
+}
+
+pub fn prepareBankID(
+    in_preparation_type: PreparationType,
+    in_bank_id: common.AkBankID,
+    optional_args: PrepareBankOptionalArgs,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareBank_ID(
+            @enumToInt(in_preparation_type),
+            in_bank_id,
+            @enumToInt(optional_args.flags),
+            @enumToInt(optional_args.bank_type),
+        ),
+    );
+}
+
+pub fn prepareBankAsyncString(
+    fallback_allocator: std.mem.Allocator,
+    in_preparation_type: PreparationType,
+    in_bank_name: []const u8,
+    in_bank_callback: callback.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+    optional_args: PrepareBankOptionalArgs,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_bank_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareBank_Async_String(
+            @enumToInt(in_preparation_type),
+            raw_bank_name,
+            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            in_cookie,
+            @enumToInt(optional_args.flags),
+            @enumToInt(optional_args.bank_type),
+        ),
+    );
+}
+
+pub fn prepareBankAsyncID(
+    in_preparation_type: PreparationType,
+    in_bank_id: common.AkBankID,
+    in_bank_callback: callback.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+    optional_args: PrepareBankOptionalArgs,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareBank_Async_ID(
+            @enumToInt(in_preparation_type),
+            in_bank_id,
+            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            in_cookie,
+            @enumToInt(optional_args.flags),
+            @enumToInt(optional_args.bank_type),
+        ),
+    );
 }
 
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
