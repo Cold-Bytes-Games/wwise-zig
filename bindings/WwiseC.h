@@ -2201,6 +2201,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook);
+    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    void WWISEC_CAkDefaultIOHookBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
 #endif
 
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED)
@@ -2209,6 +2212,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_CAkDefaultIOHookDeferred_Destroy(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkDefaultIOHookDeferred_Term(void* in_ioHook);
+    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    void WWISEC_CAkDefaultIOHookDeferred_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
 #endif
 
 #if defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING)
@@ -2217,6 +2223,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(void* in_ioHook);
+    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    void WWISEC_CAkFilePackageLowLevelIOBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePacakgeName, AkUInt32* out_uPackageID);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadAllFilePackages(void* in_ioHook);
@@ -2229,18 +2238,14 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Destroy(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Term(void* in_ioHook);
+    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
+    void WWISEC_CAkFilePackageLowLevelIODeferred_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePackageName, AkUInt32* out_uPackageID);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_UnloadAllFilePackages(void* in_ioHook);
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetPackageFallbackBehavior(void* in_ioHook, bool bFallback);
 #endif
-
-#if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING) || defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED) || defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING) || defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED)
-    WWISEC_AKRESULT WWISEC_AK_CAkMultipleFileLocation_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
-    WWISEC_AKRESULT WWISEC_AK_CAkMultipleFileLocation_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
-    void WWISEC_CAkMultipleFileLocation_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
-#endif
-
 // END IO Hooks
 #ifdef __cplusplus
 }

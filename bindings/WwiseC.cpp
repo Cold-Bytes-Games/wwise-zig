@@ -1184,6 +1184,21 @@ void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook)
 {
     reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Term();
 }
+
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlockingSetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->SetBasePath(in_pszBasePath));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->AddBasePath(in_pszBasePath));
+}
+
+void WWISEC_CAkDefaultIOHookBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
+{
+    reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
+}
 #endif
 
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED)
@@ -1216,6 +1231,21 @@ void WWISEC_AK_CAkDefaultIOHookDeferred_Term(void* in_ioHook)
 {
     reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->Term();
 }
+
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->SetBasePath(in_pszBasePath));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->AddBasePath(in_pszBasePath));
+}
+
+void WWISEC_CAkDefaultIOHookDeferred_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
+{
+    reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
+}
 #endif
 
 #if defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING)
@@ -1247,6 +1277,21 @@ WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook,
 void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(void* in_ioHook)
 {
     reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->Term();
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->SetBasePath(in_pszBasePath));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->AddBasePath(in_pszBasePath));
+}
+
+void WWISEC_CAkFilePackageLowLevelIOBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
+{
+    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
 }
 
 WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePackageName, AkUInt32* out_uPackageID)
@@ -1301,6 +1346,21 @@ void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Term(void* in_ioHook)
     reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->Term();
 }
 
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->SetBasePath(in_pszBasePath));
+}
+
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->AddBasePath(in_pszBasePath));
+}
+
+void WWISEC_CAkFilePackageLowLevelIODeferred_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
+{
+    reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
+}
+
 WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePackageName, AkUInt32* out_uPackageID)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->LoadFilePackage(in_pszFilePackageName, *out_uPackageID));
@@ -1319,23 +1379,6 @@ WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_UnloadAllFilePackages
 void WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetPackageFallbackBehavior(void* in_ioHook, bool bFallback)
 {
     reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->SetPackageFallbackBehavior(bFallback);
-}
-#endif
-
-#if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING) || defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED) || defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING) || defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED)
-WWISEC_AKRESULT WWISEC_AK_CAkMultipleFileLocation_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkMultipleFileLocation*>(in_ioHook)->SetBasePath(in_pszBasePath));
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkMultipleFileLocation_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkMultipleFileLocation*>(in_ioHook)->AddBasePath(in_pszBasePath));
-}
-
-void WWISEC_CAkMultipleFileLocation_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
-{
-    reinterpret_cast<CAkMultipleFileLocation*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
 }
 #endif
 // END IO Hooks
