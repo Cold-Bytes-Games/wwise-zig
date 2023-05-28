@@ -1109,6 +1109,99 @@ pub fn prepareBankAsyncID(
     );
 }
 
+pub fn clearPreparedEvents() common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ClearPreparedEvents(),
+    );
+}
+
+pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_type: PreparationType, in_event_names: [][]const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var char_allocator = stack_char_allocator.get();
+
+    var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+    defer area_allocator.deinit();
+
+    var allocator = area_allocator.allocator();
+
+    var raw_event_names_list = std.ArrayList([*:0]const u8).init(allocator);
+    defer raw_event_names_list.deinit();
+
+    for (in_event_names) |event_name| {
+        var raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
+        raw_event_names_list.append(raw_event_name) catch return common.WwiseError.Fail;
+    }
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareEvent_String(
+            @enumToInt(in_preparation_type),
+            @ptrCast([*c][*c]const u8, raw_event_names_list.items),
+            @truncate(u32, raw_event_names_list.items.len),
+        ),
+    );
+}
+
+pub fn prepareEventID(in_preparation_type: PreparationType, in_event_ids: []const common.AkUniqueID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareEvent_ID(
+            @enumToInt(in_preparation_type),
+            @ptrCast([*]c.WWISEC_AkUniqueID, @constCast(in_event_ids)),
+            @truncate(u32, in_event_ids.len),
+        ),
+    );
+}
+
+pub fn prepareEventAsyncString(
+    fallback_allocator: std.mem.Allocator,
+    in_preparation_type: PreparationType,
+    in_event_names: [][]const u8,
+    in_bank_callback: callback.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var char_allocator = stack_char_allocator.get();
+
+    var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+    defer area_allocator.deinit();
+
+    var allocator = area_allocator.allocator();
+
+    var raw_event_names_list = std.ArrayList([*:0]const u8).init(allocator);
+    defer raw_event_names_list.deinit();
+
+    for (in_event_names) |event_name| {
+        var raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
+        raw_event_names_list.append(raw_event_name) catch return common.WwiseError.Fail;
+    }
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareEvent_Async_String(
+            @enumToInt(in_preparation_type),
+            @ptrCast([*c][*c]const u8, raw_event_names_list.items),
+            @truncate(u32, raw_event_names_list.items.len),
+            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            in_cookie,
+        ),
+    );
+}
+
+pub fn prepareEventAsyncID(
+    in_preparation_type: PreparationType,
+    in_event_ids: []const common.AkUniqueID,
+    in_bank_callback: callback.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(
+            @enumToInt(in_preparation_type),
+            @ptrCast([*]c.WWISEC_AkUniqueID, @constCast(in_event_ids)),
+            @truncate(u32, in_event_ids.len),
+            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            in_cookie,
+        ),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),

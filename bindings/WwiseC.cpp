@@ -784,6 +784,41 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_ID(WWISEC_AK_SoundEngine
         static_cast<AkBankType>(in_bankType)));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ClearPreparedEvents()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ClearPreparedEvents());
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uNumEvent)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareEvent(static_cast<AK::SoundEngine::PreparationType>(in_PreparationType), in_ppszString, in_uNumEvent));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareEvent(static_cast<AK::SoundEngine::PreparationType>(in_PreparationType), in_pEventID, in_uNumEvent));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareEvent(
+        static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+        in_ppszString,
+        in_uNumEvent,
+        reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback),
+        in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareEvent(
+        static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+        in_pEventID,
+        in_uNumEvent,
+        reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback),
+        in_pCookie));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
