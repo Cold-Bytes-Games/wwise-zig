@@ -1553,6 +1553,66 @@ pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name:
     );
 }
 
+pub fn setSwitchID(in_switch_group: common.AkSwitchGroupID, in_switch_state: common.AkSwitchStateID, in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetSwitch_ID(in_switch_group, in_switch_state, in_game_object_id),
+    );
+}
+
+pub fn setSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group: []const u8, in_switch_state: []const u8, in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_switch_group = common.toCString(allocator, in_switch_group) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_switch_group);
+
+    var raw_switch_state = common.toCString(allocator, in_switch_state) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_switch_state);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetSwitch_String(raw_switch_group, raw_switch_state, in_game_object_id),
+    );
+}
+
+pub fn postTriggerID(in_trigger_id: common.AkTriggerID, in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PostTrigger_ID(in_trigger_id, in_game_object_id),
+    );
+}
+
+pub fn postTriggerString(fallback_allocator: std.mem.Allocator, in_trigger_name: []const u8, in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_trigger_name = common.toCString(allocator, in_trigger_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_trigger_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PostTrigger_String(raw_trigger_name, in_game_object_id),
+    );
+}
+
+pub fn setStateID(in_state_group: common.AkStateGroupID, in_state: common.AkStateID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetState_ID(in_state_group, in_state),
+    );
+}
+
+pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []const u8, in_state: []const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_state_group = common.toCString(allocator, in_state_group) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_state_group);
+
+    var raw_state = common.toCString(allocator, in_state) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_state);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetState_String(raw_state_group, raw_state),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
