@@ -1428,6 +1428,131 @@ pub fn setListenerSpatialization(
     );
 }
 
+pub const SetRTPCValueOptionalArgs = struct {
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    value_change_duration: common.AkTimeMs = 0,
+    fade_curve: common.AkCurveInterpolation = .linear,
+    bypass_internal_value_interpolation: bool = false,
+};
+
+pub fn setRTPCValueID(in_rtpc_id: common.AkRtpcID, in_value: common.AkRtpcValue, optional_args: SetRTPCValueOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetRTPCValue_ID(
+            in_rtpc_id,
+            in_value,
+            optional_args.game_object_id,
+            optional_args.value_change_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.bypass_internal_value_interpolation,
+        ),
+    );
+}
+
+pub fn setRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_value: common.AkRtpcValue, optional_args: SetRTPCValueOptionalArgs) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_rtpc_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetRTPCValue_String(
+            raw_rtpc_name,
+            in_value,
+            optional_args.game_object_id,
+            optional_args.value_change_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.bypass_internal_value_interpolation,
+        ),
+    );
+}
+
+pub const SetRTPCValueByPlayingIDOptionalArgs = struct {
+    value_change_duration: common.AkTimeMs = 0,
+    fade_curve: common.AkCurveInterpolation = .linear,
+    bypass_internal_value_interpolation: bool = false,
+};
+
+pub fn setRTPCValueByPlayingID(
+    in_rtpc_id: common.AkRtpcID,
+    in_value: common.AkRtpcValue,
+    in_playing_id: common.AkPlayingID,
+    optional_args: SetRTPCValueByPlayingIDOptionalArgs,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_ID(
+            in_rtpc_id,
+            in_value,
+            in_playing_id,
+            optional_args.value_change_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.bypass_internal_value_interpolation,
+        ),
+    );
+}
+
+pub fn setRTPCValueByPlayingIDString(
+    fallback_allocator: std.mem.Allocator,
+    in_rtpc_name: []const u8,
+    in_value: common.AkRtpcValue,
+    in_playing_id: common.AkPlayingID,
+    optional_args: SetRTPCValueByPlayingIDOptionalArgs,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_rtpc_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_String(
+            raw_rtpc_name,
+            in_value,
+            in_playing_id,
+            optional_args.value_change_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.bypass_internal_value_interpolation,
+        ),
+    );
+}
+
+pub const ResetRTPCValueOptionalArgs = struct {
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    value_change_duration: common.AkTimeMs = 0,
+    fade_curve: common.AkCurveInterpolation = .linear,
+    bypass_internal_value_interpolation: bool = false,
+};
+
+pub fn resetRTPCValueID(in_rtpc_id: common.AkRtpcID, optional_args: ResetRTPCValueOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ResetRTPCValue_ID(
+            in_rtpc_id,
+            optional_args.game_object_id,
+            optional_args.value_change_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.bypass_internal_value_interpolation,
+        ),
+    );
+}
+
+pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, optional_args: ResetRTPCValueOptionalArgs) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_rtpc_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ResetRTPCValue_String(
+            raw_rtpc_name,
+            optional_args.game_object_id,
+            optional_args.value_change_duration,
+            @enumToInt(optional_args.fade_curve),
+            optional_args.bypass_internal_value_interpolation,
+        ),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
