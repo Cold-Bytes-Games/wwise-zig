@@ -294,6 +294,8 @@ void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettin
 static_assert(sizeof(WWISEC_AkOutputSettings) == sizeof(AkOutputSettings));
 static_assert(sizeof(WWISEC_AkInitSettings) == sizeof(AkInitSettings));
 static_assert(sizeof(WWISEC_AkPlatformInitSettings) == sizeof(AkPlatformInitSettings));
+static_assert(sizeof(WWISEC_AkSourceSettings) == sizeof(AkSourceSettings));
+static_assert(sizeof(WWISEC_AkSourcePosition) == sizeof(AkSourcePosition));
 
 void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
 {
@@ -817,6 +819,21 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngin
         in_uNumEvent,
         reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback),
         in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMedia(reinterpret_cast<AkSourceSettings*>(in_pSourceSettings), in_uNumSourceSettings));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnsetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnsetMedia(reinterpret_cast<AkSourceSettings*>(in_pSourceSettings), in_uNumSourceSettings));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_TryUnsetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings, WWISEC_AKRESULT* out_pUnsetResults)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::TryUnsetMedia(reinterpret_cast<AkSourceSettings*>(in_pSourceSettings), in_uNumSourceSettings, reinterpret_cast<AKRESULT*>(out_pUnsetResults)));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)

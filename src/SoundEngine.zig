@@ -8,6 +8,24 @@ const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 
+pub const AkSourceSettings = extern struct {
+    source_id: common.AkUniqueID = 0,
+    media_memory: ?*anyopaque = null,
+    media_size: u32 = 0,
+
+    pub inline fn fromC(value: c.WWISEC_AkSourceSettings) AkSourceSettings {
+        return @bitCast(AkSourceSettings, value);
+    }
+
+    pub inline fn toC(self: AkSourceSettings) c.WWISEC_AkSourceSettings {
+        return @bitCast(c.WWISEC_AkSourceSettings, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkSourceSettings) == @sizeOf(c.WWISEC_AkSourceSettings));
+    }
+};
+
 pub const AkSourcePosition = extern struct {
     audio_node_id: common.AkUniqueID = 0,
     media_id: common.AkUniqueID = 0,
@@ -1198,6 +1216,34 @@ pub fn prepareEventAsyncID(
             @truncate(u32, in_event_ids.len),
             @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
             in_cookie,
+        ),
+    );
+}
+
+pub fn setMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetMedia(
+            @ptrCast([*]c.WWISEC_AkSourceSettings, @constCast(in_source_settings)),
+            @truncate(u32, in_source_settings.len),
+        ),
+    );
+}
+
+pub fn unsetMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnsetMedia(
+            @ptrCast([*]c.WWISEC_AkSourceSettings, @constCast(in_source_settings)),
+            @truncate(u32, in_source_settings.len),
+        ),
+    );
+}
+
+pub fn tryUnsetMedia(in_source_settings: []const AkSourceSettings, unset_results: ?[*]common.AKRESULT) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_TryUnsetMedia(
+            @ptrCast([*]c.WWISEC_AkSourceSettings, @constCast(in_source_settings)),
+            @truncate(u32, in_source_settings.len),
+            @ptrCast(?[*]c.WWISEC_AKRESULT, unset_results),
         ),
     );
 }
