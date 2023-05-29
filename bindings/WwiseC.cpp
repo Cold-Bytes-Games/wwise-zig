@@ -1014,6 +1014,47 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(WWISEC_AkUniqueID in_a
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetActorMixerEffect(in_audioNodeID, in_uFXIndex, in_shareSetID));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_ID(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusEffect(in_audioNodeID, in_uFXIndex, in_shareSetID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusEffect(in_pszBusName, in_uFXIndex, in_shareSetID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(WWISEC_AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_FXShareSetID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOutputDeviceEffect(in_outputDeviceID, in_uFXIndex, in_FXShareSetID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkUniqueID in_shareSetID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMixer(in_audioNodeID, in_shareSetID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_String(const char* in_pszBusName, WWISEC_AkUniqueID in_shareSetID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMixer(in_pszBusName, in_shareSetID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig)
+{
+    AkChannelConfig converted_channel_config;
+    converted_channel_config.Deserialize(in_channelConfig);
+
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusConfig(in_audioNodeID, converted_channel_config));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_String(const char* in_pszBusName, WWISEC_AkChannelConfig in_channelConfig)
+{
+    AkChannelConfig converted_channel_config;
+    converted_channel_config.Deserialize(in_channelConfig);
+
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusConfig(in_pszBusName, converted_channel_config));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));

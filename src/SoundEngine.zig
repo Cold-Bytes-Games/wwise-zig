@@ -1667,6 +1667,66 @@ pub fn setActorMixerEffect(in_audio_node_id: common.AkUniqueID, in_fx_index: u32
     );
 }
 
+pub fn setBusEffectID(in_audio_node_id: common.AkUniqueID, in_fx_index: u32, in_share_set_id: common.AkUniqueID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetBusEffect_ID(in_audio_node_id, in_fx_index, in_share_set_id),
+    );
+}
+
+pub fn setBusEffectString(fallback_allocatr: std.mem.Allocator, in_bus_name: []const u8, in_fx_index: u32, in_share_set_id: common.AkUniqueID) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocatr);
+    var allocator = stack_char_allocator.get();
+
+    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_bus_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetBusEffect_String(raw_bus_name, in_fx_index, in_share_set_id),
+    );
+}
+
+pub fn setOutputDeviceEffect(in_output_device_id: common.AkOutputDeviceID, in_fx_index: u32, in_fx_share_set_id: common.AkUniqueID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetOutputDeviceEffect(in_output_device_id, in_fx_index, in_fx_share_set_id),
+    );
+}
+
+pub fn setMixerID(in_audio_node_id: common.AkUniqueID, in_share_set_id: common.AkUniqueID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetMixer_ID(in_audio_node_id, in_share_set_id),
+    );
+}
+
+pub fn setMixerString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_share_set_id: common.AkUniqueID) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_bus_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetMixer_String(raw_bus_name, in_share_set_id),
+    );
+}
+
+pub fn setBusConfigID(in_audio_node_id: common.AkUniqueID, in_channel_config: speaker_config.AkChannelConfig) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetBusConfig_ID(in_audio_node_id, in_channel_config.toC()),
+    );
+}
+
+pub fn setBusConfigString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_channe_config: speaker_config.AkChannelConfig) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_bus_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetBusConfig_String(raw_bus_name, in_channe_config.toC()),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),

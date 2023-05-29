@@ -1904,6 +1904,20 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
 
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_ID(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(WWISEC_AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_FXShareSetID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkUniqueID in_shareSetID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_String(const char* in_pszBusName, WWISEC_AkUniqueID in_shareSetID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_String(const char* in_pszBusName, WWISEC_AkChannelConfig in_channelConfig);
+
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
