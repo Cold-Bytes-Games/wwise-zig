@@ -39,7 +39,7 @@ pub const CAkDefaultIOHookBlocking = if (wwise_options.include_default_io_hook_b
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
-            c.WWISEC_CAkDefaultIOHookBlocking_SetBasePath(self, raw_base_path),
+            c.WWISEC_AK_CAkDefaultIOHookBlocking_SetBasePath(self, raw_base_path),
         );
     }
 

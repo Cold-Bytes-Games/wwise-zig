@@ -1613,6 +1613,60 @@ pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []c
     );
 }
 
+pub fn setGameObjectAuxSendValues(in_game_object_id: common.AkGameObjectID, in_aux_send_values: []const common.AkAuxSendValue) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(
+            in_game_object_id,
+            @ptrCast([*]c.WWISEC_AkAuxSendValue, @constCast(in_aux_send_values)),
+            @truncate(u32, in_aux_send_values.len),
+        ),
+    );
+}
+
+pub fn registerBusVolumeCallback(in_bus_id: common.AkUniqueID, in_callback: callback.AkBusCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(
+            in_bus_id,
+            @ptrCast(c.WWISEC_AkBusCallbackFunc, in_callback),
+            in_cookie,
+        ),
+    );
+}
+
+pub fn registerBusMeteringCallback(in_bus_id: common.AkUniqueID, in_callback: callback.AkBusMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(
+            in_bus_id,
+            @ptrCast(c.WWISEC_AkBusMeteringCallbackFunc, in_callback),
+            in_metering_flags.toC(),
+            in_cookie,
+        ),
+    );
+}
+
+pub fn registerOutputDeviceMeteringCallback(in_id_output: common.AkOutputDeviceID, in_callback: callback.AkOutputDeviceMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(
+            in_id_output,
+            @ptrCast(c.WWISEC_AkOutputDeviceMeteringCallbackFunc, in_callback),
+            in_metering_flags.toC(),
+            in_cookie,
+        ),
+    );
+}
+
+pub fn setGameObjectOutputBusVolume(in_emitter_obj_id: common.AkGameObjectID, in_listener_obj_id: common.AkGameObjectID, in_control_value: f32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(in_emitter_obj_id, in_listener_obj_id, in_control_value),
+    );
+}
+
+pub fn setActorMixerEffect(in_audio_node_id: common.AkUniqueID, in_fx_index: u32, in_share_set_id: common.AkUniqueID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetActorMixerEffect(in_audio_node_id, in_fx_index, in_share_set_id),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),

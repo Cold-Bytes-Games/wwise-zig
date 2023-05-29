@@ -299,6 +299,15 @@ extern "C"
         WWISEC_AkCurveInterpolation_Constant = 9       ///< Constant ( not valid for fading values )
     } WWISEC_AkCurveInterpolation;
 
+    typedef struct WWISEC_AkAuxSendValue
+    {
+        WWISEC_AkGameObjectID listenerID; ///< Game object ID of the listener associated with this send. Use AK_INVALID_GAME_OBJECT as a wildcard to set the auxiliary send to all connected listeners (see AK::SoundEngine::SetListeners).
+        WWISEC_AkAuxBusID auxBusID;       ///< Auxiliary bus ID.
+        AkReal32 fControlValue;           ///< A value in the range [0.0f:16.0f] ( -∞ dB to +24 dB).
+                                          ///< Represents the attenuation or amplification factor applied to the volume of the sound going through the auxiliary bus.
+                                          ///< A value greater than 1.0f will amplify the sound.
+    } WWISEC_AkAuxSendValue;
+
     typedef struct WWISEC_AkVector64
     {
         AkReal64 X; ///< X Position
@@ -1882,6 +1891,18 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_ID(WWISEC_AkStateGroupID in_stateGroup, WWISEC_AkStateID in_state);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_String(const char* in_pszStateGroup, const char* in_pszState);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* in_aAuxSendValues, AkUInt32 in_uNumSendValues);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusCallbackFunc in_pfnCallback, void* in_pCookie);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(WWISEC_AkOutputDeviceID in_idOutput, WWISEC_AkOutputDeviceMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(WWISEC_AkGameObjectID in_emitterObjID, WWISEC_AkGameObjectID in_listenerObjID, AkReal32 in_fControlValue);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 

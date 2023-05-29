@@ -45,6 +45,7 @@ static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 static_assert(sizeof(WWISEC_AkExternalSourceInfo) == sizeof(AkExternalSourceInfo));
 static_assert(WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT == AK_COMM_DEFAULT_DISCOVERY_PORT);
+static_assert(sizeof(WWISEC_AkAuxSendValue) == sizeof(AkAuxSendValue));
 static_assert(sizeof(WWISEC_AkVector64) == sizeof(AkVector64));
 static_assert(sizeof(WWISEC_AkVector) == sizeof(AkVector));
 static_assert(sizeof(WWISEC_AkWorldTransform) == sizeof(AkWorldTransform));
@@ -983,6 +984,36 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_String(const char* in_pszStateGro
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetState(in_pszStateGroup, in_pszState));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* in_aAuxSendValues, AkUInt32 in_uNumSendValues)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetGameObjectAuxSendValues(in_gameObjectID, reinterpret_cast<AkAuxSendValue*>(in_aAuxSendValues), in_uNumSendValues));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusCallbackFunc in_pfnCallback, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterBusVolumeCallback(in_busID, reinterpret_cast<AkBusCallbackFunc>(in_pfnCallback), in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterBusMeteringCallback(in_busID, reinterpret_cast<AkBusMeteringCallbackFunc>(in_pfnCallback), static_cast<AkMeteringFlags>(in_eMeteringFlags), in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(WWISEC_AkOutputDeviceID in_idOutput, WWISEC_AkOutputDeviceMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterOutputDeviceMeteringCallback(in_idOutput, reinterpret_cast<AkOutputDeviceMeteringCallbackFunc>(in_pfnCallback), static_cast<AkMeteringFlags>(in_eMeteringFlags), in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(WWISEC_AkGameObjectID in_emitterObjID, WWISEC_AkGameObjectID in_listenerObjID, AkReal32 in_fControlValue)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetGameObjectOutputBusVolume(in_emitterObjID, in_listenerObjID, in_fControlValue));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetActorMixerEffect(in_audioNodeID, in_uFXIndex, in_shareSetID));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
@@ -1185,7 +1216,7 @@ void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook)
     reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Term();
 }
 
-WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlockingSetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->SetBasePath(in_pszBasePath));
 }

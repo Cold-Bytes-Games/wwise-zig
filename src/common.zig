@@ -401,6 +401,14 @@ pub const AkMeteringFlags = packed struct(u8) {
     enable_bus_meter_kpower: bool = false,
     enable_bus_meter_3d_meter: bool = false,
     reserved1: u2 = 0,
+
+    pub inline fn fromC(value: c.WWISEC_AkMeteringFlags) AkMeteringFlags {
+        return @bitCast(AkMeteringFlags, value);
+    }
+
+    pub inline fn toC(self: AkMeteringFlags) c.WWISEC_AkMeteringFlags {
+        return @bitCast(c.WWISEC_AkMeteringFlags, self);
+    }
 };
 
 pub const AkPluginType = enum(u8) {
@@ -508,9 +516,28 @@ pub const AkCurveInterpolation = enum(DefaultEnumType) {
     constant = c.WWISEC_AkCurveInterpolation_Constant,
 };
 
+pub const AkAuxSendValue = extern struct {
+    listener__id: AkGameObjectID = AK_INVALID_GAME_OBJECT,
+    aux_bus_id: AkAuxBusID = AK_INVALID_AUX_ID,
+    control_value: f32 = 0.0,
+
+    pub inline fn fromC(value: c.WWISEC_AkAuxSendValue) AkAuxSendValue {
+        return @bitCast(AkAuxSendValue, value);
+    }
+
+    pub inline fn toC(self: AkAuxSendValue) c.WWISEC_AkAuxSendValue {
+        return @bitCast(c.WWISEC_AkAuxSendValue, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkAuxSendValue) == @sizeOf(c.WWISEC_AkAuxSendValue));
+    }
+};
+
 pub const AkAudioSettings = extern struct {
     num_samples_per_frame: u32 = 0,
     num_samples_per_second: u32 = 0,
+
     pub inline fn fromC(value: c.WWISEC_AkAudioSettings) AkAudioSettings {
         return @bitCast(AkAudioSettings, value);
     }
