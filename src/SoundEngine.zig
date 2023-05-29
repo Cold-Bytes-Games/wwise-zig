@@ -666,7 +666,7 @@ pub const StopAllOptionalArgs = struct {
 };
 
 pub fn stopAll(optional_args: StopAllOptionalArgs) void {
-    return c.WWISEC_AK_SoundEngine_StopAll(optional_args.game_object_id);
+    c.WWISEC_AK_SoundEngine_StopAll(optional_args.game_object_id);
 }
 
 pub const StopPlayingIDOptionalArgs = struct {
