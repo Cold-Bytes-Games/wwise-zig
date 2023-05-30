@@ -1867,3 +1867,144 @@ pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_devic
         c.WWISEC_AK_SoundEngine_ReplaceOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), in_device_id, @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id)),
     );
 }
+
+pub fn getOutputID(in_id_shareset: common.AkUniqueID, in_id_device: u32) common.AkOutputDeviceID {
+    return c.WWISEC_AK_SoundEngine_GetOutputID_ID(in_id_shareset, in_id_device);
+}
+
+pub fn getOuputIDString(fallback_allocator: std.mem.Allocator, in_share_set: []const u8, in_id_device: u32) !common.AkOutputDeviceID {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_share_set = try common.toCString(allocator, in_share_set);
+    defer allocator.free(raw_share_set);
+
+    return c.WWISEC_AK_SoundEngine_GetOutputID_String(raw_share_set, in_id_device);
+}
+
+pub fn setBusDeviceID(in_id_bus: common.AkUniqueID, in_id_new_device: common.AkUniqueID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetBusDevice_ID(in_id_bus, in_id_new_device),
+    );
+}
+
+pub fn setBusDeviceString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_device_name: []const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_bus_name);
+
+    var raw_device_name = common.toCString(allocator, in_device_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_device_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetBusDevice_String(raw_bus_name, raw_device_name),
+    );
+}
+
+pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_plugin_id: u32, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) common.WwiseError!void {
+    var area_allocator_instance = std.heap.ArenaAllocator.init(allocator);
+    defer area_allocator_instance.deinit();
+
+    var area_allocator = area_allocator_instance.allocator();
+
+    var raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
+        if (out_device_descriptions_opt) |_| {
+            var raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
+            break :blk @ptrCast(?[*]c.WWISEC_AkDeviceDescription, raw_device_descriptions);
+        }
+
+        break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);
+    };
+
+    try common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetDeviceList_Plugin(
+            in_company_id,
+            in_plugin_id,
+            io_max_num_devices,
+            raw_device_descriptions_ptr,
+        ),
+    );
+
+    if (out_device_descriptions_opt) |out_device_descriptions| {
+        if (raw_device_descriptions_ptr) |raw_device_descritions| {
+            for (0..io_max_num_devices.*) |index| {
+                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return common.WwiseError.Fail;
+            }
+        }
+    }
+}
+
+pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share_set_id: common.AkUniqueID, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) common.WwiseError!void {
+    var area_allocator_instance = std.heap.ArenaAllocator.init(allocator);
+    defer area_allocator_instance.deinit();
+
+    var area_allocator = area_allocator_instance.allocator();
+
+    var raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
+        if (out_device_descriptions_opt) |_| {
+            var raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
+            break :blk @ptrCast(?[*]c.WWISEC_AkDeviceDescription, raw_device_descriptions);
+        }
+
+        break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);
+    };
+
+    try common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetDeviceList_ShareSet(
+            in_audio_device_share_set_id,
+            io_max_num_devices,
+            raw_device_descriptions_ptr,
+        ),
+    );
+
+    if (out_device_descriptions_opt) |out_device_descriptions| {
+        if (raw_device_descriptions_ptr) |raw_device_descritions| {
+            for (0..io_max_num_devices.*) |index| {
+                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return common.WwiseError.Fail;
+            }
+        }
+    }
+}
+
+pub fn setOutputVolume(in_id_output: common.AkOutputDeviceID, in_volume: f32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetOutputVolume(in_id_output, in_volume),
+    );
+}
+
+pub fn getDeviceSpatialAudioSupport(in_id_device: u32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetDeviceSpatialAudioSupport(in_id_device),
+    );
+}
+
+pub const SuspendOptionalArgs = struct {
+    render_anyway: bool = false,
+    fadeout: bool = true,
+};
+
+pub fn @"suspend"(optional_args: SuspendOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_Suspend(optional_args.render_anyway, optional_args.fadeout),
+    );
+}
+
+pub const WakeupFromSuspendOptionalArgs = struct {
+    delay_ms: u32 = 0,
+};
+
+pub fn wakeupFromSuspend(optional_args: WakeupFromSuspendOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_WakeupFromSuspend(optional_args.delay_ms),
+    );
+}
+
+pub fn getBufferTick() u32 {
+    return c.WWISEC_AK_SoundEngine_GetBufferTick();
+}
+
+pub fn getSampleTick() u64 {
+    return c.WWISEC_AK_SoundEngine_GetSampleTick();
+}

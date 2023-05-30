@@ -1139,6 +1139,66 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSetting
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ReplaceOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), in_outputDeviceId, reinterpret_cast<AkOutputDeviceID*>(out_pOutputDeviceId)));
 }
+
+WWISEC_AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_ID(WWISEC_AkUniqueID in_idShareset, AkUInt32 in_idDevice)
+{
+    return static_cast<WWISEC_AkOutputDeviceID>(AK::SoundEngine::GetOutputID(in_idShareset, in_idDevice));
+}
+
+WWISEC_AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_String(const char* in_szShareSet, AkUInt32 in_idDevice)
+{
+    return static_cast<WWISEC_AkOutputDeviceID>(AK::SoundEngine::GetOutputID(in_szShareSet, in_idDevice));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusDevice_ID(WWISEC_AkUniqueID in_idBus, WWISEC_AkUniqueID in_idNewDevice)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusDevice(in_idBus, in_idNewDevice));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusDevice_String(const char* in_BusName, const char* in_DeviceName)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusDevice(in_BusName, in_DeviceName));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_Plugin(AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, AkUInt32* io_maxNumDevices, WWISEC_AkDeviceDescription* out_deviceDescriptions)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetDeviceList(in_ulCompanyID, in_ulPluginID, *io_maxNumDevices, reinterpret_cast<AkDeviceDescription*>(out_deviceDescriptions)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_ShareSet(WWISEC_AkUniqueID in_audioDeviceShareSetID, AkUInt32* io_maxNumDevices, WWISEC_AkDeviceDescription* out_deviceDescriptions)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetDeviceList(in_audioDeviceShareSetID, *io_maxNumDevices, reinterpret_cast<AkDeviceDescription*>(out_deviceDescriptions)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputVolume(WWISEC_AkOutputDeviceID in_idOutput, AkReal32 in_fVolume)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOutputVolume(in_idOutput, in_fVolume));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceSpatialAudioSupport(AkUInt32 in_idDevice)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetDeviceSpatialAudioSupport(in_idDevice));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Suspend(bool in_bRenderAnyway, bool in_bFadeOut)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Suspend(in_bRenderAnyway, in_bFadeOut));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_WakeupFromSuspend(AkUInt32 in_uDelayMs)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::WakeupFromSuspend(in_uDelayMs));
+}
+
+AkUInt32 WWISEC_AK_SoundEngine_GetBufferTick()
+{
+    return AK::SoundEngine::GetBufferTick();
+}
+
+AkUInt64 WWISEC_AK_SoundEngine_GetSampleTick()
+{
+    return AK::SoundEngine::GetSampleTick();
+}
 // END AkSoundEngine
 
 // BEGIN IAkStreamMgr
