@@ -4,6 +4,7 @@ const common = @import("common.zig");
 const callback = @import("callback.zig");
 const common_defs = @import("common_defs.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
+const IBytes = @import("IBytes.zig");
 const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
@@ -1724,6 +1725,35 @@ pub fn setBusConfigString(fallback_allocator: std.mem.Allocator, in_bus_name: []
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusConfig_String(raw_bus_name, in_channe_config.toC()),
+    );
+}
+
+pub fn setObjectObstructionAndOcclusion(in_emitter_id: common.AkGameObjectID, in_listener_id: common.AkGameObjectID, in_obstruction_level: f32, in_occlusion_level: f32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(in_emitter_id, in_listener_id, in_obstruction_level, in_occlusion_level),
+    );
+}
+
+pub fn setMultipleObstructionAndOcclusion(in_emitter_id: common.AkGameObjectID, in_listener_id: common.AkGameObjectID, in_obstruction_occlusion_values: []const common.AkObstructionOcclusionValues) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(
+            in_emitter_id,
+            in_listener_id,
+            @ptrCast([*]c.WWISEC_AkObstructionOcclusionValues, @constCast(in_obstruction_occlusion_values)),
+            @truncate(u32, in_obstruction_occlusion_values.len),
+        ),
+    );
+}
+
+pub fn getContainerHistory(in_bytes: ?*IBytes.IWriteBytes) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetContainerHistory(@ptrCast(?*c.WWISEC_AK_IWriteBytes, in_bytes)),
+    );
+}
+
+pub fn setContainerHistory(in_bytes: ?*IBytes.IReadBytes) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetContainerHistory(@ptrCast(?*c.WWISEC_AK_IReadBytes, in_bytes)),
     );
 }
 

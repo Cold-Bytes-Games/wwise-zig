@@ -348,6 +348,23 @@ pub const AkTransform = extern struct {
 pub const AkSoundPosition = AkWorldTransform;
 pub const AkListenerPosition = AkWorldTransform;
 
+pub const AkObstructionOcclusionValues = extern struct {
+    occlusion: f32 = 0.0,
+    obstruction: f32 = 0.0,
+
+    pub inline fn fromC(value: c.WWISEC_AkObstructionOcclusionValues) AkObstructionOcclusionValues {
+        return @bitCast(AkObstructionOcclusionValues, value);
+    }
+
+    pub inline fn toC(self: AkObstructionOcclusionValues) c.WWISEC_AkObstructionOcclusionValues {
+        return @bitCast(c.WWISEC_AkObstructionOcclusionValues, self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkObstructionOcclusionValues) == @sizeOf(c.WWISEC_AkObstructionOcclusionValues));
+    }
+};
+
 pub const AkChannelEmitter = extern struct {
     position: AkWorldTransform = .{},
     input_channels: AkChannelMask = 0,

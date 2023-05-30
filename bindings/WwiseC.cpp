@@ -1055,6 +1055,26 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_String(const char* in_pszBusN
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusConfig(in_pszBusName, converted_channel_config));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32 in_fObstructionLevel, AkReal32 in_fOcclusionLevel)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetObjectObstructionAndOcclusion(in_EmitterID, in_ListenerID, in_fObstructionLevel, in_fOcclusionLevel));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkObstructionOcclusionValues* in_fObstructionOcclusionValues, AkUInt32 in_uNumOcclusionObstruction)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMultipleObstructionAndOcclusion(in_EmitterID, in_uListenerID, reinterpret_cast<AkObstructionOcclusionValues*>(in_fObstructionOcclusionValues), in_uNumOcclusionObstruction));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetContainerHistory(WWISEC_AK_IWriteBytes* in_pBytes)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetContainerHistory(reinterpret_cast<AK::IWriteBytes*>(in_pBytes)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetContainerHistory(WWISEC_AK_IReadBytes* in_pBytes)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetContainerHistory(reinterpret_cast<AK::IReadBytes*>(in_pBytes)));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));

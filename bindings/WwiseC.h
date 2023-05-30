@@ -339,6 +339,12 @@ extern "C"
     typedef WWISEC_AkWorldTransform WWISEC_AkSoundPosition;
     typedef WWISEC_AkWorldTransform WWISEC_AkListenerPosition;
 
+    typedef struct WWISEC_AkObstructionOcclusionValues
+    {
+        AkReal32 occlusion;   ///< OcclusionLevel: [0.0f..1.0f]
+        AkReal32 obstruction; ///< ObstructionLevel: [0.0f..1.0f]
+    } WWISEC_AkObstructionOcclusionValues;
+
     typedef struct WWISEC_AkChannelEmitter
     {
         WWISEC_AkWorldTransform position;    ///< Emitter position.
@@ -678,6 +684,11 @@ extern "C"
         WWISEC_AkDeviceDescription* out_deviceDescriptions ///< The output array of device descriptions. If this is not-null, there will be a number of entries equal to the input value of io_maxNumDevices.
     );
     // END IAkPlugin
+
+    // BEGIN IByt
+    typedef struct WWISE_AK_IReadBytes WWISEC_AK_IReadBytes;
+    typedef struct WWISE_AK_IWriteBytes WWISEC_AK_IWriteBytes;
+    // END IBytes
 
     // BEGIN AkCommonDefs
     typedef struct WWISEC_AK_AkMetering
@@ -1917,6 +1928,14 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_String(const char* in_pszBusName, WWISEC_AkChannelConfig in_channelConfig);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32 in_fObstructionLevel, AkReal32 in_fOcclusionLevel);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkObstructionOcclusionValues* in_fObstructionOcclusionValues, AkUInt32 in_uNumOcclusionObstruction);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetContainerHistory(WWISEC_AK_IWriteBytes* in_pBytes);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetContainerHistory(WWISEC_AK_IReadBytes* in_pBytes);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 
