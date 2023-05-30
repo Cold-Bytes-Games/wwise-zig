@@ -35,6 +35,8 @@ SOFTWARE.
 
 #include <new>
 
+extern "C" void WWISEC_HACK_RegisterAllPlugins();
+
 #define WWISEC_ASSERT_ENUM_VALUE_SAME(name) static_assert(static_cast<std::size_t>(WWISEC_##name) == static_cast<std::size_t>(name))
 
 // BEGIN AkTypes
@@ -310,6 +312,8 @@ bool WWISEC_AK_SoundEngine_IsInitialized()
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_Init(WWISEC_AkInitSettings* in_pSettings, WWISEC_AkPlatformInitSettings* in_pPlatformSettings)
 {
+    WWISEC_HACK_RegisterAllPlugins();
+
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Init(reinterpret_cast<AkInitSettings*>(in_pSettings), reinterpret_cast<AkPlatformInitSettings*>(in_pPlatformSettings)));
 }
 

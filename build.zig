@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const StaticPluginStep = @import("src/StaticPluginStep.zig");
+
 pub const WwiseConfiguration = enum {
     debug,
     profile,
@@ -9,11 +11,13 @@ pub const WwiseConfiguration = enum {
 pub const WwiseConfigOptions = struct {
     use_communication: bool = true,
     wwise_sdk_path: ?[]const u8 = null,
+    use_static_crt: bool = true,
     configuration: WwiseConfiguration = .profile,
     include_default_io_hook_blocking: bool = false,
     include_default_io_hook_deferred: bool = false,
     include_file_package_io_blocking: bool = false,
     include_file_package_io_deferred: bool = false,
+    static_plugins: []const []const u8 = &.{},
 };
 
 pub const WwiseBuildOptions = struct {
@@ -26,6 +30,7 @@ pub const WwiseBuildOptions = struct {
     include_file_package_io_blocking: bool,
     include_file_package_io_deferred: bool,
     string_stack_size: usize = 0,
+    static_plugins: []const []const u8,
 
     pub fn useDefaultIoHooks(self: WwiseBuildOptions) bool {
         return self.include_default_io_hook_blocking or self.include_default_io_hook_deferred or self.include_file_package_io_blocking or self.include_default_io_hook_deferred;
@@ -42,7 +47,7 @@ pub const WwisePackage = struct {
     c_library: *std.build.Step.Compile,
 };
 
-const CppFlags: []const []const u8 = &.{ "-std=c++17", "-Wall", "-Wpedantic" };
+const CppFlags: []const []const u8 = &.{ "-std=c++17", "-DUNICODE", "-Wall", "-Wpedantic" };
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
@@ -90,12 +95,14 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     const wwise_include_file_package_io_blocking_option = b.option(bool, "include_file_package_io_blocking", "Include the File Package IO Hook Blocking");
     const wwise_include_file_package_io_deferred_option = b.option(bool, "include_file_package_io_deferred", "Include the File Package IO Hook Deferred");
 
+    const wwisee_static_plugins_option = b.option([]const []const u8, "static_plugins", "List of builtin static plugins to build");
+
     const wwise_configuration = wwise_configuration_option orelse config_options.configuration;
 
     const wwise_build_options = WwiseBuildOptions{
         .wwise_sdk_path = getWwiseSDKPath(b, override_wwise_sdk_path_option),
         .configuration = wwise_configuration,
-        .use_static_crt = wwise_use_static_crt_option orelse true,
+        .use_static_crt = wwise_use_static_crt_option orelse config_options.use_static_crt,
         .use_communication = blk: {
             if (wwise_configuration == .release) {
                 break :blk false;
@@ -108,6 +115,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
         .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse config_options.include_file_package_io_blocking,
         .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse config_options.include_file_package_io_deferred,
         .string_stack_size = wwise_string_stack_size_option orelse 256,
+        .static_plugins = wwisee_static_plugins_option orelse config_options.static_plugins,
     };
 
     const wwise_c = b.addStaticLibrary(.{
@@ -117,6 +125,18 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     });
     wwise_c.addCSourceFile(thisDir() ++ "/bindings/WwiseC.cpp", CppFlags);
     wwise_c.addIncludePath(thisDir() ++ "/bindings");
+
+    const static_plugin_step = StaticPluginStep.create(b, .{ .static_plugins = wwise_build_options.static_plugins });
+    wwise_c.addCSourceFileSource(.{
+        .args = CppFlags,
+        .source = .{
+            .generated = &static_plugin_step.output_file,
+        },
+    });
+
+    for (wwise_build_options.static_plugins) |static_plugin| {
+        wwise_c.linkSystemLibrary(static_plugin);
+    }
 
     try wwiseLink(wwise_c, wwise_build_options);
     wwise_c.linkLibC();
