@@ -1757,6 +1757,99 @@ pub fn setContainerHistory(in_bytes: ?*IBytes.IReadBytes) common.WwiseError!void
     );
 }
 
+pub fn startOutputCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_capture_file_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_StartOutputCapture(raw_capture_file_name),
+    );
+}
+
+pub fn stopOutputCapture() common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_StopOutputCapture(),
+    );
+}
+
+pub fn addOutputCaptureMarker(fallback_allocator: std.mem.Allocator, in_marker_text: []const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_marker_text = common.toCString(allocator, in_marker_text) catch return common.WwiseError.Fail;
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_AddOutputCaptureMarker(raw_marker_text),
+    );
+}
+
+pub fn getSampleRate() u32 {
+    return c.WWISEC_AK_SoundEngine_GetSampleRate();
+}
+
+pub const RegistereCaptureCallbackOptionalArgs = struct {
+    id_output: common.AkOutputDeviceID = common.AK_INVALID_OUTPUT_DEVICE_ID,
+    cookie: ?*anyopaque = null,
+};
+
+pub fn regiserCaptureCallback(in_callback: callback.AkCaptureCallbackFunc, optional_args: RegistereCaptureCallbackOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_RegisterCaptureCallback(
+            @ptrCast(c.WWISEC_AkCaptureCallbackFunc, in_callback),
+            optional_args.id_output,
+            optional_args.cookie,
+        ),
+    );
+}
+
+pub const UnregistereCaptureCallbackOptionalArgs = struct {
+    id_output: common.AkOutputDeviceID = common.AK_INVALID_OUTPUT_DEVICE_ID,
+    cookie: ?*anyopaque = null,
+};
+
+pub fn unregisterCaptureCallback(in_callback: callback.AkCaptureCallbackFunc, optional_args: UnregistereCaptureCallbackOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_UnregisterCaptureCallback(
+            @ptrCast(c.WWISEC_AkCaptureCallbackFunc, in_callback),
+            optional_args.id_output,
+            optional_args.cookie,
+        ),
+    );
+}
+
+pub fn startProfilerCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    var raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_capture_file_name);
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_StartProfilerCapture(raw_capture_file_name),
+    );
+}
+
+pub fn stopProfilerCapture() common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_StopProfilerCapture(),
+    );
+}
+
+pub fn setOfflineRenderingFrameTime(in_frame_time_in_secconds: f32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetOfflineRenderingFrameTime(in_frame_time_in_secconds),
+    );
+}
+
+pub fn setOfflineRendering(in_enable_offline_rendering: bool) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetOfflineRendering(in_enable_offline_rendering),
+    );
+}
+
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),

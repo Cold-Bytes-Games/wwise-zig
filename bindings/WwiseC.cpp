@@ -1075,6 +1075,56 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetContainerHistory(WWISEC_AK_IReadBytes* 
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetContainerHistory(reinterpret_cast<AK::IReadBytes*>(in_pBytes)));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_StartOutputCapture(const AkOSChar* in_CaptureFileName)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::StartOutputCapture(in_CaptureFileName));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopOutputCapture()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::StopOutputCapture());
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureMarker(const char* in_MarkerText)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutputCaptureMarker(in_MarkerText));
+}
+
+AkUInt32 WWISEC_AK_SoundEngine_GetSampleRate()
+{
+    return AK::SoundEngine::GetSampleRate();
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, WWISEC_AkOutputDeviceID in_idOutput, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterCaptureCallback(reinterpret_cast<AkCaptureCallbackFunc>(in_pfnCallback), in_idOutput, in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, WWISEC_AkOutputDeviceID in_idOutput, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterCaptureCallback(reinterpret_cast<AkCaptureCallbackFunc>(in_pfnCallback), in_idOutput, in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_StartProfilerCapture(const AkOSChar* in_CaptureFileName)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::StartProfilerCapture(in_CaptureFileName));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopProfilerCapture()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::StopProfilerCapture());
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOfflineRenderingFrameTime(AkReal32 in_fFrameTimeInSeconds)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOfflineRenderingFrameTime(in_fFrameTimeInSeconds));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOfflineRendering(bool in_bEnableOfflineRendering)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOfflineRendering(in_bEnableOfflineRendering));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
