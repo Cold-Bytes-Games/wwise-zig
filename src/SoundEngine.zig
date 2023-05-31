@@ -631,14 +631,18 @@ pub fn cancelEventCallback(in_playing_id: common.AkPlayingID) void {
     c.WWISEC_AK_SoundEngine_CancelEventCallback(in_playing_id);
 }
 
-pub fn getSourcePlayPosition(in_playing_id: common.AkPlayingID, out_position: *common.AkTimeMs, extrapolate: bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getSourcePlayPosition(in_playing_id: common.AkPlayingID, extrapolate: bool) common.WwiseError!common.AkTimeMs {
+    var out_position: common.AkTimeMs = undefined;
+
+    try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetSourcePlayPosition(
             in_playing_id,
-            out_position,
+            &out_position,
             extrapolate,
         ),
     );
+
+    return out_position;
 }
 
 pub fn getSourcePlayPositions(in_playing_id: common.AkPlayingID, out_positions: ?[*]AkSourcePosition, io_positions_count: *u32, in_extrapolate: bool) common.WwiseError!void {
