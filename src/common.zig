@@ -534,7 +534,7 @@ pub const AkCurveInterpolation = enum(DefaultEnumType) {
 };
 
 pub const AkAuxSendValue = extern struct {
-    listener__id: AkGameObjectID = AK_INVALID_GAME_OBJECT,
+    listener_id: AkGameObjectID = AK_INVALID_GAME_OBJECT,
     aux_bus_id: AkAuxBusID = AK_INVALID_AUX_ID,
     control_value: f32 = 0.0,
 
