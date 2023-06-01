@@ -32,7 +32,7 @@ pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_even
 
     var raw_event_name = try common.toCString(allocator, in_event_name);
 
-    var raw_argument_value_list = std.ArrayList([:0]const u8).init(allocator);
+    var raw_argument_value_list = std.ArrayList([*:0]const u8).init(allocator);
     defer raw_argument_value_list.deinit();
 
     for (in_argument_value_names) |argument_value_name| {
@@ -42,7 +42,7 @@ pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_even
 
     return c.WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(
         raw_event_name,
-        @ptrCast([*c][*c]const u8, raw_argument_value_list.items),
+        @ptrCast([*c]?[*:0]const u8, raw_argument_value_list.items),
         @truncate(u32, raw_argument_value_list.items.len),
         optional_args.id_sequence,
         optional_args.candidate_callback_func,
