@@ -2290,7 +2290,95 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_Comm_Reset();
     const WWISEC_AkCommSettings* WWISEC_AK_Comm_GetCurrentSettings();
 #endif
-// END AkCommunication
+    // END AkCommunication
+
+    // BEGIN AkDynamicDialogue
+    AK_CALLBACK(bool, WWISEC_AkCandidateCallbackFunc)
+    (
+        WWISEC_AkUniqueID in_idEvent,
+        WWISEC_AkUniqueID in_idCandidate,
+        void* in_cookie);
+
+    WWISEC_AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkArgumentValueID* in_aArgumentValues, AkUInt32 in_uNumArguments, WWISEC_AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie);
+
+    WWISEC_AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(const char* in_pszEventName, const char** in_aArgumentValueNames, AkUInt32 in_uNumArguments, WWISEC_AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicDialogue_GetDialogueEventCustomPropertyValue(WWISEC_AkUniqueID in_eventID, AkUInt32 in_uPropID, AkInt32* out_iValue);
+    // END AkDynamicDialogue
+
+    // BEGIN AkDynamicSequence
+    typedef struct WWISEC_AkExternalSourceArray WWISEC_AkExternalSourceArray;
+
+    typedef struct WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem
+    {
+        WWISEC_AkUniqueID audioNodeID; ///< Unique ID of Audio Node
+        WWISEC_AkTimeMs msDelay;       ///< Delay before playing this item, in milliseconds
+        void* pCustomInfo;             ///< Optional user data
+        WWISEC_AkExternalSourceArray* pExternalSrcs;
+    } WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem_SetExternalSources(WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* self, AkUInt32 in_nExternalSrc, WWISEC_AkExternalSourceInfo* in_pExternalSrc);
+
+    typedef struct WWISEC_AK_SoundEngine_DynamicSequence_Playlist WWISEC_AK_SoundEngine_DynamicSequence_Playlist;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkTimeMs in_msDelay, void* in_pCustomInfo, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources);
+    void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Erase(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, unsigned int in_uIndex);
+    void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_EraseSwap(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, unsigned int in_uIndex);
+    bool WWISEC_AK_SoundEngine_DynamicSequence_Playlist_IsGrowingAllowed(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Reserve(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, AkUInt32 in_ulReserve);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_ReserveExtra(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, AkUInt32 in_ulReserve);
+    AkUInt32 WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Reserved(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Term(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    AkUInt32 WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Length(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Data(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    bool WWISEC_AK_SoundEngine_DynamicSequence_Playlist_IsEmpty(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Exists(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, const WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* in_Item);
+    WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_AddLast(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_AddLastItem(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, const WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* in_Item);
+    WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Last(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveLast(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Remove(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, const WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* in_Item);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveSwap(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, const WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* in_Item);
+    void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveAll(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Insert(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, unsigned int in_uIndex);
+    bool WWISEC_AK_SoundEngine_DynamicSequence_Playlist_GrowArray(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
+    bool WWISEC_AK_SoundEngine_DynamicSequence_Playlist_GrowArraySize(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, AkUInt32 in_uGrowBy);
+    bool WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Resize(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, AkUInt32 in_uiSize);
+    void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Transfer(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, WWISEC_AK_SoundEngine_DynamicSequence_Playlist* in_rSource);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Copy(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, const WWISEC_AK_SoundEngine_DynamicSequence_Playlist* in_rSource);
+
+    typedef enum WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType
+    {
+        WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType_SampleAccurate,  ///< Sample accurate mode
+        WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType_NormalTransition ///< Normal transition mode, allows the entire playlist to be edited at all times.
+    } WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType;
+
+    WWISEC_AkPlayingID WWISEC_AK_SoundEngine_DynamicSequence_Open(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType in_eDynamicSequenceType);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Close(WWISEC_AkPlayingID in_playingID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Play(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Pause(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Resume(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Stop(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Break(WWISEC_AkPlayingID in_playingID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Time(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_iPosition, bool in_bSeekToNearestMarker);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Percent(WWISEC_AkPlayingID in_playingID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPauseTimes(WWISEC_AkPlayingID in_playingID, AkUInt32* out_uTime, AkUInt32* out_uDuration);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPlayingItem(WWISEC_AkPlayingID in_playingID, WWISEC_AkUniqueID* out_audioNodeID, void** out_pCustomInfo);
+
+    WWISEC_AK_SoundEngine_DynamicSequence_Playlist* WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(WWISEC_AkPlayingID in_playingID);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPlayingID in_playingID);
+// END AkDynamicSequence
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)

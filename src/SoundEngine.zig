@@ -10,6 +10,9 @@ const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 
+pub const DynamicDialogue = @import("DynamicDialogue.zig");
+pub const DynamicSequence = @import("DynamicSequence.zig");
+
 pub const AkSourceSettings = extern struct {
     source_id: common.AkUniqueID = 0,
     media_memory: ?*anyopaque = null,
