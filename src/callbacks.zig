@@ -229,7 +229,7 @@ pub const AkOutputDeviceMeteringCallbackInfo = extern struct {
 pub const AkMusicPlaylistCallbackInfo = extern struct {
     base: AkEventCallbackInfo = .{},
     playlist_id: common.AkUniqueID = 0,
-    num_playist_items: u32 = 0,
+    num_playlist_items: u32 = 0,
     playlist_selection: u32 = 0,
     playlist_item_done: u32 = 0,
 
