@@ -193,6 +193,16 @@ pub const Playlist = opaque {
         );
     }
 
+    pub fn at(self: *Playlist, in_index: u32) *PlaylistItem {
+        return @ptrCast(
+            *PlaylistItem,
+            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_At(
+                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+                in_index,
+            ),
+        );
+    }
+
     pub fn insert(self: *Playlist, in_index: u32) ?*PlaylistItem {
         return @ptrCast(
             ?*PlaylistItem,

@@ -1482,6 +1482,11 @@ void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveAll(WWISEC_AK_SoundEng
     reinterpret_cast<AK::SoundEngine::DynamicSequence::Playlist*>(self)->RemoveAll();
 }
 
+WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_At(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, unsigned int in_uiIndex)
+{
+    return reinterpret_cast<WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem*>(&reinterpret_cast<AK::SoundEngine::DynamicSequence::Playlist*>(self)->operator[](in_uiIndex));
+}
+
 WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Insert(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, unsigned int in_uIndex)
 {
     return reinterpret_cast<WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem*>(reinterpret_cast<AK::SoundEngine::DynamicSequence::Playlist*>(self)->Insert(in_uIndex));
