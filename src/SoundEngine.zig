@@ -1,7 +1,7 @@
 const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
-const callback = @import("callback.zig");
+const callbacks = @import("callbacks.zig");
 const common_defs = @import("common_defs.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
 const IBytes = @import("IBytes.zig");
@@ -227,8 +227,8 @@ pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []c
 }
 
 pub fn registerGlobalCallback(
-    in_callback: callback.AkGlobalCallbackFunc,
-    in_location: callback.AkGlobalCallbackLocation,
+    in_callback: callbacks.AkGlobalCallbackFunc,
+    in_location: callbacks.AkGlobalCallbackLocation,
     in_cookie: ?*anyopaque,
     in_type: common.AkPluginType,
     in_company_id: u32,
@@ -246,7 +246,7 @@ pub fn registerGlobalCallback(
     );
 }
 
-pub fn unregisterGlobalCallback(in_callback: callback.AkGlobalCallbackFunc, in_location: callback.AkGlobalCallbackLocation) common.WwiseError!void {
+pub fn unregisterGlobalCallback(in_callback: callbacks.AkGlobalCallbackFunc, in_location: callbacks.AkGlobalCallbackLocation) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterGlobalCallback(
             @ptrCast(c.WWISEC_AkGlobalCallbackFunc, in_callback),
@@ -255,19 +255,19 @@ pub fn unregisterGlobalCallback(in_callback: callback.AkGlobalCallbackFunc, in_l
     );
 }
 
-pub fn registerResourceMonitorCallback(in_callback: callback.AkResourceMonitorCallbackFunc) common.WwiseError!void {
+pub fn registerResourceMonitorCallback(in_callback: callbacks.AkResourceMonitorCallbackFunc) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterResourceMonitorCallback(@ptrCast(c.WWISEC_AkResourceMonitorCallbackFunc, in_callback)),
     );
 }
 
-pub fn unregisterResourceMonitorCallback(in_callback: callback.AkResourceMonitorCallbackFunc) common.WwiseError!void {
+pub fn unregisterResourceMonitorCallback(in_callback: callbacks.AkResourceMonitorCallbackFunc) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterResourceMonitorCallback(@ptrCast(c.WWISEC_AkResourceMonitorCallbackFunc, in_callback)),
     );
 }
 
-pub fn registerAudioDeviceStatusCallback(in_callback: callback.AkDeviceStatusCallbackFunc) common.WwiseError!void {
+pub fn registerAudioDeviceStatusCallback(in_callback: callbacks.AkDeviceStatusCallbackFunc) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterAudioDeviceStatusCallback(@ptrCast(c.WWISEC_AK_AkDeviceStatusCallbackFunc, in_callback)),
     );
@@ -290,8 +290,8 @@ pub fn getIDFromString(fallback_allocator: std.mem.Allocator, string: []const u8
 }
 
 pub const PostEventOptionalArgs = struct {
-    flags: callback.AkCallbackType = .{},
-    callback_func: callback.AkCallbackFunc = null,
+    flags: callbacks.AkCallbackType = .{},
+    callback: callbacks.AkCallbackFunc = null,
     cookie: ?*anyopaque = null,
     allocator: ?std.mem.Allocator = null,
     external_sources: ?[]const common.AkExternalSourceInfo = null,
@@ -339,7 +339,7 @@ pub fn postEventID(in_eventID: common.AkUniqueID, game_object_id: common.AkGameO
         in_eventID,
         game_object_id,
         @intCast(u32, optional_args.flags.toC()),
-        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback_func),
+        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback),
         optional_args.cookie,
         num_external_sources,
         external_sources_ptr,
@@ -394,7 +394,7 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
         raw_event_name,
         game_object_id,
         @intCast(u32, optional_args.flags.toC()),
-        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback_func),
+        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback),
         optional_args.cookie,
         num_external_sources,
         external_sources_ptr,
@@ -451,8 +451,8 @@ pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_even
 
 pub const PostMIDIOnEventOptionalArgs = struct {
     absolute_offsets: bool = false,
-    flags: callback.AkCallbackType = .{},
-    callback: callback.AkCallbackFunc = null,
+    flags: callbacks.AkCallbackType = .{},
+    callback: callbacks.AkCallbackFunc = null,
     cookie: ?*anyopaque = null,
     playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
 };
@@ -913,7 +913,7 @@ pub fn decodeBank(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, i
     );
 }
 
-pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_bank_callback: callback.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) common.WwiseError!common.AkBankID {
+pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) common.WwiseError!common.AkBankID {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
@@ -934,7 +934,7 @@ pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: 
     return out_bank_id;
 }
 
-pub fn loadBankAsyncID(in_bank_id: common.AkBankID, in_bank_callback: callback.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) common.WwiseError!void {
+pub fn loadBankAsyncID(in_bank_id: common.AkBankID, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_Async_ID(
             in_bank_id,
@@ -945,7 +945,7 @@ pub fn loadBankAsyncID(in_bank_id: common.AkBankID, in_bank_callback: callback.A
     );
 }
 
-pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback.AkBankCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!common.AkBankID {
+pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!common.AkBankID {
     var out_bank_id: common.AkBankID = common.AK_INVALID_BANK_ID;
 
     try common.handleAkResult(
@@ -961,7 +961,7 @@ pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank
     return out_bank_id;
 }
 
-pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *common.AkBankID, out_bank_type: *common.AkBankType) common.WwiseError!void {
+pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *common.AkBankID, out_bank_type: *common.AkBankType) common.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
     try common.handleAkResult(
@@ -977,7 +977,7 @@ pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_
     out_bank_type.* = @intToEnum(common.AkBankType, raw_bank_type);
 }
 
-pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *common.AkBankID, out_bank_type: *common.AkBankType) common.WwiseError!void {
+pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *common.AkBankID, out_bank_type: *common.AkBankType) common.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
     try common.handleAkResult(
@@ -1015,7 +1015,7 @@ pub fn unloadBankID(in_bank_id: common.AkBankID, in_memory_bank: ?*const anyopaq
     );
 }
 
-pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, in_bank_callback: callback.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
+pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
@@ -1033,7 +1033,7 @@ pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name
     );
 }
 
-pub fn unloadBankAsyncID(in_bank_id: common.AkBankID, in_memory_bank: ?*const anyopaque, in_bank_callback: callback.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
+pub fn unloadBankAsyncID(in_bank_id: common.AkBankID, in_memory_bank: ?*const anyopaque, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnloadBank_Async_ID(
             in_bank_id,
@@ -1095,7 +1095,7 @@ pub fn prepareBankAsyncString(
     fallback_allocator: std.mem.Allocator,
     in_preparation_type: PreparationType,
     in_bank_name: []const u8,
-    in_bank_callback: callback.AkBankCallbackFunc,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
     optional_args: PrepareBankOptionalArgs,
 ) common.WwiseError!void {
@@ -1120,7 +1120,7 @@ pub fn prepareBankAsyncString(
 pub fn prepareBankAsyncID(
     in_preparation_type: PreparationType,
     in_bank_id: common.AkBankID,
-    in_bank_callback: callback.AkBankCallbackFunc,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
     optional_args: PrepareBankOptionalArgs,
 ) common.WwiseError!void {
@@ -1182,7 +1182,7 @@ pub fn prepareEventAsyncString(
     fallback_allocator: std.mem.Allocator,
     in_preparation_type: PreparationType,
     in_event_names: [][]const u8,
-    in_bank_callback: callback.AkBankCallbackFunc,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
@@ -1215,7 +1215,7 @@ pub fn prepareEventAsyncString(
 pub fn prepareEventAsyncID(
     in_preparation_type: PreparationType,
     in_event_ids: []const common.AkUniqueID,
-    in_bank_callback: callback.AkBankCallbackFunc,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) common.WwiseError!void {
     return common.handleAkResult(
@@ -1316,7 +1316,7 @@ pub fn prepareGameSyncsAsyncString(
     in_game_sync_type: common.AkGroupType,
     in_group_name: []const u8,
     in_game_sync_names: [][]const u8,
-    in_bank_callback: callback.AkBankCallbackFunc,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
@@ -1355,7 +1355,7 @@ pub fn prepareGameSyncsAsyncID(
     in_game_sync_type: common.AkGroupType,
     in_group_id: u32,
     in_game_sync_ids: []const u32,
-    in_bank_callback: callback.AkBankCallbackFunc,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) common.WwiseError!void {
     return common.handleAkResult(
@@ -1631,7 +1631,7 @@ pub fn setGameObjectAuxSendValues(in_game_object_id: common.AkGameObjectID, in_a
     );
 }
 
-pub fn registerBusVolumeCallback(in_bus_id: common.AkUniqueID, in_callback: callback.AkBusCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!void {
+pub fn registerBusVolumeCallback(in_bus_id: common.AkUniqueID, in_callback: callbacks.AkBusCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(
             in_bus_id,
@@ -1641,7 +1641,7 @@ pub fn registerBusVolumeCallback(in_bus_id: common.AkUniqueID, in_callback: call
     );
 }
 
-pub fn registerBusMeteringCallback(in_bus_id: common.AkUniqueID, in_callback: callback.AkBusMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
+pub fn registerBusMeteringCallback(in_bus_id: common.AkUniqueID, in_callback: callbacks.AkBusMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(
             in_bus_id,
@@ -1652,7 +1652,7 @@ pub fn registerBusMeteringCallback(in_bus_id: common.AkUniqueID, in_callback: ca
     );
 }
 
-pub fn registerOutputDeviceMeteringCallback(in_id_output: common.AkOutputDeviceID, in_callback: callback.AkOutputDeviceMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
+pub fn registerOutputDeviceMeteringCallback(in_id_output: common.AkOutputDeviceID, in_callback: callbacks.AkOutputDeviceMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(
             in_id_output,
@@ -1802,7 +1802,7 @@ pub const RegistereCaptureCallbackOptionalArgs = struct {
     cookie: ?*anyopaque = null,
 };
 
-pub fn regiserCaptureCallback(in_callback: callback.AkCaptureCallbackFunc, optional_args: RegistereCaptureCallbackOptionalArgs) common.WwiseError!void {
+pub fn regiserCaptureCallback(in_callback: callbacks.AkCaptureCallbackFunc, optional_args: RegistereCaptureCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterCaptureCallback(
             @ptrCast(c.WWISEC_AkCaptureCallbackFunc, in_callback),
@@ -1817,7 +1817,7 @@ pub const UnregistereCaptureCallbackOptionalArgs = struct {
     cookie: ?*anyopaque = null,
 };
 
-pub fn unregisterCaptureCallback(in_callback: callback.AkCaptureCallbackFunc, optional_args: UnregistereCaptureCallbackOptionalArgs) common.WwiseError!void {
+pub fn unregisterCaptureCallback(in_callback: callbacks.AkCaptureCallbackFunc, optional_args: UnregistereCaptureCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterCaptureCallback(
             @ptrCast(c.WWISEC_AkCaptureCallbackFunc, in_callback),

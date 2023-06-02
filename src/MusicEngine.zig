@@ -1,7 +1,7 @@
 const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
-const callback = @import("callback.zig");
+const callbacks = @import("callbacks.zig");
 
 pub const AkMusicSettings = extern struct {
     streaming_look_ahead_ratio: f32 = 0.0,
@@ -33,7 +33,7 @@ pub fn term() void {
     c.WWISEC_AK_MusicEngine_Term();
 }
 
-pub fn getPlayingSegmentInfo(in_playing_id: common.AkPlayingID, out_segment_info: *callback.AkSegmentInfo, extrapolate: bool) common.WwiseError!void {
+pub fn getPlayingSegmentInfo(in_playing_id: common.AkPlayingID, out_segment_info: *callbacks.AkSegmentInfo, extrapolate: bool) common.WwiseError!void {
     try common.handleAkResult(
         c.WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(in_playing_id, @ptrCast(*c.WWISEC_AkSegmentInfo, out_segment_info), extrapolate),
     );

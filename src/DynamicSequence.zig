@@ -1,7 +1,7 @@
 const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
-const callbacks = @import("callback.zig");
+const callbacks = @import("callbacks.zig");
 
 pub const AkExternalSourceArray = ?*anyopaque;
 
