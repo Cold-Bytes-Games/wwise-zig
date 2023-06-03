@@ -226,31 +226,36 @@ pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []c
     );
 }
 
-pub fn registerGlobalCallback(
-    in_callback: callbacks.AkGlobalCallbackFunc,
-    in_location: callbacks.AkGlobalCallbackLocation,
-    in_cookie: ?*anyopaque,
-    in_type: common.AkPluginType,
-    in_company_id: u32,
-    in_plugin_id: u32,
-) common.WwiseError!void {
+pub const RegisterGlobalCallbackOptionalArgs = struct {
+    location: callbacks.AkGlobalCallbackLocation = .{ .begin_render = true },
+    cookie: ?*anyopaque = null,
+    plugin_type: common.AkPluginType = .none,
+    company_id: u32 = 0,
+    plugin_id: u32 = 0,
+};
+
+pub fn registerGlobalCallback(in_callback: callbacks.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterGlobalCallback(
             @ptrCast(c.WWISEC_AkGlobalCallbackFunc, in_callback),
-            @intCast(u32, in_location.toC()),
-            in_cookie,
-            @enumToInt(in_type),
-            in_company_id,
-            in_plugin_id,
+            @intCast(u32, optional_args.location.toC()),
+            optional_args.cookie,
+            @enumToInt(optional_args.plugin_type),
+            optional_args.company_id,
+            optional_args.plugin_id,
         ),
     );
 }
 
-pub fn unregisterGlobalCallback(in_callback: callbacks.AkGlobalCallbackFunc, in_location: callbacks.AkGlobalCallbackLocation) common.WwiseError!void {
+pub const UnregisterGlobalCallbackOptionalArgs = struct {
+    location: callbacks.AkGlobalCallbackLocation = .{ .begin_render = true },
+};
+
+pub fn unregisterGlobalCallback(in_callback: callbacks.AkGlobalCallbackFunc, optional_args: UnregisterGlobalCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterGlobalCallback(
             @ptrCast(c.WWISEC_AkGlobalCallbackFunc, in_callback),
-            @intCast(u32, in_location.toC()),
+            @intCast(u32, optional_args.location.toC()),
         ),
     );
 }
