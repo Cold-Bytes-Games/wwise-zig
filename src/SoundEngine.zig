@@ -457,11 +457,14 @@ pub const PostMIDIOnEventOptionalArgs = struct {
     playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
 };
 
+// NOTE: mlarouche: Workaround for translate-c that does not put the proper alignment on AkMIDIPost
+extern fn WWISEC_AK_SoundEngine_PostMIDIOnEvent(in_eventID: c.WWISEC_AkUniqueID, in_gameObjectID: c.WWISEC_AkGameObjectID, in_pPosts: [*]midi_types.AkMIDIPost, in_uNumPosts: u16, in_bAbsoluteOffsets: bool, in_uFlags: u32, in_pfnCallback: c.WWISEC_AkCallbackFunc, in_pCookie: ?*anyopaque, in_playingID: c.WWISEC_AkPlayingID) c.WWISEC_AkPlayingID;
+
 pub fn postMIDIOnEvent(in_event_id: common.AkUniqueID, in_game_object_id: common.AkGameObjectID, in_midi_posts: []const midi_types.AkMIDIPost, optional_args: PostMIDIOnEventOptionalArgs) common.AkPlayingID {
-    return c.WWISEC_AK_SoundEngine_PostMIDIOnEvent(
+    return WWISEC_AK_SoundEngine_PostMIDIOnEvent(
         in_event_id,
         in_game_object_id,
-        @ptrCast([*]c.WWISEC_AkMIDIPost, @constCast(in_midi_posts)),
+        @ptrCast([*]midi_types.AkMIDIPost, @constCast(in_midi_posts)),
         @truncate(u16, in_midi_posts.len),
         optional_args.absolute_offsets,
         @intCast(u32, optional_args.flags.toC()),

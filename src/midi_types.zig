@@ -257,19 +257,71 @@ pub const AkMIDIEvent = extern struct {
     }
 };
 
+pub const AlignedAkMIDIEvent = extern struct {
+    by_type: u8 align(1) = 0,
+    by_chan: AkMidiChannelNo align(1) = 0,
+    pad0: u16 align(1) = 0,
+    message: extern union {
+        gen: tGen,
+        cc: tCc,
+        note_on_off: tNoteOnOff,
+        pitch_bendd: tPitchBend,
+        note_aftertouch: tNoteAftertouch,
+        chan_aftertouch: tChanAftertouch,
+        program_change: tProgramChange,
+        wwise_cmd: tWwiseCmd,
+    } align(1),
+
+    pub const tGen = extern struct {
+        by_param1: u8 align(1) = 0,
+        by_param2: u8 align(1) = 0,
+        pad0: [6]u8 align(1) = [_]u8{0} ** 6,
+    };
+
+    pub const tNoteOnOff = extern struct {
+        by_note: AkMidiNoteNo align(1) = 0,
+        by_velocity: u8 align(1) = 0,
+        pad0: [6]u8 align(1) = [_]u8{0} ** 6,
+    };
+
+    pub const tCc = extern struct {
+        by_cc: u8 align(1) = 0,
+        by_value: u8 align(1) = 0,
+        pad0: [6]u8 align(1) = [_]u8{0} ** 6,
+    };
+
+    pub const tPitchBend = extern struct {
+        by_value_lsb: u8 align(1) = 0,
+        by_value_msb: u8 align(1) = 0,
+        pad0: [6]u8 align(1) = [_]u8{0} ** 6,
+    };
+
+    pub const tNoteAftertouch = extern struct {
+        by_note: u8 align(1) = 0,
+        by_value: u8 align(1) = 0,
+        pad0: [6]u8 = [_]u8{0} ** 6,
+    };
+
+    pub const tChanAftertouch = extern struct {
+        by_value: u8 align(1) = 0,
+        pad0: [7]u8 align(1) = [_]u8{0} ** 7,
+    };
+
+    pub const tProgramChange = extern struct {
+        by_program_num: u8 align(1) = 0,
+        pad0: [7]u8 align(1) = [_]u8{0} ** 7,
+    };
+
+    pub const tWwiseCmd = extern struct {
+        cmd: u16 align(1),
+        arg: u32 align(1),
+        pad0: [2]u8 align(1) = [_]u8{0} ** 2,
+    };
+};
+
 pub const AkMIDIPost = extern struct {
-    base: AkMIDIEvent,
-    offset: u64,
+    base: AlignedAkMIDIEvent align(1),
+    offset: u64 align(1),
 
-    pub inline fn fromC(value: c.WWISEC_AkMIDIPost) AkMIDIPost {
-        return @bitCast(AkMIDIPost, value);
-    }
-
-    pub inline fn toC(self: AkMIDIPost) c.WWISEC_AkMIDIPost {
-        return @bitCast(c.WWISEC_AkMIDIPost, self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(AkMIDIPost) == @sizeOf(c.WWISEC_AkMIDIPost));
-    }
+    // NOTE: not checking the sizeof here because the translate-c WWISEC_AkMIDIPost is not accurate.
 };

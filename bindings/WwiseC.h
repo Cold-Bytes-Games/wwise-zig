@@ -648,10 +648,68 @@ extern "C"
     } WWISEC_AkMIDIEvent;
 
 #pragma pack(push, 4)
+    // NOTE: mlarouche: We are copying and inlining AkMIDIEvent and related inside AkMIDIPost to have proper alignment
+    typedef struct WWISEC_AkMIDIPost_tGen
+    {
+        AkUInt8 byParam1;
+        AkUInt8 byParam2;
+    } WWISEC_AkMIDIPost_tGen;
+
+    typedef struct WWISEC_AkMIDIPost_tNoteOnOff
+    {
+        WWISEC_AkMidiNoteNo byNote;
+        AkUInt8 byVelocity;
+    } WWISEC_AkMIDIPost_tNoteOnOff;
+
+    typedef struct WWISEC_AkMIDIPost_tCc
+    {
+        AkUInt8 byCc;
+        AkUInt8 byValue;
+    } WWISEC_AkMIDIPost_tCc;
+
+    typedef struct WWISEC_AkMIDIPost_tPitchBend
+    {
+        AkUInt8 byValueLsb;
+        AkUInt8 byValueMsb;
+    } WWISEC_AkMIDIPost_tPitchBend;
+
+    typedef struct WWISEC_AkMIDIPost_tNoteAftertouch
+    {
+        AkUInt8 byNote;
+        AkUInt8 byValue;
+    } WWISEC_AkMIDIPost_tNoteAftertouch;
+
+    typedef struct WWISEC_AkMIDIPost_tChanAftertouch
+    {
+        AkUInt8 byValue;
+    } WWISEC_AkMIDIPost_tChanAftertouch;
+
+    typedef struct WWISEC_AkMIDIPost_tProgramChange
+    {
+        AkUInt8 byProgramNum;
+    } WWISEC_AkMIDIPost_tProgramChange;
+
+    typedef struct WWISEC_AkMIDIPost_tWwiseCmd
+    {
+        AkUInt16 uCmd; ///< See AK_MIDI_WWISE_CMD_* pre-processor definitions
+        AkUInt32 uArg; ///< Optional argument for some commands
+    } WWISEC_AkMIDIPost_tWwiseCmd;
 
     typedef struct WWISEC_AkMIDIPost
     {
-        WWISEC_AkMIDIEvent base;
+        AkUInt8 byType; ///< See AK_MIDI_EVENT_TYPE_* pre-processor definitions
+        WWISEC_AkMidiChannelNo byChan;
+        union {
+            WWISEC_AkMIDIPost_tGen Gen;
+            WWISEC_AkMIDIPost_tCc Cc;
+            WWISEC_AkMIDIPost_tNoteOnOff NoteOnOff;
+            WWISEC_AkMIDIPost_tPitchBend PitchBend;
+            WWISEC_AkMIDIPost_tNoteAftertouch NoteAftertouch;
+            WWISEC_AkMIDIPost_tChanAftertouch ChanAftertouch;
+            WWISEC_AkMIDIPost_tProgramChange ProgramChange;
+            WWISEC_AkMIDIPost_tWwiseCmd WwiseCmd;
+        };
+
         AkUInt64 uOffset; ///< Frame offset (in samples) for MIDI event post
     } WWISEC_AkMIDIPost;
 

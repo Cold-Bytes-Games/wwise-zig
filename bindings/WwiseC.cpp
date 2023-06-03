@@ -68,6 +68,11 @@ static_assert(sizeof(WWISEC_AkMIDIEvent_tProgramChange) == sizeof(AkMIDIEvent::t
 static_assert(sizeof(WWISEC_AkMIDIEvent_tWwiseCmd) == sizeof(AkMIDIEvent::tWwiseCmd));
 static_assert(sizeof(WWISEC_AkMIDIEvent) == sizeof(AkMIDIEvent));
 static_assert(sizeof(WWISEC_AkMIDIPost) == sizeof(AkMIDIPost));
+static_assert(offsetof(WWISEC_AkMIDIPost, byChan) == offsetof(AkMIDIPost, byChan));
+static_assert(offsetof(WWISEC_AkMIDIPost, NoteOnOff.byNote) == offsetof(AkMIDIPost, NoteOnOff.byNote));
+static_assert(offsetof(WWISEC_AkMIDIPost, NoteOnOff.byVelocity) == offsetof(AkMIDIPost, NoteOnOff.byVelocity));
+static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uCmd) == offsetof(AkMIDIPost, WwiseCmd.uCmd));
+static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uArg) == offsetof(AkMIDIPost, WwiseCmd.uArg));
 // END AkMidiTypes
 
 // BEGIN AkCommonDefs
