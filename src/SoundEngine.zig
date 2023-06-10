@@ -1150,7 +1150,7 @@ pub fn clearPreparedEvents() common.WwiseError!void {
     );
 }
 
-pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_type: PreparationType, in_event_names: [][]const u8) common.WwiseError!void {
+pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_type: PreparationType, in_event_names: []const []const u8) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var char_allocator = stack_char_allocator.get();
 
