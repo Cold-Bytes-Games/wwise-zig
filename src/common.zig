@@ -140,6 +140,8 @@ pub const AK_WAVE_FORMAT_OPUS = c.WWISEC_AK_WAVE_FORMAT_OPUS;
 pub const AK_WAVE_FORMAT_OPUS_WEM = c.WWISEC_AK_WAVE_FORMAT_OPUS_WEM;
 pub const WAVE_FORMAT_XMA2 = c.WWISEC_WAVE_FORMAT_XMA2;
 
+pub const AK_BANK_PLATFORM_DATA_ALIGNMENT = c.AK_BANK_PLATFORM_DATA_ALIGNMENT;
+
 pub const AkBankType = enum(u32) {
     user = c.WWISEC_AkBankType_User,
     event = c.WWISEC_AkBankType_Event,

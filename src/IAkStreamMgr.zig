@@ -25,13 +25,13 @@ pub const AkOpenMode = enum(common.DefaultEnumType) {
 };
 
 pub const AkFileSystemFlags = extern struct {
-    company_id: u32 = common.AK_INVALID_FILE_ID,
+    company_id: u32 = 0,
     codec_id: u32 = 0,
     custom_param_size: u32 = 0,
     custom_param: ?*anyopaque = null,
     is_language_specific: bool = false,
     is_automatic_stream: bool = false,
-    cache_id: common.AkFileID = 0,
+    cache_id: common.AkFileID = common.AK_INVALID_FILE_ID,
     num_bytes_prefetch: u32 = 0,
     directory_hash: u32 = common.AK_INVALID_UNIQUE_ID,
 
@@ -53,6 +53,10 @@ pub const AkStreamInfo = struct {
     name: []const u8,
     size: u64 = 0,
     is_open: bool = false,
+
+    pub fn deinit(self: AkStreamInfo, allocator: std.mem.Allocator) void {
+        allocator.free(self.name);
+    }
 
     pub fn fromC(value: c.WWISEC_AkStreamInfo, allocator: std.mem.Allocator) !AkStreamInfo {
         return .{
@@ -448,10 +452,10 @@ pub const IAkStdStream = extern struct {
                 @ptrCast(*const IAkStdStream.VTable, self.__v).destroy(@ptrCast(*IAkStdStream, self));
             }
 
-            pub inline fn getInfo(self: *T, allocator: std.mem.Allocator, out_info: *AkStreamInfo) !void {
+            pub inline fn getInfo(self: *T, allocator: std.mem.Allocator) !AkStreamInfo {
                 var raw_stream_info: c.WWISEC_AkStreamInfo = undefined;
                 @ptrCast(*const IAkStdStream.VTable, self.__v).get_info(@ptrCast(*IAkStdStream, self), &raw_stream_info);
-                out_info.* = try AkStreamInfo.fromC(raw_stream_info, allocator);
+                return try AkStreamInfo.fromC(raw_stream_info, allocator);
             }
 
             pub inline fn getFileDescriptor(self: *T) ?*anyopaque {
@@ -679,17 +683,17 @@ pub const IAkStreamMgr = extern struct {
         get_stream_mgr_profile: *const fn (
             self: *IAkStreamMgr,
         ) callconv(.C) ?*IAkStreamMgrProfile,
-        create_std_string: *const fn (
+        create_str_id: *const fn (
             self: *IAkStreamMgr,
-            in_pszFileName: [*c]const c.AkOSChar,
+            in_fileID: c.WWISEC_AkFileID,
             in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
             in_eOpenMode: AkOpenMode,
             out_pStream: *?*IAkStdStream,
             in_bSyncOpen: bool,
         ) callconv(.C) c.WWISEC_AKRESULT,
-        create_str_id: *const fn (
+        create_std_string: *const fn (
             self: *IAkStreamMgr,
-            in_fileID: c.WWISEC_AkFileID,
+            in_pszFileName: [*c]const c.AkOSChar,
             in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
             in_eOpenMode: AkOpenMode,
             out_pStream: *?*IAkStdStream,
@@ -772,7 +776,7 @@ pub const IAkStreamMgr = extern struct {
                 return @ptrCast(*const IAkStreamMgr.VTable, self.__v).get_stream_mgr_profile(@ptrCast(*IAkStreamMgr, self));
             }
 
-            pub inline fn createStdString(
+            pub fn createStdString(
                 self: *T,
                 fallback_allocator: std.mem.Allocator,
                 in_pszFileName: []const u8,
@@ -784,7 +788,7 @@ pub const IAkStreamMgr = extern struct {
                 var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
                 var allocator = stack_char_allocator.get();
 
-                const filename_oschar = try common.toOSChar(allocator, in_pszFileName);
+                const filename_oschar = common.toOSChar(allocator, in_pszFileName) catch return common.WwiseError.Fail;
                 defer allocator.free(filename_oschar);
 
                 var raw_fsflags_ptr: ?*c.WWISEC_AkFileSystemFlags = blk: {
@@ -823,7 +827,7 @@ pub const IAkStreamMgr = extern struct {
                 ));
             }
 
-            pub inline fn createAutoString(
+            pub fn createAutoString(
                 self: *T,
                 fallback_allocator: std.mem.Allocator,
                 in_pszFileName: []const u8,
@@ -868,7 +872,7 @@ pub const IAkStreamMgr = extern struct {
                 ));
             }
 
-            pub inline fn createAutoId(
+            pub fn createAutoId(
                 self: *T,
                 in_fileID: c.WWISEC_AkFileID,
                 in_pFSFlags: ?AkFileSystemFlags,

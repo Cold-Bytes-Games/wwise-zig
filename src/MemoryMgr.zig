@@ -155,11 +155,11 @@ pub fn malloc(in_poolId: AkMemPoolId, in_uSize: usize) ?*anyopaque {
     return c.WWISEC_AK_MemoryMgr_Malloc(in_poolId, in_uSize);
 }
 
-pub fn reallocAligned(in_poolId: AkMemPoolId, in_pAlloc: *anyopaque, in_uSize: usize, in_uAlignment: u32) ?*anyopaque {
+pub fn reallocAligned(in_poolId: AkMemPoolId, in_pAlloc: ?*anyopaque, in_uSize: usize, in_uAlignment: u32) ?*anyopaque {
     return c.WWISEC_AK_MemoryMgr_ReallocAligned(in_poolId, in_pAlloc, in_uSize, in_uAlignment);
 }
 
-pub fn free(in_poolId: AkMemPoolId, in_pMemAddress: *anyopaque) void {
+pub fn free(in_poolId: AkMemPoolId, in_pMemAddress: ?*anyopaque) void {
     c.WWISEC_AK_MemoryMgr_Free(in_poolId, in_pMemAddress);
 }
 
