@@ -29,12 +29,18 @@ pub const AkJobMgrSettings = extern struct {
 };
 
 pub const AkOutputSettings = extern struct {
-    audio_device_shareset: common.AkUniqueID = 0,
+    audio_device_shareset: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
     id_device: u32 = 0,
     panning_rule: common.AkPanningRule = .speakers,
     channel_config: speaker_config.AkChannelConfig = .{},
 
-    pub fn init(fallback_allocator: std.mem.Allocator, device_shareset: []const u8, id_device: common.AkUniqueID, channel_config: speaker_config.AkChannelConfig, panning: common.AkPanningRule) !AkOutputSettings {
+    pub const InitOptionalArgs = struct {
+        id_device: common.AkUniqueID = common.AK.AK_INVALID_UNIQUE_ID,
+        channel_config: speaker_config.AkChannelConfig = .{},
+        panning: common.AkPanningRule = .speakers,
+    };
+
+    pub fn init(fallback_allocator: std.mem.Allocator, device_shareset: []const u8, optional_args: InitOptionalArgs) !AkOutputSettings {
         var raw_output_settings: c.WWISEC_AkOutputSettings = undefined;
 
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
@@ -43,7 +49,7 @@ pub const AkOutputSettings = extern struct {
         const device_shareset_cstr = try common.toCString(allocator, device_shareset);
         defer allocator.free(device_shareset_cstr);
 
-        c.WWISEC_AkOutputSettings_Init(&raw_output_settings, device_shareset_cstr, id_device, channel_config.toC(), @enumToInt(panning));
+        c.WWISEC_AkOutputSettings_Init(&raw_output_settings, device_shareset_cstr, optional_args.id_device, optional_args.channel_config.toC(), @enumToInt(optional_args.panning));
 
         return fromC(raw_output_settings);
     }

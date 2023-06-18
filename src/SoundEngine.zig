@@ -1865,10 +1865,19 @@ pub fn setOfflineRendering(in_enable_offline_rendering: bool) common.WwiseError!
     );
 }
 
-pub fn addOutput(output_settings: *const settings.AkOutputSettings, out_device_id: *?common.AkOutputDeviceID, listeners: []common.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_AddOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id), listeners.ptr, @truncate(u32, listeners.len)),
+pub fn addOutput(output_settings: *const settings.AkOutputSettings, listeners: []common.AkGameObjectID) common.WwiseError!common.AkOutputDeviceID {
+    var out_device_id: common.AkOutputDeviceID = common.AK_INVALID_OUTPUT_DEVICE_ID;
+
+    try common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_AddOutput(
+            @ptrCast(*const c.WWISEC_AkOutputSettings, output_settings),
+            @ptrCast([*]c.WWISEC_AkOutputDeviceID, &out_device_id),
+            listeners.ptr,
+            @truncate(u32, listeners.len),
+        ),
     );
+
+    return out_device_id;
 }
 
 pub fn removeOutput(id_output: common.AkOutputDeviceID) common.WwiseError!void {
