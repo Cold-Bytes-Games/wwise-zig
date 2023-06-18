@@ -801,7 +801,7 @@ pub const IAkStreamMgr = extern struct {
 
                 return common.handleAkResult(@ptrCast(*const IAkStreamMgr.VTable, self.__v).create_std_string(
                     @ptrCast(*IAkStreamMgr, self),
-                    filename_oschar,
+                    @ptrCast([*]const c.AkOSChar, filename_oschar),
                     raw_fsflags_ptr,
                     in_eOpenMode,
                     out_pStream,

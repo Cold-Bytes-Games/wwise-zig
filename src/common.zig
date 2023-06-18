@@ -235,7 +235,7 @@ pub const AkExternalSourceInfo = struct {
         return .{
             .iExternalSrcCookie = self.external_src_cookie,
             .idCodec = self.id_codec,
-            .szFile = if (self.file) |file| try toOSChar(allocator, file) else null,
+            .szFile = if (self.file) |file| @ptrCast([*]c.AkOSChar, try toOSChar(allocator, file)) else null,
             .pInMemory = self.in_memory,
             .uiMemorySize = self.memory_size,
             .idFile = self.id_file,

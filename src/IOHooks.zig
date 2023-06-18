@@ -151,7 +151,7 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(self, raw_base_path),
+            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(self, @ptrCast([*]const c.AkOSChar, raw_base_path)),
         );
     }
 
@@ -181,7 +181,7 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         defer allocator.free(raw_file_package_name);
 
         try common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(self, raw_file_package_name, &result),
+            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(self, @ptrCast([*]const c.AkOSChar, raw_file_package_name), &result),
         );
 
         return result;

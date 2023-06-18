@@ -825,7 +825,7 @@ pub fn setCurrentLanguage(fallback_allocator: std.mem.Allocator, language_name: 
     defer allocator.free(raw_language_name);
 
     return common.handleAkResult(
-        c.WWISEC_AK_StreamMgr_SetCurrentLanguage(raw_language_name),
+        c.WWISEC_AK_StreamMgr_SetCurrentLanguage(@ptrCast([*]const c.AkOSChar, raw_language_name)),
     );
 }
 
