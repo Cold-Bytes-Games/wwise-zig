@@ -147,11 +147,11 @@ pub const AkMIDIEvent = extern struct {
         by_param2: u8,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tGen) tGen {
-            return @bitCast(tGen, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tGen) c.WWISEC_AkMIDIEvent_tGen {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tGen, self);
+            return @bitCast(self);
         }
     };
 
@@ -160,11 +160,11 @@ pub const AkMIDIEvent = extern struct {
         by_velocity: u8,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tNoteOnOff) tNoteOnOff {
-            return @bitCast(tNoteOnOff, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tNoteOnOff) c.WWISEC_AkMIDIEvent_tNoteOnOff {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tNoteOnOff, self);
+            return @bitCast(self);
         }
     };
 
@@ -173,11 +173,11 @@ pub const AkMIDIEvent = extern struct {
         by_value: u8,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tCc) tCc {
-            return @bitCast(tCc, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tCc) c.WWISEC_AkMIDIEvent_tCc {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tCc, self);
+            return @bitCast(self);
         }
     };
 
@@ -186,11 +186,11 @@ pub const AkMIDIEvent = extern struct {
         by_value_msb: u8,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tPitchBend) tPitchBend {
-            return @bitCast(tPitchBend, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tPitchBend) c.WWISEC_AkMIDIEvent_tPitchBend {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tPitchBend, self);
+            return @bitCast(self);
         }
     };
 
@@ -199,11 +199,11 @@ pub const AkMIDIEvent = extern struct {
         by_value: u8,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tNoteAftertouch) tNoteAftertouch {
-            return @bitCast(tNoteAftertouch, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tNoteAftertouch) c.WWISEC_AkMIDIEvent_tNoteAftertouch {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tNoteAftertouch, self);
+            return @bitCast(self);
         }
     };
 
@@ -211,11 +211,11 @@ pub const AkMIDIEvent = extern struct {
         by_value: u8,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tChanAftertouch) tChanAftertouch {
-            return @bitCast(tChanAftertouch, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tChanAftertouch) c.WWISEC_AkMIDIEvent_tChanAftertouch {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tChanAftertouch, self);
+            return @bitCast(self);
         }
     };
 
@@ -223,11 +223,11 @@ pub const AkMIDIEvent = extern struct {
         by_program_num: u8,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tProgramChange) tProgramChange {
-            return @bitCast(tProgramChange, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tProgramChange) c.WWISEC_AkMIDIEvent_tProgramChange {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tProgramChange, self);
+            return @bitCast(self);
         }
     };
 
@@ -236,20 +236,20 @@ pub const AkMIDIEvent = extern struct {
         arg: u32,
 
         pub inline fn fromC(value: c.WWISEC_AkMIDIEvent_tWwiseCmd) tWwiseCmd {
-            return @bitCast(tWwiseCmd, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: tWwiseCmd) c.WWISEC_AkMIDIEvent_tWwiseCmd {
-            return @bitCast(c.WWISEC_AkMIDIEvent_tWwiseCmd, self);
+            return @bitCast(self);
         }
     };
 
     pub inline fn fromC(value: c.WWISEC_AkMIDIEvent) AkMIDIEvent {
-        return @bitCast(AkMIDIEvent, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkMIDIEvent) c.WWISEC_AkMIDIEvent {
-        return @bitCast(c.WWISEC_AkMIDIEvent, self);
+        return @bitCast(self);
     }
 
     comptime {

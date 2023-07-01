@@ -13,8 +13,8 @@ pub const ResolveDialogueEventOptionalArgs = struct {
 pub fn resolveDialogueEventID(in_event_id: common.AkUniqueID, in_argument_values: []const common.AkArgumentValueID, optional_args: ResolveDialogueEventOptionalArgs) common.AkUniqueID {
     return c.WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_ID(
         in_event_id,
-        @ptrCast([*]c.WWISEC_AkArgumentValueID, @constCast(in_argument_values)),
-        @truncate(u32, in_argument_values.len),
+        @ptrCast(@constCast(in_argument_values)),
+        @truncate(in_argument_values.len),
         optional_args.id_sequence,
         optional_args.candidate_callback_func,
         optional_args.cookie,
@@ -42,8 +42,8 @@ pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_even
 
     return c.WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(
         raw_event_name,
-        @ptrCast([*c]?[*:0]const u8, raw_argument_value_list.items),
-        @truncate(u32, raw_argument_value_list.items.len),
+        @ptrCast(raw_argument_value_list.items),
+        @truncate(raw_argument_value_list.items.len),
         optional_args.id_sequence,
         optional_args.candidate_callback_func,
         optional_args.cookie,

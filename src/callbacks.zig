@@ -31,22 +31,22 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     enable_get_source_stream_buffering: bool = false,
     pad2: u9 = 0,
 
-    pub const MusicSyncAll = @bitCast(AkCallbackType, c.WWISEC_AK_MusicSyncAll);
-    pub const CallbackBits = @bitCast(AkCallbackType, c.WWISEC_AK_CallbackBits);
+    pub const MusicSyncAll: AkCallbackType = @bitCast(c.WWISEC_AK_MusicSyncAll);
+    pub const CallbackBits: AkCallbackType = @bitCast(c.WWISEC_AK_CallbackBits);
 
     pub inline fn fromC(value: c.WWISEC_AkCallbackType) AkCallbackType {
-        return @bitCast(AkCallbackType, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkCallbackType) c.WWISEC_AkCallbackType {
-        return @bitCast(c.WWISEC_AkCallbackType, self);
+        return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@bitCast(common.DefaultEnumType, AkCallbackType{ .midi_event = true }) == c.WWISEC_AK_MIDIEvent);
-        std.debug.assert(@bitCast(common.DefaultEnumType, AkCallbackType{ .enable_get_source_play_position = true }) == c.WWISEC_AK_EnableGetSourcePlayPosition);
-        std.debug.assert(@bitCast(common.DefaultEnumType, AkCallbackType{ .enable_get_music_play_position = true }) == c.WWISEC_AK_EnableGetMusicPlayPosition);
-        std.debug.assert(@bitCast(common.DefaultEnumType, AkCallbackType{ .enable_get_source_stream_buffering = true }) == c.WWISEC_AK_EnableGetSourceStreamBuffering);
+        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .midi_event = true })) == c.WWISEC_AK_MIDIEvent);
+        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_play_position = true })) == c.WWISEC_AK_EnableGetSourcePlayPosition);
+        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_music_play_position = true })) == c.WWISEC_AK_EnableGetMusicPlayPosition);
+        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_stream_buffering = true })) == c.WWISEC_AK_EnableGetSourceStreamBuffering);
     }
 };
 
@@ -55,11 +55,11 @@ pub const AkCallbackInfo = extern struct {
     game_obj_id: common.AkGameObjectID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkCallbackInfo) AkCallbackInfo {
-        return @bitCast(AkCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkCallbackInfo) c.WWISEC_AkCallbackInfo {
-        return @bitCast(c.WWISEC_AkCalbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -73,11 +73,11 @@ pub const AkEventCallbackInfo = extern struct {
     event_id: common.AkUniqueID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkEventCallbackInfo) AkEventCallbackInfo {
-        return @bitCast(AkEventCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkEventCallbackInfo) c.WWISEC_AkEventCallbackInfo {
-        return @bitCast(c.WWISEC_AkEventCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -90,11 +90,11 @@ pub const AkMIDIEventCallbackInfo = extern struct {
     midi_event: midi_types.AkMIDIEvent,
 
     pub inline fn fromC(value: c.WWISEC_AkMIDIEventCallbackInfo) AkMIDIEventCallbackInfo {
-        return @bitCast(AkMIDIEventCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkMIDIEventCallbackInfo) c.WWISEC_AkMIDIEventCallbackInfo {
-        return @bitCast(c.WWISEC_AkMIDIEventCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -109,11 +109,11 @@ pub const AkMarkerCallbackInfo = extern struct {
     str_label: ?[*:0]const u8 = null,
 
     pub inline fn fromC(value: c.WWISEC_AkMarkerCallbackInfo) AkMarkerCallbackInfo {
-        return @bitCast(AkMarkerCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkMarkerCallbackInfo) c.WWISEC_AkMarkerCallbackInfo {
-        return @bitCast(c.WWISEC_AkMarkerCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -130,11 +130,11 @@ pub const AkDurationCallbackInfo = extern struct {
     streaming: bool,
 
     pub inline fn fromC(value: c.WWISEC_AkDurationCallbackInfo) AkDurationCallbackInfo {
-        return @bitCast(AkDurationCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkDurationCallbackInfo) c.WWISEC_AkDurationCallbackInfo {
-        return @bitCast(c.WWISEC_AkDurationCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -149,11 +149,11 @@ pub const AkDynamicSequenceItemCallbackInfo = extern struct {
     custom_info: ?*anyopaque = null,
 
     pub inline fn fromC(value: c.WWISEC_AkDynamicSequenceItemCallbackInfo) AkDynamicSequenceItemCallbackInfo {
-        return @bitCast(AkDynamicSequenceItemCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkDynamicSequenceItemCallbackInfo) c.WWISEC_AkDynamicSequenceItemCallbackInfo {
-        return @bitCast(c.WWISEC_AkDynamicSequenceItemCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -172,11 +172,11 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
     mixer_context: ?*IAkPlugin.IAkMixerPluginContext = null,
 
     pub inline fn fromC(value: c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
-        return @bitCast(AkSpeakerVolumeMatrixCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkSpeakerVolumeMatrixCallbackInfo) c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo {
-        return @bitCast(c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -191,11 +191,11 @@ pub const AkBusMeteringCallbackInfo = extern struct {
     metering_flags: common.AkMeteringFlags = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkBusMeteringCallbackInfo) AkBusMeteringCallbackInfo {
-        return @bitCast(AkBusMeteringCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkBusMeteringCallbackInfo) c.WWISEC_AkBusMeteringCallbackInfo {
-        return @bitCast(c.WWISEC_AkBusMeteringCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -214,11 +214,11 @@ pub const AkOutputDeviceMeteringCallbackInfo = extern struct {
     metering_flags: common.AkMeteringFlags = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkOutputDeviceMeteringCallbackInfo) AkOutputDeviceMeteringCallbackInfo {
-        return @bitCast(AkOutputDeviceMeteringCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkOutputDeviceMeteringCallbackInfo) c.WWISEC_AkOutputDeviceMeteringCallbackInfo {
-        return @bitCast(c.WWISEC_AkOutputDeviceMeteringCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -234,11 +234,11 @@ pub const AkMusicPlaylistCallbackInfo = extern struct {
     playlist_item_done: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkMusicPlaylistCallbackInfo) AkMusicPlaylistCallbackInfo {
-        return @bitCast(AkMusicPlaylistCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkMusicPlaylistCallbackInfo) c.WWISEC_AkMusicPlaylistCallbackInfo {
-        return @bitCast(c.WWISEC_AkMusicPlaylistCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -258,11 +258,11 @@ pub const AkSegmentInfo = extern struct {
     grid_offset: f32 = 0.0,
 
     pub inline fn fromC(value: c.WWISEC_AkSegmentInfo) AkSegmentInfo {
-        return @bitCast(AkSegmentInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkSegmentInfo) c.WWISEC_AkSegmentInfo {
-        return @bitCast(c.WWISEC_AkSegmentInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -278,11 +278,11 @@ pub const AkMusicSyncCallbackInfo = extern struct {
     user_cue_name: ?[*:0]const u8 = null,
 
     pub inline fn fromC(value: c.WWISEC_AkMusicSyncCallbackInfo) AkMusicSyncCallbackInfo {
-        return @bitCast(AkMusicSyncCallbackInfo, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkMusicSyncCallbackInfo) c.WWISEC_AkMusicSyncCallbackInfo {
-        return @bitCast(c.WWISEC_AkMusicSyncCallbackInfo, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -299,11 +299,11 @@ pub const AkResourceMonitorDataSummary = extern struct {
     nb_active_events: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkResourceMonitorDataSummary) AkResourceMonitorDataSummary {
-        return @bitCast(AkResourceMonitorDataSummary, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkResourceMonitorDataSummary) c.WWISEC_AkResourceMonitorDataSummary {
-        return @bitCast(c.WWISEC_AkResourceMonitorDataSummary, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -334,11 +334,11 @@ pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
     pad: u19 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkGlobalCallbackLocation) AkGlobalCallbackLocation {
-        return @bitCast(AkGlobalCallbackLocation, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkGlobalCallbackLocation) c.WWISEC_AkGlobalCallbackLocation {
-        return @bitCast(c.WWISEC_AkGlobalCallbackLocation, self);
+        return @bitCast(self);
     }
 };
 

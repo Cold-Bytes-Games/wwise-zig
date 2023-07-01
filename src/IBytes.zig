@@ -12,15 +12,15 @@ pub const IReadBytes = extern struct {
     pub fn Methods(comptime T: type) type {
         return extern struct {
             pub inline fn toSelf(iself: *const IReadBytes) *const T {
-                return @ptrCast(*const T, iself);
+                return @ptrCast(iself);
             }
 
             pub inline fn toMutableSelf(iself: *IReadBytes) *T {
-                return @ptrCast(*T, iself);
+                return @ptrCast(iself);
             }
 
             pub inline fn readBytes(self: *T, in_data: ?*anyopaque, in_count_bytes: i32, out_read: *i32) bool {
-                return @ptrCast(*const IReadBytes.VTable, self.__v).read_bytes(@ptrCast(*IReadBytes, self), in_data, in_count_bytes, out_read);
+                return @as(*const IReadBytes.VTable, @ptrCast(self.__v)).read_bytes(@ptrCast(self), in_data, in_count_bytes, out_read);
             }
         };
     }
@@ -39,15 +39,15 @@ pub const IWriteBytes = extern struct {
     pub fn Methods(comptime T: type) type {
         return extern struct {
             pub inline fn toSelf(iself: *const IWriteBytes) *const T {
-                return @ptrCast(*const T, iself);
+                return @ptrCast(iself);
             }
 
             pub inline fn toMutableSelf(iself: *IWriteBytes) *T {
-                return @ptrCast(*T, iself);
+                return @ptrCast(iself);
             }
 
             pub inline fn readBytes(self: *T, in_data: ?*const anyopaque, in_count_bytes: i32, out_written: *i32) bool {
-                return @ptrCast(*const IWriteBytes.VTable, self.__v).write_bytes(@ptrCast(*IWriteBytes, self), in_data, in_count_bytes, out_written);
+                return @as(*const IWriteBytes.VTable, @ptrCast(self.__v)).write_bytes(@ptrCast(self), in_data, in_count_bytes, out_written);
             }
         };
     }

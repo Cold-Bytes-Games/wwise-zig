@@ -10,20 +10,20 @@ pub const CAkDefaultIOHookBlocking = if (wwise_options.include_default_io_hook_b
     pub fn create(allocator: std.mem.Allocator) !*CAkDefaultIOHookBlocking {
         const instance_size_of = c.WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof();
         const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
-        return @ptrCast(*CAkDefaultIOHookBlocking, c.WWISEC_AK_CAkDefaultIOHookBlocking_Create(@ptrCast([*]u8, buffer[0..instance_size_of])));
+        return @ptrCast(c.WWISEC_AK_CAkDefaultIOHookBlocking_Create(@ptrCast(buffer[0..instance_size_of])));
     }
 
     pub fn destroy(self: *CAkDefaultIOHookBlocking, allocator: std.mem.Allocator) void {
         c.WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(self);
 
         const instance_size_of = c.WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof();
-        const buffer = @ptrCast([*]align(Alignment) u8, @alignCast(Alignment, self));
+        const buffer: [*]align(Alignment) u8 = @ptrCast(@alignCast(self));
         allocator.free(buffer[0..instance_size_of]);
     }
 
     pub inline fn init(self: *CAkDefaultIOHookBlocking, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookBlocking_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
+            c.WWISEC_AK_CAkDefaultIOHookBlocking_Init(self, @ptrCast(in_device_settings), in_async_open),
         );
     }
 
@@ -66,20 +66,20 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
     pub fn create(allocator: std.mem.Allocator) !*CAkDefaultIOHookDeferred {
         const instance_size_of = c.WWISEC_AK_CAkDefaultIOHookDeferred_Sizeof();
         const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
-        return @ptrCast(*CAkDefaultIOHookDeferred, c.WWISEC_AK_CAkDefaultIOHookDeferred_Create(@ptrCast([*]u8, buffer[0..instance_size_of])));
+        return @ptrCast(c.WWISEC_AK_CAkDefaultIOHookDeferred_Create(@ptrCast(buffer[0..instance_size_of])));
     }
 
     pub fn destroy(self: *CAkDefaultIOHookDeferred, allocator: std.mem.Allocator) void {
         c.WWISEC_AK_CAkDefaultIOHookDeferred_Destroy(self);
 
         const instance_size_of = c.WWISEC_AK_CAkDefaultIOHookDeferred_Sizeof();
-        const buffer = @ptrCast([*]align(Alignment) u8, @alignCast(Alignment, self));
+        const buffer: [*]align(Alignment) u8 = @ptrCast(@alignCast(self));
         allocator.free(buffer[0..instance_size_of]);
     }
 
     pub inline fn init(self: *CAkDefaultIOHookDeferred, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookDeferred_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
+            c.WWISEC_AK_CAkDefaultIOHookDeferred_Init(self, @ptrCast(in_device_settings), in_async_open),
         );
     }
 
@@ -122,20 +122,20 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
     pub fn create(allocator: std.mem.Allocator) !*CAkFilePackageLowLevelIOBlocking {
         const instance_size_of = c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof();
         const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
-        return @ptrCast(*CAkFilePackageLowLevelIOBlocking, c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Create(@ptrCast([*]u8, buffer[0..instance_size_of])));
+        return @ptrCast(c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Create(@ptrCast(buffer[0..instance_size_of])));
     }
 
     pub fn destroy(self: *CAkFilePackageLowLevelIOBlocking, allocator: std.mem.Allocator) void {
         c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(self);
 
         const instance_size_of = c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof();
-        const buffer = @ptrCast([*]align(Alignment) u8, @alignCast(Alignment, self));
+        const buffer: [*]align(Alignment) u8 = @ptrCast(@alignCast(self));
         allocator.free(buffer[0..instance_size_of]);
     }
 
     pub inline fn init(self: *CAkFilePackageLowLevelIOBlocking, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
+            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(self, @ptrCast(in_device_settings), in_async_open),
         );
     }
 
@@ -151,7 +151,7 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(self, @ptrCast([*]const c.AkOSChar, raw_base_path)),
+            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(self, @ptrCast(raw_base_path)),
         );
     }
 
@@ -181,7 +181,7 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         defer allocator.free(raw_file_package_name);
 
         try common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(self, @ptrCast([*]const c.AkOSChar, raw_file_package_name), &result),
+            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(self, @ptrCast(raw_file_package_name), &result),
         );
 
         return result;
@@ -210,20 +210,20 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
     pub fn create(allocator: std.mem.Allocator) !*CAkFilePackageLowLevelIODeferred {
         const instance_size_of = c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Sizeof();
         const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
-        return @ptrCast(*CAkFilePackageLowLevelIODeferred, c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Create(@ptrCast([*]u8, buffer[0..instance_size_of])));
+        return @ptrCast(c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Create(@ptrCast(buffer[0..instance_size_of])));
     }
 
     pub fn destroy(self: *CAkFilePackageLowLevelIODeferred, allocator: std.mem.Allocator) void {
         c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Destroy(self);
 
         const instance_size_of = c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Sizeof();
-        const buffer = @ptrCast([*]align(Alignment) u8, @alignCast(Alignment, self));
+        const buffer: [*]align(Alignment) u8 = @ptrCast(@alignCast(self));
         allocator.free(buffer[0..instance_size_of]);
     }
 
     pub inline fn init(self: *CAkFilePackageLowLevelIODeferred, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(self, @ptrCast(*const c.WWISEC_AkDeviceSettings, in_device_settings), in_async_open),
+            c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(self, @ptrCast(in_device_settings), in_async_open),
         );
     }
 

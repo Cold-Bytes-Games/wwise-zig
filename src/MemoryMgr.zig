@@ -75,11 +75,11 @@ pub const AkMemSettings = extern struct {
     trim_for_thread: AkMemTrimForThread = null,
 
     pub inline fn fromC(value: c.WWISEC_AkMemSettings) AkMemSettings {
-        return @bitCast(AkMemSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkMemSettings) c.WWISEC_AkMemSettings {
-        return @bitCast(c.WWISEC_AkMemSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -94,11 +94,11 @@ pub const CategoryStats = extern struct {
     frees: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AK_MemoryMgr_CategoryStats) CategoryStats {
-        return @bitCast(CategoryStats, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: CategoryStats) c.WWISEC_AK_MemoryMgr_CategoryStats {
-        return @bitCast(c.WWISEC_AK_MemoryMgr_CategoryStats, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -113,11 +113,11 @@ pub const GlobalStats = extern struct {
     max: u64 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AK_MemoryMgr_GlobalStats) GlobalStats {
-        return @bitCast(GlobalStats, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: GlobalStats) c.WWISEC_AK_MemoryMgr_GlobalStats {
-        return @bitCast(c.WWISEC_AK_MemoryMgr_GlobalStats, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -127,7 +127,7 @@ pub const GlobalStats = extern struct {
 
 pub fn init(in_pSettings: *AkMemSettings) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_MemoryMgr_Init(@ptrCast(*c.WWISEC_AkMemSettings, in_pSettings)),
+        c.WWISEC_AK_MemoryMgr_Init(@ptrCast(in_pSettings)),
     );
 }
 
@@ -136,7 +136,7 @@ pub fn term() void {
 }
 
 pub fn getDefaultSettings(out_pMemSettings: *AkMemSettings) void {
-    c.WWISEC_AK_MemoryMgr_GetDefaultSettings(@ptrCast(*c.WWISEC_AkMemSettings, out_pMemSettings));
+    c.WWISEC_AK_MemoryMgr_GetDefaultSettings(@ptrCast(out_pMemSettings));
 }
 
 pub fn isInitialized() bool {
@@ -169,13 +169,13 @@ pub fn malign(in_poolId: AkMemPoolId, in_USize: usize, in_uAlignment: u32) ?*any
 
 pub fn getCategoryStats(in_poolId: AkMemPoolId) CategoryStats {
     var result: CategoryStats = undefined;
-    c.WWISEC_AK_MemoryMgr_GetCategoryStats(in_poolId, @ptrCast(?*c.WWISEC_AK_MemoryMgr_CategoryStats, &result));
+    c.WWISEC_AK_MemoryMgr_GetCategoryStats(in_poolId, @ptrCast(&result));
     return result;
 }
 
 pub fn getGlobalStats() GlobalStats {
     var result: GlobalStats = undefined;
-    c.WWISEC_AK_MemoryMgr_GetGlobalStats(@ptrCast(?*c.WWISEC_AK_MemoryMgr_GlobalStats, &result));
+    c.WWISEC_AK_MemoryMgr_GetGlobalStats(@ptrCast(&result));
     return result;
 }
 

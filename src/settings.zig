@@ -16,11 +16,11 @@ pub const AkJobMgrSettings = extern struct {
     pub const FuncRequestJobWorker = c.WWISEC_AkJobMgrSettings_FuncRequestJobWorker;
 
     pub inline fn fromC(value: c.WWISEC_AkJobMgrSettings) AkJobMgrSettings {
-        return @bitCast(AkJobMgrSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkJobMgrSettings) c.WWISEC_AkJobMgrSettings {
-        return @bitCast(c.WWISEC_AkJobMgrSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -35,7 +35,7 @@ pub const AkOutputSettings = extern struct {
     channel_config: speaker_config.AkChannelConfig = .{},
 
     pub const InitOptionalArgs = struct {
-        id_device: common.AkUniqueID = common.AK.AK_INVALID_UNIQUE_ID,
+        id_device: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
         channel_config: speaker_config.AkChannelConfig = .{},
         panning: common.AkPanningRule = .speakers,
     };
@@ -49,17 +49,17 @@ pub const AkOutputSettings = extern struct {
         const device_shareset_cstr = try common.toCString(allocator, device_shareset);
         defer allocator.free(device_shareset_cstr);
 
-        c.WWISEC_AkOutputSettings_Init(&raw_output_settings, device_shareset_cstr, optional_args.id_device, optional_args.channel_config.toC(), @enumToInt(optional_args.panning));
+        c.WWISEC_AkOutputSettings_Init(&raw_output_settings, device_shareset_cstr, optional_args.id_device, optional_args.channel_config.toC(), @intFromEnum(optional_args.panning));
 
         return fromC(raw_output_settings);
     }
 
     pub inline fn fromC(value: c.WWISEC_AkOutputSettings) AkOutputSettings {
-        return @bitCast(AkOutputSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkOutputSettings) c.WWISEC_AkOutputSettings {
-        return @bitCast(c.WWISEC_AkOutputSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -122,16 +122,16 @@ pub const AkInitSettings = struct {
             .max_hardware_timeout_ms = value.uMaxHardwareTimeoutMs,
             .use_sound_bank_mgr_thread = value.bUseSoundBankMgrThread,
             .use_lengine_thread = value.bUseLEngineThread,
-            .bgm_callback = @ptrCast(AkBackgroundMusicChangeCallbackFunc, value.BGMCallback),
+            .bgm_callback = @ptrCast(value.BGMCallback),
             .bgm_callback_cookie = value.BGMCallbackCookie,
             .plugin_dll_path = "", // NOTE: mlarouche: the plugin_dll_path is meant to be overriden by the user, the default init settings does not supply DLL path.
-            .floor_plane = @intToEnum(AkFloorPlane, value.eFloorPlane),
+            .floor_plane = @enumFromInt(value.eFloorPlane),
             .game_units_to_meters = value.fGameUnitsToMeters,
             .bank_read_buffer_size = value.uBankReadBufferSize,
             .debug_out_of_range_limit = value.fDebugOutOfRangeLimit,
             .debug_out_of_range_check_enabled = value.bDebugOutOfRangeCheckEnabled,
             .fn_profiler_push_timer = value.fnProfilerPushTimer,
-            .fn_profiler_pop_timer = @ptrCast(AkProfilerPopTimerFunc, value.fnProfilerPopTimer),
+            .fn_profiler_pop_timer = @ptrCast(value.fnProfilerPopTimer),
             .fn_profiler_post_marker = value.fnProfilerPostMarker,
         };
     }
@@ -151,16 +151,16 @@ pub const AkInitSettings = struct {
             .uMaxHardwareTimeoutMs = self.max_hardware_timeout_ms,
             .bUseSoundBankMgrThread = self.use_sound_bank_mgr_thread,
             .bUseLEngineThread = self.use_lengine_thread,
-            .BGMCallback = @ptrCast(c.WWISEC_AkBackgroundMusicChangeCallbackFunc, self.bgm_callback),
+            .BGMCallback = @ptrCast(self.bgm_callback),
             .BGMCallbackCookie = self.bgm_callback_cookie,
-            .szPluginDLLPath = @ptrCast([*]c.AkOSChar, try common.toOSChar(allocator, self.plugin_dll_path)),
-            .eFloorPlane = @enumToInt(self.floor_plane),
+            .szPluginDLLPath = @ptrCast(try common.toOSChar(allocator, self.plugin_dll_path)),
+            .eFloorPlane = @intFromEnum(self.floor_plane),
             .fGameUnitsToMeters = self.game_units_to_meters,
             .uBankReadBufferSize = self.bank_read_buffer_size,
             .fDebugOutOfRangeLimit = self.debug_out_of_range_limit,
             .bDebugOutOfRangeCheckEnabled = self.debug_out_of_range_check_enabled,
             .fnProfilerPushTimer = self.fn_profiler_push_timer,
-            .fnProfilerPopTimer = @ptrCast(c.WWISEC_AkProfilerPopTimerFunc, self.fn_profiler_pop_timer),
+            .fnProfilerPopTimer = @ptrCast(self.fn_profiler_pop_timer),
             .fnProfilerPostMarker = self.fn_profiler_post_marker,
         };
     }
@@ -186,11 +186,11 @@ pub const WIN_AkThreadProperties = extern struct {
     stack_size: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_WIN_AkThreadProperties) WIN_AkThreadProperties {
-        return @bitCast(WIN_AkThreadProperties, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: WIN_AkThreadProperties) c.WWISEC_WIN_AkThreadProperties {
-        return @bitCast(c.WWISEC_WIN_AkThreadProperties, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -205,11 +205,11 @@ pub const POSIX_AkThreadProperties = extern struct {
     affinity_mask: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_POSIX_AkThreadProperties) POSIX_AkThreadProperties {
-        return @bitCast(POSIX_AkThreadProperties, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: POSIX_AkThreadProperties) c.WWISEC_POSIX_AkThreadProperties {
-        return @bitCast(c.WWISEC_POSIX_AkThreadProperties, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -253,11 +253,11 @@ pub const WIN_AkPlatformInitSettings = extern struct {
     max_system_audio_objects: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_WIN_AkPlatformInitSettings) WIN_AkPlatformInitSettings {
-        return @bitCast(WIN_AkPlatformInitSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: WIN_AkPlatformInitSettings) c.WWISEC_WIN_AkPlatformInitSettings {
-        return @bitCast(c.WWISEC_WIN_AkPlatformInitSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -273,11 +273,11 @@ pub const AkAudioAPILinux = packed struct(common.DefaultEnumType) {
     pub const Default = .{ .pulse_audio = true, .alsa = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPILinux) AkAudioAPILinux {
-        return @bitCast(AkAudioAPILinux, value);
+        return @bitCast(value);
     }
 
     pub fn toC(self: AkAudioAPILinux) c.WWISEC_AkAudioAPILinux {
-        return @bitCast(c.WWISEC_AkAudioAPILinux, self);
+        return @bitCast(self);
     }
 };
 
@@ -292,11 +292,11 @@ pub const LINUX_AkPlatformInitSettings = extern struct {
     sample_type: common.AkDataTypeID = 0,
 
     pub inline fn fromC(value: c.WWISEC_LINUX_AkPlatformInitSettings) LINUX_AkPlatformInitSettings {
-        return @bitCast(LINUX_AkPlatformInitSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: LINUX_AkPlatformInitSettings) c.WWISEC_LINUX_AkPlatformInitSettings {
-        return @bitCast(c.WWISEC_LINUX_AkPlatformInitSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -314,11 +314,11 @@ pub const MACOSX_AkPlatformInitSettings = extern struct {
     num_refills_in_voice: u16 = 0,
 
     pub inline fn fromC(value: c.WWISEC_MACOSX_AkPlatformInitSettings) MACOSX_AkPlatformInitSettings {
-        return @bitCast(MACOSX_AkPlatformInitSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: MACOSX_AkPlatformInitSettings) c.WWISEC_MACOSX_AkPlatformInitSettings {
-        return @bitCast(c.WWISEC_MACOSX_AkPlatformInitSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -367,11 +367,11 @@ pub const IOS_AkAudioSessionProperties = extern struct {
     audio_session_behavior: IOS_AkAudioSessionBehaviorOptions = .suspend_in_background,
 
     pub inline fn fromC(value: c.WWISEC_IOS_AkAudioSessionProperties) IOS_AkAudioSessionProperties {
-        return @bitCast(IOS_AkAudioSessionProperties, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: IOS_AkAudioSessionProperties) c.WWISEC_IOS_AkAudioSessionProperties {
-        return @bitCast(c.WWISEC_IOS_AkAudioSessionProperties, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -389,11 +389,11 @@ pub const IOS_AkAudioCallbacks = extern struct {
     interruption_callback_cookie: ?*anyopaque = null,
 
     pub inline fn fromC(value: c.WWISEC_IOS_AkAudioCallbacks) IOS_AkAudioCallbacks {
-        return @bitCast(IOS_AkAudioCallbacks, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: IOS_AkAudioCallbacks) c.WWISEC_IOS_AkAudioCallbacks {
-        return @bitCast(c.WWISEC_IOS_AkAudioCallbacks, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -413,11 +413,11 @@ pub const IOS_AkPlatformInitSettings = extern struct {
     verbose_system_output: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_IOS_AkPlatformInitSettings) IOS_AkPlatformInitSettings {
-        return @bitCast(IOS_AkPlatformInitSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: IOS_AkPlatformInitSettings) c.WWISEC_IOS_AkPlatformInitSettings {
-        return @bitCast(c.WWISEC_IOS_AkPlatformInitSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -433,11 +433,11 @@ pub const AkAudioAPIAndroid = packed struct(common.DefaultEnumType) {
     pub const Default = .{ .aaudio = true, .opensl_es = true };
 
     pub inline fn fromC(value: c.WWISEC_AkAudioAPIAndroid) AkAudioAPIAndroid {
-        return @bitCast(AkAudioAPIAndroid, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkAudioAPIAndroid) c.WWISEC_AkAudioAPIAndroid {
-        return @bitCast(c.WWISEC_AkAudioAPIAndroid, self);
+        return @bitCast(self);
     }
 };
 
@@ -457,11 +457,11 @@ pub const ANDROID_AkPlatformInitSettings = extern struct {
     enable_low_latency: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_ANDROID_AkPlatformInitSettings) ANDROID_AkPlatformInitSettings {
-        return @bitCast(ANDROID_AkPlatformInitSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: ANDROID_AkPlatformInitSettings) c.WWISEC_ANDROID_AkPlatformInitSettings {
-        return @bitCast(c.WWISEC_ANDROID_AkPlatformInitSettings, self);
+        return @bitCast(self);
     }
 
     comptime {

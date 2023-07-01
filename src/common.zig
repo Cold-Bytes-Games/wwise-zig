@@ -165,18 +165,18 @@ pub const AkAudioDeviceState = packed struct(DefaultEnumType) {
     };
 
     pub inline fn fromC(value: c.WWISEC_AkAudioDeviceState) AkAudioDeviceState {
-        return @bitCast(AkAudioDeviceState, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkAudioDeviceState) c.WWISEC_AkAudioDeviceState {
-        return @bitCast(c.WWISEC_AkAudioDeviceState, self);
+        return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .active = true }) == c.WWISEC_AkDeviceState_Active);
-        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .disabled = true }) == c.WWISEC_AkDeviceState_Disabled);
-        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .not_present = true }) == c.WWISEC_AkDeviceState_NotPresent);
-        std.debug.assert(@bitCast(DefaultEnumType, AkAudioDeviceState{ .unplugged = true }) == c.WWISEC_AkDeviceState_Unplugged);
+        std.debug.assert(@as(DefaultEnumType, @bitCast(AkAudioDeviceState{ .active = true })) == c.WWISEC_AkDeviceState_Active);
+        std.debug.assert(@as(DefaultEnumType, @bitCast(AkAudioDeviceState{ .disabled = true })) == c.WWISEC_AkDeviceState_Disabled);
+        std.debug.assert(@as(DefaultEnumType, @bitCast(AkAudioDeviceState{ .not_present = true })) == c.WWISEC_AkDeviceState_NotPresent);
+        std.debug.assert(@as(DefaultEnumType, @bitCast(AkAudioDeviceState{ .unplugged = true })) == c.WWISEC_AkDeviceState_Unplugged);
     }
 };
 
@@ -189,7 +189,7 @@ pub const AkDeviceDescription = struct {
     pub fn fromC(allocator: std.mem.Allocator, value: c.WWISEC_AkDeviceDescription) !AkDeviceDescription {
         return .{
             .id_device = value.idDevice,
-            .device_name = try fromOSChar(allocator, @ptrCast(?[*:0]const c.AkOSChar, value.deviceName[0..])),
+            .device_name = try fromOSChar(allocator, @as(?[*:0]const c.AkOSChar, @ptrCast(value.deviceName[0..]))),
             .device_state_mask = AkAudioDeviceState.fromC(value.deviceStateMask),
             .is_default_device = value.isDefaultDevice,
         };
@@ -235,7 +235,7 @@ pub const AkExternalSourceInfo = struct {
         return .{
             .iExternalSrcCookie = self.external_src_cookie,
             .idCodec = self.id_codec,
-            .szFile = if (self.file) |file| @ptrCast([*]c.AkOSChar, try toOSChar(allocator, file)) else null,
+            .szFile = if (self.file) |file| @as([*]c.AkOSChar, @ptrCast(try toOSChar(allocator, file))) else null,
             .pInMemory = self.in_memory,
             .uiMemorySize = self.memory_size,
             .idFile = self.id_file,
@@ -250,18 +250,18 @@ pub const AkVector64 = extern struct {
 
     pub inline fn toAkVector(self: AkVector64) AkVector {
         return .{
-            .x = @truncate(f32, self.x),
-            .y = @truncate(f32, self.y),
-            .z = @truncate(f32, self.z),
+            .x = @truncate(self.x),
+            .y = @truncate(self.y),
+            .z = @truncate(self.z),
         };
     }
 
     pub inline fn fromC(value: c.WWISEC_AkVector64) AkVector64 {
-        return @bitCast(AkVector64, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkVector64) c.WWISEC_AkVector64 {
-        return @bitCast(c.WWISEC_AkVector64, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -283,11 +283,11 @@ pub const AkVector = extern struct {
     }
 
     pub inline fn fromC(value: c.WWISEC_AkVector) AkVector {
-        return @bitCast(AkVector, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkVector) c.WWISEC_AkVector {
-        return @bitCast(c.WWISEC_AkVector, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -309,11 +309,11 @@ pub const AkWorldTransform = extern struct {
     }
 
     pub inline fn fromC(value: c.WWISEC_AkWorldTransform) AkWorldTransform {
-        return @bitCast(AkWorldTransform, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkWorldTransform) c.WWISEC_AkWorldTransform {
-        return @bitCast(c.WWISEC_AkVector64, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -335,11 +335,11 @@ pub const AkTransform = extern struct {
     }
 
     pub inline fn fromC(value: c.WWISEC_AkTransform) AkTransform {
-        return @bitCast(AkTransform, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkTransform) c.WWISEC_AkTransform {
-        return @bitCast(c.WWISEC_AkTransform, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -355,11 +355,11 @@ pub const AkObstructionOcclusionValues = extern struct {
     obstruction: f32 = 0.0,
 
     pub inline fn fromC(value: c.WWISEC_AkObstructionOcclusionValues) AkObstructionOcclusionValues {
-        return @bitCast(AkObstructionOcclusionValues, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkObstructionOcclusionValues) c.WWISEC_AkObstructionOcclusionValues {
-        return @bitCast(c.WWISEC_AkObstructionOcclusionValues, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -373,11 +373,11 @@ pub const AkChannelEmitter = extern struct {
     padding: [4]u8 = [_]u8{0} ** 4,
 
     pub inline fn fromC(value: c.WWISEC_AkChannelEmitter) AkChannelEmitter {
-        return @bitCast(AkChannelEmitter, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkChannelEmitter) c.WWISEC_AkChannelEmitter {
-        return @bitCast(c.WWISEC_AkChannelEmitter, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -393,16 +393,16 @@ pub const AkSetPositionFlags = packed struct(u8) {
     pub const Default = AkSetPositionFlags{ .emitter = true, .listener = true };
 
     pub inline fn fromC(value: c.WWISEC_AkSetPositionFlags) AkSetPositionFlags {
-        return @bitCast(AkSetPositionFlags, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkSetPositionFlags) c.WWISEC_AkSetPositionFlags {
-        return @bitCast(u8, self);
+        return @as(u8, @bitCast(self));
     }
 
     comptime {
-        std.debug.assert(@bitCast(u8, AkSetPositionFlags{ .emitter = true }) == c.WWISEC_AkSetPositionFlags_Emitter);
-        std.debug.assert(@bitCast(u8, AkSetPositionFlags{ .listener = true }) == c.WWISEC_AkSetPositionFlags_Listener);
+        std.debug.assert(@as(u8, @bitCast(AkSetPositionFlags{ .emitter = true })) == c.WWISEC_AkSetPositionFlags_Emitter);
+        std.debug.assert(@as(u8, @bitCast(AkSetPositionFlags{ .listener = true })) == c.WWISEC_AkSetPositionFlags_Listener);
         std.debug.assert(Default.toC() == c.WWISEC_AkSetPositionFlags_Default);
     }
 };
@@ -422,11 +422,11 @@ pub const AkMeteringFlags = packed struct(u8) {
     reserved1: u2 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkMeteringFlags) AkMeteringFlags {
-        return @bitCast(AkMeteringFlags, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkMeteringFlags) c.WWISEC_AkMeteringFlags {
-        return @bitCast(c.WWISEC_AkMeteringFlags, self);
+        return @bitCast(self);
     }
 };
 
@@ -541,11 +541,11 @@ pub const AkAuxSendValue = extern struct {
     control_value: f32 = 0.0,
 
     pub inline fn fromC(value: c.WWISEC_AkAuxSendValue) AkAuxSendValue {
-        return @bitCast(AkAuxSendValue, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkAuxSendValue) c.WWISEC_AkAuxSendValue {
-        return @bitCast(c.WWISEC_AkAuxSendValue, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -558,11 +558,11 @@ pub const AkAudioSettings = extern struct {
     num_samples_per_second: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkAudioSettings) AkAudioSettings {
-        return @bitCast(AkAudioSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkAudioSettings) c.WWISEC_AkAudioSettings {
-        return @bitCast(c.WWISEC_AkAudioSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -761,7 +761,7 @@ pub fn fromCString(allocator: std.mem.Allocator, value_opt: ?[*:0]const u8) ![]u
 }
 
 pub fn toCString(allocator: std.mem.Allocator, value: []const u8) ![:0]u8 {
-    return std.cstr.addNullByte(allocator, value);
+    return allocator.dupeZ(u8, value);
 }
 
 pub fn stackCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackFallbackAllocator(wwise_options.string_stack_size) {
@@ -795,11 +795,11 @@ pub fn VirtualDestructor(comptime T: type) type {
 pub fn CastMethods(comptime T: type) type {
     return extern struct {
         pub inline fn cast(instance: ?*anyopaque) ?*T {
-            return @ptrCast(?*T, @alignCast(@alignOf(?*T), instance));
+            return @ptrCast(@alignCast(instance));
         }
 
         pub inline fn constCast(instance: ?*const anyopaque) ?*const T {
-            return @ptrCast(?*const T, @alignCast(@alignOf(?*const T), instance));
+            return @ptrCast(@alignCast(instance));
         }
     };
 }

@@ -19,11 +19,11 @@ pub const AkSourceSettings = extern struct {
     media_size: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkSourceSettings) AkSourceSettings {
-        return @bitCast(AkSourceSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkSourceSettings) c.WWISEC_AkSourceSettings {
-        return @bitCast(c.WWISEC_AkSourceSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -39,11 +39,11 @@ pub const AkSourcePosition = extern struct {
     update_buffer_tick: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkSourcePosition) AkSourcePosition {
-        return @bitCast(AkSourcePosition, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkSourcePosition) c.WWISEC_AkSourcePosition {
-        return @bitCast(c.WWISEC_AkSourcePosition, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -93,7 +93,7 @@ pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings
 
     var native_platform_init_settings_ptr = blk: {
         if (platform_init_settings_opt) |platform_init_settings| {
-            break :blk @ptrCast(?*c.WWISEC_AkPlatformInitSettings, platform_init_settings);
+            break :blk @as(?*c.WWISEC_AkPlatformInitSettings, @ptrCast(platform_init_settings));
         }
         break :blk @as(?*c.WWISEC_AkPlatformInitSettings, null);
     };
@@ -111,7 +111,7 @@ pub fn getDefaultInitSettings(init_settings: *settings.AkInitSettings) void {
 }
 
 pub fn getDefaultPlatformInitSettings(platform_init_settings: *settings.AkPlatformInitSettings) void {
-    c.WWISEC_AK_SoundEngine_GetDefaultPlatformInitSettings(@ptrCast(*c.WWISEC_AkPlatformInitSettings, platform_init_settings));
+    c.WWISEC_AK_SoundEngine_GetDefaultPlatformInitSettings(@ptrCast(platform_init_settings));
 }
 
 pub fn term() void {
@@ -120,7 +120,7 @@ pub fn term() void {
 
 pub fn getAudioSettings(out_settings: *common.AkAudioSettings) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_GetAudioSettings(@ptrCast(*c.WWISEC_AkAudioSettings, out_settings)),
+        c.WWISEC_AK_SoundEngine_GetAudioSettings(@ptrCast(out_settings)),
     );
 }
 
@@ -132,7 +132,7 @@ pub fn getSpeakerConfiguration(in_id_output: common.AkOutputDeviceID) speaker_co
 
 pub fn getOutputDeviceConfiguration(in_id_output: common.AkOutputDeviceID, io_channel_config: *speaker_config.AkChannelConfig, io_capabilities: *common_defs.Ak3DAudioSinkCapabilities) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(in_id_output, @ptrCast(*c.WWISEC_AkChannelConfig, io_channel_config), @ptrCast(*c.WWISEC_Ak3DAudioSinkCapabilities, io_capabilities)),
+        c.WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(in_id_output, @ptrCast(io_channel_config), @ptrCast(io_capabilities)),
     );
 }
 
@@ -143,24 +143,24 @@ pub fn getPanningRule(in_id_output: common.AkOutputDeviceID) common.WwiseError!c
         c.WWISEC_AK_SoundEngine_GetPanningRule(&raw_panning_rule, in_id_output),
     );
 
-    return @intToEnum(common.AkPanningRule, raw_panning_rule);
+    return @enumFromInt(raw_panning_rule);
 }
 
 pub fn setPanningRule(in_panning_rule: common.AkPanningRule, in_id_output: common.AkOutputDeviceID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_SetPanningRule(@enumToInt(in_panning_rule), in_id_output),
+        c.WWISEC_AK_SoundEngine_SetPanningRule(@intFromEnum(in_panning_rule), in_id_output),
     );
 }
 
 pub fn getSpeakerAngles(io_speaker_angles: ?*[]f32, io_num_angles: *u32, out_height_angle: *f32, in_id_output: common.AkOutputDeviceID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_GetSpeakerAngles(@ptrCast(?[*]f32, io_speaker_angles), io_num_angles, out_height_angle, in_id_output),
+        c.WWISEC_AK_SoundEngine_GetSpeakerAngles(@ptrCast(io_speaker_angles), io_num_angles, out_height_angle, in_id_output),
     );
 }
 
 pub fn setSpeakerAngles(in_speaker_angles: []const f32, in_height_angle: f32, in_id_output: common.AkOutputDeviceID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_SetSpeakerAngles(@ptrCast([*]const f32, in_speaker_angles), @truncate(u32, in_speaker_angles.len), in_height_angle, in_id_output),
+        c.WWISEC_AK_SoundEngine_SetSpeakerAngles(@ptrCast(in_speaker_angles), @truncate(in_speaker_angles.len), in_height_angle, in_id_output),
     );
 }
 
@@ -189,17 +189,17 @@ pub fn renderAudio(in_allow_sync_render: bool) common.WwiseError!void {
 }
 
 pub fn getGlobalPluginContext() ?*IAkPlugin.IAkGlobalPluginContext {
-    return @ptrCast(?*IAkPlugin.IAkGlobalPluginContext, c.WWISEC_AK_SoundEngine_GetGlobalPluginContext());
+    return @ptrCast(c.WWISEC_AK_SoundEngine_GetGlobalPluginContext());
 }
 
 pub fn registerPlugin(in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: IAkPlugin.AkCreatePluginCallback, in_create_param_func: IAkPlugin.AkCreateParamCallback) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterPlugin(
-            @enumToInt(in_type),
+            @intFromEnum(in_type),
             in_company_id,
             in_plugin_id,
-            @ptrCast(c.WWISEC_AkCreatePluginCallback, in_create_func),
-            @ptrCast(c.WWISEC_AkCreateParamCallback, in_create_param_func),
+            @ptrCast(in_create_func),
+            @ptrCast(in_create_param_func),
         ),
     );
 }
@@ -215,7 +215,7 @@ pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []c
 
     var raw_in_dll_path = blk: {
         if (in_dll_path_opt) |in_dll_path| {
-            break :blk common.toOSChar(area_allocator.allocator(), in_dll_path) catch return common.WwiseError.Fail;
+            break :blk @as([*c]const c.AkOSChar, common.toOSChar(area_allocator.allocator(), in_dll_path) catch return common.WwiseError.Fail);
         }
 
         break :blk @as([*c]const c.AkOSChar, null);
@@ -237,10 +237,10 @@ pub const RegisterGlobalCallbackOptionalArgs = struct {
 pub fn registerGlobalCallback(in_callback: callbacks.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterGlobalCallback(
-            @ptrCast(c.WWISEC_AkGlobalCallbackFunc, in_callback),
-            @intCast(u32, optional_args.location.toC()),
+            @ptrCast(in_callback),
+            @intCast(optional_args.location.toC()),
             optional_args.cookie,
-            @enumToInt(optional_args.plugin_type),
+            @intFromEnum(optional_args.plugin_type),
             optional_args.company_id,
             optional_args.plugin_id,
         ),
@@ -254,27 +254,27 @@ pub const UnregisterGlobalCallbackOptionalArgs = struct {
 pub fn unregisterGlobalCallback(in_callback: callbacks.AkGlobalCallbackFunc, optional_args: UnregisterGlobalCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterGlobalCallback(
-            @ptrCast(c.WWISEC_AkGlobalCallbackFunc, in_callback),
-            @intCast(u32, optional_args.location.toC()),
+            @ptrCast(in_callback),
+            @intCast(optional_args.location.toC()),
         ),
     );
 }
 
 pub fn registerResourceMonitorCallback(in_callback: callbacks.AkResourceMonitorCallbackFunc) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_RegisterResourceMonitorCallback(@ptrCast(c.WWISEC_AkResourceMonitorCallbackFunc, in_callback)),
+        c.WWISEC_AK_SoundEngine_RegisterResourceMonitorCallback(@ptrCast(in_callback)),
     );
 }
 
 pub fn unregisterResourceMonitorCallback(in_callback: callbacks.AkResourceMonitorCallbackFunc) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_UnregisterResourceMonitorCallback(@ptrCast(c.WWISEC_AkResourceMonitorCallbackFunc, in_callback)),
+        c.WWISEC_AK_SoundEngine_UnregisterResourceMonitorCallback(@ptrCast(in_callback)),
     );
 }
 
 pub fn registerAudioDeviceStatusCallback(in_callback: callbacks.AkDeviceStatusCallbackFunc) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_RegisterAudioDeviceStatusCallback(@ptrCast(c.WWISEC_AK_AkDeviceStatusCallbackFunc, in_callback)),
+        c.WWISEC_AK_SoundEngine_RegisterAudioDeviceStatusCallback(@ptrCast(in_callback)),
     );
 }
 
@@ -317,7 +317,7 @@ pub fn postEventID(in_eventID: common.AkUniqueID, game_object_id: common.AkGameO
         if (optional_args.allocator) |allocator| {
             area_allocator_opt = std.heap.ArenaAllocator.init(allocator);
             if (optional_args.external_sources) |external_sources| {
-                num_external_sources = @truncate(u32, external_sources.len);
+                num_external_sources = @truncate(external_sources.len);
 
                 const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.WWISEC_AkExternalSourceInfo, num_external_sources);
 
@@ -334,7 +334,7 @@ pub fn postEventID(in_eventID: common.AkUniqueID, game_object_id: common.AkGameO
 
     const external_sources_ptr = blk: {
         if (external_sources.len > 0) {
-            break :blk @ptrCast(?[*]c.WWISEC_AkExternalSourceInfo, @constCast(external_sources));
+            break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
         }
 
         break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, null);
@@ -343,8 +343,8 @@ pub fn postEventID(in_eventID: common.AkUniqueID, game_object_id: common.AkGameO
     return c.WWISEC_AK_SoundEngine_PostEvent_ID(
         in_eventID,
         game_object_id,
-        @intCast(u32, optional_args.flags.toC()),
-        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback),
+        @intCast(optional_args.flags.toC()),
+        @ptrCast(optional_args.callback),
         optional_args.cookie,
         num_external_sources,
         external_sources_ptr,
@@ -372,7 +372,7 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
         if (optional_args.allocator) |allocator| {
             area_allocator_opt = std.heap.ArenaAllocator.init(allocator);
             if (optional_args.external_sources) |external_sources| {
-                num_external_sources = @truncate(u32, external_sources.len);
+                num_external_sources = @truncate(external_sources.len);
 
                 const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.WWISEC_AkExternalSourceInfo, num_external_sources);
 
@@ -389,7 +389,7 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
 
     const external_sources_ptr = blk: {
         if (external_sources.len > 0) {
-            break :blk @ptrCast(?[*]c.WWISEC_AkExternalSourceInfo, @constCast(external_sources));
+            break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
         }
 
         break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, null);
@@ -398,8 +398,8 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
     return c.WWISEC_AK_SoundEngine_PostEvent_String(
         raw_event_name,
         game_object_id,
-        @intCast(u32, optional_args.flags.toC()),
-        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback),
+        @intCast(optional_args.flags.toC()),
+        @ptrCast(optional_args.callback),
         optional_args.cookie,
         num_external_sources,
         external_sources_ptr,
@@ -426,10 +426,10 @@ pub fn executeActionOnEventID(in_event_id: common.AkUniqueID, in_action_type: Ak
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(
             in_event_id,
-            @enumToInt(in_action_type),
+            @intFromEnum(in_action_type),
             optional_args.game_object_id,
             optional_args.transition_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.playing_id,
         ),
     );
@@ -445,10 +445,10 @@ pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_even
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(
             raw_event_name,
-            @enumToInt(in_action_type),
+            @intFromEnum(in_action_type),
             optional_args.game_object_id,
             optional_args.transition_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.playing_id,
         ),
     );
@@ -469,11 +469,11 @@ pub fn postMIDIOnEvent(in_event_id: common.AkUniqueID, in_game_object_id: common
     return WWISEC_AK_SoundEngine_PostMIDIOnEvent(
         in_event_id,
         in_game_object_id,
-        @ptrCast([*]midi_types.AkMIDIPost, @constCast(in_midi_posts)),
-        @truncate(u16, in_midi_posts.len),
+        @ptrCast(@constCast(in_midi_posts)),
+        @truncate(in_midi_posts.len),
         optional_args.absolute_offsets,
-        @intCast(u32, optional_args.flags.toC()),
-        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback),
+        @intCast(optional_args.flags.toC()),
+        @ptrCast(optional_args.callback),
         optional_args.cookie,
         optional_args.playing_id,
     );
@@ -660,7 +660,7 @@ pub fn getSourcePlayPositions(in_playing_id: common.AkPlayingID, out_positions: 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetSourcePlayPositions(
             in_playing_id,
-            @ptrCast([*c]c.WWISEC_AkSourcePosition, out_positions),
+            @ptrCast(out_positions),
             io_positions_count,
             in_extrapolate,
         ),
@@ -694,7 +694,7 @@ pub fn stopPlayingID(in_playing_id: common.AkPlayingID, optional_args: StopPlayi
     return c.WWISEC_AK_SoundEngine_StopPlayingID(
         in_playing_id,
         optional_args.transition_duration,
-        @enumToInt(optional_args.fade_curve),
+        @intFromEnum(optional_args.fade_curve),
     );
 }
 
@@ -705,10 +705,10 @@ pub const ExecuteActionOnPlayingIDOptionalArgs = struct {
 
 pub fn executeActionOnPlayingID(in_action_type: AkActionOnEventType, in_playing_id: common.AkPlayingID, optional_args: ExecuteActionOnPlayingIDOptionalArgs) void {
     c.WWISEC_AK_SoundEngine_ExecuteActionOnPlayingID(
-        @enumToInt(in_action_type),
+        @intFromEnum(in_action_type),
         in_playing_id,
         optional_args.transition_duration,
-        @enumToInt(optional_args.fade_curve),
+        @intFromEnum(optional_args.fade_curve),
     );
 }
 
@@ -737,7 +737,7 @@ pub fn sendPluginCustomGameData(
         c.WWISEC_AK_SoundEngine_SendPluginCustomGameData(
             in_bus_id,
             in_bus_object_id,
-            @enumToInt(in_type),
+            @intFromEnum(in_type),
             in_company_id,
             in_plugin_id,
             in_data,
@@ -784,7 +784,7 @@ pub fn setPosition(in_game_object_id: common.AkGameObjectID, in_position: common
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetPosition(
             in_game_object_id,
-            @ptrCast(?*const c.WWISEC_AkSoundPosition, &in_position),
+            @ptrCast(&in_position),
             optional_args.flags.toC(),
         ),
     );
@@ -799,9 +799,9 @@ pub fn setMultiplePositionsSoundPosition(in_game_object: common.AkGameObjectID, 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(
             in_game_object,
-            @ptrCast([*]const c.WWISEC_AkSoundPosition, positions),
-            @truncate(u16, positions.len),
-            @enumToInt(optional_args.multi_position_type),
+            @ptrCast(positions),
+            @truncate(positions.len),
+            @intFromEnum(optional_args.multi_position_type),
             optional_args.flags.toC(),
         ),
     );
@@ -811,9 +811,9 @@ pub fn setMultiplePositionChannelEmitter(in_game_object: common.AkGameObjectID, 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(
             in_game_object,
-            @ptrCast([*]const c.WWISEC_AkChannelEmitter, positions),
-            @truncate(u16, positions.len),
-            @enumToInt(optional_args.multi_position_type),
+            @ptrCast(positions),
+            @truncate(positions.len),
+            @intFromEnum(optional_args.multi_position_type),
             optional_args.flags.toC(),
         ),
     );
@@ -857,7 +857,7 @@ pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []con
     var out_bank_id: common.AkBankID = common.AK_INVALID_BANK_ID;
 
     try common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_LoadBank_String(raw_bank_name, &out_bank_id, @enumToInt(optional_args.bank_type)),
+        c.WWISEC_AK_SoundEngine_LoadBank_String(raw_bank_name, &out_bank_id, @intFromEnum(optional_args.bank_type)),
     );
 
     return out_bank_id;
@@ -865,7 +865,7 @@ pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []con
 
 pub fn loadBankID(in_bank_id: common.AkBankID, optional_args: LoadBankOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_LoadBank_ID(in_bank_id, @enumToInt(optional_args.bank_type)),
+        c.WWISEC_AK_SoundEngine_LoadBank_ID(in_bank_id, @intFromEnum(optional_args.bank_type)),
     );
 }
 
@@ -886,7 +886,7 @@ pub fn loadBankMemoryViewOutBankType(in_memory_bank: ?*const anyopaque, in_memor
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView_OutBankType(in_memory_bank, in_memory_bank_size, out_bank_id, &raw_bank_type),
     );
 
-    out_bank_type.* = @intToEnum(common.AkBankType, raw_bank_type);
+    out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
 pub fn loadBankMemoryCopy(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32) common.WwiseError!common.AkBankID {
@@ -906,7 +906,7 @@ pub fn loadBankMemoryCopyOutBankType(in_memory_bank: ?*anyopaque, in_memory_bank
         c.WWISEC_AK_SoundEngine_LoadBankMemoryCopy_OutBankType(in_memory_bank, in_memory_bank_size, out_bank_id, &raw_bank_type),
     );
 
-    out_bank_type.* = @intToEnum(common.AkBankType, raw_bank_type);
+    out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
 pub fn decodeBank(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_pool_for_decoded_bank: common.AkMemPoolId, out_decoded_bank_ptr: *?*anyopaque, out_decoded_bank_size: u32) common.WwiseError!void {
@@ -933,10 +933,10 @@ pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_Async_String(
             raw_bank_name,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
             &out_bank_id,
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
     return out_bank_id;
@@ -946,9 +946,9 @@ pub fn loadBankAsyncID(in_bank_id: common.AkBankID, in_bank_callback: callbacks.
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_Async_ID(
             in_bank_id,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
 }
@@ -960,7 +960,7 @@ pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView_Async(
             in_memory_bank,
             in_memory_bank_size,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
             &out_bank_id,
         ),
@@ -976,13 +976,13 @@ pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView_Async_OutBankType(
             in_memory_bank,
             in_memory_bank_size,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
             out_bank_id,
             &raw_bank_type,
         ),
     );
-    out_bank_type.* = @intToEnum(common.AkBankType, raw_bank_type);
+    out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
 pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *common.AkBankID, out_bank_type: *common.AkBankType) common.WwiseError!void {
@@ -992,13 +992,13 @@ pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank
         c.WWISEC_AK_SoundEngine_LoadBankMemoryCopy_Async(
             in_memory_bank,
             in_memory_bank_size,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
             out_bank_id,
             &raw_bank_type,
         ),
     );
-    out_bank_type.* = @intToEnum(common.AkBankType, raw_bank_type);
+    out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
 pub const UnloadBankOptionalArgs = struct {
@@ -1013,13 +1013,13 @@ pub fn unloadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []c
     defer allocator.free(raw_bank_name);
 
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_UnloadBank_String(raw_bank_name, in_memory_bank, @enumToInt(optional_args.bank_type)),
+        c.WWISEC_AK_SoundEngine_UnloadBank_String(raw_bank_name, in_memory_bank, @intFromEnum(optional_args.bank_type)),
     );
 }
 
 pub fn unloadBankID(in_bank_id: common.AkBankID, in_memory_bank: ?*const anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_UnloadBank_ID(in_bank_id, in_memory_bank, @enumToInt(optional_args.bank_type)),
+        c.WWISEC_AK_SoundEngine_UnloadBank_ID(in_bank_id, in_memory_bank, @intFromEnum(optional_args.bank_type)),
     );
 }
 
@@ -1034,9 +1034,9 @@ pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name
         c.WWISEC_AK_SoundEngine_UnloadBank_Async_String(
             raw_bank_name,
             in_memory_bank,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
 }
@@ -1046,9 +1046,9 @@ pub fn unloadBankAsyncID(in_bank_id: common.AkBankID, in_memory_bank: ?*const an
         c.WWISEC_AK_SoundEngine_UnloadBank_Async_ID(
             in_bank_id,
             in_memory_bank,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
 }
@@ -1076,10 +1076,10 @@ pub fn prepareBankString(
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_String(
-            @enumToInt(in_preparation_type),
+            @intFromEnum(in_preparation_type),
             raw_bank_name,
-            @enumToInt(optional_args.flags),
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.flags),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
 }
@@ -1091,10 +1091,10 @@ pub fn prepareBankID(
 ) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_ID(
-            @enumToInt(in_preparation_type),
+            @intFromEnum(in_preparation_type),
             in_bank_id,
-            @enumToInt(optional_args.flags),
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.flags),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
 }
@@ -1115,12 +1115,12 @@ pub fn prepareBankAsyncString(
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_Async_String(
-            @enumToInt(in_preparation_type),
+            @intFromEnum(in_preparation_type),
             raw_bank_name,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
-            @enumToInt(optional_args.flags),
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.flags),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
 }
@@ -1134,12 +1134,12 @@ pub fn prepareBankAsyncID(
 ) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_Async_ID(
-            @enumToInt(in_preparation_type),
+            @intFromEnum(in_preparation_type),
             in_bank_id,
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(in_bank_callback),
             in_cookie,
-            @enumToInt(optional_args.flags),
-            @enumToInt(optional_args.bank_type),
+            @intFromEnum(optional_args.flags),
+            @intFromEnum(optional_args.bank_type),
         ),
     );
 }
@@ -1169,9 +1169,9 @@ pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_String(
-            @enumToInt(in_preparation_type),
-            @ptrCast([*c][*c]const u8, raw_event_names_list.items),
-            @truncate(u32, raw_event_names_list.items.len),
+            @intFromEnum(in_preparation_type),
+            @ptrCast(raw_event_names_list.items),
+            @truncate(raw_event_names_list.items.len),
         ),
     );
 }
@@ -1179,9 +1179,9 @@ pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_
 pub fn prepareEventID(in_preparation_type: PreparationType, in_event_ids: []const common.AkUniqueID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_ID(
-            @enumToInt(in_preparation_type),
-            @ptrCast([*]c.WWISEC_AkUniqueID, @constCast(in_event_ids)),
-            @truncate(u32, in_event_ids.len),
+            @intFromEnum(in_preparation_type),
+            @ptrCast(@constCast(in_event_ids)),
+            @truncate(in_event_ids.len),
         ),
     );
 }
@@ -1211,10 +1211,10 @@ pub fn prepareEventAsyncString(
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_Async_String(
-            @enumToInt(in_preparation_type),
-            @ptrCast([*c][*c]const u8, raw_event_names_list.items),
-            @truncate(u32, raw_event_names_list.items.len),
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @intFromEnum(in_preparation_type),
+            @ptrCast(raw_event_names_list.items),
+            @truncate(raw_event_names_list.items.len),
+            @ptrCast(in_bank_callback),
             in_cookie,
         ),
     );
@@ -1228,10 +1228,10 @@ pub fn prepareEventAsyncID(
 ) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(
-            @enumToInt(in_preparation_type),
-            @ptrCast([*]c.WWISEC_AkUniqueID, @constCast(in_event_ids)),
-            @truncate(u32, in_event_ids.len),
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @intFromEnum(in_preparation_type),
+            @ptrCast(@constCast(in_event_ids)),
+            @truncate(in_event_ids.len),
+            @ptrCast(in_bank_callback),
             in_cookie,
         ),
     );
@@ -1240,8 +1240,8 @@ pub fn prepareEventAsyncID(
 pub fn setMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMedia(
-            @ptrCast([*]c.WWISEC_AkSourceSettings, @constCast(in_source_settings)),
-            @truncate(u32, in_source_settings.len),
+            @ptrCast(@constCast(in_source_settings)),
+            @truncate(in_source_settings.len),
         ),
     );
 }
@@ -1249,8 +1249,8 @@ pub fn setMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!
 pub fn unsetMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnsetMedia(
-            @ptrCast([*]c.WWISEC_AkSourceSettings, @constCast(in_source_settings)),
-            @truncate(u32, in_source_settings.len),
+            @ptrCast(@constCast(in_source_settings)),
+            @truncate(in_source_settings.len),
         ),
     );
 }
@@ -1258,9 +1258,9 @@ pub fn unsetMedia(in_source_settings: []const AkSourceSettings) common.WwiseErro
 pub fn tryUnsetMedia(in_source_settings: []const AkSourceSettings, unset_results: ?[*]common.AKRESULT) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_TryUnsetMedia(
-            @ptrCast([*]c.WWISEC_AkSourceSettings, @constCast(in_source_settings)),
-            @truncate(u32, in_source_settings.len),
-            @ptrCast(?[*]c.WWISEC_AKRESULT, unset_results),
+            @ptrCast(@constCast(in_source_settings)),
+            @truncate(in_source_settings.len),
+            @ptrCast(unset_results),
         ),
     );
 }
@@ -1292,11 +1292,11 @@ pub fn prepareGameSyncsString(
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_String(
-            @enumToInt(in_preparation_type),
-            @enumToInt(in_game_sync_type),
+            @intFromEnum(in_preparation_type),
+            @intFromEnum(in_game_sync_type),
             raw_group_name,
-            @ptrCast([*c][*c]const u8, raw_game_sync_names_list.items),
-            @truncate(u32, raw_game_sync_names_list.items.len),
+            @ptrCast(raw_game_sync_names_list.items),
+            @truncate(raw_game_sync_names_list.items.len),
         ),
     );
 }
@@ -1309,11 +1309,11 @@ pub fn prepareGameSyncsID(
 ) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_ID(
-            @enumToInt(in_preparation_type),
-            @enumToInt(in_game_sync_type),
+            @intFromEnum(in_preparation_type),
+            @intFromEnum(in_game_sync_type),
             in_group_id,
-            @ptrCast([*c]u32, @constCast(in_game_sync_ids)),
-            @truncate(u32, in_game_sync_ids.len),
+            @ptrCast(@constCast(in_game_sync_ids)),
+            @truncate(in_game_sync_ids.len),
         ),
     );
 }
@@ -1347,12 +1347,12 @@ pub fn prepareGameSyncsAsyncString(
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_String(
-            @enumToInt(in_preparation_type),
-            @enumToInt(in_game_sync_type),
+            @intFromEnum(in_preparation_type),
+            @intFromEnum(in_game_sync_type),
             raw_group_name,
-            @ptrCast([*c][*c]const u8, raw_game_sync_names_list.items),
-            @truncate(u32, raw_game_sync_names_list.items.len),
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(raw_game_sync_names_list.items),
+            @truncate(raw_game_sync_names_list.items.len),
+            @ptrCast(in_bank_callback),
             in_cookie,
         ),
     );
@@ -1368,12 +1368,12 @@ pub fn prepareGameSyncsAsyncID(
 ) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_ID(
-            @enumToInt(in_preparation_type),
-            @enumToInt(in_game_sync_type),
+            @intFromEnum(in_preparation_type),
+            @intFromEnum(in_game_sync_type),
             in_group_id,
-            @ptrCast([*c]u32, @constCast(in_game_sync_ids)),
-            @truncate(u32, in_game_sync_ids.len),
-            @ptrCast(c.WWISEC_AkBankCallbackFunc, in_bank_callback),
+            @ptrCast(@constCast(in_game_sync_ids)),
+            @truncate(in_game_sync_ids.len),
+            @ptrCast(in_bank_callback),
             in_cookie,
         ),
     );
@@ -1383,8 +1383,8 @@ pub fn setListeners(in_emitter_game_obj: common.AkGameObjectID, in_listener_game
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetListeners(
             in_emitter_game_obj,
-            @ptrCast([*]const c.WWISEC_AkGameObjectID, in_listener_game_objs),
-            @truncate(u32, in_listener_game_objs.len),
+            @ptrCast(in_listener_game_objs),
+            @truncate(in_listener_game_objs.len),
         ),
     );
 }
@@ -1404,8 +1404,8 @@ pub fn removeListener(in_emitter_game_obj: common.AkGameObjectID, in_listener_ga
 pub fn setDefaultListeners(in_listener_game_objs: []const common.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetDefaultListeners(
-            @ptrCast([*]const c.WWISEC_AkGameObjectID, in_listener_game_objs),
-            @truncate(u32, in_listener_game_objs.len),
+            @ptrCast(in_listener_game_objs),
+            @truncate(in_listener_game_objs.len),
         ),
     );
 }
@@ -1458,7 +1458,7 @@ pub fn setRTPCValueID(in_rtpc_id: common.AkRtpcID, in_value: common.AkRtpcValue,
             in_value,
             optional_args.game_object_id,
             optional_args.value_change_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.bypass_internal_value_interpolation,
         ),
     );
@@ -1477,7 +1477,7 @@ pub fn setRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: [
             in_value,
             optional_args.game_object_id,
             optional_args.value_change_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.bypass_internal_value_interpolation,
         ),
     );
@@ -1501,7 +1501,7 @@ pub fn setRTPCValueByPlayingID(
             in_value,
             in_playing_id,
             optional_args.value_change_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.bypass_internal_value_interpolation,
         ),
     );
@@ -1526,7 +1526,7 @@ pub fn setRTPCValueByPlayingIDString(
             in_value,
             in_playing_id,
             optional_args.value_change_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.bypass_internal_value_interpolation,
         ),
     );
@@ -1545,7 +1545,7 @@ pub fn resetRTPCValueID(in_rtpc_id: common.AkRtpcID, optional_args: ResetRTPCVal
             in_rtpc_id,
             optional_args.game_object_id,
             optional_args.value_change_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.bypass_internal_value_interpolation,
         ),
     );
@@ -1563,7 +1563,7 @@ pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name:
             raw_rtpc_name,
             optional_args.game_object_id,
             optional_args.value_change_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
             optional_args.bypass_internal_value_interpolation,
         ),
     );
@@ -1633,8 +1633,8 @@ pub fn setGameObjectAuxSendValues(in_game_object_id: common.AkGameObjectID, in_a
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(
             in_game_object_id,
-            @ptrCast([*]c.WWISEC_AkAuxSendValue, @constCast(in_aux_send_values)),
-            @truncate(u32, in_aux_send_values.len),
+            @ptrCast(@constCast(in_aux_send_values)),
+            @truncate(in_aux_send_values.len),
         ),
     );
 }
@@ -1643,7 +1643,7 @@ pub fn registerBusVolumeCallback(in_bus_id: common.AkUniqueID, in_callback: call
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(
             in_bus_id,
-            @ptrCast(c.WWISEC_AkBusCallbackFunc, in_callback),
+            @ptrCast(in_callback),
             in_cookie,
         ),
     );
@@ -1653,7 +1653,7 @@ pub fn registerBusMeteringCallback(in_bus_id: common.AkUniqueID, in_callback: ca
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(
             in_bus_id,
-            @ptrCast(c.WWISEC_AkBusMeteringCallbackFunc, in_callback),
+            @ptrCast(in_callback),
             in_metering_flags.toC(),
             in_cookie,
         ),
@@ -1664,7 +1664,7 @@ pub fn registerOutputDeviceMeteringCallback(in_id_output: common.AkOutputDeviceI
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(
             in_id_output,
-            @ptrCast(c.WWISEC_AkOutputDeviceMeteringCallbackFunc, in_callback),
+            @ptrCast(in_callback),
             in_metering_flags.toC(),
             in_cookie,
         ),
@@ -1754,21 +1754,21 @@ pub fn setMultipleObstructionAndOcclusion(in_emitter_id: common.AkGameObjectID, 
         c.WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(
             in_emitter_id,
             in_listener_id,
-            @ptrCast([*]c.WWISEC_AkObstructionOcclusionValues, @constCast(in_obstruction_occlusion_values)),
-            @truncate(u32, in_obstruction_occlusion_values.len),
+            @ptrCast(@constCast(in_obstruction_occlusion_values)),
+            @truncate(in_obstruction_occlusion_values.len),
         ),
     );
 }
 
 pub fn getContainerHistory(in_bytes: ?*IBytes.IWriteBytes) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_GetContainerHistory(@ptrCast(?*c.WWISEC_AK_IWriteBytes, in_bytes)),
+        c.WWISEC_AK_SoundEngine_GetContainerHistory(@ptrCast(in_bytes)),
     );
 }
 
 pub fn setContainerHistory(in_bytes: ?*IBytes.IReadBytes) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_SetContainerHistory(@ptrCast(?*c.WWISEC_AK_IReadBytes, in_bytes)),
+        c.WWISEC_AK_SoundEngine_SetContainerHistory(@ptrCast(in_bytes)),
     );
 }
 
@@ -1813,7 +1813,7 @@ pub const RegistereCaptureCallbackOptionalArgs = struct {
 pub fn regiserCaptureCallback(in_callback: callbacks.AkCaptureCallbackFunc, optional_args: RegistereCaptureCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterCaptureCallback(
-            @ptrCast(c.WWISEC_AkCaptureCallbackFunc, in_callback),
+            @ptrCast(in_callback),
             optional_args.id_output,
             optional_args.cookie,
         ),
@@ -1828,7 +1828,7 @@ pub const UnregistereCaptureCallbackOptionalArgs = struct {
 pub fn unregisterCaptureCallback(in_callback: callbacks.AkCaptureCallbackFunc, optional_args: UnregistereCaptureCallbackOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterCaptureCallback(
-            @ptrCast(c.WWISEC_AkCaptureCallbackFunc, in_callback),
+            @ptrCast(in_callback),
             optional_args.id_output,
             optional_args.cookie,
         ),
@@ -1870,10 +1870,10 @@ pub fn addOutput(output_settings: *const settings.AkOutputSettings, listeners: [
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(
-            @ptrCast(*const c.WWISEC_AkOutputSettings, output_settings),
-            @ptrCast([*]c.WWISEC_AkOutputDeviceID, &out_device_id),
+            @ptrCast(output_settings),
+            @ptrCast(&out_device_id),
             listeners.ptr,
-            @truncate(u32, listeners.len),
+            @truncate(listeners.len),
         ),
     );
 
@@ -1888,7 +1888,7 @@ pub fn removeOutput(id_output: common.AkOutputDeviceID) common.WwiseError!void {
 
 pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_device_id: common.AkOutputDeviceID, out_device_id: *?common.AkOutputDeviceID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_ReplaceOutput(@ptrCast(*const c.WWISEC_AkOutputSettings, output_settings), in_device_id, @ptrCast([*]c.WWISEC_AkOutputDeviceID, out_device_id)),
+        c.WWISEC_AK_SoundEngine_ReplaceOutput(@ptrCast(output_settings), in_device_id, @ptrCast(out_device_id)),
     );
 }
 
@@ -1936,7 +1936,7 @@ pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_
     var raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
             var raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
-            break :blk @ptrCast(?[*]c.WWISEC_AkDeviceDescription, raw_device_descriptions);
+            break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 
         break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);
@@ -1969,7 +1969,7 @@ pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share
     var raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
             var raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
-            break :blk @ptrCast(?[*]c.WWISEC_AkDeviceDescription, raw_device_descriptions);
+            break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 
         break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);

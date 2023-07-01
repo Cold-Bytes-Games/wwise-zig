@@ -24,11 +24,11 @@ pub const AkCommSettings = extern struct {
         command: u16 = AK_COMM_DEFAULT_DISCOVERY_PORT + 1,
 
         pub inline fn fromC(value: c.WWISEC_AkCommSettings_Ports) Ports {
-            return @bitCast(Ports, value);
+            return @bitCast(value);
         }
 
         pub inline fn toC(self: Ports) c.WWISEC_AkCommSettings_Ports {
-            return @bitCast(c.WWISEC_AkCommSettings_Ports, self);
+            return @bitCast(self);
         }
 
         comptime {
@@ -47,11 +47,11 @@ pub const AkCommSettings = extern struct {
     }
 
     pub inline fn fromC(value: c.WWISEC_AkCommSettings) AkCommSettings {
-        return @bitCast(AkCommSettings, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: AkCommSettings) c.WWISEC_AkCommSettings {
-        return @bitCast(c.WWWISEC_AkCommSettings, self);
+        return @bitCast(self);
     }
 
     comptime {
@@ -62,12 +62,12 @@ pub const AkCommSettings = extern struct {
 
 pub fn init(in_settings: *const AkCommSettings) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_Comm_Init(@ptrCast(*const c.WWISEC_AkCommSettings, in_settings)),
+        c.WWISEC_AK_Comm_Init(@ptrCast(in_settings)),
     );
 }
 
 pub fn getDefaultInitSettings(out_settings: *AkCommSettings) !void {
-    c.WWISEC_AK_Comm_GetDefaultInitSettings(@ptrCast(*c.WWISEC_AkCommSettings, out_settings));
+    c.WWISEC_AK_Comm_GetDefaultInitSettings(@ptrCast(out_settings));
 }
 
 pub fn term() void {
@@ -81,5 +81,5 @@ pub fn reset() common.WwiseError!void {
 }
 
 pub fn getCurrentSettings() *const AkCommSettings {
-    return @ptrCast(*const AkCommSettings, c.WWISEC_AK_Comm_GetCurrentSettings());
+    return @ptrCast(c.WWISEC_AK_Comm_GetCurrentSettings());
 }

@@ -12,19 +12,19 @@ pub const PlaylistItem = extern struct {
     external_srcs: AkExternalSourceArray = null,
 
     pub inline fn fromC(value: c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem) PlaylistItem {
-        return @bitCast(PlaylistItem, value);
+        return @bitCast(value);
     }
 
     pub inline fn toC(self: PlaylistItem) c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem {
-        return @bitCast(c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem, self);
+        return @bitCast(self);
     }
 
     pub fn setExternalSources(self: *PlaylistItem, external_srcs: []const common.AkExternalSourceInfo) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem_SetExternalSources(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem, self),
-                @truncate(u32, external_srcs.len),
-                @ptrCast([*]c.WWISEC_AkExternalSourceInfo, @constCast(external_srcs)),
+                @ptrCast(self),
+                @truncate(external_srcs.len),
+                @ptrCast(@constCast(external_srcs)),
             ),
         );
     }
@@ -44,40 +44,40 @@ pub const Playlist = opaque {
     pub fn enqueue(self: *Playlist, in_audio_node_id: common.AkUniqueID, optional_args: EnqueueOptionalArgs) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+                @ptrCast(self),
                 in_audio_node_id,
                 optional_args.ms_delay,
                 optional_args.custom_info,
-                @truncate(u32, optional_args.external_sources.len),
-                @ptrCast([*]c.WWISEC_AkExternalSourceInfo, @constCast(optional_args.external_sources)),
+                @truncate(optional_args.external_sources.len),
+                @ptrCast(@constCast(optional_args.external_sources)),
             ),
         );
     }
 
     pub fn erase(self: *Playlist, in_index: u32) void {
         c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Erase(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+            @ptrCast(self),
             in_index,
         );
     }
 
     pub fn eraseSwap(self: *Playlist, in_index: u32) void {
         c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_EraseSwap(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+            @ptrCast(self),
             in_index,
         );
     }
 
     pub fn isGrowingAllowed(self: *Playlist) bool {
         return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_IsGrowingAllowed(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+            @ptrCast(self),
         );
     }
 
     pub fn reserve(self: *Playlist, in_reserve: u32) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Reserve(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+                @ptrCast(self),
                 in_reserve,
             ),
         );
@@ -86,7 +86,7 @@ pub const Playlist = opaque {
     pub fn reserveExtra(self: *Playlist, in_reserve: u32) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_ReserveExtra(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+                @ptrCast(self),
                 in_reserve,
             ),
         );
@@ -94,86 +94,58 @@ pub const Playlist = opaque {
 
     pub fn reserved(self: *Playlist) u32 {
         return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Reserved(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+            @ptrCast(self),
         );
     }
 
     pub fn term(self: *Playlist) void {
         c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Term(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+            @ptrCast(self),
         );
     }
 
     pub fn length(self: *Playlist) u32 {
         return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Length(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
+            @ptrCast(self),
         );
     }
 
     pub fn data(self: *Playlist) [*]PlaylistItem {
-        return @ptrCast(
-            [*]PlaylistItem,
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Data(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-            ),
-        );
+        return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Data(@ptrCast(self)));
     }
 
     pub fn isEmpty(self: *Playlist) bool {
-        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_IsEmpty(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-        );
+        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_IsEmpty(@ptrCast(self));
     }
 
     pub fn exists(self: *Playlist, in_item: *const PlaylistItem) ?*PlaylistItem {
-        return @ptrCast(
-            ?*PlaylistItem,
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Exists(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-                @ptrCast(?*const c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem, in_item),
-            ),
-        );
+        return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Exists(
+            @ptrCast(self),
+            @ptrCast(in_item),
+        ));
     }
 
     pub fn addLast(self: *Playlist) ?*PlaylistItem {
-        return @ptrCast(
-            ?*PlaylistItem,
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_AddLast(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-            ),
-        );
+        return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_AddLast(@ptrCast(self)));
     }
 
     pub fn addLastItem(self: *Playlist, in_item: *const PlaylistItem) ?*PlaylistItem {
-        return @ptrCast(
-            ?*PlaylistItem,
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_AddLastItem(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-                @ptrCast(?*const c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem, in_item),
-            ),
-        );
+        return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_AddLastItem(@ptrCast(self), @ptrCast(in_item)));
     }
 
     pub fn last(self: *Playlist) *PlaylistItem {
-        return @ptrCast(
-            *PlaylistItem,
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Last(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-            ),
-        );
+        return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Last(@ptrCast(self)));
     }
 
     pub fn removeLast(self: *Playlist) void {
-        c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveLast(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-        );
+        c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveLast(@ptrCast(self));
     }
 
     pub fn remove(self: *Playlist, in_item: *const PlaylistItem) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Remove(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-                @ptrCast(?*const c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem, in_item),
+                @ptrCast(self),
+                @ptrCast(in_item),
             ),
         );
     }
@@ -181,71 +153,43 @@ pub const Playlist = opaque {
     pub fn removeSwap(self: *Playlist, in_item: *const PlaylistItem) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveSwap(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-                @ptrCast(?*const c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem, in_item),
+                @ptrCast(self),
+                @ptrCast(in_item),
             ),
         );
     }
 
     pub fn removeAll(self: *Playlist) void {
-        c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveAll(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-        );
+        c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveAll(@ptrCast(self));
     }
 
     pub fn at(self: *Playlist, in_index: u32) *PlaylistItem {
-        return @ptrCast(
-            *PlaylistItem,
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_At(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-                in_index,
-            ),
-        );
+        return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_At(@ptrCast(self), in_index));
     }
 
     pub fn insert(self: *Playlist, in_index: u32) ?*PlaylistItem {
-        return @ptrCast(
-            ?*PlaylistItem,
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Insert(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-                in_index,
-            ),
-        );
+        return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Insert(@ptrCast(self), in_index));
     }
 
     pub fn growArray(self: *Playlist) bool {
-        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_GrowArray(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-        );
+        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_GrowArray(@ptrCast(self));
     }
 
     pub fn growArraySize(self: *Playlist, in_grow_by: u32) bool {
-        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_GrowArraySize(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-            in_grow_by,
-        );
+        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_GrowArraySize(@ptrCast(self), in_grow_by);
     }
 
     pub fn resize(self: *Playlist, in_size: u32) bool {
-        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Resize(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-            in_size,
-        );
+        return c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Resize(@ptrCast(self), in_size);
     }
 
     pub fn transfer(self: *Playlist, source: *Playlist) void {
-        c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Transfer(
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-            @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, source),
-        );
+        c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Transfer(@ptrCast(self), @ptrCast(source));
     }
 
     pub fn copy(self: *Playlist, source: *const Playlist) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Copy(
-                @ptrCast(?*c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, self),
-                @ptrCast(?*const c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist, source),
-            ),
+            c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Copy(@ptrCast(self), @ptrCast(source)),
         );
     }
 };
@@ -265,10 +209,10 @@ pub const OpenOptionalArgs = struct {
 pub fn open(in_game_object_id: common.AkGameObjectID, optional_args: OpenOptionalArgs) common.AkPlayingID {
     return c.WWISEC_AK_SoundEngine_DynamicSequence_Open(
         in_game_object_id,
-        @intCast(u32, optional_args.flags.toC()),
-        @ptrCast(c.WWISEC_AkCallbackFunc, optional_args.callback),
+        @intCast(optional_args.flags.toC()),
+        @ptrCast(optional_args.callback),
         optional_args.cookie,
-        @enumToInt(optional_args.dynamic_sequence_type),
+        @intFromEnum(optional_args.dynamic_sequence_type),
     );
 }
 
@@ -288,7 +232,7 @@ pub fn play(in_playing_id: common.AkPlayingID, optional_args: PlayOptionalArgs) 
         c.WWISEC_AK_SoundEngine_DynamicSequence_Play(
             in_playing_id,
             optional_args.transition_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
         ),
     );
 }
@@ -303,7 +247,7 @@ pub fn pause(in_playing_id: common.AkPlayingID, optional_args: PauseOptionalArgs
         c.WWISEC_AK_SoundEngine_DynamicSequence_Pause(
             in_playing_id,
             optional_args.transition_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
         ),
     );
 }
@@ -318,7 +262,7 @@ pub fn @"resume"(in_playing_id: common.AkPlayingID, optional_args: ResumeOptiona
         c.WWISEC_AK_SoundEngine_DynamicSequence_Resume(
             in_playing_id,
             optional_args.transition_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
         ),
     );
 }
@@ -333,7 +277,7 @@ pub fn stop(in_playing_id: common.AkPlayingID, optional_args: StopOptionalArgs) 
         c.WWISEC_AK_SoundEngine_DynamicSequence_Stop(
             in_playing_id,
             optional_args.transition_duration,
-            @enumToInt(optional_args.fade_curve),
+            @intFromEnum(optional_args.fade_curve),
         ),
     );
 }
@@ -369,10 +313,7 @@ pub fn getPlayingItem(in_playing_id: common.AkPlayingID, out_audio_node_id: *com
 }
 
 pub fn lockPlaylist(in_playing_id: common.AkPlayingID) ?*Playlist {
-    return @ptrCast(
-        ?*Playlist,
-        c.WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(in_playing_id),
-    );
+    return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(in_playing_id));
 }
 
 pub fn unlockPlaylist(in_playing_id: common.AkPlayingID) common.WwiseError!void {

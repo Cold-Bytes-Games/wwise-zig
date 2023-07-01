@@ -515,7 +515,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
     }
 
     pub inline fn numChannels(self: AkSpeakerSetup) u8 {
-        return @truncate(u8, @popCount(@bitCast(u32, self)));
+        return @truncate(@popCount(@as(u32, @bitCast(self))));
     }
 
     pub inline fn fromNumChannels(channels: u8) AkSpeakerSetup {
@@ -567,9 +567,9 @@ pub const AkSpeakerSetup = packed struct(u20) {
 };
 
 comptime {
-    std.debug.assert(@bitCast(u20, AkSpeakerSetup{ .back_center = true }) == 0x100);
-    std.debug.assert(@bitCast(u20, AkSpeakerSetup{ .side_left = true }) == 0x200);
-    std.debug.assert(@bitCast(u20, AkSpeakerSetup{ .side_right = true }) == 0x400);
+    std.debug.assert(@as(u20, @bitCast(AkSpeakerSetup{ .back_center = true })) == 0x100);
+    std.debug.assert(@as(u20, @bitCast(AkSpeakerSetup{ .side_left = true })) == 0x200);
+    std.debug.assert(@as(u20, @bitCast(AkSpeakerSetup{ .side_right = true })) == 0x400);
 }
 
 pub const AK_STANDARD_MAX_NUM_CHANNELS = 8;
@@ -695,10 +695,10 @@ pub const AkChannelConfig = packed struct(u32) {
     }
 
     pub inline fn fromC(channel_config: u32) AkChannelConfig {
-        return @bitCast(AkChannelConfig, channel_config);
+        return @bitCast(channel_config);
     }
 
     pub inline fn toC(self: AkChannelConfig) u32 {
-        return @bitCast(u32, self);
+        return @bitCast(self);
     }
 };
