@@ -210,7 +210,7 @@ pub const AkOutputDeviceMeteringCallbackInfo = extern struct {
     passthrough_metering: ?*common_defs.AkMetering = null,
     passthrough_mix_config: speaker_config.AkChannelConfig = .{},
     num_system_audio_objects: u32 = 0,
-    system_audio_object_meteering: [*]?*common_defs.AkMetering,
+    system_audio_object_metering: [*]?*common_defs.AkMetering,
     metering_flags: common.AkMeteringFlags = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkOutputDeviceMeteringCallbackInfo) AkOutputDeviceMeteringCallbackInfo {
