@@ -186,6 +186,12 @@ pub const AkDeviceDescription = struct {
     device_state_mask: AkAudioDeviceState = .{},
     is_default_device: bool = false,
 
+    pub fn deinit(self: AkDeviceDescription, allocator: std.mem.Allocator) void {
+        if (!std.mem.eql(u8, self.device_name[0..], "")) {
+            allocator.free(self.device_name);
+        }
+    }
+
     pub fn fromC(allocator: std.mem.Allocator, value: c.WWISEC_AkDeviceDescription) !AkDeviceDescription {
         return .{
             .id_device = value.idDevice,
