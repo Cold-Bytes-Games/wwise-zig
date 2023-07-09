@@ -21,51 +21,51 @@ pub const AkSpeakerSetup = packed struct(u20) {
     height_back_right: bool = false,
     padded2: u2 = 0,
 
-    pub const Setup_0_1 = AkSpeakerSetup{
+    pub const @"0.1" = AkSpeakerSetup{
         .low_frequency = true,
     };
 
-    pub const Setup_1_0 = AkSpeakerSetup{
+    pub const @"1.0" = AkSpeakerSetup{
         .front_center = true,
     };
 
-    pub const Setup_1_1 = AkSpeakerSetup{
-        .front_center = true,
-        .low_frequency = true,
-    };
-
-    pub const Setup_2_0 = AkSpeakerSetup{
-        .front_left = true,
-        .front_right = true,
-    };
-
-    pub const Setup_2_1 = AkSpeakerSetup{
-        .front_left = true,
-        .front_right = true,
-        .low_frequency = true,
-    };
-
-    pub const Setup_3_0 = AkSpeakerSetup{
-        .front_left = true,
-        .front_right = true,
-        .front_center = true,
-    };
-
-    pub const Setup_3_1 = AkSpeakerSetup{
-        .front_left = true,
-        .front_right = true,
+    pub const @"1.1" = AkSpeakerSetup{
         .front_center = true,
         .low_frequency = true,
     };
 
-    pub const Setup_4_0 = AkSpeakerSetup{
+    pub const @"2.0" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+    };
+
+    pub const @"2.1" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .low_frequency = true,
+    };
+
+    pub const @"3.0" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .front_center = true,
+    };
+
+    pub const @"3.1" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .front_center = true,
+        .low_frequency = true,
+    };
+
+    pub const @"4.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
         .side_right = true,
     };
 
-    pub const Setup_4_1 = AkSpeakerSetup{
+    pub const @"4.1" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -73,7 +73,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_5_0 = AkSpeakerSetup{
+    pub const @"5.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -81,7 +81,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .front_center = true,
     };
 
-    pub const Setup_5_1 = AkSpeakerSetup{
+    pub const @"5.1" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -90,36 +90,26 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_6_0 = AkSpeakerSetup{
-        .front_left = true,
-        .front_right = true,
-        .side_left = true,
-        .side_right = true,
-        .back_left = true,
-        .back_right = true,
-    };
-
-    pub const Setup_6_1 = AkSpeakerSetup{
+    pub const @"6.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
         .side_right = true,
         .back_left = true,
         .back_right = true,
-        .low_frequency = true,
     };
 
-    pub const Setup_7_0 = AkSpeakerSetup{
+    pub const @"6.1" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
         .side_right = true,
         .back_left = true,
         .back_right = true,
-        .front_center = true,
+        .low_frequency = true,
     };
 
-    pub const Setup_7_1 = AkSpeakerSetup{
+    pub const @"7.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -127,28 +117,38 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .back_left = true,
         .back_right = true,
         .front_center = true,
+    };
+
+    pub const @"7.1" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .side_left = true,
+        .side_right = true,
+        .back_left = true,
+        .back_right = true,
+        .front_center = true,
         .low_frequency = true,
     };
 
-    pub const Setup_Surround = AkSpeakerSetup{
+    pub const Surround = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .back_center = true,
     };
 
-    pub const Setup_Height_2 = AkSpeakerSetup{
+    pub const Height_2 = AkSpeakerSetup{
         .height_front_left = true,
         .height_front_right = true,
     };
 
-    pub const Setup_Height_4 = AkSpeakerSetup{
+    pub const Height_4 = AkSpeakerSetup{
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
         .height_back_right = true,
     };
 
-    pub const Setup_Height_5 = AkSpeakerSetup{
+    pub const Height_5 = AkSpeakerSetup{
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
@@ -156,7 +156,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_center = true,
     };
 
-    pub const Setup_Height_All = AkSpeakerSetup{
+    pub const Height_All = AkSpeakerSetup{
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
@@ -165,7 +165,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_back_center = true,
     };
 
-    pub const Setup_Height_4_Top = AkSpeakerSetup{
+    pub const Height_4_Top = AkSpeakerSetup{
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
@@ -173,7 +173,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_top = true,
     };
 
-    pub const Setup_Height_5_Top = AkSpeakerSetup{
+    pub const Height_5_Top = AkSpeakerSetup{
         .height_front_left = true,
         .height_front_right = true,
         .height_back_left = true,
@@ -182,7 +182,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_top = true,
     };
 
-    pub const Setup_Auro_222 = AkSpeakerSetup{
+    pub const @"Auro 222" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -191,7 +191,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_right = true,
     };
 
-    pub const Setup_Auro_8 = AkSpeakerSetup{
+    pub const @"Auro 8" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -202,7 +202,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_back_right = true,
     };
 
-    pub const Setup_Auro_9 = AkSpeakerSetup{
+    pub const @"Auro 9.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -214,7 +214,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .front_center = true,
     };
 
-    pub const Setup_Auro_9_1 = AkSpeakerSetup{
+    pub const @"Auro 9.1" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -227,7 +227,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Auro_10 = AkSpeakerSetup{
+    pub const @"Auro 10.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -240,7 +240,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_top = true,
     };
 
-    pub const Setup_Auro_10_1 = AkSpeakerSetup{
+    pub const @"Auro 10.1" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -254,7 +254,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Auro_11 = AkSpeakerSetup{
+    pub const @"Auro 11.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -268,7 +268,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_center = true,
     };
 
-    pub const Setup_Auro_11_1 = AkSpeakerSetup{
+    pub const @"Auro 11.1" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -283,7 +283,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Auro_11_740 = AkSpeakerSetup{
+    pub const @"Auro 11.0 (7+4)" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -297,7 +297,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_back_right = true,
     };
 
-    pub const Setup_Auro_11_1_740 = AkSpeakerSetup{
+    pub const @"Auro 11.1 (7+4)" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -312,23 +312,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Auro_13_751 = AkSpeakerSetup{
-        .front_left = true,
-        .front_right = true,
-        .side_left = true,
-        .side_right = true,
-        .back_left = true,
-        .back_right = true,
-        .front_center = true,
-        .height_front_left = true,
-        .height_front_right = true,
-        .height_back_left = true,
-        .height_back_right = true,
-        .height_front_center = true,
-        .height_top = true,
-    };
-
-    pub const Setup_Auro_13_1_751 = AkSpeakerSetup{
+    pub const @"Auro 13.0" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -342,10 +326,26 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_back_right = true,
         .height_front_center = true,
         .height_top = true,
+    };
+
+    pub const @"Auro 13.1" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .side_left = true,
+        .side_right = true,
+        .back_left = true,
+        .back_right = true,
+        .front_center = true,
+        .height_front_left = true,
+        .height_front_right = true,
+        .height_back_left = true,
+        .height_back_right = true,
+        .height_front_center = true,
+        .height_top = true,
         .low_frequency = true,
     };
 
-    pub const Setup_Dolby_5_0_2 = AkSpeakerSetup{
+    pub const @"Dolby 5.0.2" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -355,7 +355,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_right = true,
     };
 
-    pub const Setup_Dolby_5_1_2 = AkSpeakerSetup{
+    pub const @"Dolby 5.1.2" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -366,7 +366,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Dolby_6_0_2 = AkSpeakerSetup{
+    pub const @"Dolby 6.0.2" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -377,7 +377,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_right = true,
     };
 
-    pub const Setup_Dolby_6_1_2 = AkSpeakerSetup{
+    pub const @"Dolby 6.1.2" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -389,7 +389,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Dolby_6_0_4 = AkSpeakerSetup{
+    pub const @"Dolby 6.0.4" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -402,7 +402,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_back_right = true,
     };
 
-    pub const Setup_Dolby_6_1_4 = AkSpeakerSetup{
+    pub const @"Dolby 6.1.4" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -416,7 +416,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Dolby_7_0_2 = AkSpeakerSetup{
+    pub const @"Dolby 7.0.2" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -428,7 +428,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_right = true,
     };
 
-    pub const Setup_Dolby_7_1_2 = AkSpeakerSetup{
+    pub const @"Dolby 7.1.2" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -441,7 +441,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_Dolby_7_0_4 = AkSpeakerSetup{
+    pub const @"Dolby 7.0.4" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -455,7 +455,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_back_right = true,
     };
 
-    pub const Setup_Dolby_7_1_4 = AkSpeakerSetup{
+    pub const @"Dolby 7.1.4" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .side_left = true,
@@ -470,7 +470,7 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .low_frequency = true,
     };
 
-    pub const Setup_All_Speakers = AkSpeakerSetup{
+    pub const All_Speakers = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
         .front_center = true,
@@ -489,9 +489,9 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_back_right = true,
     };
 
-    pub const Setup_Mono = Setup_1_0;
-    pub const Setup_Stereo = Setup_2_0;
-    pub const Setup_Front = Setup_3_0;
+    pub const Mono = @"1.0";
+    pub const Stereo = @"2.0";
+    pub const Front = @"3.0";
 
     pub inline fn fixLeftToCenter(self: *AkSpeakerSetup) void {
         if (!self.front_center and !self.front_right and self.front_left) {
@@ -515,19 +515,19 @@ pub const AkSpeakerSetup = packed struct(u20) {
     }
 
     pub inline fn numChannels(self: AkSpeakerSetup) u8 {
-        return @truncate(@popCount(@as(u32, @bitCast(self))));
+        return @popCount(@as(u20, @bitCast(self)));
     }
 
     pub inline fn fromNumChannels(channels: u8) AkSpeakerSetup {
         return switch (channels) {
-            1 => Setup_1_0,
-            2 => Setup_2_0,
-            3 => Setup_2_1,
-            4 => Setup_4_0,
-            5 => Setup_5_0,
-            6 => Setup_5_1,
-            7 => Setup_7_0,
-            8 => Setup_7_1,
+            1 => @"1.0",
+            2 => @"2.0",
+            3 => @"2.1",
+            4 => @"4.0",
+            5 => @"5.0",
+            6 => @"5.1",
+            7 => @"7.0",
+            8 => @"7.1",
             else => .{},
         };
     }
