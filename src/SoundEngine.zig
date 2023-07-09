@@ -1629,11 +1629,18 @@ pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []c
     );
 }
 
-pub fn setGameObjectAuxSendValues(in_game_object_id: common.AkGameObjectID, in_aux_send_values: []const common.AkAuxSendValue) common.WwiseError!void {
+pub fn setGameObjectAuxSendValues(allocator: std.mem.Allocator, in_game_object_id: common.AkGameObjectID, in_aux_send_values: []const common.AkAuxSendValue) common.WwiseError!void {
+    const raw_aux_send_values = allocator.alloc(c.WWISEC_AkAuxSendValue, in_aux_send_values.len) catch return common.WwiseError.Fail;
+    defer allocator.free(raw_aux_send_values);
+
+    for (0..in_aux_send_values.len) |index| {
+        raw_aux_send_values[index] = in_aux_send_values[index].toC();
+    }
+
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(
             in_game_object_id,
-            @ptrCast(@constCast(in_aux_send_values)),
+            @ptrCast(raw_aux_send_values),
             @truncate(in_aux_send_values.len),
         ),
     );
