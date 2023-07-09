@@ -2,6 +2,8 @@ const std = @import("std");
 
 const StaticPluginStep = @import("src/StaticPluginStep.zig");
 
+const WwisePlatform = @import("src/wwise_platform.zig").WwisePlatform;
+
 pub const WwiseConfiguration = enum {
     debug,
     profile,
@@ -21,6 +23,7 @@ pub const WwiseConfigOptions = struct {
 };
 
 pub const WwiseBuildOptions = struct {
+    platform: WwisePlatform,
     wwise_sdk_path: []const u8,
     configuration: WwiseConfiguration,
     use_static_crt: bool,
@@ -100,6 +103,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     const wwise_configuration = wwise_configuration_option orelse config_options.configuration;
 
     const wwise_build_options = WwiseBuildOptions{
+        .platform = try getWwisePlatform(target),
         .wwise_sdk_path = getWwiseSDKPath(b, override_wwise_sdk_path_option),
         .configuration = wwise_configuration,
         .use_static_crt = wwise_use_static_crt_option orelse config_options.use_static_crt,
@@ -165,6 +169,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     option_step.addOption(bool, "include_default_io_hook_deferred", wwise_build_options.include_default_io_hook_deferred);
     option_step.addOption(bool, "include_file_package_io_blocking", wwise_build_options.include_file_package_io_blocking);
     option_step.addOption(bool, "include_file_package_io_deferred", wwise_build_options.include_file_package_io_deferred);
+    option_step.addOption(WwisePlatform, "platform", wwise_build_options.platform);
 
     const wwise_compile_options = option_step.createModule();
 
@@ -221,6 +226,17 @@ fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []co
     return "";
 }
 
+fn getWwisePlatform(target: std.zig.CrossTarget) !WwisePlatform {
+    return switch (target.getOsTag()) {
+        .windows => .windows,
+        .linux => if (target.getAbi() == .android) .android else .linux,
+        .macos => .macos,
+        .ios => .ios,
+        .tvos => .tvos,
+        else => error.OsNotSupported,
+    };
+}
+
 fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_options: WwiseBuildOptions) ![]const u8 {
     const config_string = switch (wwise_build_options.configuration) {
         .debug => "Debug",
@@ -228,7 +244,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
         .release => "Release",
     };
 
-    switch (target.getOsTag()) {
+    switch (wwise_build_options.platform) {
         .windows => {
             const arch_string = switch (target.getCpuArch()) {
                 .x86 => "Win32",
@@ -240,26 +256,25 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
 
             return b.fmt("{s}_vc170/{s}{s}/lib", .{ arch_string, config_string, static_crt_string });
         },
+        .android => {
+            const arch_string = switch (target.getCpuArch()) {
+                .aarch64 => "arm64-v8a",
+                .arm => "armeabi-v7a",
+                .x86 => "x86",
+                .x86_64 => "x86_64",
+                else => return error.ArchNotSupported,
+            };
+
+            return b.fmt("Android_{s}/{s}/lib", .{ arch_string, config_string });
+        },
         .linux => {
-            if (target.getAbi() == .android) {
-                const arch_string = switch (target.getCpuArch()) {
-                    .aarch64 => "arm64-v8a",
-                    .arm => "armeabi-v7a",
-                    .x86 => "x86",
-                    .x86_64 => "x86_64",
-                    else => return error.ArchNotSupported,
-                };
+            const arch_string = switch (target.getCpuArch()) {
+                .x86_64 => "x64",
+                .aarch64 => "aarch64",
+                else => return error.ArchNotSupported,
+            };
 
-                return b.fmt("Android_{s}/{s}/lib", .{ arch_string, config_string });
-            } else {
-                const arch_string = switch (target.getCpuArch()) {
-                    .x86_64 => "x64",
-                    .aarch64 => "aarch64",
-                    else => return error.ArchNotSupported,
-                };
-
-                return b.fmt("Linux_{s}/{s}/lib", .{ arch_string, config_string });
-            }
+            return b.fmt("Linux_{s}/{s}/lib", .{ arch_string, config_string });
         },
         .macos => {
             return b.fmt("Mac/{s}/lib", .{config_string});
@@ -293,25 +308,11 @@ fn handleDefaultIOHooks(compile_step: *std.Build.CompileStep, wwise_build_option
         return;
     }
 
-    const platform_name = blk: {
-        switch (compile_step.target.getOsTag()) {
-            .windows => break :blk "Win32",
-            .linux,
-            .macos,
-            .ios,
-            .tvos,
-            => {
-                if (compile_step.target.getAbi() == .android) {
-                    break :blk "Android";
-                }
-                break :blk "POSIX";
-            },
-            else => {
-                return error.OsNotSupported;
-            },
-        }
-
-        break :blk "";
+    const platform_name = switch (wwise_build_options.platform) {
+        .windows => "Win32",
+        .android => "Android",
+        .linux, .macos, .ios, .tvos => "POSIX",
+        else => return error.OsNotSupported,
     };
 
     compile_step.addIncludePath(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path}));

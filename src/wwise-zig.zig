@@ -17,6 +17,7 @@ pub usingnamespace @import("IBytes.zig");
 pub usingnamespace @import("midi_types.zig");
 pub usingnamespace @import("settings.zig");
 pub usingnamespace @import("speaker_config.zig");
+pub usingnamespace @import("wwise_platform.zig");
 
 comptime {
     @setEvalBranchQuota(5000);

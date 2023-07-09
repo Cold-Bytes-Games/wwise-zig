@@ -3,6 +3,7 @@ const builtin = @import("builtin");
 const c = @import("c.zig");
 const common = @import("common.zig");
 const speaker_config = @import("speaker_config.zig");
+const wwise_options = @import("wwise_options");
 
 pub const AkJobWorkerFunc = ?*const fn (in_job_type: common.AkJobType, in_execution_time_usec: u32) callconv(.C) void;
 
@@ -217,28 +218,13 @@ pub const POSIX_AkThreadProperties = extern struct {
     }
 };
 
-pub const AkPlatformInitSettings = blk: {
-    switch (builtin.os.tag) {
-        .windows => {
-            break :blk WIN_AkPlatformInitSettings;
-        },
-        .linux => {
-            if (builtin.target.isAndroid()) {
-                break :blk ANDROID_AkPlatformInitSettings;
-            }
-
-            break :blk LINUX_AkPlatformInitSettings;
-        },
-        .macos => {
-            break :blk MACOSX_AkPlatformInitSettings;
-        },
-        .ios => {
-            break :blk IOS_AkPlatformInitSettings;
-        },
-        else => {
-            @compileError("Implement AkPlatformInitSettings for the platform");
-        },
-    }
+pub const AkPlatformInitSettings = switch (wwise_options.platform) {
+    .windows => WIN_AkPlatformInitSettings,
+    .android => ANDROID_AkPlatformInitSettings,
+    .linux => LINUX_AkPlatformInitSettings,
+    .macos => MACOSX_AkPlatformInitSettings,
+    .ios => IOS_AkPlatformInitSettings,
+    else => @compileError("Implement AkPlatformInitSettings for the platform"),
 };
 
 pub const WIN_AkPlatformInitSettings = extern struct {
