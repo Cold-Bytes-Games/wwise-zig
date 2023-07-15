@@ -308,6 +308,14 @@ extern "C"
                                           ///< A value greater than 1.0f will amplify the sound.
     } WWISEC_AkAuxSendValue;
 
+    typedef enum WWISEC_AkConnectionType
+    {
+        WWISEC_ConnectionType_Direct = 0x0,          ///< Direct (main, dry) connection.
+        WWISEC_ConnectionType_GameDefSend = 0x1,     ///< Connection by a game-defined send.
+        WWISEC_ConnectionType_UserDefSend = 0x2,     ///< Connection by a user-defined send.
+        WWISEC_ConnectionType_ReflectionsSend = 0x3, ///< Connection by a early reflections send.
+    } WWISEC_AkConnectionType;
+
     typedef struct WWISEC_AkVector64
     {
         AkReal64 X; ///< X Position
@@ -351,6 +359,27 @@ extern "C"
         WWISEC_AkChannelMask uInputChannels; ///< Channels to which the above position applies.
         char padding[4];                     ///< In order to preserve consistent struct size across archs, we need some padding
     } WWISEC_AkChannelEmitter;
+
+    typedef struct WWISEC_AkEmitterListenerPair
+    {
+        WWISEC_AkWorldTransform emitter;          ///< Emitter position.
+        AkReal32 fDistance;                       ///< Distance between emitter and listener.
+        AkReal32 fEmitterAngle;                   ///< Angle between position vector and emitter orientation.
+        AkReal32 fListenerAngle;                  ///< Angle between position vector and listener orientation.
+        AkReal32 fDryMixGain;                     ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for direct connections.
+        AkReal32 fGameDefAuxMixGain;              ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for game-defined send connections.
+        AkReal32 fUserDefAuxMixGain;              ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for user-defined send connections.
+        AkReal32 fOcclusion;                      ///< Emitter-listener-pair-specific occlusion factor
+        AkReal32 fObstruction;                    ///< Emitter-listener-pair-specific obstruction factor
+        AkReal32 fDiffraction;                    ///< Emitter-listener-pair-specific diffraction coefficient
+        AkReal32 fTransmissionLoss;               ///< Emitter-listener-pair-specific transmission occlusion.
+        AkReal32 fSpread;                         ///< Emitter-listener-pair-specific spread
+        AkReal32 fAperture;                       ///< Emitter-listener-pair-specific aperture
+        AkReal32 fScalingFactor;                  ///< Combined scaling factor due to both emitter and listener.
+        WWISEC_AkChannelMask uEmitterChannelMask; ///< Channels of the emitter that apply to this ray.
+        WWISEC_AkRayID id;                        ///< ID of this emitter-listener pair, unique for a given emitter.
+        WWISEC_AkGameObjectID m_uListenerID;      ///< Listener game object ID.
+    } WWISEC_AkEmitterListenerPair;
 
     // ---------------------------------------------------------------
 // Languages
@@ -435,6 +464,30 @@ extern "C"
 #define WWISEC_AK_WAVE_FORMAT_OPUS 0x3040
 #define WWISEC_AK_WAVE_FORMAT_OPUS_WEM 0x3041
 #define WWISEC_WAVE_FORMAT_XMA2 0x166
+
+    typedef struct WWISEC_IAkSoftwareCodec WWISEC_IAkSoftwareCodec;
+    typedef struct WWISEC_IAkFileCodec WWISEC_IAkFileCodec;
+    typedef struct WWISEC_IAkGrainCodec WWISEC_IAkGrainCodec;
+    /// Registered file source creation function prototype.
+    AK_CALLBACK(WWISEC_IAkSoftwareCodec*, WWISEC_AkCreateFileSourceCallback)
+    (void* in_pCtx);
+    /// Registered bank source node creation function prototype.
+    AK_CALLBACK(WWISEC_IAkSoftwareCodec*, WWISEC_AkCreateBankSourceCallback)
+    (void* in_pCtx);
+    /// Registered FileCodec creation function prototype.
+    AK_CALLBACK(WWISEC_IAkFileCodec*, WWISEC_AkCreateFileCodecCallback)
+    ();
+    /// Registered IAkGrainCodec creation function prototype.
+    AK_CALLBACK(WWISEC_IAkGrainCodec*, WWISEC_AkCreateGrainCodecCallback)
+    ();
+
+    typedef struct WWISEC_AkCodecDescriptor
+    {
+        WWISEC_AkCreateFileSourceCallback pFileSrcCreateFunc;    // File VPL source.
+        WWISEC_AkCreateBankSourceCallback pBankSrcCreateFunc;    // Bank VPL source.
+        WWISEC_AkCreateFileCodecCallback pFileCodecCreateFunc;   // FileCodec utility.
+        WWISEC_AkCreateGrainCodecCallback pGrainCodecCreateFunc; // GrainCodec utility.
+    } WWISEC_AkCodecDescriptor;
 
     typedef enum WWISEC_AkBankTypeEnum
     {
@@ -723,27 +776,17 @@ extern "C"
     typedef const AkReal32* WWISEC_AK_SpeakerVolumes_ConstMatrixPtr; ///< Constant volume matrix. Access each input channel vector with AK::SpeakerVolumes::Matrix::GetChannel().
     // END AkSpeakerVolumes
 
-    // BEGIN IAkPlugin
-    typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
-    typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
-    typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
-    typedef struct WWISEC_AK_IAkPlugin WWISEC_AK_IAkPlugin;
-    typedef struct WWISEC_AK_IAkPluginParam WWISEC_AK_IAkPluginParam;
-    typedef struct WWISEC_AK_IAkPluginMemAlloc WWISEC_AK_IAkPluginMemAlloc;
+    // BEGIN AkMonitorError
+    typedef enum WWISEC_AK_Monitor_ErrorLevel
+    {
+        WWISEC_AK_Monitor_ErrorLevel_Message = (1 << 0), // used as bitfield
+        WWISEC_AK_Monitor_ErrorLevel_Error = (1 << 1),
 
-    AK_CALLBACK(WWISEC_AK_IAkPlugin*, WWISEC_AkCreatePluginCallback)
-    (WWISEC_AK_IAkPluginMemAlloc* in_pAllocator);
-    AK_CALLBACK(WWISEC_AK_IAkPluginParam*, WWISEC_AkCreateParamCallback)
-    (WWISEC_AK_IAkPluginMemAlloc* in_pAllocator);
-    /// Registered plugin device enumeration function prototype, used for providing lists of devices by plug-ins.
-    AK_CALLBACK(WWISEC_AKRESULT, WWISEC_AkGetDeviceListCallback)
-    (
-        AkUInt32* io_maxNumDevices,                        ///< In: The length of the out_deviceDescriptions array, or zero is out_deviceDescriptions is null. Out: If out_deviceDescriptions is not-null, this should be set to the number of entries in out_deviceDescriptions that was populated (and should be less-than-or-equal to the initial value). If out_deviceDescriptions is null, this should be set to the maximum number of devices that may be returned by this callback.
-        WWISEC_AkDeviceDescription* out_deviceDescriptions ///< The output array of device descriptions. If this is not-null, there will be a number of entries equal to the input value of io_maxNumDevices.
-    );
-    // END IAkPlugin
+        WWISEC_AK_Monitor_ErrorLevel_All = WWISEC_AK_Monitor_ErrorLevel_Message | WWISEC_AK_Monitor_ErrorLevel_Error
+    } WWISEC_AK_Monitor_ErrorLevel;
+    // END AkMonitorError
 
-    // BEGIN IByt
+    // BEGIN IBytes
     typedef struct WWISE_AK_IReadBytes WWISEC_AK_IReadBytes;
     typedef struct WWISE_AK_IWriteBytes WWISEC_AK_IWriteBytes;
     // END IBytes
@@ -807,6 +850,14 @@ extern "C"
     void WWISEC_AkAudioBuffer_RelocateMedia(WWISEC_AkAudioBuffer* instance, AkUInt8* in_pNewMedia, AkUInt8* in_pOldMedia);
     AkUInt16 WWISEC_AkAudioBuffer_MaxFrames(const WWISEC_AkAudioBuffer* instance);
     // END AkCommonDefs
+
+    typedef struct WWISEC_AK_IAkStreamMgr WWISEC_AK_IAkStreamMgr;
+    typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
+    typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
+    typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
+    typedef struct WWISEC_AK_IAkPlugin WWISEC_AK_IAkPlugin;
+    typedef struct WWISEC_AK_IAkPluginParam WWISEC_AK_IAkPluginParam;
+    typedef struct WWISEC_AK_IAkPluginMemAlloc WWISEC_AK_IAkPluginMemAlloc;
 
     // BEGIN AkCallback
     typedef enum WWISEC_AkCallbackType
@@ -1033,6 +1084,92 @@ extern "C"
         void* in_pCookie                        ///< Callback cookie that will be sent to the callback function along with additional information
     );
     // END AkCallback
+
+    // BEGIN AkVirtualAcoustics
+    typedef struct WWISEC_AkAcousticTexture
+    {
+        AkUInt32 ID;
+
+        AkReal32 fAbsorptionOffset;
+        AkReal32 fAbsorptionLow;
+        AkReal32 fAbsorptionMidLow;
+        AkReal32 fAbsorptionMidHigh;
+        AkReal32 fAbsorptionHigh;
+        AkReal32 fScattering;
+    } WWISEC_AkAcousticTexture;
+    // END AkVirtualAcoustics
+
+    // BEGIN IAkPlugin
+    AK_CALLBACK(WWISEC_AK_IAkPlugin*, WWISEC_AkCreatePluginCallback)
+    (WWISEC_AK_IAkPluginMemAlloc* in_pAllocator);
+    AK_CALLBACK(WWISEC_AK_IAkPluginParam*, WWISEC_AkCreateParamCallback)
+    (WWISEC_AK_IAkPluginMemAlloc* in_pAllocator);
+    /// Registered plugin device enumeration function prototype, used for providing lists of devices by plug-ins.
+    AK_CALLBACK(WWISEC_AKRESULT, WWISEC_AkGetDeviceListCallback)
+    (
+        AkUInt32* io_maxNumDevices,                        ///< In: The length of the out_deviceDescriptions array, or zero is out_deviceDescriptions is null. Out: If out_deviceDescriptions is not-null, this should be set to the number of entries in out_deviceDescriptions that was populated (and should be less-than-or-equal to the initial value). If out_deviceDescriptions is null, this should be set to the maximum number of devices that may be returned by this callback.
+        WWISEC_AkDeviceDescription* out_deviceDescriptions ///< The output array of device descriptions. If this is not-null, there will be a number of entries equal to the input value of io_maxNumDevices.
+    );
+
+    WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkGlobalPluginContext_GetStreamMgr(const WWISEC_AK_IAkGlobalPluginContext* self);
+    AkUInt16 WWISEC_AK_IAkGlobalPluginContext_GetMaxBufferLength(const WWISEC_AK_IAkGlobalPluginContext* self);
+    bool WWISEC_AK_IAkGlobalPluginContext_IsRenderingOffline(const WWISEC_AK_IAkGlobalPluginContext* self);
+    AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetSampleRate(const WWISEC_AK_IAkGlobalPluginContext* self);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_PostMonitorMessage(WWISEC_AK_IAkGlobalPluginContext* self, const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_RegisterPlugin(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkCreatePluginCallback in_pCreateFunc, WWISEC_AkCreateParamCallback in_pCreateParamFunc);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_RegisterCodec(WWISEC_AK_IAkGlobalPluginContext* self, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkCreateFileSourceCallback in_pFileCreateFunc, WWISEC_AkCreateBankSourceCallback in_pBankCreateFunc);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_RegisterGlobalCallback(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_UnregisterGlobalCallback(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation);
+    WWISEC_AK_IAkPluginMemAlloc* WWISEC_AK_IAkGlobalPluginContext_GetAllocator(WWISEC_AK_IAkGlobalPluginContext* self);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_busID, WWISEC_AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
+    void WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(WWISEC_AK_IAkGlobalPluginContext* self, AkReal32 in_fAzimuth, AkReal32 in_fElevation, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_VectorPtr out_vVolumes);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_MatrixPtr out_mxVolume);
+    const WWISEC_AkAcousticTexture* WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkAcousticTextureID in_AcousticTextureID);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(const WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkEmitterListenerPair* in_pair, AkReal32* out_fAzimuth, AkReal32* out_fElevation);
+    // const AkPlatformInitSettings* WWISEC_AK_IAkGlobalPluginContext_GetPlatformInitSettings(const WWISEC_AK_IAkGlobalPluginContext* self);
+    // const AkInitSettings* WWISEC_AK_IAkGlobalPluginContext_GetInitSettings(const WWISEC_AK_IAkGlobalPluginContext* self);
+    // AKRESULT WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(
+    //     const WWISEC_AK_IAkGlobalPluginContext* self,
+    //     AkAudioSettings& out_audioSettings ///< Returned audio settings
+    // );
+    // AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(const WWISEC_AK_IAkGlobalPluginContext* self, const char* in_pszString);
+    // AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(
+    //     WWISEC_AK_IAkGlobalPluginContext* self,
+    //     AkUniqueID in_eventID,                            ///< Unique ID of the event
+    //     AkGameObjectID in_gameObjectID,                   ///< Associated game object ID
+    //     AkUInt32 in_uFlags = 0,                           ///< Bitmask: see \ref AkCallbackType
+    //     AkCallbackFunc in_pfnCallback = NULL,             ///< Callback function
+    //     void* in_pCookie = NULL,                          ///< Callback cookie that will be sent to the callback function along with additional information
+    //     AkUInt32 in_cExternals = 0,                       ///< Optional count of external source structures
+    //     AkExternalSourceInfo* in_pExternalSources = NULL, ///< Optional array of external source resolution information
+    //     AkPlayingID in_PlayingID = AK_INVALID_PLAYING_ID  ///< Optional (advanced users only) Specify the playing ID to target with the event. Will Cause active actions in this event to target an existing Playing ID. Let it be AK_INVALID_PLAYING_ID or do not specify any for normal playback.
+    // );
+    // AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(
+    //     WWISEC_AK_IAkGlobalPluginContext* self,
+    //     AkUniqueID in_eventID,                           ///< Unique ID of the Event
+    //     AkGameObjectID in_gameObjectID,                  ///< Associated game object ID
+    //     AkMIDIPost* in_pPosts,                           ///< MIDI Events to post
+    //     AkUInt16 in_uNumPosts,                           ///< Number of MIDI Events to post
+    //     bool in_bAbsoluteOffsets = false,                ///< Whether AkMIDIPost::uOffset values are relative to current frame or absolute
+    //     AkUInt32 in_uFlags = 0,                          ///< Bitmask: see \ref AkCallbackType
+    //     AkCallbackFunc in_pfnCallback = NULL,            ///< Callback function
+    //     void* in_pCookie = NULL,                         ///< Callback cookie that will be sent to the callback function along with additional information
+    //     AkPlayingID in_playingID = AK_INVALID_PLAYING_ID ///< Target playing ID
+    // );
+    // AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(
+    //     WWISEC_AK_IAkGlobalPluginContext* self,
+    //     AkUniqueID in_eventID = AK_INVALID_UNIQUE_ID,            ///< Unique ID of the Event
+    //     AkGameObjectID in_gameObjectID = AK_INVALID_GAME_OBJECT, ///< Associated game object ID
+    //     AkPlayingID in_playingID = AK_INVALID_PLAYING_ID         ///< Target playing ID
+    // );
+    // IAkPlatformContext* WWISEC_AK_IAkGlobalPluginContext_GetPlatformContext(const WWISEC_AK_IAkGlobalPluginContext* self);
+    // IAkPluginService* WWISEC_AK_IAkGlobalPluginContext_GetPluginService(
+    //     const WWISEC_AK_IAkGlobalPluginContext* self,
+    //     AkPluginServiceType in_pluginService ///< Enum value for the specific plug-in service to fetch
+    // );
+    // AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetBufferTick(const WWISEC_AK_IAkGlobalPluginContext* self);
+    // END IAkPlugin
 
     // BEGIN AkMemoryMgr
     /// Memory category IDs.
@@ -2196,7 +2333,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
 #pragma pack(pop)
 
-    void* WWISEC_AK_IAkStreamMgr_Get();
+    WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get();
     // END IAkStreamMgr
 
     // BEGIN AkStreamMgrModule

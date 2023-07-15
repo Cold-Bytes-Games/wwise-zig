@@ -142,6 +142,30 @@ pub const WAVE_FORMAT_XMA2 = c.WWISEC_WAVE_FORMAT_XMA2;
 
 pub const AK_BANK_PLATFORM_DATA_ALIGNMENT = c.AK_BANK_PLATFORM_DATA_ALIGNMENT;
 
+pub const IAkSoftwareCodec = opaque {};
+pub const IAkFileCodec = opaque {};
+pub const IAkGrainCodec = opaque {};
+
+pub const AkCreateFileSourceCallback = ?*const fn (in_ctx: ?*anyopaque) callconv(.C) ?*IAkSoftwareCodec;
+pub const AkCreateBankSourceCallback = ?*const fn (in_ctx: ?*anyopaque) callconv(.C) ?*IAkSoftwareCodec;
+pub const AkCreateFileCodecCallback = ?*const fn () callconv(.C) ?*IAkFileCodec;
+pub const AkCreateGrainCodecCallback = ?*const fn () callconv(.C) ?*IAkGrainCodec;
+
+pub const AkCodecDescriptor = extern struct {
+    file_src_create_func: AkCreateFileSourceCallback,
+    bank_src_create_func: AkCreateBankSourceCallback,
+    file_codec_create_func: AkCreateFileCodecCallback,
+    grain_codec_create_func: AkCreateGrainCodecCallback,
+
+    pub fn fromC(value: c.WWISEC_AkCodecDescriptor) AkCodecDescriptor {
+        return @bitCast(value);
+    }
+
+    pub fn toC(self: AkCodecDescriptor) c.WWISEC_AkCodecDescriptor {
+        return @bitCast(self);
+    }
+};
+
 pub const AkBankType = enum(u32) {
     user = c.WWISEC_AkBankType_User,
     event = c.WWISEC_AkBankType_Event,
@@ -247,6 +271,13 @@ pub const AkExternalSourceInfo = struct {
             .idFile = self.id_file,
         };
     }
+};
+
+pub const AkConnectionType = enum(DefaultEnumType) {
+    direct = c.WWISEC_ConnectionType_Direct,
+    game_def_send = c.WWISEC_ConnectionType_GameDefSend,
+    user_def_send = c.WWISEC_ConnectionType_UserDefSend,
+    reflections_send = c.WWISEC_ConnectionType_ReflectionsSend,
 };
 
 pub const AkVector64 = extern struct {
@@ -388,6 +419,43 @@ pub const AkChannelEmitter = extern struct {
 
     comptime {
         std.debug.assert(@sizeOf(AkChannelEmitter) == @sizeOf(c.WWISEC_AkChannelEmitter));
+    }
+};
+
+pub const AkEmitterListenerPair = extern struct {
+    emitter: AkWorldTransform = .{},
+    distance: f32 = 0.0,
+    emitter_angle: f32 = 0.0,
+    listener_angle: f32 = 0.0,
+    dry_mix_gain: f32 = 1.0,
+    game_def_aux_mix_gain: f32 = 1.0,
+    user_def_aux_mix_gain: f32 = 1.0,
+    occlusion: f32 = 0.0,
+    obstruction: f32 = 0.0,
+    diffraction: f32 = 0.0,
+    transmission_loss: f32 = 0.0,
+    spread: f32 = 0.0,
+    aperture: f32 = 100.0,
+    scaling_factor: f32 = 1.0,
+    emitter_channel_mask: AkChannelMask = 0xFFFFFFFF,
+    id: AkRayID = 0,
+    listener_id: AkGameObjectID = 0,
+
+    pub fn getGainForConnectionType(self: AkEmitterListenerPair, in_type: AkConnectionType) f32 {
+        return switch (in_type) {
+            .direct => self.dry_mix_gain,
+            .game_def_send => self.game_def_aux_mix_gain,
+            .user_def_send => self.user_def_aux_mix_gain,
+            else => 1.0,
+        };
+    }
+
+    pub fn fromC(value: c.WWISEC_AkEmitterListenerPair) AkEmitterListenerPair {
+        return @bitCast(value);
+    }
+
+    pub fn toC(self: AkEmitterListenerPair) c.WWISEC_AkEmitterListenerPair {
+        return @bitCast(self);
     }
 };
 

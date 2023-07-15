@@ -34,6 +34,8 @@ SOFTWARE.
 #include <AK/SoundEngine/Common/AkStreamMgrModule.h>
 #include <AK/SoundEngine/Common/AkTypes.h>
 #include <AK/SoundEngine/Common/IAkStreamMgr.h>
+#include <Ak/SoundEngine/Common/AkVirtualAcoustics.h>
+#include <Ak/SoundEngine/Common/IAkPlugin.h>
 
 #include <new>
 
@@ -45,6 +47,10 @@ extern "C" void WWISEC_HACK_RegisterAllPlugins();
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_UnknownFileError);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_NUM_JOB_TYPES);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AkDeviceState_All);
+WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_Direct);
+WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_GameDefSend);
+WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_UserDefSend);
+WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_ReflectionsSend);
 static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 static_assert(sizeof(WWISEC_AkExternalSourceInfo) == sizeof(AkExternalSourceInfo));
@@ -55,6 +61,8 @@ static_assert(sizeof(WWISEC_AkVector) == sizeof(AkVector));
 static_assert(sizeof(WWISEC_AkWorldTransform) == sizeof(AkWorldTransform));
 static_assert(sizeof(WWISEC_AkTransform) == sizeof(AkTransform));
 static_assert(sizeof(WWISEC_AkChannelEmitter) == sizeof(AkChannelEmitter));
+static_assert(sizeof(WWISEC_AkEmitterListenerPair) == sizeof(AkEmitterListenerPair));
+static_assert(sizeof(WWISEC_AkCodecDescriptor) == sizeof(AkCodecDescriptor));
 // END AkTypes
 
 // BEGIN AkMidiTypes
@@ -213,6 +221,103 @@ static_assert(sizeof(WWISEC_AkSegmentInfo) == sizeof(AkSegmentInfo));
 static_assert(sizeof(WWISEC_AkMusicSyncCallbackInfo) == sizeof(AkMusicSyncCallbackInfo));
 static_assert(sizeof(WWISEC_AkResourceMonitorDataSummary) == sizeof(AkResourceMonitorDataSummary));
 // END AkCallback
+
+// BEGIN IAkPlugin
+WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkGlobalPluginContext_GetStreamMgr(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetStreamMgr());
+}
+
+AkUInt16 WWISEC_AK_IAkGlobalPluginContext_GetMaxBufferLength(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetMaxBufferLength();
+}
+
+bool WWISEC_AK_IAkGlobalPluginContext_IsRenderingOffline(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->IsRenderingOffline();
+}
+
+AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetSampleRate(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetSampleRate();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_PostMonitorMessage(WWISEC_AK_IAkGlobalPluginContext* self, const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostMonitorMessage(in_pszError, static_cast<AK::Monitor::ErrorLevel>(in_eErrorLevel)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_RegisterPlugin(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkCreatePluginCallback in_pCreateFunc, WWISEC_AkCreateParamCallback in_pCreateParamFunc)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->RegisterPlugin(
+        static_cast<AkPluginType>(in_eType),
+        in_ulCompanyID,
+        in_ulPluginID,
+        reinterpret_cast<AkCreatePluginCallback>(in_pCreateFunc),
+        reinterpret_cast<AkCreateParamCallback>(in_pCreateParamFunc)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_RegisterCodec(WWISEC_AK_IAkGlobalPluginContext* self, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkCreateFileSourceCallback in_pFileCreateFunc, WWISEC_AkCreateBankSourceCallback in_pBankCreateFunc)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->RegisterCodec(in_ulCompanyID, in_ulPluginID, reinterpret_cast<AkCreateFileSourceCallback>(in_pFileCreateFunc), reinterpret_cast<AkCreateBankSourceCallback>(in_pBankCreateFunc)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_RegisterGlobalCallback(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->RegisterGlobalCallback(static_cast<AkPluginType>(in_eType), in_ulCompanyID, in_ulPluginID, reinterpret_cast<AkGlobalCallbackFunc>(in_pCallback), in_eLocation, in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_UnregisterGlobalCallback(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->UnregisterGlobalCallback(reinterpret_cast<AkGlobalCallbackFunc>(in_pCallback), in_eLocation));
+}
+
+WWISEC_AK_IAkPluginMemAlloc* WWISEC_AK_IAkGlobalPluginContext_GetAllocator(WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<WWISEC_AK_IAkPluginMemAlloc*>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->GetAllocator());
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->SetRTPCValue(in_rtpcID, in_value, in_gameObjectID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_busID, WWISEC_AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->SendPluginCustomGameData(in_busID, in_busObjectID, static_cast<AkPluginType>(in_eType), in_uCompanyID, in_uPluginID, in_pData, in_uSizeInBytes));
+}
+
+void WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(WWISEC_AK_IAkGlobalPluginContext* self, AkReal32 in_fAzimuth, AkReal32 in_fElevation, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_VectorPtr out_vVolumes)
+{
+    AkChannelConfig channelConfig;
+    channelConfig.Deserialize(in_cfgAmbisonics);
+
+    reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->ComputeAmbisonicsEncoding(in_fAzimuth, in_fElevation, channelConfig, out_vVolumes);
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_MatrixPtr out_mxVolume)
+{
+    AkChannelConfig channelConfig;
+    channelConfig.Deserialize(in_cfgAmbisonics);
+
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->ComputeWeightedAmbisonicsDecodingFromSampledSphere(reinterpret_cast<const AkVector*>(in_samples), in_uNumSamples, channelConfig, out_mxVolume));
+}
+
+const WWISEC_AkAcousticTexture* WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkAcousticTextureID in_AcousticTextureID)
+{
+    return reinterpret_cast<const WWISEC_AkAcousticTexture*>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->GetAcousticTexture(in_AcousticTextureID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(const WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkEmitterListenerPair* in_pair, AkReal32* out_fAzimuth, AkReal32* out_fElevation)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->ComputeSphericalCoordinates(*reinterpret_cast<const AkEmitterListenerPair*>(in_pair), *out_fAzimuth, *out_fElevation));
+}
+// END IAkPlugin
+
+// BEGIN AkVirtualAcoustics
+static_assert(sizeof(WWISEC_AkAcousticTexture) == sizeof(AkAcousticTexture));
+// END AkVirtualAcoustics
 
 // BEGIN AkMemoryMgr
 WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
@@ -947,12 +1052,12 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_String(const char* in_pszRtpc
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValueByPlayingID(in_rtpcID, in_value, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve, in_bBypassInternalValueInterpolation)));
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValueByPlayingID(in_rtpcID, in_value, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_String(const char* in_pszRtpcName, WWISEC_AkRtpcValue in_value, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValueByPlayingID(in_pszRtpcName, in_value, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve, in_bBypassInternalValueInterpolation)));
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValueByPlayingID(in_pszRtpcName, in_value, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
@@ -1225,9 +1330,9 @@ static_assert(sizeof(WWISEC_AkDeviceData) == sizeof(AkDeviceData));
 static_assert(sizeof(WWISEC_AkStreamRecord) == sizeof(AkStreamRecord));
 static_assert(sizeof(WWISEC_AkStreamData) == sizeof(AkStreamData));
 
-void* WWISEC_AK_IAkStreamMgr_Get()
+WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get()
 {
-    return AK::IAkStreamMgr::Get();
+    return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AK::IAkStreamMgr::Get());
 }
 // END IAkStreamMgr
 
