@@ -222,6 +222,96 @@ static_assert(sizeof(WWISEC_AkMusicSyncCallbackInfo) == sizeof(AkMusicSyncCallba
 static_assert(sizeof(WWISEC_AkResourceMonitorDataSummary) == sizeof(AkResourceMonitorDataSummary));
 // END AkCallback
 
+// BEGIN AkVirtualAcoustics
+static_assert(sizeof(WWISEC_AkAcousticTexture) == sizeof(AkAcousticTexture));
+// END AkVirtualAcoustics
+
+// BEGIN AkMemoryMgr
+WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
+static_assert(sizeof(WWISEC_AK_MemoryMgr_CategoryStats) == sizeof(AK::MemoryMgr::CategoryStats));
+static_assert(sizeof(WWISEC_AK_MemoryMgr_GlobalStats) == sizeof(AK::MemoryMgr::GlobalStats));
+
+bool WWISEC_AK_MemoryMgr_IsInitialized()
+{
+    return AK::MemoryMgr::IsInitialized();
+}
+
+void WWISEC_AK_MemoryMgr_Term()
+{
+    AK::MemoryMgr::Term();
+}
+
+void WWISEC_AK_MemoryMgr_InitForThread()
+{
+    AK::MemoryMgr::InitForThread();
+}
+
+void WWISEC_AK_MemoryMgr_TermForThread()
+{
+    AK::MemoryMgr::TermForThread();
+}
+
+void* WWISEC_AK_MemoryMgr_Malloc(WWISEC_AkMemPoolId in_poolId, size_t in_uSize)
+{
+    return AK::MemoryMgr::Malloc(static_cast<AkMemPoolId>(in_poolId), in_uSize);
+}
+
+void* WWISEC_AK_MemoryMgr_ReallocAligned(WWISEC_AkMemPoolId in_poolId, void* in_pAlloc, size_t in_uSize, AkUInt32 in_uAlignment)
+{
+    return AK::MemoryMgr::ReallocAligned(static_cast<AkMemPoolId>(in_poolId), in_pAlloc, in_uSize, in_uAlignment);
+}
+
+void WWISEC_AK_MemoryMgr_Free(WWISEC_AkMemPoolId in_poolId, void* in_pMemAddress)
+{
+    AK::MemoryMgr::Free(in_poolId, in_pMemAddress);
+}
+
+void* WWISEC_AK_MemoryMgr_Malign(WWISEC_AkMemPoolId in_poolId, size_t in_USize, AkUInt32 in_uAlignment)
+{
+    return AK::MemoryMgr::Malign(in_poolId, in_USize, in_uAlignment);
+}
+
+void WWISEC_AK_MemoryMgr_GetCategoryStats(WWISEC_AkMemPoolId in_poolId, WWISEC_AK_MemoryMgr_CategoryStats* out_poolStats)
+{
+    AK::MemoryMgr::GetCategoryStats(in_poolId, *reinterpret_cast<AK::MemoryMgr::CategoryStats*>(out_poolStats));
+}
+
+void WWISEC_AK_MemoryMgr_GetGlobalStats(WWISEC_AK_MemoryMgr_GlobalStats* out_stats)
+{
+    AK::MemoryMgr::GetGlobalStats(*reinterpret_cast<AK::MemoryMgr::GlobalStats*>(out_stats));
+}
+
+void WWISEC_AK_MemoryMgr_StartProfileThreadUsage()
+{
+    AK::MemoryMgr::StartProfileThreadUsage();
+}
+
+AkUInt64 WWISEC_AK_MemoryMgr_StopProfileThreadUsage()
+{
+    return AK::MemoryMgr::StopProfileThreadUsage();
+}
+
+void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename)
+{
+    AK::MemoryMgr::DumpToFile(pszFilename);
+}
+// END AkMemoryMgr
+
+// BEGIN AkModule
+static_assert(sizeof(WWISEC_AkMemSettings) == sizeof(AkMemSettings));
+
+WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::MemoryMgr::Init(reinterpret_cast<AkMemSettings*>(in_pSettings)));
+}
+
+void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettings)
+{
+    AK::MemoryMgr::GetDefaultSettings(*reinterpret_cast<AkMemSettings*>(out_pMemSettings));
+}
+
+// END AkModule
+
 // BEGIN IAkPlugin
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkGlobalPluginContext_GetStreamMgr(const WWISEC_AK_IAkGlobalPluginContext* self)
 {
@@ -314,96 +404,6 @@ WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(con
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->ComputeSphericalCoordinates(*reinterpret_cast<const AkEmitterListenerPair*>(in_pair), *out_fAzimuth, *out_fElevation));
 }
 // END IAkPlugin
-
-// BEGIN AkVirtualAcoustics
-static_assert(sizeof(WWISEC_AkAcousticTexture) == sizeof(AkAcousticTexture));
-// END AkVirtualAcoustics
-
-// BEGIN AkMemoryMgr
-WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
-static_assert(sizeof(WWISEC_AK_MemoryMgr_CategoryStats) == sizeof(AK::MemoryMgr::CategoryStats));
-static_assert(sizeof(WWISEC_AK_MemoryMgr_GlobalStats) == sizeof(AK::MemoryMgr::GlobalStats));
-
-bool WWISEC_AK_MemoryMgr_IsInitialized()
-{
-    return AK::MemoryMgr::IsInitialized();
-}
-
-void WWISEC_AK_MemoryMgr_Term()
-{
-    AK::MemoryMgr::Term();
-}
-
-void WWISEC_AK_MemoryMgr_InitForThread()
-{
-    AK::MemoryMgr::InitForThread();
-}
-
-void WWISEC_AK_MemoryMgr_TermForThread()
-{
-    AK::MemoryMgr::TermForThread();
-}
-
-void* WWISEC_AK_MemoryMgr_Malloc(WWISEC_AkMemPoolId in_poolId, size_t in_uSize)
-{
-    return AK::MemoryMgr::Malloc(static_cast<AkMemPoolId>(in_poolId), in_uSize);
-}
-
-void* WWISEC_AK_MemoryMgr_ReallocAligned(WWISEC_AkMemPoolId in_poolId, void* in_pAlloc, size_t in_uSize, AkUInt32 in_uAlignment)
-{
-    return AK::MemoryMgr::ReallocAligned(static_cast<AkMemPoolId>(in_poolId), in_pAlloc, in_uSize, in_uAlignment);
-}
-
-void WWISEC_AK_MemoryMgr_Free(WWISEC_AkMemPoolId in_poolId, void* in_pMemAddress)
-{
-    AK::MemoryMgr::Free(in_poolId, in_pMemAddress);
-}
-
-void* WWISEC_AK_MemoryMgr_Malign(WWISEC_AkMemPoolId in_poolId, size_t in_USize, AkUInt32 in_uAlignment)
-{
-    return AK::MemoryMgr::Malign(in_poolId, in_USize, in_uAlignment);
-}
-
-void WWISEC_AK_MemoryMgr_GetCategoryStats(WWISEC_AkMemPoolId in_poolId, WWISEC_AK_MemoryMgr_CategoryStats* out_poolStats)
-{
-    AK::MemoryMgr::GetCategoryStats(in_poolId, *reinterpret_cast<AK::MemoryMgr::CategoryStats*>(out_poolStats));
-}
-
-void WWISEC_AK_MemoryMgr_GetGlobalStats(WWISEC_AK_MemoryMgr_GlobalStats* out_stats)
-{
-    AK::MemoryMgr::GetGlobalStats(*reinterpret_cast<AK::MemoryMgr::GlobalStats*>(out_stats));
-}
-
-void WWISEC_AK_MemoryMgr_StartProfileThreadUsage()
-{
-    AK::MemoryMgr::StartProfileThreadUsage();
-}
-
-AkUInt64 WWISEC_AK_MemoryMgr_StopProfileThreadUsage()
-{
-    return AK::MemoryMgr::StopProfileThreadUsage();
-}
-
-void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename)
-{
-    AK::MemoryMgr::DumpToFile(pszFilename);
-}
-// END AkMemoryMgr
-
-// BEGIN AkModule
-static_assert(sizeof(WWISEC_AkMemSettings) == sizeof(AkMemSettings));
-
-WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings)
-{
-    return static_cast<WWISEC_AKRESULT>(AK::MemoryMgr::Init(reinterpret_cast<AkMemSettings*>(in_pSettings)));
-}
-
-void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettings)
-{
-    AK::MemoryMgr::GetDefaultSettings(*reinterpret_cast<AkMemSettings*>(out_pMemSettings));
-}
-
-// END AkModule
 
 // BEGIN AkSoundEngine
 static_assert(sizeof(WWISEC_AkOutputSettings) == sizeof(AkOutputSettings));
