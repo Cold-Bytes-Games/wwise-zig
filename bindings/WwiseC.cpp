@@ -403,6 +403,56 @@ WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(con
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->ComputeSphericalCoordinates(*reinterpret_cast<const AkEmitterListenerPair*>(in_pair), *out_fAzimuth, *out_fElevation));
 }
+
+const WWISEC_AkPlatformInitSettings* WWISEC_AK_IAkGlobalPluginContext_GetPlatformInitSettings(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<const WWISEC_AkPlatformInitSettings*>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetPlatformInitSettings());
+}
+
+const WWISEC_AkInitSettings* WWISEC_AK_IAkGlobalPluginContext_GetInitSettings(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<const WWISEC_AkInitSettings*>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetInitSettings());
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(const WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkAudioSettings* out_audioSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetAudioSettings(*reinterpret_cast<AkAudioSettings*>(out_audioSettings)));
+}
+
+AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(const WWISEC_AK_IAkGlobalPluginContext* self, const char* in_pszString)
+{
+    return reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetIDFromString(in_pszString);
+}
+
+WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID)
+{
+    return static_cast<WWISEC_AkPlayingID>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostEventSync(in_eventID, in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie), in_cExternals, reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources), in_PlayingID);
+}
+
+WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AkPlayingID in_playingID)
+{
+    return reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostMIDIOnEventSync(in_eventID, in_gameObjectID, reinterpret_cast<AkMIDIPost*>(in_pPosts), in_uNumPosts, in_bAbsoluteOffsets, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_playingID);
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->StopMIDIOnEventSync(in_eventID, in_gameObjectID, in_playingID));
+}
+
+WWISEC_IAkPlatformContext* WWISEC_AK_IAkGlobalPluginContext_GetPlatformContext(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<WWISEC_IAkPlatformContext*>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetPlatformContext());
+}
+
+WWISEC_IAkPluginService* WWISEC_AK_IAkGlobalPluginContext_GetPluginService(const WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AK_AkPluginServiceType in_pluginService)
+{
+    return reinterpret_cast<WWISEC_IAkPluginService*>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetPluginService(static_cast<AK::AkPluginServiceType>(in_pluginService)));
+}
+
+AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetBufferTick(const WWISEC_AK_IAkGlobalPluginContext* self)
+{
+    return reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetBufferTick();
+}
 // END IAkPlugin
 
 // BEGIN AkSoundEngine

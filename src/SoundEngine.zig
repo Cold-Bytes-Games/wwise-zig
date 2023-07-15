@@ -314,6 +314,10 @@ pub fn postEventID(in_eventID: common.AkUniqueID, game_object_id: common.AkGameO
     }
 
     const external_sources = blk: {
+        if (optional_args.external_sources != null) {
+            std.debug.assert(optional_args.allocator != null);
+        }
+
         if (optional_args.allocator) |allocator| {
             area_allocator_opt = std.heap.ArenaAllocator.init(allocator);
             if (optional_args.external_sources) |external_sources| {
@@ -465,7 +469,12 @@ pub const PostMIDIOnEventOptionalArgs = struct {
 // NOTE: mlarouche: Workaround for translate-c that does not put the proper alignment on AkMIDIPost
 extern fn WWISEC_AK_SoundEngine_PostMIDIOnEvent(in_eventID: c.WWISEC_AkUniqueID, in_gameObjectID: c.WWISEC_AkGameObjectID, in_pPosts: [*]midi_types.AkMIDIPost, in_uNumPosts: u16, in_bAbsoluteOffsets: bool, in_uFlags: u32, in_pfnCallback: c.WWISEC_AkCallbackFunc, in_pCookie: ?*anyopaque, in_playingID: c.WWISEC_AkPlayingID) c.WWISEC_AkPlayingID;
 
-pub fn postMIDIOnEvent(in_event_id: common.AkUniqueID, in_game_object_id: common.AkGameObjectID, in_midi_posts: []const midi_types.AkMIDIPost, optional_args: PostMIDIOnEventOptionalArgs) common.AkPlayingID {
+pub fn postMIDIOnEvent(
+    in_event_id: common.AkUniqueID,
+    in_game_object_id: common.AkGameObjectID,
+    in_midi_posts: []const midi_types.AkMIDIPost,
+    optional_args: PostMIDIOnEventOptionalArgs,
+) common.AkPlayingID {
     return WWISEC_AK_SoundEngine_PostMIDIOnEvent(
         in_event_id,
         in_game_object_id,
