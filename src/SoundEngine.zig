@@ -87,7 +87,9 @@ pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings
 
     defer {
         if (native_init_settings_ptr) |native_init_settings| {
-            allocator.free(native_init_settings.szPluginDLLPath[0..std.mem.len(native_init_settings.szPluginDLLPath)]);
+            if (native_init_settings.szPluginDLLPath != null) {
+                allocator.free(native_init_settings.szPluginDLLPath[0..std.mem.len(native_init_settings.szPluginDLLPath)]);
+            }
         }
     }
 
@@ -103,11 +105,14 @@ pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings
     );
 }
 
-pub fn getDefaultInitSettings(init_settings: *settings.AkInitSettings) void {
+// We are passing an allocator here, but it is not used in reality
+// because the plugin path returned by AK::SoundEngine::GetDefaultInitSettings is always null
+// You don't need to call deinit() on AkInitSettings here.
+pub fn getDefaultInitSettings(allocator: std.mem.Allocator, init_settings: *settings.AkInitSettings) !void {
     var native_settings: c.WWISEC_AkInitSettings = undefined;
     c.WWISEC_AK_SoundEngine_GetDefaultInitSettings(&native_settings);
 
-    init_settings.* = settings.AkInitSettings.fromC(native_settings);
+    init_settings.* = try settings.AkInitSettings.fromC(allocator, native_settings);
 }
 
 pub fn getDefaultPlatformInitSettings(platform_init_settings: *settings.AkPlatformInitSettings) void {
@@ -1902,7 +1907,7 @@ pub fn removeOutput(id_output: common.AkOutputDeviceID) common.WwiseError!void {
     );
 }
 
-pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_device_id: common.AkOutputDeviceID, out_device_id: *?common.AkOutputDeviceID) common.WwiseError!void {
+pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_device_id: common.AkOutputDeviceID, out_device_id: ?*common.AkOutputDeviceID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_ReplaceOutput(@ptrCast(output_settings), in_device_id, @ptrCast(out_device_id)),
     );

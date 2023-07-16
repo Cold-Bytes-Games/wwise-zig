@@ -40,7 +40,7 @@ test "AkSoundEngine init" {
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
     var init_settings: AK.AkInitSettings = .{};
-    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
 
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
@@ -113,7 +113,7 @@ test "CAkDefaultIOHookBlocking create" {
     try io_hook.setBasePath(std.testing.allocator, ".");
 
     var init_settings: AK.AkInitSettings = .{};
-    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
 
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
@@ -153,7 +153,7 @@ test "CAkDefaultIOHookDeferred create" {
     try io_hook.setBasePath(std.testing.allocator, ".");
 
     var init_settings: AK.AkInitSettings = .{};
-    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
 
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
@@ -199,7 +199,7 @@ test "CAkFilePackageLowLevelIOBlocking create" {
     try std.testing.expectError(AK.WwiseError.FileNotFound, no_package_error);
 
     var init_settings: AK.AkInitSettings = .{};
-    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
 
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
@@ -246,7 +246,7 @@ test "CAkFilePackageLowLevelIODeferred create" {
     try std.testing.expectError(AK.WwiseError.FileNotFound, no_package_error);
 
     var init_settings: AK.AkInitSettings = .{};
-    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
 
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
@@ -277,7 +277,7 @@ test "AkCommunication init" {
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
     var init_settings: AK.AkInitSettings = .{};
-    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
 
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
@@ -319,7 +319,7 @@ test "AkMusicEngine init" {
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
 
     var init_settings: AK.AkInitSettings = .{};
-    AK.SoundEngine.getDefaultInitSettings(&init_settings);
+    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
 
     var platform_init_settings: AK.AkPlatformInitSettings = .{};
     AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);

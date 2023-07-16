@@ -98,7 +98,7 @@ pub const AkInitSettings = struct {
     use_lengine_thread: bool = false,
     bgm_callback: AkBackgroundMusicChangeCallbackFunc = null,
     bgm_callback_cookie: ?*anyopaque = null,
-    plugin_dll_path: []const u8 = "",
+    plugin_dll_path: ?[]const u8 = "",
     floor_plane: AkFloorPlane = .xz,
     game_units_to_meters: f32 = 0.0,
     bank_read_buffer_size: u32 = 0,
@@ -108,7 +108,13 @@ pub const AkInitSettings = struct {
     fn_profiler_pop_timer: AkProfilerPopTimerFunc = null,
     fn_profiler_post_marker: AkProfilerPostMarkerFunc = null,
 
-    pub fn fromC(value: c.WWISEC_AkInitSettings) AkInitSettings {
+    pub fn deinit(self: AkInitSettings, allocator: std.mem.Allocator) void {
+        if (self.plugin_dll_path) |plugin_dll_path| {
+            allocator.free(plugin_dll_path);
+        }
+    }
+
+    pub fn fromC(allocator: std.mem.Allocator, value: c.WWISEC_AkInitSettings) !AkInitSettings {
         return .{
             .pfn_assert_hook = value.pfnAssertHook,
             .max_num_paths = value.uMaxNumPaths,
@@ -125,7 +131,7 @@ pub const AkInitSettings = struct {
             .use_lengine_thread = value.bUseLEngineThread,
             .bgm_callback = @ptrCast(value.BGMCallback),
             .bgm_callback_cookie = value.BGMCallbackCookie,
-            .plugin_dll_path = "", // NOTE: mlarouche: the plugin_dll_path is meant to be overriden by the user, the default init settings does not supply DLL path.
+            .plugin_dll_path = if (value.szPluginDLLPath != null) try common.fromOSChar(allocator, value.szPluginDLLPath) else null,
             .floor_plane = @enumFromInt(value.eFloorPlane),
             .game_units_to_meters = value.fGameUnitsToMeters,
             .bank_read_buffer_size = value.uBankReadBufferSize,
@@ -154,7 +160,7 @@ pub const AkInitSettings = struct {
             .bUseLEngineThread = self.use_lengine_thread,
             .BGMCallback = @ptrCast(self.bgm_callback),
             .BGMCallbackCookie = self.bgm_callback_cookie,
-            .szPluginDLLPath = @ptrCast(try common.toOSChar(allocator, self.plugin_dll_path)),
+            .szPluginDLLPath = if (self.plugin_dll_path != null) @ptrCast(try common.toOSChar(allocator, self.plugin_dll_path.?)) else null,
             .eFloorPlane = @intFromEnum(self.floor_plane),
             .fGameUnitsToMeters = self.game_units_to_meters,
             .uBankReadBufferSize = self.bank_read_buffer_size,

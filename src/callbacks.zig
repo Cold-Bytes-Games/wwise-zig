@@ -34,11 +34,11 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     pub const MusicSyncAll: AkCallbackType = @bitCast(c.WWISEC_AK_MusicSyncAll);
     pub const CallbackBits: AkCallbackType = @bitCast(c.WWISEC_AK_CallbackBits);
 
-    pub inline fn fromC(value: c.WWISEC_AkCallbackType) AkCallbackType {
+    pub inline fn fromC(value: u32) AkCallbackType {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkCallbackType) c.WWISEC_AkCallbackType {
+    pub inline fn toC(self: AkCallbackType) u32 {
         return @bitCast(self);
     }
 
@@ -333,11 +333,11 @@ pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
     wakeup_from_suspend: bool = false,
     pad: u19 = 0,
 
-    pub inline fn fromC(value: c.WWISEC_AkGlobalCallbackLocation) AkGlobalCallbackLocation {
+    pub inline fn fromC(value: u32) AkGlobalCallbackLocation {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkGlobalCallbackLocation) c.WWISEC_AkGlobalCallbackLocation {
+    pub inline fn toC(self: AkGlobalCallbackLocation) u32 {
         return @bitCast(self);
     }
 };

@@ -664,8 +664,8 @@ pub const AkChannelConfig = packed struct(u32) {
         self.channel_mask = .{};
     }
 
-    pub inline fn isValid(self: AkChannelConfig) void {
-        return self.config_type <= .objects and (self.num_channels != 0 or self.config_type == .objects);
+    pub inline fn isValid(self: AkChannelConfig) bool {
+        return @intFromEnum(self.config_type) <= @intFromEnum(AkChannelConfigType.objects) and (self.num_channels != 0 or self.config_type == .objects);
     }
 
     pub inline fn removeLFE(self: AkChannelConfig) AkChannelConfig {

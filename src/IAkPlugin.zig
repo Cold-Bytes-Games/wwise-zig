@@ -31,32 +31,36 @@ pub const IAkMixerPluginContext = opaque {};
 pub const IAkGlobalPluginContext = opaque {
     pub fn getStreamMgr(self: *const IAkGlobalPluginContext) *IAkStreamMgr.IAkStreamMgr {
         return @ptrCast(
-            c.WWISEC_AK_IAkGlobalPluginContext_GetStreamMgr(self),
+            @alignCast(
+                c.WWISEC_AK_IAkGlobalPluginContext_GetStreamMgr(
+                    @ptrCast(self),
+                ),
+            ),
         );
     }
 
     pub fn getMaxBufferLength(self: *const IAkGlobalPluginContext) u16 {
-        return c.WWISEC_AK_IAkGlobalPluginContext_GetMaxBufferLength(self);
+        return c.WWISEC_AK_IAkGlobalPluginContext_GetMaxBufferLength(@ptrCast(self));
     }
 
     pub fn isRenderingOffline(self: *const IAkGlobalPluginContext) bool {
-        return c.WWISEC_AK_IAkGlobalPluginContext_IsRenderingOffline(self);
+        return c.WWISEC_AK_IAkGlobalPluginContext_IsRenderingOffline(@ptrCast(self));
     }
 
     pub fn getSampleRate(self: *const IAkGlobalPluginContext) u32 {
-        return c.WWISEC_AK_IAkGlobalPluginContext_GetSampleRate(self);
+        return c.WWISEC_AK_IAkGlobalPluginContext_GetSampleRate(@ptrCast(self));
     }
 
     pub fn postMonitorMessage(self: *IAkGlobalPluginContext, fallback_allocator: std.mem.Allocator, in_error: []const u8, in_error_level: Monitor.ErrorLevel) common.WwiseError!void {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_char_allocator.get();
 
-        const raw_error = common.toCString(allocator, in_error);
+        const raw_error = common.toCString(allocator, in_error) catch return common.WwiseError.Fail;
         defer allocator.free(raw_error);
 
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_PostMonitorMessage(
-                self,
+                @ptrCast(self),
                 raw_error,
                 in_error_level.toC(),
             ),
@@ -66,7 +70,7 @@ pub const IAkGlobalPluginContext = opaque {
     pub fn registerPlugin(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: AkCreatePluginCallback, in_create_param_func: AkCreateParamCallback) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterPlugin(
-                self,
+                @ptrCast(self),
                 @intFromEnum(in_type),
                 in_company_id,
                 in_plugin_id,
@@ -79,7 +83,7 @@ pub const IAkGlobalPluginContext = opaque {
     pub fn registerCodec(self: *IAkGlobalPluginContext, in_company_id: u32, in_plugin_id: u32, in_file_create_func: common.AkCreateFileSourceCallback, in_bank_create_func: common.AkCreateBankSourceCallback) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterCodec(
-                self,
+                @ptrCast(self),
                 in_company_id,
                 in_plugin_id,
                 @ptrCast(in_file_create_func),
@@ -96,7 +100,7 @@ pub const IAkGlobalPluginContext = opaque {
     pub fn registerGlobalCallback(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_callback: callbacks.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterGlobalCallback(
-                self,
+                @ptrCast(self),
                 @intFromEnum(in_type),
                 in_company_id,
                 in_plugin_id,
@@ -118,15 +122,15 @@ pub const IAkGlobalPluginContext = opaque {
     ) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_UnregisterGlobalCallback(
-                self,
-                in_callback,
-                optional_args.locaition.toC(),
+                @ptrCast(self),
+                @ptrCast(in_callback),
+                optional_args.location.toC(),
             ),
         );
     }
 
     pub fn getAllocator(self: *IAkGlobalPluginContext) ?*IAkPluginMemAlloc {
-        return c.WWISEC_AK_IAkGlobalPluginContext_GetAllocator(self);
+        return @ptrCast(c.WWISEC_AK_IAkGlobalPluginContext_GetAllocator(@ptrCast(self)));
     }
 
     pub const SetRtpcValueOptionalArgs = struct {
@@ -144,7 +148,7 @@ pub const IAkGlobalPluginContext = opaque {
     ) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(
-                self,
+                @ptrCast(self),
                 in_rtpcID,
                 in_value,
                 optional_args.game_object_id,
@@ -167,10 +171,10 @@ pub const IAkGlobalPluginContext = opaque {
     ) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(
-                self,
+                @ptrCast(self),
                 in_bus_id,
                 in_bus_object_id,
-                in_type,
+                @intFromEnum(in_type),
                 in_company_id,
                 in_plugin_id,
                 in_data,
@@ -187,10 +191,10 @@ pub const IAkGlobalPluginContext = opaque {
         out_volumes: SpeakerVolumes.VectorPtr,
     ) void {
         return c.WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(
-            self,
+            @ptrCast(self),
             in_azimuth,
             in_elevation,
-            in_cfg_ambisonics,
+            in_cfg_ambisonics.toC(),
             out_volumes,
         );
     }
@@ -203,7 +207,7 @@ pub const IAkGlobalPluginContext = opaque {
     ) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(
-                self,
+                @ptrCast(self),
                 @ptrCast(in_samples),
                 @truncate(in_samples.len),
                 in_cfg_ambisonics.toC(),
@@ -213,8 +217,8 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub fn getAcousticTexture(self: *IAkGlobalPluginContext, in_acoustic_texture_id: common.AkAcousticTextureID) ?*const virtual_acoustics.AkAcousticTexture {
-        return virtual_acoustics.AkAcousticTexture.fromC(
-            c.WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(self, in_acoustic_texture_id),
+        return @ptrCast(
+            c.WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(@ptrCast(self), in_acoustic_texture_id),
         );
     }
 
@@ -226,7 +230,7 @@ pub const IAkGlobalPluginContext = opaque {
     ) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(
-                self,
+                @ptrCast(self),
                 @ptrCast(in_pair),
                 out_azimuth,
                 out_elevation,
@@ -235,16 +239,24 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub fn getPlatformInitSettings(self: *const IAkGlobalPluginContext) ?*const settings.AkPlatformInitSettings {
-        return @ptrCast(c.WWISEC_AK_IAkGlobalPluginContext_GetPlatformInitSettings(self));
+        return @ptrCast(c.WWISEC_AK_IAkGlobalPluginContext_GetPlatformInitSettings(@ptrCast(self)));
     }
 
-    pub fn getInitSettings(self: *const IAkGlobalPluginContext) ?*const settings.AkInitSettings {
-        return @ptrCast(c.WWISEC_AK_IAkGlobalPluginContext_GetInitSettings(self));
+    // It is recommended that you call deinit() on the returned AkInitSettings here
+    pub fn getInitSettings(self: *const IAkGlobalPluginContext, allocator: std.mem.Allocator) !?settings.AkInitSettings {
+        var raw_init_settings_opt: ?*const c.WWISEC_AkInitSettings = null;
+        raw_init_settings_opt = @ptrCast(c.WWISEC_AK_IAkGlobalPluginContext_GetInitSettings(@ptrCast(self)));
+
+        if (raw_init_settings_opt) |raw_init_settings| {
+            return try settings.AkInitSettings.fromC(allocator, raw_init_settings.*);
+        } else {
+            return null;
+        }
     }
 
     pub fn getAudioSettings(self: *const IAkGlobalPluginContext) common.WwiseError!common.AkAudioSettings {
         var result: common.AkAudioSettings = .{};
-        try common.handleAkResult(c.WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(self, @ptrCast(&result)));
+        try common.handleAkResult(c.WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(@ptrCast(self), @ptrCast(&result)));
         return result;
     }
 
@@ -252,10 +264,10 @@ pub const IAkGlobalPluginContext = opaque {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_char_allocator.get();
 
-        var raw_string = common.toCString(allocator, in_string);
+        var raw_string = try common.toCString(allocator, in_string);
         defer allocator.free(raw_string);
 
-        return c.WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(self, raw_string);
+        return c.WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(@ptrCast(self), raw_string);
     }
 
     pub const PostEventSyncOptionalArgs = struct {
@@ -272,7 +284,7 @@ pub const IAkGlobalPluginContext = opaque {
         in_event_id: common.AkUniqueID,
         in_game_object_id: common.AkGameObjectID,
         optional_args: PostEventSyncOptionalArgs,
-    ) common.AkPlayingID {
+    ) !common.AkPlayingID {
         var num_external_sources: u32 = 0;
 
         var area_allocator_opt: ?std.heap.ArenaAllocator = null;
@@ -314,7 +326,7 @@ pub const IAkGlobalPluginContext = opaque {
         };
 
         return c.WWISEC_AK_IAkGlobalPluginContext_PostEventSync(
-            self,
+            @ptrCast(self),
             in_event_id,
             in_game_object_id,
             optional_args.flags.toC(),
@@ -345,7 +357,7 @@ pub const IAkGlobalPluginContext = opaque {
         optional_args: PostMIDIOnEventSyncOptionalArgs,
     ) common.AkPlayingID {
         return WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(
-            self,
+            @ptrCast(self),
             in_event_id,
             in_game_object_id,
             @ptrCast(@constCast(in_midi_posts)),
@@ -367,7 +379,7 @@ pub const IAkGlobalPluginContext = opaque {
     pub fn stopMIDIOnEventSync(self: *IAkGlobalPluginContext, optional_args: StopMIDIOnEventSync) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(
-                self,
+                @ptrCast(self),
                 optional_args.event_id,
                 optional_args.game_object_id,
                 optional_args.playing_id,
@@ -376,17 +388,17 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub fn getPlatformContext(self: *const IAkGlobalPluginContext) ?*platform_context.IAkPlatformContext {
-        return @ptrCast(c.WWISEC_AK_IAkGlobalPluginContext_GetPlatformContext(self));
+        return @ptrCast(c.WWISEC_AK_IAkGlobalPluginContext_GetPlatformContext(@ptrCast(self)));
     }
 
     pub fn getPluginService(self: *const IAkGlobalPluginContext, in_plugin_service: AkPluginServiceType) ?*IAkPluginService {
         return @ptrCast(
-            c.WWISEC_AK_IAkGlobalPluginContext_GetPluginService(self, @intFromEnum(in_plugin_service)),
+            c.WWISEC_AK_IAkGlobalPluginContext_GetPluginService(@ptrCast(self), @intFromEnum(in_plugin_service)),
         );
     }
 
     pub fn getBufferTick(self: *const IAkGlobalPluginContext) u32 {
-        return c.WWISEC_AK_IAkGlobalPluginContext_GetBufferTick(self);
+        return c.WWISEC_AK_IAkGlobalPluginContext_GetBufferTick(@ptrCast(self));
     }
 };
 
