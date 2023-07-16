@@ -16,7 +16,7 @@ pub const InitSettings = extern struct {
         return @bitCast(self);
     }
 
-    pub fn getJobMgrSettigns(self: *InitSettings) settings.AkJobMgrSettings {
+    pub fn getJobMgrSettings(self: *InitSettings) settings.AkJobMgrSettings {
         var raw_job_mgr_settings: c.WWISEC_AkJobMgrSettings = undefined;
         c.WWISEC_AK_JobWorkerMgr_InitSettings_GetJobMgrSettings(@ptrCast(self), &raw_job_mgr_settings);
         return settings.AkJobMgrSettings.fromC(raw_job_mgr_settings);
