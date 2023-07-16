@@ -12,6 +12,7 @@ pub const WwiseConfiguration = enum {
 
 pub const WwiseConfigOptions = struct {
     use_communication: bool = true,
+    use_default_job_worker: bool = true,
     wwise_sdk_path: ?[]const u8 = null,
     use_static_crt: bool = true,
     configuration: WwiseConfiguration = .profile,
@@ -28,6 +29,7 @@ pub const WwiseBuildOptions = struct {
     configuration: WwiseConfiguration,
     use_static_crt: bool,
     use_communication: bool,
+    use_default_job_worker: bool,
     include_default_io_hook_blocking: bool,
     include_default_io_hook_deferred: bool,
     include_file_package_io_blocking: bool,
@@ -88,10 +90,11 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     }
 
     const override_wwise_sdk_path_option = b.option([]const u8, "wwise_sdk", "Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK");
-    const wwise_configuration_option = b.option(WwiseConfiguration, "configuration", "Which library of Wwise to use");
-    const wwise_use_static_crt_option = b.option(bool, "use_static_crt", "On Windows, use the static CRT version of the library");
-    const wwise_use_communication_option = b.option(bool, "use_communication", "Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time");
-    const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 256)");
+    const wwise_configuration_option = b.option(WwiseConfiguration, "configuration", "Which library of Wwise to use (Default: profile)");
+    const wwise_use_static_crt_option = b.option(bool, "use_static_crt", "On Windows, use the static CRT version of the library (Default: true)");
+    const wwise_use_communication_option = b.option(bool, "use_communication", "Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time (Default: true)");
+    const wwise_use_default_job_worker_option = b.option(bool, "use_default_job_worker", "Enable usage of the default job worker given by Audiokinetic. (Default:true)");
+    const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default: 256)");
 
     const wwise_include_default_io_hook_blocking_option = b.option(bool, "include_default_io_hook_blocking", "Include the Default IO Hook Blocking");
     const wwise_include_default_io_hook_deferred_option = b.option(bool, "include_default_io_hook_deferred", "Include the Default IO Hook Deferred");
@@ -114,6 +117,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
 
             break :blk wwise_use_communication_option orelse config_options.use_communication;
         },
+        .use_default_job_worker = wwise_use_default_job_worker_option orelse config_options.use_default_job_worker,
         .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null or config_options.include_default_io_hook_blocking or config_options.include_file_package_io_blocking,
         .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null or config_options.include_default_io_hook_deferred or config_options.include_file_package_io_deferred,
         .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse config_options.include_file_package_io_blocking,
@@ -160,11 +164,12 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
         wwise_c.defineCMacro("AK_OPTIMIZED", null);
     }
 
-    try handleDefaultIOHooks(wwise_c, wwise_build_options);
+    try handleDefaultWwiseSystems(wwise_c, wwise_build_options);
 
     const option_step = b.addOptions();
     option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 256);
     option_step.addOption(bool, "use_communication", wwise_build_options.use_communication);
+    option_step.addOption(bool, "use_default_job_worker", wwise_build_options.use_default_job_worker);
     option_step.addOption(bool, "include_default_io_hook_blocking", wwise_build_options.include_default_io_hook_blocking);
     option_step.addOption(bool, "include_default_io_hook_deferred", wwise_build_options.include_default_io_hook_deferred);
     option_step.addOption(bool, "include_file_package_io_blocking", wwise_build_options.include_file_package_io_blocking);
@@ -303,7 +308,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
     return "";
 }
 
-fn handleDefaultIOHooks(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
+fn handleDefaultWwiseSystems(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
     if (!wwise_build_options.useDefaultIoHooks()) {
         return;
     }
@@ -337,6 +342,11 @@ fn handleDefaultIOHooks(compile_step: *std.Build.CompileStep, wwise_build_option
 
     if (wwise_build_options.include_file_package_io_deferred) {
         compile_step.defineCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED", null);
+    }
+
+    if (wwise_build_options.use_default_job_worker) {
+        compile_step.defineCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", null);
+        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkJobWorkerMgr.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
     }
 
     if (wwise_build_options.useFilePackageIO()) {

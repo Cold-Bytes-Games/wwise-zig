@@ -2610,6 +2610,24 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetPackageFallbackBehavior(void* in_ioHook, bool bFallback);
 #endif
 // END IO Hooks
+
+// BEGIN AkJobWorkerMgr
+#if defined(WWISEC_USE_DEFAULT_JOB_WORKER)
+    typedef struct WWISEC_AK_JobWorkerMgr_InitSettings
+    {
+        AkUInt32 uExecutionTimeUSec;                         // Maximum amount of time allotted for one execution of a worker, in microseconds. Defaults to 0 (no timeout).
+        AkUInt32 uNumWorkerThreads;                          // How many threads to allocate for processing jobs. Defaults to 2
+        WWISEC_AkThreadProperties* arThreadWorkerProperties; // Array of thread settings, should have uNumWorkerThreads elements. If null, will take default thread settings
+    } WWISEC_AK_JobWorkerMgr_InitSettings;
+
+    void WWISEC_AK_JobWorkerMgr_InitSettings_GetJobMgrSettings(WWISEC_AK_JobWorkerMgr_InitSettings* self, WWISEC_AkJobMgrSettings* out_JobMgrSettings);
+
+    void WWISEC_AK_JobWorkerMgr_GetDefaultInitSettings(WWISEC_AK_JobWorkerMgr_InitSettings* out_initSettings);
+    bool WWISEC_AK_JobWorkerMgr_IsInitialized();
+    WWISEC_AKRESULT WWISEC_AK_JobWorkerMgr_InitWorkers(const WWISEC_AK_JobWorkerMgr_InitSettings* in_implInitSettings);
+    void WWISEC_AK_JobWorkerMgr_TermWorkers();
+#endif
+// END AkJobWorkerMgr
 #ifdef __cplusplus
 }
 #endif

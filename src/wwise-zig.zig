@@ -3,6 +3,7 @@ const wwise_options = @import("wwise_options");
 pub const AkMemSettings = MemoryMgr.AkMemSettings;
 pub const Comm = if (wwise_options.use_communication) @import("Comm.zig") else void;
 pub const IOHooks = @import("IOHooks.zig");
+pub const JobWorkerMgr = if (wwise_options.use_default_job_worker) @import("JobWorkerMgr.zig") else void;
 pub const MemoryMgr = @import("MemoryMgr.zig");
 pub const Monitor = @import("Monitor.zig");
 pub const MusicEngine = @import("MusicEngine.zig");

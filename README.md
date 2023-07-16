@@ -16,14 +16,15 @@ Available options:
 | Option | Values | Description |
 | -- | -- | -- |
 | `wwise_sdk` | `[]const u8` | Override the path to the Wwise SDK, by default it will use the path in environment variable WWISESDK |
-| `configuration` | debug, profile, release | Which library configuration of Wwise to use |
-| `use_static_crt` | `bool` | On Windows, do you want to use the StaticCRT build of Wwise |
-| `use_communication` | `bool` | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time |
-| `string_stack_size` | `usize` | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default 256) |
-| `include_default_io_hook_blocking` | `bool` | Include the Default IO Hook Blocking |
-| `include_default_io_hook_deferred` | `bool` | Include the Default IO Hook Deferred |
-| `include_file_package_io_blocking` | `bool` | Include the File Package IO Hook Blocking |
-| `include_file_package_io_deferred` | `bool` | Include the File Package IO Hook Deferred |
+| `configuration` | debug, profile, release | Which library configuration of Wwise to use (Default: profile) |
+| `use_static_crt` | `bool` | On Windows, do you want to use the StaticCRT build of Wwise (Default: true) |
+| `use_communication` | `bool` | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time (Default: true) |
+| `use_default_job_worker` | `bool` | Enable usage of the default job worker given by Audiokinetic. (Default:true) |
+| `string_stack_size` | `usize` | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default: 256) |
+| `include_default_io_hook_blocking` | `bool` | Include the Default IO Hook Blocking (Default: false) |
+| `include_default_io_hook_deferred` | `bool` | Include the Default IO Hook Deferred (Default: false) |
+| `include_file_package_io_blocking` | `bool` | Include the File Package IO Hook Blocking (Default: false) |
+| `include_file_package_io_deferred` | `bool` | Include the File Package IO Hook Deferred (Default: false) |
 
 We recommend using `AK` as your import name to match closely with the C++ API.
 

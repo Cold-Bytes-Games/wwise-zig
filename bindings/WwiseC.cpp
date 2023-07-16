@@ -426,7 +426,7 @@ AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(const WWISEC_AK_IAkGlo
 
 WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID)
 {
-    return static_cast<WWISEC_AkPlayingID>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostEventSync(in_eventID, in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie), in_cExternals, reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources), in_PlayingID);
+    return static_cast<WWISEC_AkPlayingID>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostEventSync(in_eventID, in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_cExternals, reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources), in_PlayingID));
 }
 
 WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AkPlayingID in_playingID)
@@ -1970,5 +1970,39 @@ void WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetPackageFallbackBehavior(void*
 {
     reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->SetPackageFallbackBehavior(bFallback);
 }
+
 #endif
 // END IO Hooks
+
+// BEGIN AkJobWorkerMgr
+#if defined(WWISEC_USE_DEFAULT_JOB_WORKER)
+#include <AkJobWorkerMgr.h>
+
+static_assert(sizeof(WWISEC_AK_JobWorkerMgr_InitSettings) == sizeof(AK::JobWorkerMgr::InitSettings));
+
+void WWISEC_AK_JobWorkerMgr_InitSettings_GetJobMgrSettings(WWISEC_AK_JobWorkerMgr_InitSettings* self, WWISEC_AkJobMgrSettings* out_JobMgrSettings)
+{
+    *reinterpret_cast<AkJobMgrSettings*>(out_JobMgrSettings) = reinterpret_cast<AK::JobWorkerMgr::InitSettings*>(self)->GetJobMgrSettings();
+}
+
+void WWISEC_AK_JobWorkerMgr_GetDefaultInitSettings(WWISEC_AK_JobWorkerMgr_InitSettings* out_initSettings)
+{
+    AK::JobWorkerMgr::GetDefaultInitSettings(*reinterpret_cast<AK::JobWorkerMgr::InitSettings*>(out_initSettings));
+}
+
+bool WWISEC_AK_JobWorkerMgr_IsInitialized()
+{
+    return AK::JobWorkerMgr::IsInitialized();
+}
+
+WWISEC_AKRESULT WWISEC_AK_JobWorkerMgr_InitWorkers(const WWISEC_AK_JobWorkerMgr_InitSettings* in_implInitSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::JobWorkerMgr::InitWorkers(*reinterpret_cast<const AK::JobWorkerMgr::InitSettings*>(in_implInitSettings)));
+}
+
+void WWISEC_AK_JobWorkerMgr_TermWorkers()
+{
+    AK::JobWorkerMgr::TermWorkers();
+}
+#endif
+// END AkJobWorkerMgr
