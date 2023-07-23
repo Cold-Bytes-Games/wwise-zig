@@ -84,6 +84,8 @@ static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uArg) == offsetof(AkMIDIPost,
 // END AkMidiTypes
 
 // BEGIN AkCommonDefs
+static_assert(WWISEC_AK_INT == AK_INT);
+static_assert(WWISEC_AK_FLOAT == AK_FLOAT);
 static_assert(sizeof(WWISEC_AK_AkMetering) == sizeof(AK::AkMetering));
 static_assert(sizeof(WWISEC_AkAudioBuffer) == sizeof(AkAudioBuffer));
 

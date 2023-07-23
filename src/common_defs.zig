@@ -4,6 +4,9 @@ const common = @import("common.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const speaker_config = @import("speaker_config.zig");
 
+pub const AK_INT = c.WWISEC_AK_INT;
+pub const AK_FLOAT = c.WWISEC_AK_FLOAT;
+
 pub const AkMetering = extern struct {
     peak: SpeakerVolumes.VectorPtr,
     true_peak: SpeakerVolumes.VectorPtr,

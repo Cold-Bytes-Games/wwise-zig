@@ -792,6 +792,9 @@ extern "C"
     // END IBytes
 
     // BEGIN AkCommonDefs
+    const WWISEC_AkDataTypeID WWISEC_AK_INT = 0;   ///< Integer data type (uchar, short, and so on)
+    const WWISEC_AkDataTypeID WWISEC_AK_FLOAT = 1; ///< Float data type
+
     typedef struct WWISEC_AK_AkMetering
     {
         /// Peak of each channel in this frame.
