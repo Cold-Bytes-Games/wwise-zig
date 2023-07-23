@@ -309,7 +309,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
 }
 
 fn handleDefaultWwiseSystems(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
-    if (!wwise_build_options.useDefaultIoHooks() or !wwise_build_options.use_default_job_worker) {
+    if (!wwise_build_options.useDefaultIoHooks() and !wwise_build_options.use_default_job_worker) {
         return;
     }
 
