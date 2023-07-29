@@ -21,6 +21,7 @@ pub usingnamespace @import("IBytes.zig");
 pub usingnamespace @import("midi_types.zig");
 pub usingnamespace @import("platform_context.zig");
 pub usingnamespace @import("settings.zig");
+pub usingnamespace @import("reflect_game_data.zig");
 pub usingnamespace @import("speaker_config.zig");
 pub usingnamespace @import("virtual_acoustics.zig");
 pub usingnamespace @import("wwise_platform.zig");

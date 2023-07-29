@@ -2021,7 +2021,37 @@ static_assert(sizeof(WWISEC_AkRoomID) == sizeof(AkRoomID));
 const WWISEC_AkRoomID WWISEC_AK_SpatialAudio_kOutdoorRoomID{AK::SpatialAudio::kOutdoorRoomID};
 // END AkSpatialAudioTypes
 
+// BEGIN AkReflectGameData
+static_assert(WWISEC_AK_MAX_NUM_TEXTURE == AK_MAX_NUM_TEXTURE);
+static_assert(sizeof(WWISEC_AkImageSourceName) == sizeof(AkImageSourceName));
+static_assert(sizeof(WWISEC_AkImageSourceTexture) == sizeof(AkImageSourceTexture));
+static_assert(sizeof(WWISEC_AkImageSourceParams) == sizeof(AkImageSourceParams));
+static_assert(sizeof(WWISEC_AkReflectImageSource) == sizeof(AkReflectImageSource));
+static_assert(sizeof(WWISEC_AkReflectGameData) == sizeof(AkReflectGameData));
+// END AkReflectGameData
+
 // BEGIN AkSpatialAudio
+static_assert(sizeof(WWISEC_AkSpatialAudioInitSettings) == sizeof(AkSpatialAudioInitSettings));
+static_assert(sizeof(WWISEC_AkImageSourceSettings) == sizeof(AkImageSourceSettings));
+static_assert(sizeof(WWISEC_AkVertex) == sizeof(AkVertex));
+static_assert(sizeof(WWISEC_AkExtent) == sizeof(AkExtent));
+static_assert(sizeof(WWISEC_AkTriangle) == sizeof(AkTriangle));
+static_assert(sizeof(WWISEC_AkAcousticSurface) == sizeof(AkAcousticSurface));
+static_assert(sizeof(WWISEC_AkReflectionPathInfo) == sizeof(WWISEC_AkReflectionPathInfo));
+static_assert(sizeof(WWISEC_AkDiffractionPathInfo) == sizeof(AkDiffractionPathInfo));
+static_assert(sizeof(WWISEC_AkPortalParams) == sizeof(AkPortalParams));
+static_assert(sizeof(WWISEC_AkRoomParams) == sizeof(AkRoomParams));
+static_assert(sizeof(WWISEC_AkGeometryParams) == sizeof(AkGeometryParams));
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_X == AK_DEFAULT_GEOMETRY_POSITION_X);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Y == AK_DEFAULT_GEOMETRY_POSITION_Y);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Z == AK_DEFAULT_GEOMETRY_POSITION_Z);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_FRONT_X == AK_DEFAULT_GEOMETRY_FRONT_X);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_FRONT_Y == AK_DEFAULT_GEOMETRY_FRONT_Y);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_FRONT_Z == AK_DEFAULT_GEOMETRY_FRONT_Z);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_X == AK_DEFAULT_GEOMETRY_TOP_X);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_Y == AK_DEFAULT_GEOMETRY_TOP_Y);
+static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_Z == AK_DEFAULT_GEOMETRY_TOP_Z);
+static_assert(sizeof(WWISEC_AkGeometryInstanceParams) == sizeof(AkGeometryInstanceParams));
 // END AkSpatialAudio
 
 // BEGIN AkReverbEstimation
