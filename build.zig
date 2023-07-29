@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const StaticPluginStep = @import("src/StaticPluginStep.zig");
+const StaticPluginStep = @import("build/StaticPluginStep.zig");
 
 const WwisePlatform = @import("src/wwise_platform.zig").WwisePlatform;
 
@@ -13,6 +13,7 @@ pub const WwiseConfiguration = enum {
 pub const WwiseConfigOptions = struct {
     use_communication: bool = true,
     use_default_job_worker: bool = false,
+    use_spatial_audio: bool = false,
     wwise_sdk_path: ?[]const u8 = null,
     use_static_crt: bool = true,
     configuration: WwiseConfiguration = .profile,
@@ -30,6 +31,7 @@ pub const WwiseBuildOptions = struct {
     use_static_crt: bool,
     use_communication: bool,
     use_default_job_worker: bool,
+    use_spatial_audio: bool,
     include_default_io_hook_blocking: bool,
     include_default_io_hook_deferred: bool,
     include_file_package_io_blocking: bool,
@@ -94,6 +96,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     const wwise_use_static_crt_option = b.option(bool, "use_static_crt", "On Windows, use the static CRT version of the library (Default: true)");
     const wwise_use_communication_option = b.option(bool, "use_communication", "Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time (Default: true)");
     const wwise_use_default_job_worker_option = b.option(bool, "use_default_job_worker", "Enable usage of the default job worker given by Audiokinetic. (Default: false)");
+    const wwise_use_spatial_audio_option = b.option(bool, "use_spatial_audio", "Enable usagee of the Spatial Audio module (Default: false)");
     const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default: 256)");
 
     const wwise_include_default_io_hook_blocking_option = b.option(bool, "include_default_io_hook_blocking", "Include the Default IO Hook Blocking");
@@ -118,6 +121,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
             break :blk wwise_use_communication_option orelse config_options.use_communication;
         },
         .use_default_job_worker = wwise_use_default_job_worker_option orelse config_options.use_default_job_worker,
+        .use_spatial_audio = wwise_use_spatial_audio_option orelse config_options.use_spatial_audio,
         .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null or config_options.include_default_io_hook_blocking or config_options.include_file_package_io_blocking,
         .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null or config_options.include_default_io_hook_deferred or config_options.include_file_package_io_deferred,
         .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse config_options.include_file_package_io_blocking,
@@ -160,6 +164,10 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
         wwise_c.defineCMacro("WWISEC_USE_COMMUNICATION", null);
     }
 
+    if (wwise_build_options.use_spatial_audio) {
+        wwise_c.defineCMacro("WWISEC_USE_SPATIAL_AUDIO", null);
+    }
+
     if (wwise_build_options.configuration == .release) {
         wwise_c.defineCMacro("AK_OPTIMIZED", null);
     }
@@ -170,6 +178,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 256);
     option_step.addOption(bool, "use_communication", wwise_build_options.use_communication);
     option_step.addOption(bool, "use_default_job_worker", wwise_build_options.use_default_job_worker);
+    option_step.addOption(bool, "use_spatial_audio", wwise_build_options.use_spatial_audio);
     option_step.addOption(bool, "include_default_io_hook_blocking", wwise_build_options.include_default_io_hook_blocking);
     option_step.addOption(bool, "include_default_io_hook_deferred", wwise_build_options.include_default_io_hook_deferred);
     option_step.addOption(bool, "include_file_package_io_blocking", wwise_build_options.include_file_package_io_blocking);
@@ -207,6 +216,10 @@ pub fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_build_options: Wwis
         if (compile_step.target.getOsTag() == .windows) {
             compile_step.linkSystemLibrary("ws2_32");
         }
+    }
+
+    if (wwise_build_options.use_spatial_audio) {
+        compile_step.linkSystemLibrary("AkSpatialAudio");
     }
 
     compile_step.linkSystemLibrary("AkSoundEngine");

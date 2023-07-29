@@ -2630,7 +2630,19 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_JobWorkerMgr_InitWorkers(const WWISEC_AK_JobWorkerMgr_InitSettings* in_implInitSettings);
     void WWISEC_AK_JobWorkerMgr_TermWorkers();
 #endif
-// END AkJobWorkerMgr
+    // END AkJobWorkerMgr
+
+#if defined(WWISEC_USE_SPATIAL_AUDIO)
+// BEGIN AkSpatialAudioTypes
+// END AkSpatialAudioTypes
+
+// BEGIN AkSpatialAudio
+// END AkSpatialAudio
+
+// BEGIN AkReverbEstimation
+// END AkReverbEstimation
+#endif
+
 #ifdef __cplusplus
 }
 #endif

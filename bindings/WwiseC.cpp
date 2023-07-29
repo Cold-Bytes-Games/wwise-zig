@@ -2008,3 +2008,9 @@ void WWISEC_AK_JobWorkerMgr_TermWorkers()
 }
 #endif
 // END AkJobWorkerMgr
+
+#if defined(WWISEC_USE_SPATIAL_AUDIO)
+#include <AK/SpatialAudio/Common/AkReverbEstimation.h>
+#include <AK/SpatialAudio/Common/AkSpatialAudio.h>
+#include <AK/SpatialAudio/Common/AkSpatialAudioTypes.h>
+#endif

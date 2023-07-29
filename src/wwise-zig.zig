@@ -8,6 +8,7 @@ pub const MemoryMgr = @import("MemoryMgr.zig");
 pub const Monitor = @import("Monitor.zig");
 pub const MusicEngine = @import("MusicEngine.zig");
 pub const SoundEngine = @import("SoundEngine.zig");
+pub const SpatialAudio = @import("SpatialAudio.zig");
 pub const SpeakerVolumes = @import("SpeakerVolumes.zig");
 pub const StreamMgr = @import("StreamMgr.zig");
 pub usingnamespace @import("callbacks.zig");

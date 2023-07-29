@@ -20,6 +20,7 @@ Available options:
 | `use_static_crt` | `bool` | On Windows, do you want to use the StaticCRT build of Wwise (Default: true) |
 | `use_communication` | `bool` | Enable remote communication with Wwise Authoring. Disabled by default on Release configuration so you can leave it true at all time (Default: true) |
 | `use_default_job_worker` | `bool` | Enable usage of the default job worker given by Audiokinetic. (Default: false) |
+| `use_spatial_audio` | `bool` | Enable usagee of the Spatial Audio module (Default: false) |
 | `string_stack_size` | `usize` | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default: 256) |
 | `include_default_io_hook_blocking` | `bool` | Include the Default IO Hook Blocking (Default: false) |
 | `include_default_io_hook_deferred` | `bool` | Include the Default IO Hook Deferred (Default: false) |

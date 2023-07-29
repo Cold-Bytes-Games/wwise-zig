@@ -7,6 +7,9 @@ pub usingnamespace @cImport({
     if (wwise_options.use_default_job_worker) {
         @cDefine("WWISEC_USE_DEFAULT_JOB_WORKER", "");
     }
+    if (wwise_options.use_spatial_audio) {
+        @cDefine("WWISEC_USE_SPATIAL_AUDIO", "");
+    }
     if (wwise_options.include_default_io_hook_blocking) {
         @cDefine("WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING", "");
     }
