@@ -2013,4 +2013,17 @@ void WWISEC_AK_JobWorkerMgr_TermWorkers()
 #include <AK/SpatialAudio/Common/AkReverbEstimation.h>
 #include <AK/SpatialAudio/Common/AkSpatialAudio.h>
 #include <AK/SpatialAudio/Common/AkSpatialAudioTypes.h>
+
+// BEGIN AkSpatialAudioTypes
+static_assert(sizeof(WWISEC_AkSpatialAudioID) == sizeof(AkSpatialAudioID));
+static_assert(sizeof(WWISEC_AkRoomID) == sizeof(AkRoomID));
+
+const WWISEC_AkRoomID WWISEC_AK_SpatialAudio_kOutdoorRoomID{AK::SpatialAudio::kOutdoorRoomID};
+// END AkSpatialAudioTypes
+
+// BEGIN AkSpatialAudio
+// END AkSpatialAudio
+
+// BEGIN AkReverbEstimation
+// END AkReverbEstimation
 #endif

@@ -2634,6 +2634,72 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
 #if defined(WWISEC_USE_SPATIAL_AUDIO)
 // BEGIN AkSpatialAudioTypes
+#define WWISEC_AK_MAX_REFLECT_ORDER 4
+#define WWISEC_AK_MAX_REFLECTION_PATH_LENGTH (WWISEC_AK_MAX_REFLECT_ORDER + 4)
+#define WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH 8
+#define WWISEC_AK_MAX_SOUND_PROPAGATION_WIDTH 8
+#define WWISEC_AK_DEFAULT_MOVEMENT_THRESHOLD (1.0f)
+#define WWISEC_AK_SA_EPSILON (0.001f)
+#define WWISEC_AK_SA_DIFFRACTION_EPSILON (0.002f)       // Radians
+#define WWISEC_AK_SA_DIFFRACTION_DOT_EPSILON (0.000002) // 1.f - cos(AK_SA_DIFFRACTION_EPSILON)
+#define WWISEC_AK_SA_PLANE_THICKNESS_RATIO (0.005f)
+#define WWISEC_AK_SA_MIN_ENVIRONMENT_ABSORPTION (0.1f)
+#define WWISEC_AK_SA_MIN_ENVIRONMENT_SURFACE_AREA (1.0f)
+
+    const AkUInt32 WWISEC_kDefaultDiffractionMaxEdges = 8;
+    const AkUInt32 WWISEC_kDefaultDiffractionMaxPaths = 8;
+    const AkReal32 WWISEC_kMaxDiffraction = 1.0f;
+
+    // Max values that are used for calculating diffraction paths between the listener and a portal.
+    const AkUInt32 WWISEC_kDiffractionMaxEdges = 8;
+    const AkUInt32 WWISEC_kDiffractionMaxPaths = 8;
+    const AkUInt32 WWISEC_kPortalToPortalDiffractionMaxPaths = 8;
+
+    typedef AkUInt16 WWISEC_AkVertIdx;
+    typedef AkUInt16 WWISEC_AkTriIdx;
+    typedef AkUInt16 WWISEC_AkSurfIdx;
+    typedef AkUInt16 WWISEC_AkEdgeIdx;
+    typedef AkUInt16 WWISEC_AkEdgeReceptorIdx;
+
+#define WWISEC_AK_INVALID_VERTEX ((WWISEC_AkVertIdx)(-1))
+#define WWISEC_AK_INVALID_TRIANGLE ((WWISEC_AkTriIdx)(-1))
+#define WWISEC_AK_INVALID_SURFACE ((WWISEC_AkSurfIdx)(-1))
+#define WWISEC_AK_INVALID_EDGE ((WWISEC_AkEdgeIdx)(-1))
+
+    typedef struct WWISEC_AkSpatialAudioID
+    {
+        AkUInt64 id;
+    } WWISEC_AkSpatialAudioID;
+
+    typedef struct WWISEC_AkRoomID
+    {
+        AkUInt64 id;
+    } WWISEC_AkRoomID;
+
+    static const WWISEC_AkGameObjectID WWISEC_OutdoorsGameObjID = (WWISEC_AkGameObjectID)-4;
+
+    extern const WWISEC_AkRoomID WWISEC_AK_SpatialAudio_kOutdoorRoomID;
+
+    ///< Unique ID for portals.  This ID type exists in the same ID-space as game object ID's.  The client is responsible for not choosing portal ID's
+    /// that conflict with registered game objects' ID's.  Internally, the spatial audio rooms and portals API manages registration and un-registration of game objects that
+    /// represent portals using AkPortalID's provided by the client; AkPortalID's are convertied to AkGameObjectID's by calling AsGameObjectID().
+    /// \sa
+    ///	- \ref AK::SpatialAudio::SetPortal
+    ///	- \ref AK::SpatialAudio::RemovePortal
+    typedef WWISEC_AkSpatialAudioID WWISEC_AkPortalID;
+
+    ///< Unique ID for identifying geometry sets.  Chosen by the client using any means desired.
+    /// \sa
+    ///	- \ref AK::SpatialAudio::SetGeometry
+    ///	- \ref AK::SpatialAudio::RemoveGeometry
+    typedef WWISEC_AkSpatialAudioID WWISEC_AkGeometrySetID;
+
+    ///< Unique ID for identifying geometry set instances.  Chosen by the client using any means desired.
+    /// \sa
+    ///	- \ref AK::SpatialAudio::SetGeometry
+    ///	- \ref AK::SpatialAudio::RemoveGeometry
+    typedef WWISEC_AkSpatialAudioID WWISEC_AkGeometryInstanceID;
+
 // END AkSpatialAudioTypes
 
 // BEGIN AkSpatialAudio
