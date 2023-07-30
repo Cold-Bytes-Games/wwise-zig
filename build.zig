@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 
 const StaticPluginStep = @import("build/StaticPluginStep.zig");
 
@@ -230,6 +231,79 @@ pub fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_build_options: Wwis
     if (compile_step.target.getOsTag() == .windows) {
         compile_step.linkSystemLibrary("user32");
     }
+}
+
+pub const GenerateSoundBanksArgs = struct {
+    /// Override the path of the Wwise SDK, if not it will use the WWISESDK environment variable
+    override_wwise_sdk_path: ?[]const u8 = null,
+    /// Explicit list the platforms you want to generate the sound banks, if nothing specified, all the platforms will be generated
+    platforms: []const WwisePlatform = &.{},
+    /// Explicit list of the languages to generate, if not specified it will build all the languages
+    languages: []const []const u8 = &.{},
+    /// Instead of passing the platforms, you can use the target from Zig
+    target: ?std.zig.CrossTarget = null,
+    /// Output folder of the sound banks, will use the default in the project if omitted
+    output_folder: ?[]const u8 = null,
+    /// List of sound banks to generate, if not specified it will build all the sound banks
+    sound_banks: []const []const u8 = &.{},
+    /// Overrides the root output path specified in the soundbank settings.
+    root_output_path: ?[]const u8 = null,
+};
+
+pub fn addGenerateSoundBanksStep(b: *std.Build, wwise_project_path: []const u8, args: GenerateSoundBanksArgs) !*std.Build.Step.Run {
+    var arg_list = std.ArrayList([]const u8).init(b.allocator);
+    defer arg_list.deinit();
+
+    const absolute_wwise_project_path = b.pathFromRoot(wwise_project_path);
+
+    const wwise_sdk_path = getWwiseSDKPath(b, args.override_wwise_sdk_path);
+
+    const application_name = switch (builtin.os.tag) {
+        .windows => "WwiseConsole.exe",
+        else => "WwiseConsole",
+    };
+
+    const wwise_console_path = try std.fs.path.resolve(b.allocator, &.{ wwise_sdk_path, "..", "Authoring", "x64", "Release", "bin", application_name });
+
+    try arg_list.append(wwise_console_path);
+    try arg_list.append("generate-soundbank");
+    try arg_list.append(absolute_wwise_project_path);
+
+    if (args.target) |target| {
+        const wwise_platform = try getWwisePlatform(target);
+
+        try arg_list.append("--platform");
+        try arg_list.append(b.fmt("{s}", .{wwise_platform.getAuthoringPlatformName()}));
+    }
+
+    for (args.platforms) |platform| {
+        try arg_list.append("--platform");
+        try arg_list.append(b.fmt("{s}", .{platform.getAuthoringPlatformName()}));
+    }
+
+    for (args.languages) |language| {
+        try arg_list.append("--language");
+        try arg_list.append(b.fmt("{s}", .{language}));
+    }
+
+    if (args.output_folder) |output_folder| {
+        try arg_list.append("--output");
+        try arg_list.append(b.fmt("{s}", .{output_folder}));
+    }
+
+    for (args.sound_banks) |sound_bank| {
+        try arg_list.append("--bank");
+        try arg_list.append(b.fmt("{s}", .{sound_bank}));
+    }
+
+    if (args.root_output_path) |root_output_path| {
+        try arg_list.append("--root-output-path");
+        try arg_list.append(b.fmt("{s}", .{root_output_path}));
+    }
+
+    const run_step = b.addSystemCommand(arg_list.items);
+    run_step.extra_file_dependencies = &.{absolute_wwise_project_path};
+    return run_step;
 }
 
 fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []const u8 {
