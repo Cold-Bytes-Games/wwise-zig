@@ -3095,39 +3095,69 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 #define WWISEC_AK_DEFAULT_GEOMETRY_TOP_Y (1.0)
 #define WWISEC_AK_DEFAULT_GEOMETRY_TOP_Z (0.0)
 
-typedef struct WWISEC_AkGeometryInstanceParams
-{
-	/// Set the position and orientation of the geometry instance.
-	/// AkWorldTransform uses one vector to define the position of the geometry instance, and two more to define the orientation; a forward vector and an up vector. 
-	/// To ensure that a geometry instance has the correct rotation with respect to the game, AkInitSettings::eFloorPlane must be initialized with the correct value.
-	///	\sa
-	/// - \ref AkInitSettings::eFloorPlane
-	/// - \ref AK::SpatialAudio::SetGeometryInstance
-	///	- \ref AK::SpatialAudio::RemoveGeometryInstance
-	WWISEC_AkWorldTransform PositionAndOrientation;
+    typedef struct WWISEC_AkGeometryInstanceParams
+    {
+        /// Set the position and orientation of the geometry instance.
+        /// AkWorldTransform uses one vector to define the position of the geometry instance, and two more to define the orientation; a forward vector and an up vector.
+        /// To ensure that a geometry instance has the correct rotation with respect to the game, AkInitSettings::eFloorPlane must be initialized with the correct value.
+        ///	\sa
+        /// - \ref AkInitSettings::eFloorPlane
+        /// - \ref AK::SpatialAudio::SetGeometryInstance
+        ///	- \ref AK::SpatialAudio::RemoveGeometryInstance
+        WWISEC_AkWorldTransform PositionAndOrientation;
 
-	/// Set the 3-dimensional scaling of the geometry instance.
-	/// \sa
-	/// - \ref AK::SpatialAudio::SetGeometryInstance
-	///	- \ref AK::SpatialAudio::RemoveGeometryInstance
-	WWISEC_AkVector Scale;
+        /// Set the 3-dimensional scaling of the geometry instance.
+        /// \sa
+        /// - \ref AK::SpatialAudio::SetGeometryInstance
+        ///	- \ref AK::SpatialAudio::RemoveGeometryInstance
+        WWISEC_AkVector Scale;
 
-	/// Geometry set referenced by the instance
-	/// \sa
-	///	- \ref AK::SpatialAudio::SetGeometry
-	///	- \ref AK::SpatialAudio::RemoveGeometry
-	/// - \ref AK::SpatialAudio::SetGeometryInstance
-	///	- \ref AK::SpatialAudio::RemoveGeometryInstance
-	WWISEC_AkGeometrySetID GeometrySetID;
+        /// Geometry set referenced by the instance
+        /// \sa
+        ///	- \ref AK::SpatialAudio::SetGeometry
+        ///	- \ref AK::SpatialAudio::RemoveGeometry
+        /// - \ref AK::SpatialAudio::SetGeometryInstance
+        ///	- \ref AK::SpatialAudio::RemoveGeometryInstance
+        WWISEC_AkGeometrySetID GeometrySetID;
 
-	/// Associate this geometry instance with the room \c RoomID. Associating a geometry instance with a particular room will limit the scope in which the geometry is visible/accessible. \c RoomID can be left as default (-1), in which case 
-	/// this geometry instance will have a global scope. It is recommended to associate geometry with a room when the geometry is (1) fully contained within the room (ie. not visible to other rooms accept by portals), 
-	/// and (2) the room does not share geometry with other rooms. Doing so reduces the search space for ray casting performed by reflection and diffraction calculations. Take note that once one or more geometry instances 
-	/// are associated with a room, that room will no longer be able to access geometry that is in the global scope.
-	///	- \ref AK::SpatialAudio::SetRoom
-	///	- \ref AkRoomParams
-	WWISEC_AkRoomID RoomID;
-} WWISEC_AkGeometryInstanceParams;
+        /// Associate this geometry instance with the room \c RoomID. Associating a geometry instance with a particular room will limit the scope in which the geometry is visible/accessible. \c RoomID can be left as default (-1), in which case
+        /// this geometry instance will have a global scope. It is recommended to associate geometry with a room when the geometry is (1) fully contained within the room (ie. not visible to other rooms accept by portals),
+        /// and (2) the room does not share geometry with other rooms. Doing so reduces the search space for ray casting performed by reflection and diffraction calculations. Take note that once one or more geometry instances
+        /// are associated with a room, that room will no longer be able to access geometry that is in the global scope.
+        ///	- \ref AK::SpatialAudio::SetRoom
+        ///	- \ref AkRoomParams
+        WWISEC_AkRoomID RoomID;
+    } WWISEC_AkGeometryInstanceParams;
+
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_Init(const WWISEC_AkSpatialAudioInitSettings* in_initSettings);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RegisterListener(WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnregisterListener(WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectRadius(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_outerRadius, AkReal32 in_innerRadius);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(WWISEC_AkImageSourceID in_srcID, const WWISEC_AkImageSourceSettings* in_info, const char* in_name, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveImageSource(WWISEC_AkImageSourceID in_srcID, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ClearImageSources(WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGeometry(WWISEC_AkGeometrySetID in_GeomSetID, const WWISEC_AkGeometryParams* in_params);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometry(WWISEC_AkGeometrySetID in_SetID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID, const WWISEC_AkGeometryInstanceParams* in_params);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetRoom(WWISEC_AkRoomID in_RoomID, const WWISEC_AkRoomParams* in_Params, const char* in_RoomName);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveRoom(WWISEC_AkRoomID in_RoomID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortal(WWISEC_AkPortalID in_PortalID, const WWISEC_AkPortalParams* in_Params, const char* in_PortalName);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemovePortal(WWISEC_AkPortalID in_PortalID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflectionsOrder, bool in_bUpdatePaths);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffractionOrder, bool in_bUpdatePaths);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPrimaryRays);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(AkUInt32 in_uNbFrames);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fSendVolume);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction, AkReal32 in_fOcclusion);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalToPortalObstruction(WWISEC_AkPortalID in_PortalID0, WWISEC_AkPortalID in_PortalID1, AkReal32 in_fObstruction);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_portal, AkReal32* out_wetDiffraction);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine();
 // END AkSpatialAudio
 
 // BEGIN AkReverbEstimation

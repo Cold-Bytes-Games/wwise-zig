@@ -2052,6 +2052,151 @@ static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_X == AK_DEFAULT_GEOMETRY_TOP_X);
 static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_Y == AK_DEFAULT_GEOMETRY_TOP_Y);
 static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_Z == AK_DEFAULT_GEOMETRY_TOP_Z);
 static_assert(sizeof(WWISEC_AkGeometryInstanceParams) == sizeof(AkGeometryInstanceParams));
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_Init(const WWISEC_AkSpatialAudioInitSettings* in_initSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::Init(*reinterpret_cast<const AkSpatialAudioInitSettings*>(in_initSettings)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RegisterListener(WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RegisterListener(in_gameObjectID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnregisterListener(WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::UnregisterListener(in_gameObjectID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectRadius(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_outerRadius, AkReal32 in_innerRadius)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGameObjectRadius(in_gameObjectID, in_outerRadius, in_innerRadius));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(WWISEC_AkImageSourceID in_srcID, const WWISEC_AkImageSourceSettings* in_info, const char* in_name, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetImageSource(in_srcID, *reinterpret_cast<const AkImageSourceSettings*>(in_info), in_name, in_AuxBusID, in_gameObjectID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveImageSource(WWISEC_AkImageSourceID in_srcID, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveImageSource(in_srcID, in_AuxBusID, in_gameObjectID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ClearImageSources(WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ClearImageSources(in_AuxBusID, in_gameObjectID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGeometry(WWISEC_AkGeometrySetID in_GeomSetID, const WWISEC_AkGeometryParams* in_params)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGeometry(in_GeomSetID.id, *reinterpret_cast<const AkGeometryParams*>(in_params)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometry(WWISEC_AkGeometrySetID in_SetID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveGeometry(in_SetID.id));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID, const WWISEC_AkGeometryInstanceParams* in_params)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGeometryInstance(in_GeometryInstanceID.id, *reinterpret_cast<const AkGeometryInstanceParams*>(in_params)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveGeometryInstance(in_GeometryInstanceID.id));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::QueryReflectionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkReflectionPathInfo*>(out_aPaths), *io_uArraySize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetRoom(WWISEC_AkRoomID in_RoomID, const WWISEC_AkRoomParams* in_Params, const char* in_RoomName)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetRoom(in_RoomID.id, *reinterpret_cast<const AkRoomParams*>(in_Params), in_RoomName));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveRoom(WWISEC_AkRoomID in_RoomID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveRoom(in_RoomID.id));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortal(WWISEC_AkPortalID in_PortalID, const WWISEC_AkPortalParams* in_Params, const char* in_PortalName)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetPortal(in_PortalID.id, *reinterpret_cast<const AkPortalParams*>(in_Params), in_PortalName));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemovePortal(WWISEC_AkPortalID in_PortalID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemovePortal(in_PortalID.id));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGameObjectInRoom(in_gameObjectID, in_CurrentRoomID.id));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflectionsOrder, bool in_bUpdatePaths)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetReflectionsOrder(in_uReflectionsOrder, in_bUpdatePaths));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffractionOrder, bool in_bUpdatePaths)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetDiffractionOrder(in_uDiffractionOrder, in_bUpdatePaths));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPrimaryRays)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetNumberOfPrimaryRays(in_uNbPrimaryRays));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(AkUInt32 in_uNbFrames)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetLoadBalancingSpread(in_uNbFrames));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetEarlyReflectionsAuxSend(in_gameObjectID, in_auxBusID));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fSendVolume)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetEarlyReflectionsVolume(in_gameObjectID, in_fSendVolume));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction, AkReal32 in_fOcclusion)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetPortalObstructionAndOcclusion(in_PortalID.id, in_fObstruction, in_fOcclusion));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGameObjectToPortalObstruction(in_gameObjectID, in_PortalID.id, in_fObstruction));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalToPortalObstruction(WWISEC_AkPortalID in_PortalID0, WWISEC_AkPortalID in_PortalID1, AkReal32 in_fObstruction)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetPortalToPortalObstruction(in_PortalID0.id, in_PortalID1.id, in_fObstruction));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_portal, AkReal32* out_wetDiffraction)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::QueryWetDiffraction(in_portal.id, *out_wetDiffraction));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::QueryDiffractionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkDiffractionPathInfo*>(out_aPaths), *io_uArraySize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ResetStochasticEngine());
+}
 // END AkSpatialAudio
 
 // BEGIN AkReverbEstimation
