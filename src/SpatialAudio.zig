@@ -3,6 +3,8 @@ const c = @import("c.zig");
 const common = @import("common.zig");
 const reflect_game_data = @import("reflect_game_data.zig");
 
+pub const ReverbEstimation = @import("ReverbEstimation.zig");
+
 pub const AK_MAX_REFLECT_ORDER = c.WWISEC_AK_MAX_REFLECT_ORDER;
 pub const AK_MAX_REFLECTION_PATH_LENGTH = c.WWISEC_AK_MAX_REFLECTION_PATH_LENGTH;
 pub const AK_MAX_SOUND_PROPAGATION_DEPTH = c.WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH;

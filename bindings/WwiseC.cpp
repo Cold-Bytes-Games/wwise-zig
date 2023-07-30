@@ -2200,5 +2200,34 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine()
 // END AkSpatialAudio
 
 // BEGIN AkReverbEstimation
+float WWISEC_AK_SpatialAudio_ReverbEstimation_CalculateSlope(const WWISEC_AkAcousticTexture* texture)
+{
+    return AK::SpatialAudio::ReverbEstimation::CalculateSlope(*reinterpret_cast<const AkAcousticTexture*>(texture));
+}
+
+void WWISEC_AK_SpatialAudio_ReverbEstimation_GetAverageAbsorptionValues(WWISEC_AkAcousticTexture* in_textures, float* in_surfaceAreas, int in_numTextures, WWISEC_AkAcousticTexture* out_average)
+{
+    AK::SpatialAudio::ReverbEstimation::GetAverageAbsorptionValues(reinterpret_cast<AkAcousticTexture*>(in_textures), in_surfaceAreas, in_numTextures, *reinterpret_cast<AkAcousticTexture*>(out_average));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateT60Decay(AkReal32 in_volumeCubicMeters, AkReal32 in_surfaceAreaSquaredMeters, AkReal32 in_environmentAverageAbsorption, AkReal32* out_decayEstimate)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ReverbEstimation::EstimateT60Decay(in_volumeCubicMeters, in_surfaceAreaSquaredMeters, in_environmentAverageAbsorption, *out_decayEstimate));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(WWISEC_AkVector in_environmentExtentMeters, AkReal32* out_timeToFirstReflectionMs, AkReal32 in_speedOfSound)
+{
+    AkVector convertedAkVector;
+    convertedAkVector.X = in_environmentExtentMeters.X;
+    convertedAkVector.Y = in_environmentExtentMeters.Y;
+    convertedAkVector.Z = in_environmentExtentMeters.Z;
+
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ReverbEstimation::EstimateTimeToFirstReflection(convertedAkVector, *out_timeToFirstReflectionMs, in_speedOfSound));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateHFDamping(WWISEC_AkAcousticTexture* in_textures, float* in_surfaceAreas, int in_numTextures, AkReal32* out_hfDamping)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ReverbEstimation::EstimateHFDamping(reinterpret_cast<AkAcousticTexture*>(in_textures), in_surfaceAreas, in_numTextures, *out_hfDamping));
+}
 // END AkReverbEstimation
 #endif
