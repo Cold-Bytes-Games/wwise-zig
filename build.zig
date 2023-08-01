@@ -136,15 +136,22 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
         .target = target,
         .optimize = optimize,
     });
-    wwise_c.addCSourceFile(thisDir() ++ "/bindings/WwiseC.cpp", CppFlags);
-    wwise_c.addIncludePath(thisDir() ++ "/bindings");
+    wwise_c.addCSourceFile(.{
+        .file = .{
+            .path = thisDir() ++ "/bindings/WwiseC.cpp",
+        },
+        .flags = CppFlags,
+    });
+    wwise_c.addIncludePath(.{
+        .path = thisDir() ++ "/bindings",
+    });
 
     const static_plugin_step = StaticPluginStep.create(b, .{ .static_plugins = wwise_build_options.static_plugins });
-    wwise_c.addCSourceFileSource(.{
-        .args = CppFlags,
-        .source = .{
+    wwise_c.addCSourceFile(.{
+        .file = .{
             .generated = &static_plugin_step.output_file,
         },
+        .flags = CppFlags,
     });
 
     for (wwise_build_options.static_plugins) |static_plugin| {
@@ -207,9 +214,15 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
 pub fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
     const wwise_library_relative_path = try getWwiseLibraryPath(compile_step.step.owner, compile_step.target, wwise_build_options);
 
-    compile_step.addSystemIncludePath(compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" }));
-    compile_step.addIncludePath(thisDir() ++ "/bindings");
-    compile_step.addLibraryPath(compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path }));
+    compile_step.addSystemIncludePath(.{
+        .path = compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" }),
+    });
+    compile_step.addIncludePath(.{
+        .path = thisDir() ++ "/bindings",
+    });
+    compile_step.addLibraryPath(.{
+        .path = compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path }),
+    });
 
     if (wwise_build_options.use_communication) {
         compile_step.linkSystemLibrary("CommunicationCentral");
@@ -407,22 +420,44 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.CompileStep, wwise_build_o
         else => return error.OsNotSupported,
     };
 
-    compile_step.addIncludePath(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path}));
-    compile_step.addIncludePath(compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}", .{ wwise_build_options.wwise_sdk_path, platform_name }));
+    compile_step.addIncludePath(.{
+        .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path}),
+    });
+    compile_step.addIncludePath(.{
+        .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}", .{ wwise_build_options.wwise_sdk_path, platform_name }),
+    });
 
     if (wwise_build_options.useDefaultIoHooks()) {
-        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkMultipleFileLocation.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
-        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkGeneratedSoundBanksResolver.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
+        compile_step.addCSourceFile(.{
+            .file = .{
+                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkMultipleFileLocation.cpp", .{wwise_build_options.wwise_sdk_path}),
+            },
+            .flags = CppFlags,
+        });
+        compile_step.addCSourceFile(.{
+            .file = .{
+                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkGeneratedSoundBanksResolver.cpp", .{wwise_build_options.wwise_sdk_path}),
+            },
+            .flags = CppFlags,
+        });
     }
 
     if (wwise_build_options.include_default_io_hook_blocking) {
         compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING", null);
-        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookBlocking.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }), CppFlags);
+        compile_step.addCSourceFile(.{
+            .file = .{
+                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookBlocking.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }),
+            },
+            .flags = CppFlags,
+        });
     }
 
     if (wwise_build_options.include_default_io_hook_deferred) {
         compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", null);
-        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }), CppFlags);
+        compile_step.addCSourceFile(.{
+            .file = .{ .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }) },
+            .flags = CppFlags,
+        });
     }
 
     if (wwise_build_options.include_file_package_io_blocking) {
@@ -435,12 +470,27 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.CompileStep, wwise_build_o
 
     if (wwise_build_options.use_default_job_worker) {
         compile_step.defineCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", null);
-        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkJobWorkerMgr.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
+        compile_step.addCSourceFile(.{
+            .file = .{
+                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkJobWorkerMgr.cpp", .{wwise_build_options.wwise_sdk_path}),
+            },
+            .flags = CppFlags,
+        });
     }
 
     if (wwise_build_options.useFilePackageIO()) {
-        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackage.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
-        compile_step.addCSourceFile(compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackageLUT.cpp", .{wwise_build_options.wwise_sdk_path}), CppFlags);
+        compile_step.addCSourceFile(.{
+            .file = .{
+                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackage.cpp", .{wwise_build_options.wwise_sdk_path}),
+            },
+            .flags = CppFlags,
+        });
+        compile_step.addCSourceFile(.{
+            .file = .{
+                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackageLUT.cpp", .{wwise_build_options.wwise_sdk_path}),
+            },
+            .flags = CppFlags,
+        });
     }
 }
 
