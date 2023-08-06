@@ -14,9 +14,9 @@ This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
 1. Add this repo in your `build.zig.zon` file, you'll need to add the hash and update the commit hash to the latest commit in the branch
 ```zig
-  .wwise-zig = .{
-            .url = "https://github.com/Cold-Bytes-Games/wwise-zig/archive/e4cda8a9faafef1a01e6c7f9a3772500d6cbdc8c.tar.gz",
-        },
+.wwise-zig = .{
+    .url = "https://github.com/Cold-Bytes-Games/wwise-zig/archive/e4cda8a9faafef1a01e6c7f9a3772500d6cbdc8c.tar.gz",
+},
 ```
 2. Import the dependency in your `build.zig`. We currently don't support the default `dependency()` way due to limitations in the Zig build system. See the Usage section for the list of available options.
 
