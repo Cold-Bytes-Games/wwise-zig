@@ -2,6 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 
 const StaticPluginStep = @import("build/StaticPluginStep.zig");
+const GenerateWwiseIDStep = @import("build/GenerateWwiseIDStep.zig");
 
 const WwisePlatform = @import("src/wwise_platform.zig").WwisePlatform;
 
@@ -105,7 +106,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     const wwise_include_file_package_io_blocking_option = b.option(bool, "include_file_package_io_blocking", "Include the File Package IO Hook Blocking");
     const wwise_include_file_package_io_deferred_option = b.option(bool, "include_file_package_io_deferred", "Include the File Package IO Hook Deferred");
 
-    const wwisee_static_plugins_option = b.option([]const []const u8, "static_plugins", "List of builtin static plugins to build");
+    const wwise_static_plugins_option = b.option([]const []const u8, "static_plugins", "List of builtin static plugins to build");
 
     const wwise_configuration = wwise_configuration_option orelse config_options.configuration;
 
@@ -128,7 +129,7 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
         .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse config_options.include_file_package_io_blocking,
         .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse config_options.include_file_package_io_deferred,
         .string_stack_size = wwise_string_stack_size_option orelse 256,
-        .static_plugins = wwisee_static_plugins_option orelse config_options.static_plugins,
+        .static_plugins = wwise_static_plugins_option orelse config_options.static_plugins,
     };
 
     const wwise_c = b.addStaticLibrary(.{
@@ -315,8 +316,35 @@ pub fn addGenerateSoundBanksStep(b: *std.Build, wwise_project_path: []const u8, 
     }
 
     const run_step = b.addSystemCommand(arg_list.items);
+    run_step.step.name = "Generate Wwise Sound Banks";
     run_step.extra_file_dependencies = &.{absolute_wwise_project_path};
     return run_step;
+}
+
+pub const GenerateWwiseIDModuleOptions = struct {
+    /// Add a dependency to any step, such as generate sound banks
+    previous_step: ?*std.Build.Step = null,
+};
+
+pub fn generateWwiseIDModule(b: *std.Build, wwise_id_file_path: []const u8, wwise_zig_module: *std.Build.Module, options: GenerateWwiseIDModuleOptions) *std.build.Module {
+    const generate_id_module_step = GenerateWwiseIDStep.create(b, .{
+        .id_file_path = wwise_id_file_path,
+    });
+
+    if (options.previous_step) |previous_step| {
+        generate_id_module_step.step.dependOn(previous_step);
+    }
+
+    const id_module = b.createModule(.{
+        .source_file = .{
+            .generated = &generate_id_module_step.output_file,
+        },
+        .dependencies = &.{
+            .{ .name = "wwise-zig", .module = wwise_zig_module },
+        },
+    });
+
+    return id_module;
 }
 
 fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []const u8 {

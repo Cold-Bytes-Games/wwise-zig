@@ -10,6 +10,46 @@ The library assumes that you installed Wwise using the Wwise Launcher. We do not
 
 This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
+## Import it in your project
+,
+1. Add this repo in your `build.zig.zon` file, you'll need to add the hash and update the commit hash  to the latest commit in the branch
+```zig
+  .wwise-zig = .{
+            .url = "https://github.com/Cold-Bytes-Games/wwise-zig/archive/e4cda8a9faafef1a01e6c7f9a3772500d6cbdc8c.tar.gz",
+        },
+```
+2. Import the dependency in your `build.zig`. We currently don't support the default `dependency()` way.See the Usage section for the list of available options
+
+```zig
+const std = @import("std");
+const wwise_zig = @import("wwise-zig");
+
+pub fn build(b: *std.Build) !void {
+    const wwise_package = try wwise_zig.package(b, target, optimize, .{
+        .use_communication = true,
+        .use_default_job_worker = true,
+        .use_static_crt = true,
+        .include_file_package_io_blocking = true,
+        .configuration = .profile,
+        .static_plugins = &.{
+            "AkToneSource",
+            "AkParametricEQFX",
+            "AkDelayFX",
+            "AkPeakLimiterFX",
+            "AkRoomVerbFX",
+            "AkStereoDelayFX",
+            "AkSynthOneSource",
+            "AkAudioInputSource",
+            "AkVorbisDecoder",
+        },
+    });
+
+    exe.addModule("wwise-zig", wwise_package.module);
+    exe.linkLibrary(wwise_package.c_library);
+    try wwise_zig.wwiseLink(exe, wwise_package.options);
+}
+```
+
 ## Usage
 
 Available options:
@@ -91,21 +131,86 @@ pub fn main() !void {
 }
 ```
 
+### Generate the Sound Banks with the Zig build system
+
+We are bundling a build step to generate the sound banks. To use it:
+1. Include the wwise-zig dependency in youtr `build.zig.zon` file.
+1. Import the wwise-zig module in your `build.zig`.
+1. Call `addGenerateSooundBanksStep()` and pass the `std.Build` instance and some optioons.
+1. After that, it is recommended that you add the generate sound banks steps as a dependency of your compile step.
+
+Options available:
+| Option | Values | Description |
+| -- | -- | -- |
+| `override_wwise_sdk_path` | `[]const u8` | Override the path of the Wwise SDK, if not it will use the WWISESDK environment variable |
+| `platforms` | ` []const WwisePlatform` | Explicit list the platforms you want to generate the sound banks, if nothing specified, all the platforms will be generated |
+| `languages` | `[]const []const u8` | Explicit list of the languages to generate, if not specified it will build all the languages |
+| `target` | `std.zig.CrossTarget` | Instead of passing the platforms, you can use the target from Zig |
+| `output_folder` | `[]const u8` | Output folder of the sound banks, will use the default in the project if omitted |
+| `sound_banks` | `[]const []const u8` | List of sound banks to generate, if not specified it will build all the sound banks |
+| `root_output_path` | `[]const u8` | Overrides the root output path specified in the soundbank settings|
+
+Example:
+```zig
+const std = @import("std");
+const wwise_zig = @import("wwise-zig");
+
+pub fn build(b: *std.Build) !void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const build_soundbanks_step = try wwise_zig.addGenerateSoundBanksStep(b, "WwiseProject/IntegrationDemo.wproj", .{
+        .target = target,
+    });
+
+     const exe = b.addExecutable(.{
+        .name = "wwise-zig-demo",
+        .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.step.dependOn(&build_soundbanks_step.step);
+
+    // [...]
+}
+```
+
+### Generate a zig module with Wwise ID
+
+If specified in the Wwise project settings, you can generate a C header file that contains all the unique ID of your events, soundbanks, states, switch, game parameters. We include a way to parse that header file and generate a Zig module on the fly.
+
+You need to pass the main `wwise-zig` module to the function because we use `AkUniqueID` from the main module.
+
+It is recommended that you add a dependency to the generated sound banks step if you use it in your `build.zig` file.
+
+```zig
+const std = @import("std");
+const wwise_zig = @import("wwise-zig");
+
+pub fn build(b: *std.Build) !void {
+    // [...]
+     const wwise_id_module = wwise_zig.generateWwiseIDModule(b, "WwiseProject/GeneratedSoundBanks/Wwise_IDs.h", wwise_package.module, .{
+        .previous_step = &build_soundbanks_step.step,
+    });
+
+    exe.addModule("wwise-ids", wwise_id_module);
+```
+
 ## Supported platforms
 
-| Platform | Architecture           |  Tested |
-| --       | --                     | --      |
-| Windows  | x86 (msvc ABI only)    | ❌      |
-| Windows  | x86-64 (msvc ABI only) | ✅      |
-| Linux    | x86-64                 | ✅      |
-| Linux    | aarch64                | ❌      |
-| Android  | arm64                  | ❌      |
-| Android  | arm                    | ❌      |
-| Android  | x86                    | ❌      |
-| Android  | x86-64                 | ❌      |
-| Mac      | x86-64                 | ❌      |
-| iOS      |                        | ❌      |
-| tvOS     |                        | ❌      |
+| Platform | Architecture                   |  Tested |
+| --       | --                             | --      |
+| Windows  | x86 (msvc ABI only)            | ❌      |
+| Windows  | x86-64 (msvc ABI only)         | ✅      |
+| Linux    | x86-64                         | ✅      |
+| Linux    | aarch64                        | ❌      |
+| Android  | arm64                          | ❌      |
+| Android  | arm                            | ❌      |
+| Android  | x86                            | ❌      |
+| Android  | x86-64                         | ❌      |
+| Mac      | Universal (x86-64 and aarch64) | ❌      |
+| iOS      |                                | ❌      |
+| tvOS     |                                | ❌      |
 
 - On Windows, the default GNU ABI is not supported, always use the MSVC ABI
 - On Windows, we always use the latest supported Visual Studio (currently 2022)

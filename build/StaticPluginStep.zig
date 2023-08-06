@@ -75,11 +75,6 @@ fn make(step: *Step, prog_node: *std.Progress.Node) !void {
 
     const digest = man.final();
 
-    // If output_path has directory parts, deal with them.  Example:
-    // output_dir is zig-cache/o/HASH
-    // output_path is libavutil/avconfig.h
-    // We want to open directory zig-cache/o/HASH/libavutil/
-    // but keep output_dir as zig-cache/o/HASH for -I include
     const sub_path = try std.fs.path.join(arena, &.{ "o", &digest, file_name });
     const sub_path_dirname = std.fs.path.dirname(sub_path).?;
 
