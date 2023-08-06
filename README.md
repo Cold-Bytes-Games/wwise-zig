@@ -18,7 +18,7 @@ This is a 3rd party binding and it is not affiliated with Audiokinetic.
             .url = "https://github.com/Cold-Bytes-Games/wwise-zig/archive/e4cda8a9faafef1a01e6c7f9a3772500d6cbdc8c.tar.gz",
         },
 ```
-2. Import the dependency in your `build.zig`. We currently don't support the default `dependency()` way.See the Usage section for the list of available options
+2. Import the dependency in your `build.zig`. We currently don't support the default `dependency()` way due to limitations in the Zig build system. See the Usage section for the list of available options.
 
 ```zig
 const std = @import("std");
