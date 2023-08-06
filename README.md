@@ -11,8 +11,8 @@ The library assumes that you installed Wwise using the Wwise Launcher. We do not
 This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
 ## Import it in your project
-,
-1. Add this repo in your `build.zig.zon` file, you'll need to add the hash and update the commit hash  to the latest commit in the branch
+
+1. Add this repo in your `build.zig.zon` file, you'll need to add the hash and update the commit hash to the latest commit in the branch
 ```zig
   .wwise-zig = .{
             .url = "https://github.com/Cold-Bytes-Games/wwise-zig/archive/e4cda8a9faafef1a01e6c7f9a3772500d6cbdc8c.tar.gz",
@@ -80,6 +80,30 @@ pub fn main() !void {
     defer AK.MemoryMgr.term();
 }
 ```
+
+You can also look at the Integration Demo ported to Zig here for how the API is used in a sample application: https://github.com/Cold-Bytes-Games/wwise-zig-demo
+
+## Supported platforms
+
+| Platform | Architecture                   |  Tested |
+| --       | --                             | --      |
+| Windows  | x86 (msvc ABI only)            | ❌      |
+| Windows  | x86-64 (msvc ABI only)         | ✅      |
+| Linux    | x86-64                         | ✅      |
+| Linux    | aarch64                        | ❌      |
+| Android  | arm64                          | ❌      |
+| Android  | arm                            | ❌      |
+| Android  | x86                            | ❌      |
+| Android  | x86-64                         | ❌      |
+| Mac      | Universal (x86-64 and aarch64) | ❌      |
+| iOS      |                                | ❌      |
+| tvOS     |                                | ❌      |
+
+- On Windows, the default GNU ABI is not supported, always use the MSVC ABI
+- On Windows, we always use the latest supported Visual Studio (currently 2022)
+- On Linux, the default I/O hooks are currently not supported (see #1)
+- UWP is gonna be deprecated so it is not supported
+- No support for consoles yet
 
 ### Handling AkOsChar and C null-terminated strings
 
@@ -195,28 +219,6 @@ pub fn build(b: *std.Build) !void {
 
     exe.addModule("wwise-ids", wwise_id_module);
 ```
-
-## Supported platforms
-
-| Platform | Architecture                   |  Tested |
-| --       | --                             | --      |
-| Windows  | x86 (msvc ABI only)            | ❌      |
-| Windows  | x86-64 (msvc ABI only)         | ✅      |
-| Linux    | x86-64                         | ✅      |
-| Linux    | aarch64                        | ❌      |
-| Android  | arm64                          | ❌      |
-| Android  | arm                            | ❌      |
-| Android  | x86                            | ❌      |
-| Android  | x86-64                         | ❌      |
-| Mac      | Universal (x86-64 and aarch64) | ❌      |
-| iOS      |                                | ❌      |
-| tvOS     |                                | ❌      |
-
-- On Windows, the default GNU ABI is not supported, always use the MSVC ABI
-- On Windows, we always use the latest supported Visual Studio (currently 2022)
-- On Linux, the default I/O hooks are currently not supported (see #1)
-- UWP is gonna be deprecated so it is not supported
-- No support for consoles yet
 
 ## Versioning info
 
