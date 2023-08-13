@@ -259,11 +259,11 @@ pub const AkRoomParams = extern struct {
 };
 
 pub const AkGeometryParams = extern struct {
-    triangles: ?[*]AkTriangle = null,
+    triangles: ?[*]const AkTriangle = null,
     num_triangles: AkTriIdx = 0,
-    vertices: ?[*]AkVertex = null,
+    vertices: ?[*]const AkVertex = null,
     num_vertices: AkVertIdx = 0,
-    surfaces: ?[*]AkAcousticSurface = null,
+    surfaces: ?[*]const AkAcousticSurface = null,
     num_surfaces: AkSurfIdx = 0,
     enable_diffraction: bool = false,
     enable_diffraction_on_boundary_edges: bool = false,
