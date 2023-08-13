@@ -210,7 +210,7 @@ pub const AkDiffractionPathInfo = extern struct {
     virtual_pos: common.AkWorldTransform = .{},
     node_count: u32 = 0,
     diffraction: f32 = 0.0,
-    transmission_lost: f32 = 0.0,
+    transmission_loss: f32 = 0.0,
     tot_length: f32 = 0.0,
     obstruction_value: f32 = 0.0,
 
@@ -455,13 +455,18 @@ pub const SetRoomOptionalArgs = struct {
 };
 
 pub fn setRoom(in_room_id: AkRoomID, in_params: *const AkRoomParams, optional_args: SetRoomOptionalArgs) common.WwiseError!void {
+    var area_allocator_opt: ?std.heap.ArenaAllocator = null;
+    defer {
+        if (area_allocator_opt) |area_allocator| {
+            area_allocator.deinit();
+        }
+    }
+
     const raw_name = blk: {
         if (optional_args.allocator != null and optional_args.room_name != null) {
-            var stack_char_allocator = common.stackCharAllocator(optional_args.allocator.?);
-            var allocator = stack_char_allocator.get();
+            area_allocator_opt = std.heap.ArenaAllocator.init(optional_args.allocator.?);
 
-            const converted_name = common.toCString(allocator, optional_args.room_name.?) catch return common.WwiseError.Fail;
-            defer allocator.free(converted_name);
+            const converted_name = common.toCString(area_allocator_opt.?.allocator(), optional_args.room_name.?) catch return common.WwiseError.Fail;
 
             break :blk @as(?[*:0]const u8, converted_name);
         }
@@ -490,13 +495,18 @@ pub const SetPortalOptionalArgs = struct {
 };
 
 pub fn setPortal(in_portal_id: AkPortalID, in_params: *const AkPortalParams, optional_args: SetPortalOptionalArgs) common.WwiseError!void {
+    var area_allocator_opt: ?std.heap.ArenaAllocator = null;
+    defer {
+        if (area_allocator_opt) |area_allocator| {
+            area_allocator.deinit();
+        }
+    }
+
     const raw_name = blk: {
         if (optional_args.allocator != null and optional_args.portal_name != null) {
-            var stack_char_allocator = common.stackCharAllocator(optional_args.allocator.?);
-            var allocator = stack_char_allocator.get();
+            area_allocator_opt = std.heap.ArenaAllocator.init(optional_args.allocator.?);
 
-            const converted_name = common.toCString(allocator, optional_args.portal_name.?) catch return common.WwiseError.Fail;
-            defer allocator.free(converted_name);
+            const converted_name = common.toCString(area_allocator_opt.?.allocator(), optional_args.portal_name.?) catch return common.WwiseError.Fail;
 
             break :blk @as(?[*:0]const u8, converted_name);
         }
