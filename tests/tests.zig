@@ -167,10 +167,6 @@ test "CAkFilePackageLowLevelIOBlocking create" {
         return error.SkipZigTest;
     }
 
-    if (builtin.os.tag == .linux) {
-        return error.SkipZigTest;
-    }
-
     var memory_settings: AK.AkMemSettings = .{};
     AK.MemoryMgr.getDefaultSettings(&memory_settings);
 
@@ -210,10 +206,6 @@ test "CAkFilePackageLowLevelIOBlocking create" {
 
 test "CAkFilePackageLowLevelIODeferred create" {
     if (AK.IOHooks.CAkFilePackageLowLevelIODeferred == void) {
-        return error.SkipZigTest;
-    }
-
-    if (builtin.os.tag == .linux) {
         return error.SkipZigTest;
     }
 
