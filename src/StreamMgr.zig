@@ -199,7 +199,7 @@ pub const IAkIOHookBlocking = opaque {
         ) callconv(.C) common.AKRESULT,
     };
 
-    pub inline fn close(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc) common.WwiseError!void {
+    pub fn close(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_Close(
                 @ptrCast(self),
@@ -208,24 +208,24 @@ pub const IAkIOHookBlocking = opaque {
         );
     }
 
-    pub inline fn getBlockSize(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc) u32 {
+    pub fn getBlockSize(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc) u32 {
         return c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetBlockSize(
             @ptrCast(self),
             @constCast(@ptrCast(in_file_desc)),
         );
     }
 
-    pub inline fn getDeviceDesc(self: *IAkIOHookBlocking, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
+    pub fn getDeviceDesc(self: *IAkIOHookBlocking, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
         var raw_device_desc: stream_interfaces.NativeAkDeviceDesc = undefined;
         c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetDeviceDesc(@ptrCast(self), @ptrCast(&raw_device_desc));
         out_device_desc.* = try stream_interfaces.AkDeviceDesc.fromC(&raw_device_desc, allocator);
     }
 
-    pub inline fn getDeviceData(self: *IAkIOHookBlocking) u32 {
+    pub fn getDeviceData(self: *IAkIOHookBlocking) u32 {
         return c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetDeviceData(@ptrCast(self));
     }
 
-    pub inline fn read(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc, in_heuristics: *const AkIoHeuristics, out_buffer: ?*anyopaque, in_transfer_info: *const AkIOTransferInfo) common.WwiseError!void {
+    pub fn read(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc, in_heuristics: *const AkIoHeuristics, out_buffer: ?*anyopaque, in_transfer_info: *const AkIOTransferInfo) common.WwiseError!void {
         try common.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_Read(
                 @ptrCast(self),
@@ -237,7 +237,7 @@ pub const IAkIOHookBlocking = opaque {
         );
     }
 
-    pub inline fn write(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc, in_heuristics: *const AkIoHeuristics, in_data: ?*anyopaque, io_transfer_info: *AkIOTransferInfo) common.WwiseError!void {
+    pub fn write(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc, in_heuristics: *const AkIoHeuristics, in_data: ?*anyopaque, io_transfer_info: *AkIOTransferInfo) common.WwiseError!void {
         try common.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_Write(
                 @ptrCast(self),
@@ -261,129 +261,126 @@ pub const IAkIOHookBlocking = opaque {
 };
 
 // Inherits from IAkLowLevelIOHook
-pub const IAkIOHookDeferredBatch = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkIOHookDeferredBatch) = .{},
-        close: *const fn (iself: *IAkIOHookDeferredBatch, in_file_desc: *c.WWISEC_AkFileDesc) callconv(.C) c.WWISEC_AKRESULT,
-        get_block_size: *const fn (iself: *IAkIOHookDeferredBatch, in_file_desc: *c.WWISEC_AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkIOHookDeferredBatch, out_device_desc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
-        get_device_data: *const fn (iself: *IAkIOHookDeferredBatch) callconv(.C) u32,
+pub const IAkIOHookDeferredBatch = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (iself: *IAkIOHookBlocking) callconv(.C) void,
+        close: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (iself: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
+        get_device_data: *const fn (iself: *IAkIOHookBlocking) callconv(.C) u32,
         batch_read: *const fn (
             iself: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
-            in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
+            in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
-            io_dispatch_results: [*]c.WWISEC_AKRESULT,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            io_dispatch_results: [*]common.AKRESULT,
+        ) callconv(.C) common.AKRESULT,
         batch_write: *const fn (
             iself: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
-            in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
+            in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
-            io_dispatch_results: [*]c.WWISEC_AKRESULT,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            io_dispatch_results: [*]common.AKRESULT,
+        ) callconv(.C) common.AKRESULT,
         batch_cancel: *const fn (
             iself: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
-            in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
+            in_transfer_items: [*]BatchIoTransferItem,
             io_cancel_all_transfers_for_this_file: [*]*bool,
         ) callconv(.C) void,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IAkIOHookDeferredBatch) *const T {
-                return @ptrCast(iself);
-            }
+    pub const BatchIoTransferItem = extern struct {
+        file_desc: ?*AkFileDesc = null,
+        io_heuristics: AkIoHeuristics = .{},
+        transfer_info: ?[*]AkAsyncIOTransferInfo = null,
+    };
 
-            pub inline fn toMutableSelf(iself: *IAkIOHookDeferredBatch) *T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).virtual_destructor.call(@ptrCast(self));
-            }
-
-            pub inline fn close(self: *T, in_file_desc: AkFileDesc) common.WwiseError!void {
-                var raw_file_desc = in_file_desc.toC();
-                return common.handleAkResult(
-                    @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).close(@ptrCast(self), &raw_file_desc),
-                );
-            }
-
-            pub inline fn getBlockSize(self: *T, in_file_desc: AkFileDesc) u32 {
-                var raw_file_desc = in_file_desc.toC();
-                return @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).get_block_size(@ptrCast(self), &raw_file_desc);
-            }
-
-            pub inline fn getDeviceDesc(self: *T, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
-                var raw_device_desc: c.WWISEC_AkDeviceDesc = undefined;
-                @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).get_device_desc(@ptrCast(self), &raw_device_desc);
-                out_device_desc.* = try stream_interfaces.AkDeviceDesc.fromC(raw_device_desc, allocator);
-            }
-
-            pub inline fn getDeviceData(self: *T) u32 {
-                return @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).get_device_data(@ptrCast(self));
-            }
-
-            pub inline fn batchRead(
-                self: *T,
-                in_num_transfers: u32,
-                in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
-                in_batch_io_callback: AkBatchIOCallback,
-                io_dispatch_results: [*]c.WWISEC_AKRESULT,
-            ) common.WwiseError!void {
-                return common.handleAkResult(
-                    @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).batch_read(
-                        @ptrCast(self),
-                        in_num_transfers,
-                        in_transfer_items,
-                        in_batch_io_callback,
-                        io_dispatch_results,
-                    ),
-                );
-            }
-
-            pub inline fn batchWrite(
-                self: *T,
-                in_num_transfers: u32,
-                in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
-                in_batch_io_callback: AkBatchIOCallback,
-                io_dispatch_results: [*]c.WWISEC_AKRESULT,
-            ) common.WwiseError!void {
-                return common.handleAkResult(
-                    @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).batch_write(
-                        @as(*IAkIOHookDeferredBatch, @ptrCast(self)),
-                        in_num_transfers,
-                        in_transfer_items,
-                        in_batch_io_callback,
-                        io_dispatch_results,
-                    ),
-                );
-            }
-
-            pub inline fn batchCancel(
-                self: *T,
-                in_num_transfers: u32,
-                in_transfer_items: [*]c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem,
-                io_cancel_all_transfers_for_this_file: [*]*bool,
-            ) void {
-                @as(*const IAkIOHookDeferredBatch.VTable, @ptrCast(self.__v)).batch_cancel(
-                    @ptrCast(self),
-                    in_num_transfers,
-                    in_transfer_items,
-                    io_cancel_all_transfers_for_this_file,
-                );
-            }
-        };
+    pub fn close(self: *IAkIOHookDeferredBatch, in_file_desc: *const AkFileDesc) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Close(
+                @ptrCast(self),
+                @constCast(@ptrCast(in_file_desc)),
+            ),
+        );
     }
 
-    pub const BatchIoTransferItem = c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem;
+    pub fn getBlockSize(self: *IAkIOHookDeferredBatch, in_file_desc: *const AkFileDesc) u32 {
+        return c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetBlockSize(
+            @ptrCast(self),
+            @constCast(@ptrCast(in_file_desc)),
+        );
+    }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn getDeviceDesc(self: *IAkIOHookDeferredBatch, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
+        var raw_device_desc: stream_interfaces.NativeAkDeviceDesc = undefined;
+        c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetDeviceDesc(@ptrCast(self), @ptrCast(&raw_device_desc));
+        out_device_desc.* = try stream_interfaces.AkDeviceDesc.fromC(&raw_device_desc, allocator);
+    }
+
+    pub fn getDeviceData(self: *IAkIOHookDeferredBatch) u32 {
+        return c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetDeviceData(@ptrCast(self));
+    }
+
+    pub fn batchRead(
+        self: *IAkIOHookDeferredBatch,
+        in_num_transfers: u32,
+        in_transfer_items: [*]BatchIoTransferItem,
+        in_batch_io_callback: AkBatchIOCallback,
+        io_dispatch_results: [*]common.AKRESULT,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchRead(
+                @ptrCast(self),
+                in_num_transfers,
+                @ptrCast(in_transfer_items),
+                @ptrCast(in_batch_io_callback),
+                @ptrCast(io_dispatch_results),
+            ),
+        );
+    }
+
+    pub fn batchWrite(
+        self: *IAkIOHookDeferredBatch,
+        in_num_transfers: u32,
+        in_transfer_items: [*]BatchIoTransferItem,
+        in_batch_io_callback: AkBatchIOCallback,
+        io_dispatch_results: [*]common.AKRESULT,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchWrite(
+                @ptrCast(self),
+                in_num_transfers,
+                @ptrCast(in_transfer_items),
+                @ptrCast(in_batch_io_callback),
+                @ptrCast(io_dispatch_results),
+            ),
+        );
+    }
+
+    pub fn batchCancel(
+        self: *IAkIOHookDeferredBatch,
+        in_num_transfers: u32,
+        in_transfer_items: [*]BatchIoTransferItem,
+        io_cancel_all_transfers_for_this_file: [*]*bool,
+    ) void {
+        c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchCancel(
+            @ptrCast(self),
+            in_num_transfers,
+            @ptrCast(in_transfer_items),
+            @ptrCast(io_cancel_all_transfers_for_this_file),
+        );
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkIOHookDeferredBatch {
+        return @ptrCast(
+            c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 // Inherits from IAkIOHookDeferredBatch

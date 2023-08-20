@@ -2453,6 +2453,36 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookBlocking_Read(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance, WWISEC_AkFileDesc* in_fileDesc, const WWISEC_AkIoHeuristics* in_heuristics, void* out_pBuffer, WWISEC_AkIOTransferInfo* in_transferInfo);
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookBlocking_Write(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance, WWISEC_AkFileDesc* in_fileDesc, const WWISEC_AkIoHeuristics* in_heuristics, void* in_pData, WWISEC_AkIOTransferInfo* io_transferInfo);
 
+    typedef struct WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch;
+
+    typedef struct WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+        WWISEC_AKRESULT(*Close)
+        (void* instance, WWISEC_AkFileDesc* in_fileDesc);
+        AkUInt32 (*GetBlockSize)(void* instance, WWISEC_AkFileDesc* in_fileDesc);
+        void (*GetDeviceDesc)(void* instance, WWISEC_AkDeviceDesc* out_deviceDesc);
+        AkUInt32 (*GetDeviceData)(void* instance);
+
+        WWISEC_AKRESULT(*BatchRead)
+        (void* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, WWISEC_AkBatchIOCallback in_pBatchIoCallback, WWISEC_AKRESULT* io_pDispatchResults);
+
+        WWISEC_AKRESULT(*BatchWrite)
+        (void* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, WWISEC_AkBatchIOCallback in_pBatchIoCallback, WWISEC_AKRESULT* io_pDispatchResults);
+
+        void (*BatchCancel)(void* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile);
+    } WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_FunctionTable;
+    WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_FunctionTable* functionTable);
+    void WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_DestroyInstance(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance);
+
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Close(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, WWISEC_AkFileDesc* in_fileDesc);
+    AkUInt32 WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetBlockSize(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, WWISEC_AkFileDesc* in_fileDesc);
+    void WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetDeviceDesc(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, WWISEC_AkDeviceDesc* out_deviceDesc);
+    AkUInt32 WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetDeviceData(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchRead(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, WWISEC_AkBatchIOCallback in_pBatchIoCallback, WWISEC_AKRESULT* io_pDispatchResults);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchWrite(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, WWISEC_AkBatchIOCallback in_pBatchIoCallback, WWISEC_AKRESULT* io_pDispatchResults);
+    void WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchCancel(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile);
+
     void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings);
     void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings);
     void* WWISEC_AK_StreamMgr_GetFileLocationResolver();

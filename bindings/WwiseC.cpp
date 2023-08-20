@@ -1567,6 +1567,118 @@ WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookBlocking_Write(WWISEC_AK_StreamMgr_
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkIOHookBlocking*>(instance)->Write(*reinterpret_cast<AkFileDesc*>(in_fileDesc), *reinterpret_cast<const AkIoHeuristics*>(in_heuristics), in_pData, *reinterpret_cast<AkIOTransferInfo*>(io_transferInfo)));
 }
 
+class WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Wrapper : public AK::StreamMgr::IAkIOHookDeferredBatch
+{
+  public:
+    WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Wrapper(void* instance, const WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    AKRESULT Close(AkFileDesc& in_fileDesc) override
+    {
+        return static_cast<AKRESULT>(_functions.Close(_instance, reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc)));
+    }
+
+    AkUInt32 GetBlockSize(AkFileDesc& in_fileDesc) override
+    {
+        return _functions.GetBlockSize(_instance, reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc));
+    }
+
+    void GetDeviceDesc(AkDeviceDesc& out_deviceDesc) override
+    {
+        _functions.GetDeviceDesc(_instance, reinterpret_cast<WWISEC_AkDeviceDesc*>(&out_deviceDesc));
+    }
+
+    AkUInt32 GetDeviceData() override
+    {
+        return _functions.GetDeviceData(_instance);
+    }
+
+    AKRESULT BatchRead(AkUInt32 in_uNumTransfers, BatchIoTransferItem* in_pTransferItems, AkBatchIOCallback in_pBatchIoCallback, AKRESULT* io_pDispatchResults) override
+    {
+        return static_cast<AKRESULT>(
+            _functions.BatchRead(
+                _instance,
+                in_uNumTransfers,
+                reinterpret_cast<WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem*>(in_pTransferItems),
+                reinterpret_cast<WWISEC_AkBatchIOCallback>(in_pBatchIoCallback),
+                reinterpret_cast<WWISEC_AKRESULT*>(io_pDispatchResults)));
+    }
+
+    AKRESULT BatchWrite(AkUInt32 in_uNumTransfers, BatchIoTransferItem* in_pTransferItems, AkBatchIOCallback in_pBatchIoCallback, AKRESULT* io_pDispatchResults) override
+    {
+        return static_cast<AKRESULT>(
+            _functions.BatchWrite(
+                _instance,
+                in_uNumTransfers,
+                reinterpret_cast<WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem*>(in_pTransferItems),
+                reinterpret_cast<WWISEC_AkBatchIOCallback>(in_pBatchIoCallback),
+                reinterpret_cast<WWISEC_AKRESULT*>(io_pDispatchResults)));
+    }
+
+    void BatchCancel(AkUInt32 in_uNumTransfers, BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile) override
+    {
+        _functions.BatchCancel(_instance, in_uNumTransfers, reinterpret_cast<WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem*>(in_pTransferItems), io_ppbCancelAllTransfersForThisFile);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_FunctionTable _functions;
+};
+
+WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch*>(AkNew(AkMemID_Integration, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_DestroyInstance(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance)
+{
+    WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_Close(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, WWISEC_AkFileDesc* in_fileDesc)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch*>(instance)->Close(*reinterpret_cast<AkFileDesc*>(in_fileDesc)));
+}
+
+AkUInt32 WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetBlockSize(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, WWISEC_AkFileDesc* in_fileDesc)
+{
+    return reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch*>(instance)->GetBlockSize(*reinterpret_cast<AkFileDesc*>(in_fileDesc));
+}
+
+void WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetDeviceDesc(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, WWISEC_AkDeviceDesc* out_deviceDesc)
+{
+    reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch*>(instance)->GetDeviceDesc(*reinterpret_cast<AkDeviceDesc*>(out_deviceDesc));
+}
+
+AkUInt32 WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_GetDeviceData(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance)
+{
+    return reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch*>(instance)->GetDeviceData();
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchRead(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, WWISEC_AkBatchIOCallback in_pBatchIoCallback, WWISEC_AKRESULT* io_pDispatchResults)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch*>(instance)->BatchRead(in_uNumTransfers, reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch::BatchIoTransferItem*>(in_pTransferItems), reinterpret_cast<AkBatchIOCallback>(in_pBatchIoCallback), reinterpret_cast<AKRESULT*>(io_pDispatchResults)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchWrite(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, WWISEC_AkBatchIOCallback in_pBatchIoCallback, WWISEC_AKRESULT* io_pDispatchResults)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch*>(instance)->BatchRead(in_uNumTransfers, reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch::BatchIoTransferItem*>(in_pTransferItems), reinterpret_cast<AkBatchIOCallback>(in_pBatchIoCallback), reinterpret_cast<AKRESULT*>(io_pDispatchResults)));
+}
+
+void WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchCancel(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile)
+{
+    reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch*>(instance)->BatchCancel(in_uNumTransfers, reinterpret_cast<AK::StreamMgr::IAkIOHookDeferredBatch::BatchIoTransferItem*>(in_pTransferItems), io_ppbCancelAllTransfersForThisFile);
+}
+
 void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings)
 {
     return AK::StreamMgr::Create(*reinterpret_cast<AkStreamMgrSettings*>(in_settings));
