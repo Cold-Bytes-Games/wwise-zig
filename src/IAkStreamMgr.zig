@@ -115,30 +115,38 @@ pub const AkAutoStmBufSettings = extern struct {
     }
 };
 
+pub const NativeAkDeviceDesc = extern struct {
+    device_id: common.AkDeviceID = 0,
+    can_write: bool = false,
+    can_read: bool = false,
+    device_name: [16]c.AkUtf16 = undefined,
+    string_size: u32 = 0,
+};
+
 pub const AkDeviceDesc = struct {
     device_id: common.AkDeviceID = 0,
     can_write: bool = false,
     can_read: bool = false,
-    device_name: []const u8,
+    device_name: []const u8 = "",
 
-    pub fn fromC(value: c.WWISEC_AkDeviceDesc, allocator: std.mem.Allocator) !AkDeviceDesc {
+    pub fn fromC(value: *const NativeAkDeviceDesc, allocator: std.mem.Allocator) !AkDeviceDesc {
         return .{
-            .device_id = value.deviceID,
-            .can_write = value.bCanWrite,
-            .can_read = value.bCanRead,
-            .device_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.szDeviceName[0..value.uStringSize]),
+            .device_id = value.device_id,
+            .can_write = value.can_write,
+            .can_read = value.can_read,
+            .device_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.device_name[0..value.string_size]),
         };
     }
 
-    pub fn toC(self: AkDeviceDesc) !c.WWISEC_AkDeviceDesc {
-        var result: c.WWISEC_AkDeviceDesc = undefined;
+    pub fn toC(self: AkDeviceDesc) !NativeAkDeviceDesc {
+        var result: NativeAkDeviceDesc = undefined;
 
-        result.deviceID = self.device_id;
-        result.bCanWrite = self.can_write;
-        result.bCanRead = self.can_read;
+        result.device_id = self.device_id;
+        result.can_write = self.can_write;
+        result.can_read = self.can_read;
 
-        @memset(&result.szDeviceName, 0);
-        result.uStringSize = @truncate(try std.unicode.utf8ToUtf16Le(&result.szDeviceName, self.device_name));
+        @memset(&result.device_name, 0);
+        result.string_size = @truncate(try std.unicode.utf8ToUtf16Le(&result.device_name, self.device_name));
 
         return result;
     }

@@ -61,8 +61,8 @@ test "AkDeviceDesc toC()" {
 
     var raw_device_desc = try device_desc.toC();
 
-    try std.testing.expectEqualSlices(u16, std.unicode.utf8ToUtf16LeStringLiteral("Zig test"), raw_device_desc.szDeviceName[0..raw_device_desc.uStringSize]);
-    try std.testing.expectEqual(device_desc.device_name.len, raw_device_desc.uStringSize);
+    try std.testing.expectEqualSlices(u16, std.unicode.utf8ToUtf16LeStringLiteral("Zig test"), raw_device_desc.device_name[0..raw_device_desc.string_size]);
+    try std.testing.expectEqual(device_desc.device_name.len, raw_device_desc.string_size);
 }
 
 test "AkStreamRecord toC()" {
@@ -326,4 +326,137 @@ test "AkMusicEngine init" {
 
     try AK.MusicEngine.init(&music_settings);
     defer AK.MusicEngine.term();
+}
+
+const ZigTestIAkOHookBlocking = struct {
+    destructor_called: bool = false,
+    close_called: bool = false,
+    get_block_size_called: bool = false,
+    get_device_desc_called: bool = false,
+    get_device_data_called: bool = false,
+    read_called: bool = false,
+    write_called: bool = false,
+    close_size: i64 = 0,
+
+    pub fn destructor(self: *ZigTestIAkOHookBlocking) callconv(.C) void {
+        self.destructor_called = true;
+    }
+
+    pub fn close(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.C) AK.AKRESULT {
+        self.close_size = in_file_desc.file_size;
+        self.close_called = true;
+
+        return .success;
+    }
+
+    pub fn getBlockSize(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.C) u32 {
+        _ = in_file_desc;
+        self.get_block_size_called = true;
+        return 512;
+    }
+
+    pub fn getDeviceDesc(self: *ZigTestIAkOHookBlocking, out_device_desc: *AK.NativeAkDeviceDesc) callconv(.C) void {
+        self.get_device_desc_called = true;
+
+        var zig_device_desc = AK.AkDeviceDesc{};
+        zig_device_desc.can_write = false;
+        zig_device_desc.can_read = true;
+        zig_device_desc.device_name = "wwise-zig IO";
+
+        out_device_desc.* = zig_device_desc.toC() catch unreachable;
+    }
+
+    pub fn getDeviceData(self: *ZigTestIAkOHookBlocking) callconv(.C) u32 {
+        self.get_device_data_called = true;
+        return 4269;
+    }
+
+    pub fn read(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc, in_heuristics: *AK.StreamMgr.AkIoHeuristics, out_buffer: ?*anyopaque, in_transfer_info: *AK.StreamMgr.AkIOTransferInfo) callconv(.C) AK.AKRESULT {
+        _ = in_transfer_info;
+        _ = in_file_desc;
+        _ = out_buffer;
+        _ = in_heuristics;
+
+        self.read_called = true;
+
+        return .success;
+    }
+
+    pub fn write(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc, in_heuristics: *AK.StreamMgr.AkIoHeuristics, in_data: ?*anyopaque, in_transfer_info: *AK.StreamMgr.AkIOTransferInfo) callconv(.C) AK.AKRESULT {
+        _ = in_heuristics;
+        _ = in_transfer_info;
+        _ = in_data;
+        _ = in_file_desc;
+
+        self.write_called = true;
+
+        return .success;
+    }
+
+    pub fn createIAkIOHookBlocking(self: *ZigTestIAkOHookBlocking) *AK.StreamMgr.IAkIOHookBlocking {
+        return AK.StreamMgr.IAkIOHookBlocking.createInstance(
+            self,
+            &AK.StreamMgr.IAkIOHookBlocking.FunctionTable{
+                .destructor = @ptrCast(&destructor),
+                .close = @ptrCast(&close),
+                .get_block_size = @ptrCast(&getBlockSize),
+                .get_device_desc = @ptrCast(&getDeviceDesc),
+                .get_device_data = @ptrCast(&getDeviceData),
+                .read = @ptrCast(&read),
+                .write = @ptrCast(&write),
+            },
+        );
+    }
+};
+
+test "Verify IAkIOHookBlocking Zig inheritance from and to C++ by itself" {
+    var memory_settings: AK.AkMemSettings = .{};
+    AK.MemoryMgr.getDefaultSettings(&memory_settings);
+
+    try AK.MemoryMgr.init(&memory_settings);
+    defer AK.MemoryMgr.term();
+
+    var zig_io_blocking = ZigTestIAkOHookBlocking{};
+
+    {
+        var native_io_blocking = zig_io_blocking.createIAkIOHookBlocking();
+        defer AK.StreamMgr.IAkIOHookBlocking.destroyInstance(native_io_blocking);
+
+        const file_desc = AK.StreamMgr.AkFileDesc{
+            .file_size = 123456,
+        };
+
+        const heuristics = AK.StreamMgr.AkIoHeuristics{};
+
+        const block_size = native_io_blocking.getBlockSize(&file_desc);
+        try std.testing.expectEqual(@as(u32, 512), block_size);
+        try std.testing.expect(zig_io_blocking.get_block_size_called);
+
+        var device_desc = AK.AkDeviceDesc{};
+        defer std.testing.allocator.free(device_desc.device_name);
+
+        try native_io_blocking.getDeviceDesc(std.testing.allocator, &device_desc);
+        try std.testing.expectEqualStrings("wwise-zig IO", device_desc.device_name);
+        try std.testing.expect(device_desc.can_read);
+        try std.testing.expect(!device_desc.can_write);
+        try std.testing.expect(zig_io_blocking.get_device_desc_called);
+
+        const device_data = native_io_blocking.getDeviceData();
+        try std.testing.expectEqual(@as(u32, 4269), device_data);
+        try std.testing.expect(zig_io_blocking.get_device_data_called);
+
+        var transfer_info = AK.StreamMgr.AkIOTransferInfo{};
+
+        try native_io_blocking.read(&file_desc, &heuristics, null, &transfer_info);
+        try std.testing.expect(zig_io_blocking.read_called);
+
+        try native_io_blocking.write(&file_desc, &heuristics, null, &transfer_info);
+        try std.testing.expect(zig_io_blocking.write_called);
+
+        try native_io_blocking.close(&file_desc);
+        try std.testing.expect(zig_io_blocking.close_called);
+        try std.testing.expectEqual(file_desc.file_size, zig_io_blocking.close_size);
+    }
+
+    try std.testing.expect(zig_io_blocking.destructor_called);
 }

@@ -1397,6 +1397,176 @@ static_assert(sizeof(WWISEC_AkAsyncIOTransferInfo) == sizeof(AkAsyncIOTransferIn
 static_assert(sizeof(WWISEC_AkIoHeuristics) == sizeof(WWISEC_AkIoHeuristics));
 static_assert(sizeof(WWISEC_AK_StreamMgr_IAkIOHookDeferredBatch_BatchIoTransferItem) == sizeof(AK::StreamMgr::IAkIOHookDeferredBatch::BatchIoTransferItem));
 
+class WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper : public AK::StreamMgr::IAkLowLevelIOHook
+{
+  public:
+    WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper(void* instance, const WWISEC_AK_StreamMgr_IAkLowLevelIOHook_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    AKRESULT Close(AkFileDesc& in_fileDesc) override
+    {
+        return static_cast<AKRESULT>(_functions.Close(_instance, reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc)));
+    }
+
+    AkUInt32 GetBlockSize(AkFileDesc& in_fileDesc) override
+    {
+        return _functions.GetBlockSize(_instance, reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc));
+    }
+
+    void GetDeviceDesc(AkDeviceDesc& out_deviceDesc) override
+    {
+        _functions.GetDeviceDesc(_instance, reinterpret_cast<WWISEC_AkDeviceDesc*>(&out_deviceDesc));
+    }
+
+    AkUInt32 GetDeviceData() override
+    {
+        return _functions.GetDeviceData(_instance);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_StreamMgr_IAkLowLevelIOHook_FunctionTable _functions;
+};
+
+WWISEC_AK_StreamMgr_IAkLowLevelIOHook* WWISEC_AK_StreamMgr_IAkLowLevelIOHook_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkLowLevelIOHook_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_StreamMgr_IAkLowLevelIOHook*>(AkNew(AkMemID_Integration, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_DestroyInstance(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance)
+{
+    WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Close(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, WWISEC_AkFileDesc* in_fileDesc)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(instance)->Close(*reinterpret_cast<AkFileDesc*>(in_fileDesc)));
+}
+
+AkUInt32 WWISEC_AK_StreamMgr_IAkLowLevelIOHook_GetBlockSize(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, WWISEC_AkFileDesc* in_fileDesc)
+{
+    return reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(instance)->GetBlockSize(*reinterpret_cast<AkFileDesc*>(in_fileDesc));
+}
+
+void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_GetDeviceDesc(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, WWISEC_AkDeviceDesc* out_deviceDesc)
+{
+    reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(instance)->GetDeviceDesc(*reinterpret_cast<AkDeviceDesc*>(out_deviceDesc));
+}
+
+AkUInt32 WWISEC_AK_StreamMgr_IAkLowLevelIOHook_GetDeviceData(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance)
+{
+    return reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(instance)->GetDeviceData();
+}
+
+class WWISEC_AK_StreamMgr_IAkIOHookBlocking_Wrapper : public AK::StreamMgr::IAkIOHookBlocking
+{
+  public:
+    WWISEC_AK_StreamMgr_IAkIOHookBlocking_Wrapper(void* instance, const WWISEC_AK_StreamMgr_IAkIOHookBlocking_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_StreamMgr_IAkIOHookBlocking_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    AKRESULT Close(AkFileDesc& in_fileDesc) override
+    {
+        return static_cast<AKRESULT>(_functions.Close(_instance, reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc)));
+    }
+
+    AkUInt32 GetBlockSize(AkFileDesc& in_fileDesc) override
+    {
+        return _functions.GetBlockSize(_instance, reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc));
+    }
+
+    void GetDeviceDesc(AkDeviceDesc& out_deviceDesc) override
+    {
+        _functions.GetDeviceDesc(_instance, reinterpret_cast<WWISEC_AkDeviceDesc*>(&out_deviceDesc));
+    }
+
+    AkUInt32 GetDeviceData() override
+    {
+        return _functions.GetDeviceData(_instance);
+    }
+
+    AKRESULT Read(AkFileDesc& in_fileDesc, const AkIoHeuristics& in_heuristics, void* out_pBuffer, AkIOTransferInfo& in_transferInfo) override
+    {
+        return static_cast<AKRESULT>(_functions.Read(
+            _instance,
+            reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc),
+            reinterpret_cast<const WWISEC_AkIoHeuristics*>(&in_heuristics),
+            out_pBuffer,
+            reinterpret_cast<WWISEC_AkIOTransferInfo*>(&in_transferInfo)));
+    }
+
+    AKRESULT Write(AkFileDesc& in_fileDesc, const AkIoHeuristics& in_heuristics, void* in_pData, AkIOTransferInfo& io_transferInfo) override
+    {
+        return static_cast<AKRESULT>(_functions.Write(
+            _instance,
+            reinterpret_cast<WWISEC_AkFileDesc*>(&in_fileDesc),
+            reinterpret_cast<const WWISEC_AkIoHeuristics*>(&in_heuristics),
+            in_pData,
+            reinterpret_cast<WWISEC_AkIOTransferInfo*>(&io_transferInfo)));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_StreamMgr_IAkIOHookBlocking_FunctionTable _functions;
+};
+
+WWISEC_AK_StreamMgr_IAkIOHookBlocking* WWISEC_AK_StreamMgr_IAkIOHookBlocking_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkIOHookBlocking_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_StreamMgr_IAkIOHookBlocking*>(AkNew(AkMemID_Integration, WWISEC_AK_StreamMgr_IAkIOHookBlocking_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_StreamMgr_IAkIOHookBlocking_DestroyInstance(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance)
+{
+    WWISEC_AK_StreamMgr_IAkIOHookBlocking_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_StreamMgr_IAkIOHookBlocking_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_StreamMgr_IAkIOHookBlocking_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookBlocking_Close(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance, WWISEC_AkFileDesc* in_fileDesc)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkIOHookBlocking*>(instance)->Close(*reinterpret_cast<AkFileDesc*>(in_fileDesc)));
+}
+
+AkUInt32 WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetBlockSize(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance, WWISEC_AkFileDesc* in_fileDesc)
+{
+    return reinterpret_cast<AK::StreamMgr::IAkIOHookBlocking*>(instance)->GetBlockSize(*reinterpret_cast<AkFileDesc*>(in_fileDesc));
+}
+
+void WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetDeviceDesc(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance, WWISEC_AkDeviceDesc* out_deviceDesc)
+{
+    reinterpret_cast<AK::StreamMgr::IAkIOHookBlocking*>(instance)->GetDeviceDesc(*reinterpret_cast<AkDeviceDesc*>(out_deviceDesc));
+}
+
+AkUInt32 WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetDeviceData(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance)
+{
+    return reinterpret_cast<AK::StreamMgr::IAkIOHookBlocking*>(instance)->GetDeviceData();
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookBlocking_Read(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance, WWISEC_AkFileDesc* in_fileDesc, const WWISEC_AkIoHeuristics* in_heuristics, void* out_pBuffer, WWISEC_AkIOTransferInfo* in_transferInfo)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkIOHookBlocking*>(instance)->Read(*reinterpret_cast<AkFileDesc*>(in_fileDesc), *reinterpret_cast<const AkIoHeuristics*>(in_heuristics), out_pBuffer, *reinterpret_cast<AkIOTransferInfo*>(in_transferInfo)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookBlocking_Write(WWISEC_AK_StreamMgr_IAkIOHookBlocking* instance, WWISEC_AkFileDesc* in_fileDesc, const WWISEC_AkIoHeuristics* in_heuristics, void* in_pData, WWISEC_AkIOTransferInfo* io_transferInfo)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkIOHookBlocking*>(instance)->Write(*reinterpret_cast<AkFileDesc*>(in_fileDesc), *reinterpret_cast<const AkIoHeuristics*>(in_heuristics), in_pData, *reinterpret_cast<AkIOTransferInfo*>(io_transferInfo)));
+}
+
 void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings)
 {
     return AK::StreamMgr::Create(*reinterpret_cast<AkStreamMgrSettings*>(in_settings));

@@ -129,169 +129,135 @@ pub const AkIoHeuristics = extern struct {
     }
 };
 
-pub const IAkLowLevelIOHook = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkLowLevelIOHook) = .{},
-        close: *const fn (iself: *IAkLowLevelIOHook, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) c.WWISEC_AKRESULT,
-        get_block_size: *const fn (iself: *IAkLowLevelIOHook, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkLowLevelIOHook, out_deviceDesc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
+pub const IAkLowLevelIOHook = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (iself: *IAkLowLevelIOHook) callconv(.C) void,
+        close: *const fn (iself: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (iself: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (iself: *IAkLowLevelIOHook, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
         get_device_data: *const fn (iself: *IAkLowLevelIOHook) callconv(.C) u32,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IAkLowLevelIOHook) *const T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn toMutableSelf(iself: *IAkLowLevelIOHook) *T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkLowLevelIOHook.VTable, @ptrCast(self.__v)).virtual_destructor.call(@ptrCast(self));
-            }
-
-            pub inline fn close(self: *T, in_file_desc: AkFileDesc) common.WwiseError!void {
-                var raw_file_desc = in_file_desc.toC();
-                return common.handleAkResult(
-                    @as(*const IAkLowLevelIOHook.VTable, @ptrCast(self.__v)).close(@ptrCast(self), &raw_file_desc),
-                );
-            }
-
-            pub inline fn getBlockSize(self: *T, in_file_desc: AkFileDesc) u32 {
-                var raw_file_desc = in_file_desc.toC();
-                return @as(*const IAkLowLevelIOHook.VTable, @ptrCast(self.__v)).get_block_size(@ptrCast(self), &raw_file_desc);
-            }
-
-            pub inline fn getDeviceDesc(self: *T, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
-                var raw_device_desc: c.WWISEC_AkDeviceDesc = undefined;
-                @as(*const IAkLowLevelIOHook.VTable, @ptrCast(self.__v)).get_device_desc(@ptrCast(self), &raw_device_desc);
-                out_device_desc.* = try stream_interfaces.AkDeviceDesc.fromC(raw_device_desc, allocator);
-            }
-
-            pub inline fn getDeviceData(self: *T) u32 {
-                return @as(*const IAkLowLevelIOHook.VTable, @ptrCast(self.__v)).get_device_data(@ptrCast(self));
-            }
-        };
+    pub fn close(self: *IAkLowLevelIOHook, in_file_desc: *const AkFileDesc) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Close(
+                @ptrCast(self),
+                @constCast(@ptrCast(in_file_desc)),
+            ),
+        );
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn getBlockSize(self: *IAkLowLevelIOHook, in_file_desc: *const AkFileDesc) u32 {
+        return c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_GetBlockSize(
+            @ptrCast(self),
+            @constCast(@ptrCast(in_file_desc)),
+        );
+    }
+
+    pub fn getDeviceDesc(self: *IAkLowLevelIOHook, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
+        var raw_device_desc: stream_interfaces.NativeAkDeviceDesc = undefined;
+        c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_GetDeviceDesc(@ptrCast(self), @ptrCast(&raw_device_desc));
+        out_device_desc.* = try stream_interfaces.AkDeviceDesc.fromC(&raw_device_desc, allocator);
+    }
+
+    pub fn getDeviceData(self: *IAkLowLevelIOHook) u32 {
+        return c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_GetDeviceData(@ptrCast(self));
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkLowLevelIOHook {
+        return @ptrCast(
+            c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 // Inherits from IAkLowLevelIOHook
-pub const IAkIOHookBlocking = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkIOHookBlocking) = .{},
-        close: *const fn (iself: *IAkIOHookBlocking, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) c.WWISEC_AKRESULT,
-        get_block_size: *const fn (iself: *IAkIOHookBlocking, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkIOHookBlocking, out_deviceDesc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
+pub const IAkIOHookBlocking = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (iself: *IAkIOHookBlocking) callconv(.C) void,
+        close: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (iself: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
         get_device_data: *const fn (iself: *IAkIOHookBlocking) callconv(.C) u32,
         read: *const fn (
             iself: *IAkIOHookBlocking,
-            in_fileDesc: *c.WWISEC_AkFileDesc,
-            in_heuristics: *c.WWISEC_AkIoHeuristics,
-            out_pBuffer: ?*anyopaque,
-            in_transferInfo: *c.WWISEC_AkIOTransferInfo,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_desc: *AkFileDesc,
+            in_heuristics: *AkIoHeuristics,
+            out_buffer: ?*anyopaque,
+            in_transfer_info: *AkIOTransferInfo,
+        ) callconv(.C) common.AKRESULT,
         write: *const fn (
             iself: *IAkIOHookBlocking,
-            in_fileDesc: *c.WWISEC_AkFileDesc,
-            in_pData: ?*anyopaque,
-            in_transferInfo: *c.WWISEC_AkIOTransferInfo,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_desc: *AkFileDesc,
+            in_heuristics: *AkIoHeuristics,
+            in_data: ?*anyopaque,
+            in_transfer_info: *AkIOTransferInfo,
+        ) callconv(.C) common.AKRESULT,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IAkIOHookBlocking) *const T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn toMutableSelf(iself: *IAkIOHookBlocking) *T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkIOHookBlocking.VTable, @ptrCast(self.__v)).virtual_destructor.call(@ptrCast(self));
-            }
-
-            pub inline fn close(self: *T, in_file_desc: AkFileDesc) common.WwiseError!void {
-                var raw_file_desc = in_file_desc.toC();
-                return common.handleAkResult(
-                    @as(*const IAkIOHookBlocking.VTable, @ptrCast(self.__v)).close(@ptrCast(self), &raw_file_desc),
-                );
-            }
-
-            pub inline fn getBlockSize(self: *T, in_file_desc: AkFileDesc) u32 {
-                var raw_file_desc = in_file_desc.toC();
-                return @as(*const IAkIOHookBlocking.VTable, @ptrCast(self.__v)).get_block_size(@ptrCast(self), &raw_file_desc);
-            }
-
-            pub inline fn getDeviceDesc(self: *T, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
-                var raw_device_desc: c.WWISEC_AkDeviceDesc = undefined;
-                @as(*const IAkIOHookBlocking.VTable, @ptrCast(self.__v)).get_device_desc(@ptrCast(self), &raw_device_desc);
-                out_device_desc.* = try stream_interfaces.AkDeviceDesc.fromC(raw_device_desc, allocator);
-            }
-
-            pub inline fn getDeviceData(self: *T) u32 {
-                return @as(*const IAkIOHookBlocking.VTable, @ptrCast(self.__v)).get_device_data(@ptrCast(self));
-            }
-
-            pub inline fn read(
-                self: *T,
-                in_file_desc: AkFileDesc,
-                in_heuristics: AkIoHeuristics,
-                out_buffer: ?*anyopaque,
-                io_transfer_info: *AkIOTransferInfo,
-            ) common.WwiseError!void {
-                var raw_file_desc = in_file_desc.toC();
-                var raw_heuristics = in_heuristics.toC();
-                var raw_transfer_info = io_transfer_info.toC();
-
-                try common.handleAkResult(
-                    @as(*const IAkIOHookBlocking.VTable, @ptrCast(self.__v)).read(
-                        @ptrCast(self),
-                        &raw_file_desc,
-                        &raw_heuristics,
-                        out_buffer,
-                        &raw_transfer_info,
-                    ),
-                );
-                io_transfer_info.* = AkIOTransferInfo.fromC(raw_transfer_info);
-            }
-
-            pub inline fn write(
-                self: *T,
-                in_file_desc: AkFileDesc,
-                in_heuristics: AkIoHeuristics,
-                in_data: ?*anyopaque,
-                io_transfer_info: *AkIOTransferInfo,
-            ) common.WwiseError!void {
-                var raw_file_desc = in_file_desc.toC();
-                var raw_heuristics = in_heuristics.toC();
-                var raw_transfer_info = io_transfer_info.toC();
-                try common.handleAkResult(
-                    @as(*const IAkIOHookBlocking.VTable, @ptrCast(self.__v)).write(
-                        @ptrCast(self),
-                        &raw_file_desc,
-                        &raw_heuristics,
-                        in_data,
-                        &raw_transfer_info,
-                    ),
-                );
-                io_transfer_info.* = AkIOTransferInfo.fromC(raw_transfer_info);
-            }
-        };
+    pub inline fn close(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_Close(
+                @ptrCast(self),
+                @constCast(@ptrCast(in_file_desc)),
+            ),
+        );
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub inline fn getBlockSize(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc) u32 {
+        return c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetBlockSize(
+            @ptrCast(self),
+            @constCast(@ptrCast(in_file_desc)),
+        );
+    }
+
+    pub inline fn getDeviceDesc(self: *IAkIOHookBlocking, allocator: std.mem.Allocator, out_device_desc: *stream_interfaces.AkDeviceDesc) !void {
+        var raw_device_desc: stream_interfaces.NativeAkDeviceDesc = undefined;
+        c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetDeviceDesc(@ptrCast(self), @ptrCast(&raw_device_desc));
+        out_device_desc.* = try stream_interfaces.AkDeviceDesc.fromC(&raw_device_desc, allocator);
+    }
+
+    pub inline fn getDeviceData(self: *IAkIOHookBlocking) u32 {
+        return c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_GetDeviceData(@ptrCast(self));
+    }
+
+    pub inline fn read(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc, in_heuristics: *const AkIoHeuristics, out_buffer: ?*anyopaque, in_transfer_info: *const AkIOTransferInfo) common.WwiseError!void {
+        try common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_Read(
+                @ptrCast(self),
+                @constCast(@ptrCast(in_file_desc)),
+                @ptrCast(in_heuristics),
+                out_buffer,
+                @constCast(@ptrCast(in_transfer_info)),
+            ),
+        );
+    }
+
+    pub inline fn write(self: *IAkIOHookBlocking, in_file_desc: *const AkFileDesc, in_heuristics: *const AkIoHeuristics, in_data: ?*anyopaque, io_transfer_info: *AkIOTransferInfo) common.WwiseError!void {
+        try common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_Write(
+                @ptrCast(self),
+                @constCast(@ptrCast(in_file_desc)),
+                @ptrCast(in_heuristics),
+                in_data,
+                @ptrCast(io_transfer_info),
+            ),
+        );
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkIOHookBlocking {
+        return @ptrCast(
+            c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_StreamMgr_IAkIOHookBlocking_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 // Inherits from IAkLowLevelIOHook
@@ -300,9 +266,9 @@ pub const IAkIOHookDeferredBatch = extern struct {
 
     pub const VTable = extern struct {
         virtual_destructor: common.VirtualDestructor(IAkIOHookDeferredBatch) = .{},
-        close: *const fn (iself: *IAkIOHookDeferredBatch, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) c.WWISEC_AKRESULT,
-        get_block_size: *const fn (iself: *IAkIOHookDeferredBatch, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkIOHookDeferredBatch, out_deviceDesc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
+        close: *const fn (iself: *IAkIOHookDeferredBatch, in_file_desc: *c.WWISEC_AkFileDesc) callconv(.C) c.WWISEC_AKRESULT,
+        get_block_size: *const fn (iself: *IAkIOHookDeferredBatch, in_file_desc: *c.WWISEC_AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (iself: *IAkIOHookDeferredBatch, out_device_desc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
         get_device_data: *const fn (iself: *IAkIOHookDeferredBatch) callconv(.C) u32,
         batch_read: *const fn (
             iself: *IAkIOHookDeferredBatch,
@@ -426,9 +392,9 @@ pub const IAkIOHookDeferred = extern struct {
 
     pub const VTable = extern struct {
         virtual_destructor: common.VirtualDestructor(IAkIOHookDeferred) = .{},
-        close: *const fn (iself: *IAkIOHookDeferred, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) c.WWISEC_AKRESULT,
-        get_block_size: *const fn (iself: *IAkIOHookDeferred, in_fileDesc: *c.WWISEC_AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkIOHookDeferred, out_deviceDesc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
+        close: *const fn (iself: *IAkIOHookDeferred, in_file_desc: *c.WWISEC_AkFileDesc) callconv(.C) c.WWISEC_AKRESULT,
+        get_block_size: *const fn (iself: *IAkIOHookDeferred, in_file_desc: *c.WWISEC_AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (iself: *IAkIOHookDeferred, out_device_desc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
         get_device_data: *const fn (iself: *IAkIOHookDeferred) callconv(.C) u32,
         batch_read: *const fn (
             iself: *IAkIOHookDeferred,
@@ -452,19 +418,19 @@ pub const IAkIOHookDeferred = extern struct {
         ) callconv(.C) void,
         read: *const fn (
             iself: *IAkIOHookDeferred,
-            in_fileDesc: *c.WWISEC_AkFileDesc,
+            in_file_desc: *c.WWISEC_AkFileDesc,
             in_heuristics: *c.WWISEC_AkIoHeuristics,
             io_transferInfo: *c.WWISEC_AkAsyncIOTransferInfo,
         ) callconv(.C) c.WWISEC_AKRESULT,
         write: *const fn (
             iself: *IAkIOHookDeferred,
-            in_fileDesc: *c.WWISEC_AkFileDesc,
+            in_file_desc: *c.WWISEC_AkFileDesc,
             in_heuristics: *c.WWISEC_AkIoHeuristics,
             io_transferInfo: *c.WWISEC_AkAsyncIOTransferInfo,
         ) callconv(.C) c.WWISEC_AKRESULT,
         cancel: *const fn (
             iself: *IAkIOHookDeferred,
-            in_fileDesc: *c.WWISEC_AkFileDesc,
+            in_file_desc: *c.WWISEC_AkFileDesc,
             io_transferInfo: *c.WWISEC_AkAsyncIOTransferInfo,
             io_bCancelAllTransfersForThisFile: *bool,
         ) callconv(.C) void,
