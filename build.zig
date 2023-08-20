@@ -56,7 +56,7 @@ pub const WwisePackage = struct {
     c_library: *std.build.Step.Compile,
 };
 
-const CppFlags: []const []const u8 = &.{ "-std=c++17", "-DUNICODE", "-Wall", "-Wpedantic" };
+const CppFlags: []const []const u8 = &.{ "-std=c++17", "-DUNICODE", "-Wall", "-Wpedantic", "-fno-sanitize=alignment" };
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
