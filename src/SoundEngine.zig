@@ -220,10 +220,10 @@ pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []c
 
     var raw_in_dll_path = blk: {
         if (in_dll_path_opt) |in_dll_path| {
-            break :blk @as([*c]const c.AkOSChar, common.toOSChar(area_allocator.allocator(), in_dll_path) catch return common.WwiseError.Fail);
+            break :blk @as([*c]const common.AkOSChar, common.toOSChar(area_allocator.allocator(), in_dll_path) catch return common.WwiseError.Fail);
         }
 
-        break :blk @as([*c]const c.AkOSChar, null);
+        break :blk @as([*c]const common.AkOSChar, null);
     };
 
     return common.handleAkResult(

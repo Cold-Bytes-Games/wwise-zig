@@ -430,7 +430,7 @@ pub const IAkStdStream = extern struct {
         destroy: *const fn (iself: *IAkStdStream) callconv(.C) void,
         get_info: *const fn (iself: *IAkStdStream, out_info: *c.WWISEC_AkStreamInfo) callconv(.C) void,
         get_file_descriptor: *const fn (iself: *IAkStdStream) callconv(.C) ?*anyopaque,
-        set_stream_name: *const fn (iself: *IAkStdStream, in_stream_name: [*:0]const c.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
+        set_stream_name: *const fn (iself: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
         get_block_size: *const fn (iself: *IAkStdStream) callconv(.C) u32,
         read: *const fn (iself: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
         write: *const fn (iself: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
@@ -558,7 +558,7 @@ pub const IAkAutoStream = extern struct {
         set_heuristics: *const fn (iself: *IAkAutoStream, in_heuristics: *c.WWISEC_AkAutoStmHeuristics) callconv(.C) void,
         set_minimal_buffer_size: *const fn (iself: *IAkAutoStream, in_min_buffer_size: u32) callconv(.C) void,
         set_min_target_buffer_size: *const fn (iself: *IAkAutoStream, in_min_target_buffer_size: u32) callconv(.C) void,
-        set_stream_name: *const fn (iself: *IAkAutoStream, in_stream_name: [*:0]const c.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
+        set_stream_name: *const fn (iself: *IAkAutoStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
         get_block_size: *const fn (iself: *IAkAutoStream) callconv(.C) u32,
         query_buffering_status: *const fn (iself: *IAkAutoStream, out_num_bytes_available: *u32) callconv(.C) c.WWISEC_AKRESULT,
         get_nominal_buffering: *const fn (iself: *IAkAutoStream) callconv(.C) u32,
@@ -701,7 +701,7 @@ pub const IAkStreamMgr = extern struct {
         ) callconv(.C) c.WWISEC_AKRESULT,
         create_std_string: *const fn (
             self: *IAkStreamMgr,
-            in_pszFileName: [*c]const c.AkOSChar,
+            in_pszFileName: [*c]const common.AkOSChar,
             in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
             in_eOpenMode: AkOpenMode,
             out_pStream: *?*IAkStdStream,
@@ -709,7 +709,7 @@ pub const IAkStreamMgr = extern struct {
         ) callconv(.C) c.WWISEC_AKRESULT,
         create_auto_string: *const fn (
             self: *IAkStreamMgr,
-            in_pszFileName: [*c]const c.AkOSChar,
+            in_pszFileName: [*c]const common.AkOSChar,
             in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
             in_heuristics: *const c.WWISEC_AkAutoStmHeuristics,
             in_pBufferSettings: ?*c.WWISEC_AkAutoStmBufSettings,
@@ -809,7 +809,7 @@ pub const IAkStreamMgr = extern struct {
 
                 return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).create_std_string(
                     @as(*IAkStreamMgr, @ptrCast(self)),
-                    @as([*]const c.AkOSChar, @ptrCast(filename_oschar)),
+                    @as([*]const common.AkOSChar, @ptrCast(filename_oschar)),
                     raw_fsflags_ptr,
                     in_eOpenMode,
                     out_pStream,

@@ -3,6 +3,8 @@ const builtin = @import("builtin");
 const c = @import("c.zig");
 const wwise_options = @import("wwise_options");
 
+pub const AkOSChar = c.AkOSChar;
+
 pub const AkUniqueID = c.WWISEC_AkUniqueID;
 pub const AkStateID = c.WWISEC_AkStateID;
 pub const AkStateGroupID = c.WWISEC_AkStateGroupID;
@@ -219,7 +221,7 @@ pub const AkDeviceDescription = struct {
     pub fn fromC(allocator: std.mem.Allocator, value: c.WWISEC_AkDeviceDescription) !AkDeviceDescription {
         return .{
             .id_device = value.idDevice,
-            .device_name = try fromOSChar(allocator, @as(?[*:0]const c.AkOSChar, @ptrCast(value.deviceName[0..]))),
+            .device_name = try fromOSChar(allocator, @as(?[*:0]const AkOSChar, @ptrCast(value.deviceName[0..]))),
             .device_state_mask = AkAudioDeviceState.fromC(value.deviceStateMask),
             .is_default_device = value.isDefaultDevice,
         };
@@ -265,7 +267,7 @@ pub const AkExternalSourceInfo = struct {
         return .{
             .iExternalSrcCookie = self.external_src_cookie,
             .idCodec = self.id_codec,
-            .szFile = if (self.file) |file| @as([*]c.AkOSChar, @ptrCast(try toOSChar(allocator, file))) else null,
+            .szFile = if (self.file) |file| @as([*]AkOSChar, @ptrCast(try toOSChar(allocator, file))) else null,
             .pInMemory = self.in_memory,
             .uiMemorySize = self.memory_size,
             .idFile = self.id_file,

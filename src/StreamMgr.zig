@@ -575,140 +575,161 @@ pub const IAkIOHookDeferred = opaque {
     }
 };
 
-pub const IAkFileLocationResolver = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkFileLocationResolver) = .{},
+pub const IAkFileLocationResolver = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (iself: *IAkFileLocationResolver) callconv(.C) void,
         open_string: *const fn (
-            iself: *IAkFileLocationResolver,
-            in_file_name: [*]const c.AkOSChar,
-            in_openMode: c.WWISEC_AkOpenMode,
-            in_flags: ?*c.WWISEC_AkFileSystemFlags,
+            self: *IAkFileLocationResolver,
+            in_file_name: [*]const common.AkOSChar,
+            in_openMode: stream_interfaces.AkOpenMode,
+            in_flags: ?*stream_interfaces.AkFileSystemFlags,
             io_syncOpen: *bool,
-            io_fileDesc: *c.WWISEC_AkFileDesc,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            io_fileDesc: *AkFileDesc,
+        ) callconv(.C) common.AKRESULT,
         open_id: *const fn (
-            iself: *IAkFileLocationResolver,
+            self: *IAkFileLocationResolver,
             in_fileID: c.WWISEC_AkFileID,
-            in_openMode: c.WWISEC_AkOpenMode,
-            in_flags: ?*c.WWISEC_AkFileSystemFlags,
+            in_openMode: stream_interfaces.AkOpenMode,
+            in_flags: ?*stream_interfaces.AkFileSystemFlags,
             io_syncOpen: *bool,
-            io_fileDesc: *c.WWISEC_AkFileDesc,
-        ) callconv(.C) c.WWISEC_AKRESULT,
-        output_searched_paths_string: *const fn (
-            iself: *IAkFileLocationResolver,
-            in_result: *c.WWISEC_AKRESULT,
-            in_file_name: [*]const c.AkOSChar,
-            in_flags: ?*c.WWISEC_AkFileSystemFlags,
-            in_open_mode: c.WWISEC_AkOpenMode,
-            out_searched_path: *[*]const c.AkOSChar,
+            io_fileDesc: *AkFileDesc,
+        ) callconv(.C) common.AKRESULT,
+        output_searched_paths_string: ?*const fn (
+            self: *IAkFileLocationResolver,
+            in_result: *const common.AKRESULT,
+            in_file_name: [*]const common.AkOSChar,
+            in_flags: ?*stream_interfaces.AkFileSystemFlags,
+            in_open_mode: stream_interfaces.AkOpenMode,
+            out_searched_path: *[*]const common.AkOSChar,
             in_path_size: i32,
-        ) callconv(.C) c.WWISEC_AKRESULT,
-        output_searched_paths_id: *const fn (
-            iself: *IAkFileLocationResolver,
-            in_result: *c.WWISEC_AKRESULT,
-            in_file_id: c.WWISEC_AkFileID,
-            in_flags: ?*c.WWISEC_AkFileSystemFlags,
-            in_open_mode: c.WWISEC_AkOpenMode,
-            out_searched_path: *[*]const c.AkOSChar,
+        ) callconv(.C) common.AKRESULT = null,
+        output_searched_paths_id: ?*const fn (
+            self: *IAkFileLocationResolver,
+            in_result: *const common.AKRESULT,
+            in_file_id: common.AkFileID,
+            in_flags: ?*stream_interfaces.AkFileSystemFlags,
+            in_open_mode: stream_interfaces.AkOpenMode,
+            out_searched_path: *[*]const common.AkOSChar,
             in_path_size: i32,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+        ) callconv(.C) common.AKRESULT = null,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IAkFileLocationResolver) *const T {
-                return @ptrCast(iself);
-            }
+    pub fn openString(
+        self: *IAkFileLocationResolver,
+        fallback_allocator: std.mem.Allocator,
+        in_file_name: []const u8,
+        in_open_mode: stream_interfaces.AkOpenMode,
+        in_flags: ?*stream_interfaces.AkFileSystemFlags,
+        io_sync_open: *bool,
+        io_file_desc: *AkFileDesc,
+    ) common.WwiseError!void {
+        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var allocator = stack_oschar_allocator.get();
 
-            pub inline fn toMutableSelf(iself: *IAkFileLocationResolver) *T {
-                return @ptrCast(iself);
-            }
+        var raw_file_name = common.toOSChar(allocator, in_file_name) catch return common.WwiseError.Fail;
+        defer allocator.free(raw_file_name);
 
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkFileLocationResolver.VTable, @ptrCast(self.__v)).virtual_destructor.call(@ptrCast(self));
-            }
-
-            pub inline fn openString(
-                self: *T,
-                fallback_allocator: std.mem.Allocator,
-                in_file_name: []const u8,
-                in_open_mode: stream_interfaces.AkOpenMode,
-                in_flags: ?stream_interfaces.AkFileSystemFlags,
-                io_sync_open: *bool,
-                io_file_desc: *AkFileDesc,
-            ) common.WwiseError!void {
-                var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
-                var allocator = stack_oschar_allocator.get();
-
-                var raw_file_name = common.toOSChar(allocator, in_file_name) catch return common.WwiseError.Fail;
-                defer allocator.free(raw_file_name);
-
-                var raw_flags = blk: {
-                    if (in_flags) |flags| {
-                        var raw_c_flags = flags.toC();
-                        break :blk &raw_c_flags;
-                    }
-
-                    break :blk @as(?*c.WWISEC_AkFileSystemFlags, null);
-                };
-
-                var raw_file_desc = io_file_desc.toC();
-
-                try common.handleAkResult(
-                    @as(*const IAkFileLocationResolver.VTable, @ptrCast(self.__v)).open_string(
-                        @ptrCast(self),
-                        raw_file_name,
-                        in_open_mode,
-                        raw_flags,
-                        io_sync_open,
-                        &raw_file_desc,
-                    ),
-                );
-
-                io_file_desc.* = AkFileDesc.fromC(raw_file_desc);
-            }
-
-            pub inline fn openId(
-                self: *T,
-                in_file_id: common.AkFileID,
-                in_open_mode: stream_interfaces.AkOpenMode,
-                in_flags: ?stream_interfaces.AkFileSystemFlags,
-                io_sync_open: *bool,
-                io_file_desc: *AkFileDesc,
-            ) common.WwiseError!void {
-                var raw_flags = blk: {
-                    if (in_flags) |flags| {
-                        var raw_c_flags = flags.toC();
-                        break :blk &raw_c_flags;
-                    }
-
-                    break :blk @as(?*c.WWISEC_AkFileSystemFlags, null);
-                };
-
-                var raw_file_desc = io_file_desc.toC();
-
-                try common.handleAkResult(
-                    @as(*const IAkFileLocationResolver.VTable, @ptrCast(self.__v)).open_id(
-                        @ptrCast(self),
-                        in_file_id,
-                        in_open_mode,
-                        raw_flags,
-                        io_sync_open,
-                        &raw_file_desc,
-                    ),
-                );
-
-                io_file_desc.* = AkFileDesc.fromC(raw_file_desc);
-            }
-
-            // TODO: Implement OutputSearchedPaths wrappers (not used by the default IO hooks)
-        };
+        try common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenString(
+                @ptrCast(self),
+                raw_file_name,
+                @intFromEnum(in_open_mode),
+                @ptrCast(in_flags),
+                io_sync_open,
+                @ptrCast(io_file_desc),
+            ),
+        );
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn openId(
+        self: *IAkFileLocationResolver,
+        in_file_id: common.AkFileID,
+        in_open_mode: stream_interfaces.AkOpenMode,
+        in_flags: ?*stream_interfaces.AkFileSystemFlags,
+        io_sync_open: *bool,
+        io_file_desc: *AkFileDesc,
+    ) common.WwiseError!void {
+        try common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenID(
+                @ptrCast(self),
+                in_file_id,
+                @intFromEnum(in_open_mode),
+                @ptrCast(in_flags),
+                io_sync_open,
+                @ptrCast(io_file_desc),
+            ),
+        );
+    }
+
+    pub fn outputSearchedPathsString(
+        self: *IAkFileLocationResolver,
+        allocator: std.mem.Allocator,
+        in_result: common.AKRESULT,
+        in_filename: []const u8,
+        in_flags: ?*stream_interfaces.AkFileSystemFlags,
+        in_open_mode: stream_interfaces.AkOpenMode,
+        out_searched_path: *[]u8,
+    ) common.WwiseError!void {
+        var stack_oschar_allocator = common.stackCharAllocator(allocator);
+        var oschar_allocator = stack_oschar_allocator.get();
+
+        var raw_filename = common.toOSChar(oschar_allocator, in_filename) catch return common.WwiseError.Fail;
+        defer oschar_allocator.free(raw_filename);
+
+        var raw_out_searched_path = allocator.allocSentinel(common.AkOSChar, out_searched_path.len, 0) catch return common.WwiseError.Fail;
+        defer allocator.free(raw_out_searched_path);
+
+        try common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsString(
+                @ptrCast(self),
+                @ptrCast(&in_result),
+                raw_filename,
+                @ptrCast(in_flags),
+                @intFromEnum(in_open_mode),
+                raw_out_searched_path,
+                @intCast(raw_out_searched_path.len),
+            ),
+        );
+
+        out_searched_path.* = common.fromOSChar(allocator, raw_out_searched_path) catch return common.WwiseError.Fail;
+    }
+
+    pub fn outputSearchedPathsID(
+        self: *IAkFileLocationResolver,
+        allocator: std.mem.Allocator,
+        in_result: common.AKRESULT,
+        in_file_id: common.AkFileID,
+        in_flags: ?*stream_interfaces.AkFileSystemFlags,
+        in_open_mode: stream_interfaces.AkOpenMode,
+        out_searched_path: *[]u8,
+    ) common.WwiseError!void {
+        var raw_out_searched_path = allocator.allocSentinel(common.AkOSChar, out_searched_path.len, 0) catch return common.WwiseError.Fail;
+        defer allocator.free(raw_out_searched_path);
+
+        try common.handleAkResult(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsID(
+                @ptrCast(self),
+                @ptrCast(&in_result),
+                in_file_id,
+                @ptrCast(in_flags),
+                @intFromEnum(in_open_mode),
+                raw_out_searched_path,
+                @intCast(raw_out_searched_path.len),
+            ),
+        );
+
+        out_searched_path.* = common.fromOSChar(allocator, raw_out_searched_path) catch return common.WwiseError.Fail;
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkFileLocationResolver {
+        return @ptrCast(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 pub fn create(in_settings: *AkStreamMgrSettings) ?*stream_interfaces.IAkStreamMgr {

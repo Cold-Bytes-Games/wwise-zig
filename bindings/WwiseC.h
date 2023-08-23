@@ -2529,6 +2529,33 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkIOHookDeferred_Write(WWISEC_AK_StreamMgr_IAkIOHookDeferred* instance, WWISEC_AkFileDesc* in_fileDesc, const WWISEC_AkIoHeuristics* in_heuristics, WWISEC_AkAsyncIOTransferInfo* io_transferInfo);
     void WWISEC_AK_StreamMgr_IAkIOHookDeferred_Cancel(WWISEC_AK_StreamMgr_IAkIOHookDeferred* instance, WWISEC_AkFileDesc* in_fileDesc, WWISEC_AkAsyncIOTransferInfo* io_transferInfo, bool* io_bCancelAllTransfersForThisFile);
 
+    typedef struct WWISEC_AK_StreamMgr_IAkFileLocationResolver WWISEC_AK_StreamMgr_IAkFileLocationResolver;
+
+    typedef struct WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        WWISEC_AKRESULT(*OpenString)
+        (void* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
+
+        WWISEC_AKRESULT(*OpenID)
+        (void* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
+
+        WWISEC_AKRESULT(*OutputSearchedPathsString)
+        (void* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
+
+        WWISEC_AKRESULT(*OutputSearchedPathsID)
+        (void* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
+
+    } WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable;
+    WWISEC_AK_StreamMgr_IAkFileLocationResolver* WWISEC_AK_StreamMgr_IAkFileLocationResolver_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable* functionTable);
+    void WWISEC_AK_StreamMgr_IAkFileLocationResolver_DestroyInstance(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance);
+
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
+
     void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings);
     void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings);
     void* WWISEC_AK_StreamMgr_GetFileLocationResolver();

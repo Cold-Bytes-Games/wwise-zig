@@ -1845,6 +1845,163 @@ void WWISEC_AK_StreamMgr_IAkIOHookDeferred_Cancel(WWISEC_AK_StreamMgr_IAkIOHookD
     reinterpret_cast<AK::StreamMgr::IAkIOHookDeferred*>(instance)->Cancel(*reinterpret_cast<AkFileDesc*>(in_fileDesc), *reinterpret_cast<AkAsyncIOTransferInfo*>(io_transferInfo), *io_bCancelAllTransfersForThisFile);
 }
 
+class WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper : public AK::StreamMgr::IAkFileLocationResolver
+{
+  public:
+    WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper(void* instance, const WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    AKRESULT Open(
+        const AkOSChar* in_pszFileName,
+        AkOpenMode in_eOpenMode,
+        AkFileSystemFlags* in_pFlags,
+        bool& io_bSyncOpen,
+        AkFileDesc& io_fileDesc) override
+    {
+        return static_cast<AKRESULT>(
+            _functions.OpenString(
+                _instance,
+                in_pszFileName,
+                static_cast<WWISEC_AkOpenMode>(in_eOpenMode),
+                reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFlags),
+                &io_bSyncOpen,
+                reinterpret_cast<WWISEC_AkFileDesc*>(&io_fileDesc)));
+    }
+
+    AKRESULT Open(
+        AkFileID in_fileID,
+        AkOpenMode in_eOpenMode,
+        AkFileSystemFlags* in_pFlags,
+        bool& io_bSyncOpen,
+        AkFileDesc& io_fileDesc) override
+    {
+        return static_cast<AKRESULT>(
+            _functions.OpenID(
+                _instance,
+                in_fileID,
+                static_cast<WWISEC_AkOpenMode>(in_eOpenMode),
+                reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFlags),
+                &io_bSyncOpen,
+                reinterpret_cast<WWISEC_AkFileDesc*>(&io_fileDesc)));
+    }
+
+    AKRESULT OutputSearchedPaths(
+        const AKRESULT& in_result,
+        const AkOSChar* in_pszFileName,
+        AkFileSystemFlags* in_pFlags,
+        AkOpenMode in_eOpenMode,
+        AkOSChar* out_searchedPath,
+        AkInt32 in_pathSize) override
+    {
+        if (!_functions.OutputSearchedPathsString)
+        {
+            return AK::StreamMgr::IAkFileLocationResolver::OutputSearchedPaths(in_result, in_pszFileName, in_pFlags, in_eOpenMode, out_searchedPath, in_pathSize);
+        }
+
+        return static_cast<AKRESULT>(
+            _functions.OutputSearchedPathsString(
+                _instance,
+                reinterpret_cast<const WWISEC_AKRESULT*>(&in_result),
+                in_pszFileName,
+                reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFlags),
+                static_cast<WWISEC_AkOpenMode>(in_eOpenMode),
+                out_searchedPath,
+                in_pathSize));
+    };
+
+    AKRESULT OutputSearchedPaths(
+        const AKRESULT& in_result,
+        const AkFileID in_fileID,
+        AkFileSystemFlags* in_pFlags,
+        AkOpenMode in_eOpenMode,
+        AkOSChar* out_searchedPath,
+        AkInt32 in_pathSize) override
+    {
+        if (!_functions.OutputSearchedPathsID)
+        {
+            return AK::StreamMgr::IAkFileLocationResolver::OutputSearchedPaths(in_result, in_fileID, in_pFlags, in_eOpenMode, out_searchedPath, in_pathSize);
+        }
+
+        return static_cast<AKRESULT>(
+            _functions.OutputSearchedPathsID(
+                _instance,
+                reinterpret_cast<const WWISEC_AKRESULT*>(&in_result),
+                in_fileID,
+                reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFlags),
+                static_cast<WWISEC_AkOpenMode>(in_eOpenMode),
+                out_searchedPath,
+                in_pathSize));
+    };
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable _functions;
+};
+
+WWISEC_AK_StreamMgr_IAkFileLocationResolver* WWISEC_AK_StreamMgr_IAkFileLocationResolver_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_StreamMgr_IAkFileLocationResolver*>(AkNew(AkMemID_Integration, WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper)(instance, functionTable));
+}
+void WWISEC_AK_StreamMgr_IAkFileLocationResolver_DestroyInstance(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance)
+{
+    WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->Open(
+            in_pszFileName,
+            static_cast<AkOpenMode>(in_eOpenMode),
+            reinterpret_cast<AkFileSystemFlags*>(in_pFlags),
+            *io_bSyncOpen,
+            *reinterpret_cast<AkFileDesc*>(io_fileDesc)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->Open(
+            in_fileID,
+            static_cast<AkOpenMode>(in_eOpenMode),
+            reinterpret_cast<AkFileSystemFlags*>(in_pFlags),
+            *io_bSyncOpen,
+            *reinterpret_cast<AkFileDesc*>(io_fileDesc)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->OutputSearchedPaths(
+            *reinterpret_cast<const AKRESULT*>(in_result),
+            in_pszFileName,
+            reinterpret_cast<AkFileSystemFlags*>(in_pFlags),
+            static_cast<AkOpenMode>(in_eOpenMode),
+            out_searchedPath,
+            in_pathSize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->OutputSearchedPaths(
+            *reinterpret_cast<const AKRESULT*>(in_result),
+            in_fileID,
+            reinterpret_cast<AkFileSystemFlags*>(in_pFlags),
+            static_cast<AkOpenMode>(in_eOpenMode),
+            out_searchedPath,
+            in_pathSize));
+}
+
 void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings)
 {
     return AK::StreamMgr::Create(*reinterpret_cast<AkStreamMgrSettings*>(in_settings));
