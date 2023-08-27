@@ -2443,6 +2443,75 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_GetStatus(WWISEC_AK_IAkStdStream* instance);
     WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_WaitForPendingOperation(WWISEC_AK_IAkStdStream* instance);
 
+    typedef struct WWISEC_AK_IAkAutoStream WWISEC_AK_IAkAutoStream;
+
+    typedef struct WWISEC_AK_IAkAutoStream_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        void (*Destroy)(void* instance);
+        void (*GetInfo)(void* instance, WWISEC_AkStreamInfo* out_info);
+        void* (*GetFileDescriptor)(void* instance);
+        void (*GetHeuristics)(void* instance, WWISEC_AkAutoStmHeuristics* out_heuristics);
+
+        WWISEC_AKRESULT(*SetHeuristics)
+        (void* instance, const WWISEC_AkAutoStmHeuristics* in_heuristics);
+
+        WWISEC_AKRESULT(*SetMinimalBufferSize)
+        (void* instance, AkUInt32 in_uMinBufferSize);
+
+        WWISEC_AKRESULT(*SetMinTargetBufferSize)
+        (void* instance, AkUInt32 in_uMinTargetBufferSize);
+
+        WWISEC_AKRESULT(*SetStreamName)
+        (void* instance, const AkOSChar* in_pszStreamName);
+
+        AkUInt32 (*GetBlockSize)(void* instance);
+
+        WWISEC_AKRESULT(*QueryBufferingStatus)
+        (void* instance, AkUInt32* out_uNumBytesAvailable);
+
+        AkUInt32 (*GetNominalBuffering)(void* instance);
+
+        WWISEC_AKRESULT(*Start)
+        (void* instance);
+
+        WWISEC_AKRESULT(*Stop)
+        (void* instance);
+
+        AkUInt64 (*GetPosition)(void* instance, bool* out_pbEndOfStream);
+
+        WWISEC_AKRESULT(*SetPosition)
+        (void* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset);
+
+        WWISEC_AKRESULT(*GetBuffer)
+        (void* instance, void** out_pBuffer, AkUInt32* out_uSize, bool in_bWait);
+
+        WWISEC_AKRESULT(*ReleaseBuffer)
+        (void* instance);
+    } WWISEC_AK_IAkAutoStream_FunctionTable;
+
+    WWISEC_AK_IAkAutoStream* WWISEC_AK_IAkAutoStream_CreateInstance(void* instance, const WWISEC_AK_IAkAutoStream_FunctionTable* functionTable);
+    void WWISEC_AK_IAkAutoStream_DestroyInstance(WWISEC_AK_IAkAutoStream* instance);
+
+    void WWISEC_AK_IAkAutoStream_Destroy(WWISEC_AK_IAkAutoStream* instance);
+    void WWISEC_AK_IAkAutoStream_GetInfo(WWISEC_AK_IAkAutoStream* instance, WWISEC_AkStreamInfo* out_info);
+    void* WWISEC_AK_IAkAutoStream_GetFileDescriptor(WWISEC_AK_IAkAutoStream* instance);
+    void WWISEC_AK_IAkAutoStream_GetHeuristics(WWISEC_AK_IAkAutoStream* instance, WWISEC_AkAutoStmHeuristics* out_heuristics);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetHeuristics(WWISEC_AK_IAkAutoStream* instance, const WWISEC_AkAutoStmHeuristics* in_heuristics);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinimalBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinBufferSize);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinTargetBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinTargetBufferSize);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetStreamName(WWISEC_AK_IAkAutoStream* instance, const AkOSChar* in_pszStreamName);
+    AkUInt32 WWISEC_AK_IAkAutoStream_GetBlockSize(WWISEC_AK_IAkAutoStream* instance);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_QueryBufferingStatus(WWISEC_AK_IAkAutoStream* instance, AkUInt32* out_uNumBytesAvailable);
+    AkUInt32 WWISEC_AK_IAkAutoStream_GetNominalBuffering(WWISEC_AK_IAkAutoStream* instance);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Start(WWISEC_AK_IAkAutoStream* instance);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Stop(WWISEC_AK_IAkAutoStream* instance);
+    AkUInt64 WWISEC_AK_IAkAutoStream_GetPosition(WWISEC_AK_IAkAutoStream* instance, bool* out_pbEndOfStream);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetPosition(WWISEC_AK_IAkAutoStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_GetBuffer(WWISEC_AK_IAkAutoStream* instance, void** out_pBuffer, AkUInt32* out_uSize, bool in_bWait);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_ReleaseBuffer(WWISEC_AK_IAkAutoStream* instance);
+
     WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get();
     // END IAkStreamMgr
 

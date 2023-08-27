@@ -1791,6 +1791,206 @@ WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_WaitForPendingOperation(WWISEC_AK_IAkS
     return static_cast<WWISEC_AkStmStatus>(reinterpret_cast<AK::IAkStdStream*>(instance)->WaitForPendingOperation());
 }
 
+class WWISEC_AK_IAkAutoStream_Wrapper : public AK::IAkAutoStream
+{
+  public:
+    WWISEC_AK_IAkAutoStream_Wrapper(void* instance, const WWISEC_AK_IAkAutoStream_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkAutoStream_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Destroy() override
+    {
+        _functions.Destroy(_instance);
+    }
+
+    void GetInfo(AkStreamInfo& out_info) override
+    {
+        _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkStreamInfo*>(&out_info));
+    }
+
+    void* GetFileDescriptor() override
+    {
+        return _functions.GetFileDescriptor(_instance);
+    }
+
+    void GetHeuristics(AkAutoStmHeuristics& out_heuristics) override
+    {
+        _functions.GetHeuristics(_instance, reinterpret_cast<WWISEC_AkAutoStmHeuristics*>(&out_heuristics));
+    }
+
+    AKRESULT SetHeuristics(const AkAutoStmHeuristics& in_heuristics) override
+    {
+        return static_cast<AKRESULT>(_functions.SetHeuristics(_instance, reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics)));
+    }
+
+    AKRESULT SetMinimalBufferSize(AkUInt32 in_uMinBufferSize) override
+    {
+        return static_cast<AKRESULT>(_functions.SetMinimalBufferSize(_instance, in_uMinBufferSize));
+    }
+
+    AKRESULT SetMinTargetBufferSize(AkUInt32 in_uMinTargetBufferSize) override
+    {
+        return static_cast<AKRESULT>(_functions.SetMinTargetBufferSize(_instance, in_uMinTargetBufferSize));
+    }
+
+    AKRESULT SetStreamName(const AkOSChar* in_pszStreamName) override
+    {
+        return static_cast<AKRESULT>(_functions.SetStreamName(_instance, in_pszStreamName));
+    }
+
+    AkUInt32 GetBlockSize() override
+    {
+        return _functions.GetBlockSize(_instance);
+    }
+
+    AKRESULT QueryBufferingStatus(AkUInt32& out_uNumBytesAvailable) override
+    {
+        return static_cast<AKRESULT>(_functions.QueryBufferingStatus(_instance, &out_uNumBytesAvailable));
+    }
+
+    AkUInt32 GetNominalBuffering() override
+    {
+        return _functions.GetNominalBuffering(_instance);
+    }
+
+    AKRESULT Start() override
+    {
+        return static_cast<AKRESULT>(_functions.Start(_instance));
+    }
+
+    AKRESULT Stop() override
+    {
+        return static_cast<AKRESULT>(_functions.Stop(_instance));
+    }
+
+    AkUInt64 GetPosition(bool* out_pbEndOfStream) override
+    {
+        return _functions.GetPosition(_instance, out_pbEndOfStream);
+    }
+
+    AKRESULT SetPosition(AkInt64 in_iMoveOffset, AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset) override
+    {
+        return static_cast<AKRESULT>(_functions.SetPosition(_instance, in_iMoveOffset, static_cast<WWISEC_AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+    }
+
+    AKRESULT GetBuffer(void*& out_pBuffer, AkUInt32& out_uSize, bool in_bWait) override
+    {
+        return static_cast<AKRESULT>(_functions.GetBuffer(_instance, &out_pBuffer, &out_uSize, in_bWait));
+    }
+
+    AKRESULT ReleaseBuffer() override
+    {
+        return static_cast<AKRESULT>(_functions.ReleaseBuffer(_instance));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkAutoStream_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkAutoStream* WWISEC_AK_IAkAutoStream_CreateInstance(void* instance, const WWISEC_AK_IAkAutoStream_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkAutoStream*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkAutoStream_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkAutoStream_DestroyInstance(WWISEC_AK_IAkAutoStream* instance)
+{
+    WWISEC_AK_IAkAutoStream_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkAutoStream_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkAutoStream_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkAutoStream_Destroy(WWISEC_AK_IAkAutoStream* instance)
+{
+    reinterpret_cast<AK::IAkAutoStream*>(instance)->Destroy();
+}
+
+void WWISEC_AK_IAkAutoStream_GetInfo(WWISEC_AK_IAkAutoStream* instance, WWISEC_AkStreamInfo* out_info)
+{
+    reinterpret_cast<AK::IAkAutoStream*>(instance)->GetInfo(*reinterpret_cast<AkStreamInfo*>(out_info));
+}
+
+void* WWISEC_AK_IAkAutoStream_GetFileDescriptor(WWISEC_AK_IAkAutoStream* instance)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetFileDescriptor();
+}
+
+void WWISEC_AK_IAkAutoStream_GetHeuristics(WWISEC_AK_IAkAutoStream* instance, WWISEC_AkAutoStmHeuristics* out_heuristics)
+{
+    reinterpret_cast<AK::IAkAutoStream*>(instance)->GetHeuristics(*reinterpret_cast<AkAutoStmHeuristics*>(out_heuristics));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetHeuristics(WWISEC_AK_IAkAutoStream* instance, const WWISEC_AkAutoStmHeuristics* in_heuristics)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetHeuristics(*reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinimalBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinBufferSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetMinimalBufferSize(in_uMinBufferSize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinTargetBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinTargetBufferSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetMinTargetBufferSize(in_uMinTargetBufferSize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetStreamName(WWISEC_AK_IAkAutoStream* instance, const AkOSChar* in_pszStreamName)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetStreamName(in_pszStreamName));
+}
+
+AkUInt32 WWISEC_AK_IAkAutoStream_GetBlockSize(WWISEC_AK_IAkAutoStream* instance)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetBlockSize();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_QueryBufferingStatus(WWISEC_AK_IAkAutoStream* instance, AkUInt32* out_uNumBytesAvailable)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->QueryBufferingStatus(*out_uNumBytesAvailable));
+}
+
+AkUInt32 WWISEC_AK_IAkAutoStream_GetNominalBuffering(WWISEC_AK_IAkAutoStream* instance)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetNominalBuffering();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Start(WWISEC_AK_IAkAutoStream* instance)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->Start());
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Stop(WWISEC_AK_IAkAutoStream* instance)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->Stop());
+}
+
+AkUInt64 WWISEC_AK_IAkAutoStream_GetPosition(WWISEC_AK_IAkAutoStream* instance, bool* out_pbEndOfStream)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetPosition(out_pbEndOfStream);
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetPosition(WWISEC_AK_IAkAutoStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetPosition(in_iMoveOffset, static_cast<AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_GetBuffer(WWISEC_AK_IAkAutoStream* instance, void** out_pBuffer, AkUInt32* out_uSize, bool in_bWait)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->GetBuffer(*out_pBuffer, *out_uSize, in_bWait));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_ReleaseBuffer(WWISEC_AK_IAkAutoStream* instance)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->ReleaseBuffer());
+}
+
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get()
 {
     return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AK::IAkStreamMgr::Get());
