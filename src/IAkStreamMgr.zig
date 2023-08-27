@@ -51,6 +51,25 @@ pub const AkFileSystemFlags = extern struct {
     }
 };
 
+pub const NativeAkStreamInfo = extern struct {
+    device_id: common.AkDeviceID = 0,
+    name: ?[*:0]const common.AkOSChar,
+    size: u64 = 0,
+    is_open: bool = false,
+
+    pub fn fromC(value: c.WWISEC_AkStreamInfo) NativeAkStreamInfo {
+        return @bitCast(value);
+    }
+
+    pub fn toC(self: NativeAkStreamInfo) c.WWISEC_AkStreamInfo {
+        return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(NativeAkStreamInfo) == @sizeOf(c.WWISEC_AkStreamInfo));
+    }
+};
+
 pub const AkStreamInfo = struct {
     device_id: common.AkDeviceID = 0,
     name: []const u8,
@@ -61,21 +80,21 @@ pub const AkStreamInfo = struct {
         allocator.free(self.name);
     }
 
-    pub fn fromC(value: c.WWISEC_AkStreamInfo, allocator: std.mem.Allocator) !AkStreamInfo {
+    pub fn fromC(value: NativeAkStreamInfo, allocator: std.mem.Allocator) !AkStreamInfo {
         return .{
-            .device_id = value.deviceID,
-            .name = try common.fromOSChar(allocator, value.pszName),
-            .size = value.uSize,
-            .is_open = value.bIsOpen,
+            .device_id = value.device_id,
+            .name = try common.fromOSChar(allocator, value.name),
+            .size = value.size,
+            .is_open = value.is_open,
         };
     }
 
-    pub fn toC(self: AkStreamInfo, allocator: std.mem.Allocator) !c.WWISEC_AkStreamInfo {
+    pub fn toC(self: AkStreamInfo, allocator: std.mem.Allocator) !NativeAkStreamInfo {
         return .{
-            .deviceID = self.device_id,
-            .pszName = try common.toOSChar(allocator, self.name),
-            .uSize = self.size,
-            .bIsOpen = self.is_open,
+            .device_id = self.device_id,
+            .name = try common.toOSChar(allocator, self.name),
+            .size = self.size,
+            .is_open = self.is_open,
         };
     }
 };
@@ -229,7 +248,7 @@ pub const AkStreamRecord = struct {
         allocator.free(self.stream_name);
     }
 
-    pub fn fromC(allocator: std.mem.Allocator, value: *NativeAkStreamRecord) !AkStreamRecord {
+    pub fn fromC(value: *NativeAkStreamRecord, allocator: std.mem.Allocator) !AkStreamRecord {
         return .{
             .stream_id = value.stream_id,
             .device_id = value.device_id,
@@ -298,7 +317,7 @@ pub const IAkStreamProfile = opaque {
     pub fn getStreamRecord(self: *IAkStreamProfile, allocator: std.mem.Allocator, out_stream_record: *AkStreamRecord) !void {
         var native_stream_record: NativeAkStreamRecord = undefined;
         c.WWISEC_AK_IAkStreamProfile_GetStreamRecord(@ptrCast(self), @ptrCast(&native_stream_record));
-        out_stream_record.* = try AkStreamRecord.fromC(allocator, &native_stream_record);
+        out_stream_record.* = try AkStreamRecord.fromC(&native_stream_record, allocator);
     }
 
     pub fn getStreamData(self: *IAkStreamProfile, out_stream_data: *AkStreamData) void {
@@ -424,128 +443,122 @@ pub const IAkStreamMgrProfile = opaque {
     }
 };
 
-pub const IAkStdStream = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkStdStream) = .{},
+pub const IAkStdStream = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (self: *IAkStdStream) callconv(.C) void,
         destroy: *const fn (self: *IAkStdStream) callconv(.C) void,
-        get_info: *const fn (self: *IAkStdStream, out_info: *c.WWISEC_AkStreamInfo) callconv(.C) void,
+        get_info: *const fn (self: *IAkStdStream, out_info: *NativeAkStreamInfo) callconv(.C) void,
         get_file_descriptor: *const fn (self: *IAkStdStream) callconv(.C) ?*anyopaque,
-        set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
+        set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) common.AKRESULT,
         get_block_size: *const fn (self: *IAkStdStream) callconv(.C) u32,
-        read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
-        write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
+        read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) common.AKRESULT,
+        write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) common.AKRESULT,
         get_position: *const fn (self: *IAkStdStream, out_end_of_stream: *bool) callconv(.C) u64,
-        set_position: *const fn (self: *IAkStdStream, in_move_offset: i64, in_move_method: c.WWISEC_AkMoveMethod, out_real_offset: *i64) callconv(.C) c.WWISEC_AKRESULT,
+        set_position: *const fn (self: *IAkStdStream, in_move_offset: i64, in_move_method: AkMoveMethod, out_real_offset: *i64) callconv(.C) common.AKRESULT,
         cancel: *const fn (self: *IAkStdStream) callconv(.C) void,
         get_data: *const fn (self: *IAkStdStream, out_size: *u32) callconv(.C) ?*anyopaque,
-        get_status: *const fn (self: *IAkStdStream) callconv(.C) c.WWISEC_AkStmStatus,
-        wait_for_pending_operation: *const fn (self: *IAkStdStream) callconv(.C) c.WWISEC_AkStmStatus,
+        get_status: *const fn (self: *IAkStdStream) callconv(.C) AkStmStatus,
+        wait_for_pending_operation: *const fn (self: *IAkStdStream) callconv(.C) AkStmStatus,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(self: *const IAkStdStream) *const T {
-                return @as(*const T, @ptrCast(self));
-            }
-
-            pub inline fn toMutableSelf(self: *IAkStdStream) *T {
-                return @as(*T, @ptrCast(self));
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).virtual_destructor.call(@as(*IAkStdStream, @ptrCast(self)));
-            }
-
-            pub inline fn destroy(self: *T) void {
-                @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).destroy(@as(*IAkStdStream, @ptrCast(self)));
-            }
-
-            pub inline fn getInfo(self: *T, allocator: std.mem.Allocator) !AkStreamInfo {
-                var raw_stream_info: c.WWISEC_AkStreamInfo = undefined;
-                @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).get_info(@as(*IAkStdStream, @ptrCast(self)), &raw_stream_info);
-                return try AkStreamInfo.fromC(raw_stream_info, allocator);
-            }
-
-            pub inline fn getFileDescriptor(self: *T) ?*anyopaque {
-                return @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).get_file_descriptor(@as(*IAkStdStream, @ptrCast(self)));
-            }
-
-            pub inline fn setStreamName(self: *T, fallback_allocator: std.mem.Allocator, stream_name: []const u8) common.WwiseError!void {
-                var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
-                var allocator = stack_oschar_allocator.get();
-
-                var raw_stream_name = common.toOSChar(allocator, stream_name) catch return common.WwiseError.Fail;
-                defer allocator.free(raw_stream_name);
-
-                return common.handleAkResult(
-                    @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).set_stream_name(@as(*IAkStdStream, @ptrCast(self)), raw_stream_name),
-                );
-            }
-
-            pub inline fn getBlockSize(self: *T) u32 {
-                return @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).get_block_size(@as(*IAkStdStream, @ptrCast(self)));
-            }
-
-            pub inline fn read(self: *T, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
-                return common.handleAkResult(
-                    @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).read(
-                        @as(*IAkStdStream, @ptrCast(self)),
-                        in_buffer,
-                        in_req_size,
-                        in_wait,
-                        in_priority,
-                        in_deadline,
-                        out_size,
-                    ),
-                );
-            }
-
-            pub inline fn write(self: *T, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
-                return common.handleAkResult(
-                    @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).write(
-                        @as(*IAkStdStream, @ptrCast(self)),
-                        in_buffer,
-                        in_req_size,
-                        in_wait,
-                        in_priority,
-                        in_deadline,
-                        out_size,
-                    ),
-                );
-            }
-
-            pub inline fn getPosition(self: *T, out_end_of_stream: *bool) u64 {
-                return @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).get_position(@as(*IAkStdStream, @ptrCast(self)), out_end_of_stream);
-            }
-
-            pub inline fn setPosition(self: *T, in_move_offset: i64, in_move_method: AkMoveMethod, out_real_offset: *i64) common.WwiseError!void {
-                return common.handleAkResult(
-                    @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).set_position(@as(*IAkStdStream, @ptrCast(self)), in_move_offset, @intFromEnum(in_move_method), out_real_offset),
-                );
-            }
-
-            pub inline fn cancel(self: *T) void {
-                @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).cancel(@as(*IAkStdStream, @ptrCast(self)));
-            }
-
-            pub inline fn getData(self: *T, out_size: *u32) ?*anyopaque {
-                return @as(*const IAkStdStream.VTable, @ptrCast(self.__v)).get_data(@as(*IAkStdStream, @ptrCast(self)), out_size);
-            }
-
-            pub inline fn getStatus(self: *T) AkStmStatus {
-                return @as(AkStmStatus, @enumFromInt(@as(*const IAkStdStream.VTable, @ptrCast(self.__v)).get_status(@as(*IAkStdStream, @ptrCast(self)))));
-            }
-
-            pub inline fn waitForPendingOperation(self: *T) AkStmStatus {
-                return @as(AkStmStatus, @enumFromInt(@as(*const IAkStdStream.VTable, @ptrCast(self.__v)).wait_for_pending_operation(@as(*IAkStdStream, @ptrCast(self)))));
-            }
-        };
+    pub fn destroy(self: *IAkStdStream) void {
+        c.WWISEC_AK_IAkStdStream_Destroy(@ptrCast(self));
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn getInfo(self: *IAkStdStream, allocator: std.mem.Allocator) !AkStreamInfo {
+        var raw_stream_info: NativeAkStreamInfo = undefined;
+        c.WWISEC_AK_IAkStdStream_GetInfo(@ptrCast(self), @ptrCast(&raw_stream_info));
+        return try AkStreamInfo.fromC(raw_stream_info, allocator);
+    }
+
+    pub fn getFileDescriptor(self: *IAkStdStream) ?*anyopaque {
+        return c.WWISEC_AK_IAkStdStream_GetFileDescriptor(@ptrCast(self));
+    }
+
+    pub fn setStreamName(self: *IAkStdStream, fallback_allocator: std.mem.Allocator, stream_name: []const u8) common.WwiseError!void {
+        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var allocator = stack_oschar_allocator.get();
+
+        var raw_stream_name = common.toOSChar(allocator, stream_name) catch return common.WwiseError.Fail;
+        defer allocator.free(raw_stream_name);
+
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStdStream_SetStreamName(@ptrCast(self), raw_stream_name),
+        );
+    }
+
+    pub fn getBlockSize(self: *IAkStdStream) u32 {
+        return c.WWISEC_AK_IAkStdStream_GetBlockSize(@ptrCast(self));
+    }
+
+    pub fn read(self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStdStream_Read(
+                @ptrCast(self),
+                in_buffer,
+                in_req_size,
+                in_wait,
+                in_priority,
+                in_deadline,
+                out_size,
+            ),
+        );
+    }
+
+    pub fn write(self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStdStream_Write(
+                @ptrCast(self),
+                in_buffer,
+                in_req_size,
+                in_wait,
+                in_priority,
+                in_deadline,
+                out_size,
+            ),
+        );
+    }
+
+    pub fn getPosition(self: *IAkStdStream, out_end_of_stream: *bool) u64 {
+        return c.WWISEC_AK_IAkStdStream_GetPosition(@ptrCast(self), out_end_of_stream);
+    }
+
+    pub fn setPosition(self: *IAkStdStream, in_move_offset: i64, in_move_method: AkMoveMethod, out_real_offset: *i64) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStdStream_SetPosition(
+                @ptrCast(self),
+                in_move_offset,
+                @intFromEnum(in_move_method),
+                out_real_offset,
+            ),
+        );
+    }
+
+    pub fn cancel(self: *IAkStdStream) void {
+        c.WWISEC_AK_IAkStdStream_Cancel(@ptrCast(self));
+    }
+
+    pub fn getData(self: *IAkStdStream, out_size: *u32) ?*anyopaque {
+        return c.WWISEC_AK_IAkStdStream_GetData(@ptrCast(self), out_size);
+    }
+
+    pub fn getStatus(self: *IAkStdStream) AkStmStatus {
+        return @enumFromInt(c.WWISEC_AK_IAkStdStream_GetStatus(@ptrCast(self)));
+    }
+
+    pub fn waitForPendingOperation(self: *IAkStdStream) AkStmStatus {
+        return @enumFromInt(c.WWISEC_AK_IAkStdStream_WaitForPendingOperation(@ptrCast(self)));
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkStdStream {
+        return @ptrCast(
+            c.WWISEC_AK_IAkStdStream_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_IAkStdStream_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 pub const IAkAutoStream = extern struct {

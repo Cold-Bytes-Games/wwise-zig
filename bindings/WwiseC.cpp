@@ -1631,6 +1631,166 @@ WWISEC_AK_IAkDeviceProfile* WWISEC_AK_IAkStreamMgrProfile_GetDeviceProfile(WWISE
     return reinterpret_cast<WWISEC_AK_IAkDeviceProfile*>(reinterpret_cast<AK::IAkStreamMgrProfile*>(instance)->GetDeviceProfile(in_uDeviceIndex));
 }
 
+class WWISEC_AK_IAkStdStream_Wrapper : public AK::IAkStdStream
+{
+  public:
+    WWISEC_AK_IAkStdStream_Wrapper(void* instance, const WWISEC_AK_IAkStdStream_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkStdStream_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Destroy() override
+    {
+        _functions.Destroy(_instance);
+    }
+
+    void GetInfo(AkStreamInfo& out_info) override
+    {
+        _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkStreamInfo*>(&out_info));
+    }
+
+    void* GetFileDescriptor() override
+    {
+        return _functions.GetFileDescriptor(_instance);
+    }
+
+    AKRESULT SetStreamName(const AkOSChar* in_pszStreamName) override
+    {
+        return static_cast<AKRESULT>(_functions.SetStreamName(_instance, in_pszStreamName));
+    }
+
+    AkUInt32 GetBlockSize() override
+    {
+        return _functions.GetBlockSize(_instance);
+    }
+
+    AKRESULT Read(void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32& out_uSize) override
+    {
+        return static_cast<AKRESULT>(_functions.Read(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<WWISEC_AkPriority>(in_priority), in_fDeadline, &out_uSize));
+    }
+
+    AKRESULT Write(void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32& out_uSize) override
+    {
+        return static_cast<AKRESULT>(_functions.Write(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<WWISEC_AkPriority>(in_priority), in_fDeadline, &out_uSize));
+    }
+
+    AkUInt64 GetPosition(bool* out_pbEndOfStream) override
+    {
+        return _functions.GetPosition(_instance, out_pbEndOfStream);
+    }
+
+    AKRESULT SetPosition(AkInt64 in_iMoveOffset, AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset) override
+    {
+        return static_cast<AKRESULT>(_functions.SetPosition(_instance, in_iMoveOffset, static_cast<WWISEC_AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+    }
+
+    void Cancel() override
+    {
+        _functions.Cancel(_instance);
+    }
+
+    void* GetData(AkUInt32& out_uSize) override
+    {
+        return _functions.GetData(_instance, &out_uSize);
+    }
+
+    AkStmStatus GetStatus() override
+    {
+        return static_cast<AkStmStatus>(_functions.GetStatus(_instance));
+    }
+
+    AkStmStatus WaitForPendingOperation() override
+    {
+        return static_cast<AkStmStatus>(_functions.WaitForPendingOperation(_instance));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkStdStream_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkStdStream* WWISEC_AK_IAkStdStream_CreateInstance(void* instance, const WWISEC_AK_IAkStdStream_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStdStream*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkStdStream_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkStdStream_DestroyInstance(WWISEC_AK_IAkStdStream* instance)
+{
+    WWISEC_AK_IAkStdStream_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkStdStream_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkStdStream_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkStdStream_Destroy(WWISEC_AK_IAkStdStream* instance)
+{
+    reinterpret_cast<AK::IAkStdStream*>(instance)->Destroy();
+}
+
+void WWISEC_AK_IAkStdStream_GetInfo(WWISEC_AK_IAkStdStream* instance, WWISEC_AkStreamInfo* out_info)
+{
+    reinterpret_cast<AK::IAkStdStream*>(instance)->GetInfo(*reinterpret_cast<AkStreamInfo*>(out_info));
+}
+
+void* WWISEC_AK_IAkStdStream_GetFileDescriptor(WWISEC_AK_IAkStdStream* instance)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetFileDescriptor();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetStreamName(WWISEC_AK_IAkStdStream* instance, const AkOSChar* in_pszStreamName)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->SetStreamName(in_pszStreamName));
+}
+
+AkUInt32 WWISEC_AK_IAkStdStream_GetBlockSize(WWISEC_AK_IAkStdStream* instance)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetBlockSize();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Read(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->Read(in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, *out_uSize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Write(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->Write(in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, *out_uSize));
+}
+
+AkUInt64 WWISEC_AK_IAkStdStream_GetPosition(WWISEC_AK_IAkStdStream* instance, bool* out_pbEndOfStream)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetPosition(out_pbEndOfStream);
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetPosition(WWISEC_AK_IAkStdStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->SetPosition(in_iMoveOffset, static_cast<AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+}
+
+void WWISEC_AK_IAkStdStream_Cancel(WWISEC_AK_IAkStdStream* instance)
+{
+    reinterpret_cast<AK::IAkStdStream*>(instance)->Cancel();
+}
+
+void* WWISEC_AK_IAkStdStream_GetData(WWISEC_AK_IAkStdStream* instance, AkUInt32* out_uSize)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetData(*out_uSize);
+}
+
+WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_GetStatus(WWISEC_AK_IAkStdStream* instance)
+{
+    return static_cast<WWISEC_AkStmStatus>(reinterpret_cast<AK::IAkStdStream*>(instance)->GetStatus());
+}
+
+WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_WaitForPendingOperation(WWISEC_AK_IAkStdStream* instance)
+{
+    return static_cast<WWISEC_AkStmStatus>(reinterpret_cast<AK::IAkStdStream*>(instance)->WaitForPendingOperation());
+}
+
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get()
 {
     return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AK::IAkStreamMgr::Get());
