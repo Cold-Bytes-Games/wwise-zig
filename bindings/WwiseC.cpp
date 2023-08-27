@@ -1382,6 +1382,75 @@ static_assert(sizeof(WWISEC_AkDeviceData) == sizeof(AkDeviceData));
 static_assert(sizeof(WWISEC_AkStreamRecord) == sizeof(AkStreamRecord));
 static_assert(sizeof(WWISEC_AkStreamData) == sizeof(AkStreamData));
 
+class WWISEC_AK_IAkStreamProfile_Wrapper : public AK::IAkStreamProfile
+{
+  public:
+    WWISEC_AK_IAkStreamProfile_Wrapper(void* instance, const WWISEC_AK_IAkStreamProfile_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkStreamProfile_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void GetStreamRecord(AkStreamRecord& out_streamRecord) override
+    {
+        _functions.GetStreamRecord(_instance, reinterpret_cast<WWISEC_AkStreamRecord*>(&out_streamRecord));
+    }
+
+    void GetStreamData(AkStreamData& out_streamData) override
+    {
+        _functions.GetStreamData(_instance, reinterpret_cast<WWISEC_AkStreamData*>(&out_streamData));
+    }
+
+    bool IsNew() override
+    {
+        return _functions.IsNew(_instance);
+    }
+
+    void ClearNew() override
+    {
+        return _functions.ClearNew(_instance);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkStreamProfile_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkStreamProfile* WWISEC_AK_IAkStreamProfile_CreateInstance(void* instance, const WWISEC_AK_IAkStreamProfile_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamProfile*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkStreamProfile_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkStreamProfile_DestroyInstance(WWISEC_AK_IAkStreamProfile* instance)
+{
+    WWISEC_AK_IAkStreamProfile_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkStreamProfile_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkStreamProfile_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkStreamProfile_GetStreamRecord(WWISEC_AK_IAkStreamProfile* instance, WWISEC_AkStreamRecord* out_streamRecord)
+{
+    reinterpret_cast<AK::IAkStreamProfile*>(instance)->GetStreamRecord(*reinterpret_cast<AkStreamRecord*>(out_streamRecord));
+}
+
+void WWISEC_AK_IAkStreamProfile_GetStreamData(WWISEC_AK_IAkStreamProfile* instance, WWISEC_AkStreamData* out_streamData)
+{
+    reinterpret_cast<AK::IAkStreamProfile*>(instance)->GetStreamData(*reinterpret_cast<AkStreamData*>(out_streamData));
+}
+bool WWISEC_AK_IAkStreamProfile_IsNew(WWISEC_AK_IAkStreamProfile* instance)
+{
+    return reinterpret_cast<AK::IAkStreamProfile*>(instance)->IsNew();
+}
+
+void WWISEC_AK_IAkStreamProfile_ClearNew(WWISEC_AK_IAkStreamProfile* instance)
+{
+    reinterpret_cast<AK::IAkStreamProfile*>(instance)->ClearNew();
+}
+
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get()
 {
     return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AK::IAkStreamMgr::Get());

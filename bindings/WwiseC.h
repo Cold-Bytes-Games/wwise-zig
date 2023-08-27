@@ -2312,6 +2312,27 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
 #pragma pack(pop)
 
+    typedef struct WWISEC_AK_IAkStreamProfile WWISEC_AK_IAkStreamProfile;
+
+    typedef struct WWISEC_AK_IAkStreamProfile_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        void (*GetStreamRecord)(void* instance, WWISEC_AkStreamRecord* out_streamRecord);
+        void (*GetStreamData)(void* instance, WWISEC_AkStreamData* out_streamData);
+        bool (*IsNew)(void* instance);
+        void (*ClearNew)(void* instance);
+
+    } WWISEC_AK_IAkStreamProfile_FunctionTable;
+
+    WWISEC_AK_IAkStreamProfile* WWISEC_AK_IAkStreamProfile_CreateInstance(void* instance, const WWISEC_AK_IAkStreamProfile_FunctionTable* functionTable);
+    void WWISEC_AK_IAkStreamProfile_DestroyInstance(WWISEC_AK_IAkStreamProfile* instance);
+
+    void WWISEC_AK_IAkStreamProfile_GetStreamRecord(WWISEC_AK_IAkStreamProfile* instance, WWISEC_AkStreamRecord* out_streamRecord);
+    void WWISEC_AK_IAkStreamProfile_GetStreamData(WWISEC_AK_IAkStreamProfile* instance, WWISEC_AkStreamData* out_streamData);
+    bool WWISEC_AK_IAkStreamProfile_IsNew(WWISEC_AK_IAkStreamProfile* instance);
+    void WWISEC_AK_IAkStreamProfile_ClearNew(WWISEC_AK_IAkStreamProfile* instance);
+
     WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get();
     // END IAkStreamMgr
 

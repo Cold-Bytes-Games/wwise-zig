@@ -79,8 +79,8 @@ test "AkStreamRecord toC()" {
 
     var raw_stream_record = try stream_record.toC();
 
-    try std.testing.expectEqualSlices(u16, std.unicode.utf8ToUtf16LeStringLiteral("Test Stream"), raw_stream_record.szStreamName[0..raw_stream_record.uStringSize]);
-    try std.testing.expectEqual(stream_record.stream_name.len, raw_stream_record.uStringSize);
+    try std.testing.expectEqualSlices(u16, std.unicode.utf8ToUtf16LeStringLiteral("Test Stream"), raw_stream_record.stream_name[0..raw_stream_record.string_size]);
+    try std.testing.expectEqual(stream_record.stream_name.len, raw_stream_record.string_size);
 }
 
 test "CAkDefaultIOHookBlocking create" {

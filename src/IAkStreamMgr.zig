@@ -3,6 +3,9 @@ const c = @import("c.zig");
 const common = @import("common.zig");
 const settings = @import("settings.zig");
 
+pub const AK_MONITOR_STREAMNAME_MAXLENGTH = c.WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH;
+pub const AK_MONITOR_DEVICENAME_MAXLENGTH = c.WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH;
+
 pub const AkStmStatus = enum(common.DefaultEnumType) {
     idle = c.WWISEC_AK_StmStatusIdle,
     completed = c.WWISEC_AK_StmStatusCompleted,
@@ -119,8 +122,12 @@ pub const NativeAkDeviceDesc = extern struct {
     device_id: common.AkDeviceID = 0,
     can_write: bool = false,
     can_read: bool = false,
-    device_name: [16]c.AkUtf16 = undefined,
+    device_name: [AK_MONITOR_DEVICENAME_MAXLENGTH]common.AkUtf16 = undefined,
     string_size: u32 = 0,
+
+    comptime {
+        std.debug.assert(@sizeOf(NativeAkDeviceDesc) == @sizeOf(c.WWISEC_AkDeviceDesc));
+    }
 };
 
 pub const AkDeviceDesc = struct {
@@ -184,6 +191,30 @@ pub const AkDeviceData = extern struct {
     }
 };
 
+pub const NativeAkStreamRecord = extern struct {
+    stream_id: u32 = 0,
+    device_id: common.AkDeviceID = 0,
+    stream_name: [AK_MONITOR_STREAMNAME_MAXLENGTH]common.AkUtf16,
+    string_size: u32 = 0,
+    file_size: u64 = 0,
+    custom_param_size: u32 = 0,
+    custom_param: u32 = 0,
+    is_auto_stream: bool = false,
+    is_caching_stream: bool = false,
+
+    pub inline fn fromC(value: c.WWISEC_AkStreamRecord) AkDeviceData {
+        return @bitCast(value);
+    }
+
+    pub inline fn toC(self: AkDeviceData) c.WWISEC_AkStreamRecord {
+        return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(NativeAkStreamRecord) == @sizeOf(c.WWISEC_AkStreamRecord));
+    }
+};
+
 pub const AkStreamRecord = struct {
     stream_id: u32 = 0,
     device_id: common.AkDeviceID = 0,
@@ -194,32 +225,36 @@ pub const AkStreamRecord = struct {
     is_auto_stream: bool = false,
     is_caching_stream: bool = false,
 
-    pub fn fromC(value: c.WWISEC_AkStreamRecord, allocator: std.mem.Allocator) !AkStreamRecord {
+    pub fn deinit(self: AkStreamRecord, allocator: std.mem.Allocator) void {
+        allocator.free(self.stream_name);
+    }
+
+    pub fn fromC(allocator: std.mem.Allocator, value: *NativeAkStreamRecord) !AkStreamRecord {
         return .{
-            .stream_id = value.uStreamID,
-            .device_id = value.deviceID,
-            .stream_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.szStreamName[0..]),
-            .file_size = value.uFileSize,
-            .custom_param_size = value.uCustomParamSize,
-            .custom_param = value.uCustomParam,
-            .is_auto_stream = value.bIsAutoStream,
-            .is_caching_stream = value.bIsCachingStream,
+            .stream_id = value.stream_id,
+            .device_id = value.device_id,
+            .stream_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.stream_name[0..]),
+            .file_size = value.file_size,
+            .custom_param_size = value.custom_param_size,
+            .custom_param = value.custom_param,
+            .is_auto_stream = value.is_auto_stream,
+            .is_caching_stream = value.is_caching_stream,
         };
     }
 
-    pub fn toC(self: AkStreamRecord) !c.WWISEC_AkStreamRecord {
-        var result: c.WWISEC_AkStreamRecord = undefined;
+    pub fn toC(self: AkStreamRecord) !NativeAkStreamRecord {
+        var result: NativeAkStreamRecord = undefined;
 
-        @memset(&result.szStreamName, 0);
-        result.uStringSize = @truncate(try std.unicode.utf8ToUtf16Le(&result.szStreamName, self.stream_name));
+        @memset(&result.stream_name, 0);
+        result.string_size = @truncate(try std.unicode.utf8ToUtf16Le(&result.stream_name, self.stream_name));
 
-        result.uStreamID = self.stream_id;
-        result.deviceID = self.device_id;
-        result.uFileSize = self.file_size;
-        result.uCustomParamSize = self.custom_param_size;
-        result.uCustomParam = self.custom_param;
-        result.bIsAutoStream = self.is_auto_stream;
-        result.bIsCachingStream = self.is_caching_stream;
+        result.stream_id = self.stream_id;
+        result.device_id = self.device_id;
+        result.file_size = self.file_size;
+        result.custom_param_size = self.custom_param_size;
+        result.custom_param = self.custom_param;
+        result.is_auto_stream = self.is_auto_stream;
+        result.is_caching_stream = self.is_caching_stream;
 
         return result;
     }
@@ -251,55 +286,42 @@ pub const AkStreamData = extern struct {
     }
 };
 
-pub const IAkStreamProfile = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkStreamProfile) = .{},
-        get_stream_record: *const fn (self: *IAkStreamProfile, out_streamRecord: *c.WWISEC_AkStreamRecord) callconv(.C) void,
-        get_stream_data: *const fn (self: *IAkStreamProfile, ouut_streamData: *c.WWISEC_AkStreamData) callconv(.C) void,
+pub const IAkStreamProfile = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (self: *IAkStreamProfile) callconv(.C) void,
+        get_stream_record: *const fn (self: *IAkStreamProfile, out_stream_record: *AkStreamRecord) callconv(.C) void,
+        get_stream_data: *const fn (self: *IAkStreamProfile, ouut_stream_data: *AkStreamData) callconv(.C) void,
         is_new: *const fn (self: *IAkStreamProfile) callconv(.C) bool,
         clear_new: *const fn (self: *IAkStreamProfile) callconv(.C) void,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IAkStreamProfile) *const T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn toMutableSelf(iself: *IAkStreamProfile) *T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkStreamProfile.VTable, @ptrCast(self.__v)).virtual_destructor.call(@as(*IAkStreamProfile, @ptrCast(self)));
-            }
-
-            pub inline fn getStreamRecord(self: *T, allocator: std.mem.Allocator, out_stream_record: *AkStreamRecord) !void {
-                var raw_stream_record: c.WWISEC_AkStreamRecord = undefined;
-                @as(*const IAkStreamProfile.VTable, @ptrCast(self.__v)).get_stream_record(@as(*IAkStreamProfile, @ptrCast(self)), &raw_stream_record);
-                out_stream_record.* = try AkStreamRecord.fromC(raw_stream_record, allocator);
-            }
-
-            pub inline fn getStreamData(self: *T, out_stream_data: *AkStreamData) void {
-                var raw_stream_data: c.WWISEC_AkStreamData = undefined;
-                @as(*const IAkStreamProfile.VTable, @ptrCast(self.__v)).get_stream_data(@as(*IAkStreamProfile, @ptrCast(self)), &raw_stream_data);
-                out_stream_data.* = AkStreamData.fromC(raw_stream_data);
-            }
-
-            pub inline fn isNew(self: *T) bool {
-                return @as(*const IAkStreamProfile.VTable, @ptrCast(self.__v)).is_new(@as(*IAkStreamProfile, @ptrCast(self)));
-            }
-
-            pub inline fn clearNew(self: *T) void {
-                @as(*const IAkStreamProfile.VTable, @ptrCast(self.__v)).clear_new(@as(*IAkStreamProfile, @ptrCast(self)));
-            }
-        };
+    pub fn getStreamRecord(self: *IAkStreamProfile, allocator: std.mem.Allocator, out_stream_record: *AkStreamRecord) !void {
+        var native_stream_record: NativeAkStreamRecord = undefined;
+        c.WWISEC_AK_IAkStreamProfile_GetStreamRecord(@ptrCast(self), @ptrCast(&native_stream_record));
+        out_stream_record.* = try AkStreamRecord.fromC(allocator, &native_stream_record);
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn getStreamData(self: *IAkStreamProfile, out_stream_data: *AkStreamData) void {
+        c.WWISEC_AK_IAkStreamProfile_GetStreamData(@ptrCast(self), @ptrCast(out_stream_data));
+    }
+
+    pub fn isNew(self: *IAkStreamProfile) bool {
+        return c.WWISEC_AK_IAkStreamProfile_IsNew(@ptrCast(self));
+    }
+
+    pub fn clearNew(self: *IAkStreamProfile) void {
+        c.WWISEC_AK_IAkStreamProfile_ClearNew(@ptrCast(self));
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkStreamProfile {
+        return @ptrCast(
+            c.WWISEC_AK_IAkStreamProfile_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_IAkStreamProfile_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 pub const IAkDeviceProfile = extern struct {

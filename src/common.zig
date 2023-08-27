@@ -4,6 +4,7 @@ const c = @import("c.zig");
 const wwise_options = @import("wwise_options");
 
 pub const AkOSChar = c.AkOSChar;
+pub const AkUtf16 = c.AkUtf16;
 
 pub const AkUniqueID = c.WWISEC_AkUniqueID;
 pub const AkStateID = c.WWISEC_AkStateID;
