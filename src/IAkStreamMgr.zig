@@ -384,53 +384,44 @@ pub const IAkDeviceProfile = opaque {
     }
 };
 
-pub const IAkStreamMgrProfile = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkStreamMgrProfile) = .{},
-        start_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.C) c.WWISEC_AKRESULT,
+pub const IAkStreamMgrProfile = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (self: *IAkStreamMgrProfile) callconv(.C) void,
+        start_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.C) common.AKRESULT,
         stop_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.C) void,
         get_num_devices: *const fn (self: *IAkStreamMgrProfile) callconv(.C) u32,
-        get_device_profile: *const fn (self: *IAkStreamMgrProfile) callconv(.C) ?*IAkDeviceProfile,
+        get_device_profile: *const fn (self: *IAkStreamMgrProfile, in_device_index: u32) callconv(.C) ?*IAkDeviceProfile,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(self: *const IAkStreamMgrProfile) *const T {
-                return @as(*const T, @ptrCast(self));
-            }
-
-            pub inline fn toMutableSelf(self: *IAkStreamMgrProfile) *T {
-                return @as(*T, @ptrCast(self));
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkStreamMgrProfile.VTable, @ptrCast(self.__v)).virtual_destructor.call(@as(*IAkStreamMgrProfile, @ptrCast(self)));
-            }
-
-            pub inline fn startMonitoring(self: *T) common.WwiseError!void {
-                return common.handleAkResult(
-                    @as(*const IAkStreamMgrProfile.VTable, @ptrCast(self.__v)).start_monitoring(@as(*IAkStreamMgrProfile, @ptrCast(self))),
-                );
-            }
-
-            pub inline fn stopMonitoring(self: *T) void {
-                @as(*const IAkStreamMgrProfile.VTable, @ptrCast(self.__v)).stop_monitoring(@as(*IAkStreamMgrProfile, @ptrCast(self)));
-            }
-
-            pub inline fn getNumDevices(self: *T) u32 {
-                return @as(*const IAkStreamMgrProfile.VTable, @ptrCast(self.__v)).get_num_devices(@as(*IAkStreamMgrProfile, @ptrCast(self)));
-            }
-
-            pub inline fn getDeviceProfile(self: *T) ?*IAkDeviceProfile {
-                return @as(*const IAkStreamMgrProfile.VTable, @ptrCast(self.__v)).get_device_profile(@as(*IAkStreamMgrProfile, @ptrCast(self)));
-            }
-        };
+    pub fn startMonitoring(self: *IAkStreamMgrProfile) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgrProfile_StartMonitoring(@ptrCast(self)),
+        );
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn stopMonitoring(self: *IAkStreamMgrProfile) void {
+        c.WWISEC_AK_IAkStreamMgrProfile_StopMonitoring(@ptrCast(self));
+    }
+
+    pub fn getNumDevices(self: *IAkStreamMgrProfile) u32 {
+        return c.WWISEC_AK_IAkStreamMgrProfile_GetNumDevices(@ptrCast(self));
+    }
+
+    pub fn getDeviceProfile(self: *IAkStreamMgrProfile, in_device_index: u32) ?*IAkDeviceProfile {
+        return @ptrCast(
+            c.WWISEC_AK_IAkStreamMgrProfile_GetDeviceProfile(@ptrCast(self), in_device_index),
+        );
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkStreamMgrProfile {
+        return @ptrCast(
+            c.WWISEC_AK_IAkStreamMgrProfile_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_IAkStreamMgrProfile_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 pub const IAkStdStream = extern struct {

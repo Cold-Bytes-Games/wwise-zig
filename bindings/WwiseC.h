@@ -2362,6 +2362,27 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AkUInt32 WWISEC_AK_IAkDeviceProfile_GetNumStreams(WWISEC_AK_IAkDeviceProfile* instance);
     WWISEC_AK_IAkStreamProfile* WWISEC_AK_IAkDeviceProfile_GetStreamProfile(WWISEC_AK_IAkDeviceProfile* instance, AkUInt32 in_uStreamIndex);
 
+    typedef struct WWISEC_AK_IAkStreamMgrProfile WWISEC_AK_IAkStreamMgrProfile;
+
+    typedef struct WWISEC_AK_IAkStreamMgrProfile_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        WWISEC_AKRESULT(*StartMonitoring)
+        (void* instance);
+        void (*StopMonitoring)(void* instance);
+        AkUInt32 (*GetNumDevices)(void* instance);
+        WWISEC_AK_IAkDeviceProfile* (*GetDeviceProfile)(void* instance, AkUInt32 in_uDeviceIndex);
+    } WWISEC_AK_IAkStreamMgrProfile_FunctionTable;
+
+    WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgrProfile_CreateInstance(void* instance, const WWISEC_AK_IAkStreamMgrProfile_FunctionTable* functionTable);
+    void WWISEC_AK_IAkStreamMgrProfile_DestroyInstance(WWISEC_AK_IAkStreamMgrProfile* instance);
+
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgrProfile_StartMonitoring(WWISEC_AK_IAkStreamMgrProfile* instance);
+    void WWISEC_AK_IAkStreamMgrProfile_StopMonitoring(WWISEC_AK_IAkStreamMgrProfile* instance);
+    AkUInt32 WWISEC_AK_IAkStreamMgrProfile_GetNumDevices(WWISEC_AK_IAkStreamMgrProfile* instance);
+    WWISEC_AK_IAkDeviceProfile* WWISEC_AK_IAkStreamMgrProfile_GetDeviceProfile(WWISEC_AK_IAkStreamMgrProfile* instance, AkUInt32 in_uDeviceIndex);
+
     WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get();
     // END IAkStreamMgr
 
