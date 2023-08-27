@@ -2333,6 +2333,35 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     bool WWISEC_AK_IAkStreamProfile_IsNew(WWISEC_AK_IAkStreamProfile* instance);
     void WWISEC_AK_IAkStreamProfile_ClearNew(WWISEC_AK_IAkStreamProfile* instance);
 
+    typedef struct WWISEC_AK_IAkDeviceProfile WWISEC_AK_IAkDeviceProfile;
+
+    typedef struct WWISEC_AK_IAkDeviceProfile_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        void (*OnProfileStart)(void* instance);
+        void (*OnProfileEnd)(void* instance);
+        void (*GetDesc)(void* instance, WWISEC_AkDeviceDesc* out_deviceDesc);
+        void (*GetData)(void* instance, WWISEC_AkDeviceData* out_deviceData);
+        bool (*IsNew)(void* instance);
+        void (*ClearNew)(void* instance);
+        AkUInt32 (*GetNumStreams)(void* instance);
+        WWISEC_AK_IAkStreamProfile* (*GetStreamProfile)(void* instance, AkUInt32 in_uStreamIndex);
+
+    } WWISEC_AK_IAkDeviceProfile_FunctionTable;
+
+    WWISEC_AK_IAkDeviceProfile* WWISEC_AK_IAkDeviceProfile_CreateInstance(void* instance, const WWISEC_AK_IAkDeviceProfile_FunctionTable* functionTable);
+    void WWISEC_AK_IAkDeviceProfile_DestroyInstance(WWISEC_AK_IAkStreamProfile* instance);
+
+    void WWISEC_AK_IAkDeviceProfile_OnProfileStart(WWISEC_AK_IAkDeviceProfile* instance);
+    void WWISEC_AK_IAkDeviceProfile_OnProfileEnd(WWISEC_AK_IAkDeviceProfile* instance);
+    void WWISEC_AK_IAkDeviceProfile_GetDesc(WWISEC_AK_IAkDeviceProfile* instance, WWISEC_AkDeviceDesc* out_deviceDesc);
+    void WWISEC_AK_IAkDeviceProfile_GetData(WWISEC_AK_IAkDeviceProfile* instance, WWISEC_AkDeviceData* out_deviceData);
+    bool WWISEC_AK_IAkDeviceProfile_IsNew(WWISEC_AK_IAkDeviceProfile* instance);
+    void WWISEC_AK_IAkDeviceProfile_ClearNew(WWISEC_AK_IAkDeviceProfile* instance);
+    AkUInt32 WWISEC_AK_IAkDeviceProfile_GetNumStreams(WWISEC_AK_IAkDeviceProfile* instance);
+    WWISEC_AK_IAkStreamProfile* WWISEC_AK_IAkDeviceProfile_GetStreamProfile(WWISEC_AK_IAkDeviceProfile* instance, AkUInt32 in_uStreamIndex);
+
     WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get();
     // END IAkStreamMgr
 

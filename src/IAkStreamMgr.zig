@@ -324,75 +324,64 @@ pub const IAkStreamProfile = opaque {
     }
 };
 
-pub const IAkDeviceProfile = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkDeviceProfile) = .{},
-        on_profile_start: *const fn (iself: *IAkDeviceProfile) callconv(.C) void,
-        on_profile_end: *const fn (iself: *IAkDeviceProfile) callconv(.C) void,
-        get_desc: *const fn (iself: *IAkDeviceProfile, out_device_desc: *c.WWISEC_AkDeviceDesc) callconv(.C) void,
-        get_data: *const fn (iself: *IAkDeviceProfile, out_device_data: *c.WWISEC_AkDeviceData) callconv(.C) void,
-        is_new: *const fn (iself: *IAkDeviceProfile) callconv(.C) bool,
-        clear_new: *const fn (iself: *IAkDeviceProfile) callconv(.C) void,
-        get_num_streams: *const fn (iself: *IAkDeviceProfile) callconv(.C) u32,
-        get_stream_profile: *const fn (iself: *IAkDeviceProfile, in_stream_index: u32) callconv(.C) ?*IAkStreamProfile,
+pub const IAkDeviceProfile = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
+        on_profile_start: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
+        on_profile_end: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
+        get_desc: *const fn (self: *IAkDeviceProfile, out_device_desc: *NativeAkDeviceDesc) callconv(.C) void,
+        get_data: *const fn (self: *IAkDeviceProfile, out_device_data: *AkDeviceData) callconv(.C) void,
+        is_new: *const fn (self: *IAkDeviceProfile) callconv(.C) bool,
+        clear_new: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
+        get_num_streams: *const fn (self: *IAkDeviceProfile) callconv(.C) u32,
+        get_stream_profile: *const fn (self: *IAkDeviceProfile, in_stream_index: u32) callconv(.C) ?*IAkStreamProfile,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IAkDeviceProfile) *const T {
-                return @as(*const T, @ptrCast(iself));
-            }
-
-            pub inline fn toMutableSelf(iself: *IAkDeviceProfile) *T {
-                return @as(*T, @ptrCast(iself));
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).virtual_destructor.call(@as(*IAkDeviceProfile, @ptrCast(self)));
-            }
-
-            pub inline fn onProfileStart(self: *T) void {
-                @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).on_profile_start(@as(*IAkDeviceProfile, @ptrCast(self)));
-            }
-
-            pub inline fn onProfileEnd(self: *T) void {
-                @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).on_profile_end(@as(*IAkDeviceProfile, @ptrCast(self)));
-            }
-
-            pub inline fn getDesc(self: *T, allocator: std.mem.Allocator, out_device_desc: *AkDeviceDesc) !void {
-                var raw_device_desc: c.WWISEC_AkDeviceDesc = undefined;
-                @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).get_desc(@as(*IAkDeviceProfile, @ptrCast(self)), &raw_device_desc);
-                out_device_desc.* = try AkDeviceDesc.fromC(raw_device_desc, allocator);
-            }
-
-            pub inline fn getData(self: *T, out_device_data: *AkDeviceData) void {
-                var raw_device_data: c.WWISEC_AkDeviceData = undefined;
-                @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).get_data(@as(*IAkDeviceProfile, @ptrCast(self)), &raw_device_data);
-                out_device_data.* = AkDeviceData.fromC(raw_device_data);
-            }
-
-            pub inline fn isNew(self: *T) bool {
-                return @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).is_new(@as(*IAkDeviceProfile, @ptrCast(self)));
-            }
-
-            pub inline fn clearNew(self: *T) void {
-                @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).clear_new(@as(*IAkDeviceProfile, @ptrCast(self)));
-            }
-
-            pub inline fn getNumStreams(self: *T) u32 {
-                return @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).get_num_streams(@as(*IAkDeviceProfile, @ptrCast(self)));
-            }
-
-            pub inline fn getStreamProfile(self: *T, in_stream_index: u32) ?*IAkStreamProfile {
-                return @as(*const IAkDeviceProfile.VTable, @ptrCast(self.__v)).get_stream_profile(@as(*IAkDeviceProfile, @ptrCast(self)), in_stream_index);
-            }
-        };
+    pub fn onProfileStart(self: *IAkDeviceProfile) void {
+        c.WWISEC_AK_IAkDeviceProfile_OnProfileStart(@ptrCast(self));
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn onProfileEnd(self: *IAkDeviceProfile) void {
+        c.WWISEC_AK_IAkDeviceProfile_OnProfileEnd(@ptrCast(self));
+    }
+
+    pub fn getDesc(self: *IAkDeviceProfile, allocator: std.mem.Allocator, out_device_desc: *AkDeviceDesc) !void {
+        var raw_device_desc: NativeAkDeviceDesc = undefined;
+        c.WWISEC_AK_IAkDeviceProfile_GetDesc(@ptrCast(self), @ptrCast(&raw_device_desc));
+        out_device_desc.* = try AkDeviceDesc.fromC(&raw_device_desc, allocator);
+    }
+
+    pub fn getData(self: *IAkDeviceProfile, out_device_data: *AkDeviceData) void {
+        c.WWISEC_AK_IAkDeviceProfile_GetData(@ptrCast(self), @ptrCast(out_device_data));
+    }
+
+    pub fn isNew(self: *IAkDeviceProfile) bool {
+        return c.WWISEC_AK_IAkDeviceProfile_IsNew(@ptrCast(self));
+    }
+
+    pub fn clearNew(self: *IAkDeviceProfile) void {
+        c.WWISEC_AK_IAkDeviceProfile_ClearNew(@ptrCast(self));
+    }
+
+    pub fn getNumStreams(self: *IAkDeviceProfile) u32 {
+        return c.WWISEC_AK_IAkDeviceProfile_GetNumStreams(@ptrCast(self));
+    }
+
+    pub fn getStreamProfile(self: *IAkDeviceProfile, in_stream_index: u32) ?*IAkStreamProfile {
+        return @ptrCast(
+            c.WWISEC_AK_IAkDeviceProfile_GetStreamProfile(@ptrCast(self), in_stream_index),
+        );
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkDeviceProfile {
+        return @ptrCast(
+            c.WWISEC_AK_IAkDeviceProfile_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_IAkDeviceProfile_DestroyInstance(@ptrCast(instance));
+    }
 };
 
 pub const IAkStreamMgrProfile = extern struct {
@@ -400,20 +389,20 @@ pub const IAkStreamMgrProfile = extern struct {
 
     pub const VTable = extern struct {
         virtual_destructor: common.VirtualDestructor(IAkStreamMgrProfile) = .{},
-        start_monitoring: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) c.WWISEC_AKRESULT,
-        stop_monitoring: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) void,
-        get_num_devices: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) u32,
-        get_device_profile: *const fn (iself: *IAkStreamMgrProfile) callconv(.C) ?*IAkDeviceProfile,
+        start_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.C) c.WWISEC_AKRESULT,
+        stop_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.C) void,
+        get_num_devices: *const fn (self: *IAkStreamMgrProfile) callconv(.C) u32,
+        get_device_profile: *const fn (self: *IAkStreamMgrProfile) callconv(.C) ?*IAkDeviceProfile,
     };
 
     pub fn Methods(comptime T: type) type {
         return extern struct {
-            pub inline fn toSelf(iself: *const IAkStreamMgrProfile) *const T {
-                return @as(*const T, @ptrCast(iself));
+            pub inline fn toSelf(self: *const IAkStreamMgrProfile) *const T {
+                return @as(*const T, @ptrCast(self));
             }
 
-            pub inline fn toMutableSelf(iself: *IAkStreamMgrProfile) *T {
-                return @as(*T, @ptrCast(iself));
+            pub inline fn toMutableSelf(self: *IAkStreamMgrProfile) *T {
+                return @as(*T, @ptrCast(self));
             }
 
             pub inline fn deinit(self: *T) void {
@@ -449,29 +438,29 @@ pub const IAkStdStream = extern struct {
 
     pub const VTable = extern struct {
         virtual_destructor: common.VirtualDestructor(IAkStdStream) = .{},
-        destroy: *const fn (iself: *IAkStdStream) callconv(.C) void,
-        get_info: *const fn (iself: *IAkStdStream, out_info: *c.WWISEC_AkStreamInfo) callconv(.C) void,
-        get_file_descriptor: *const fn (iself: *IAkStdStream) callconv(.C) ?*anyopaque,
-        set_stream_name: *const fn (iself: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
-        get_block_size: *const fn (iself: *IAkStdStream) callconv(.C) u32,
-        read: *const fn (iself: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
-        write: *const fn (iself: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
-        get_position: *const fn (iself: *IAkStdStream, out_end_of_stream: *bool) callconv(.C) u64,
-        set_position: *const fn (iself: *IAkStdStream, in_move_offset: i64, in_move_method: c.WWISEC_AkMoveMethod, out_real_offset: *i64) callconv(.C) c.WWISEC_AKRESULT,
-        cancel: *const fn (iself: *IAkStdStream) callconv(.C) void,
-        get_data: *const fn (iself: *IAkStdStream, out_size: *u32) callconv(.C) ?*anyopaque,
-        get_status: *const fn (iself: *IAkStdStream) callconv(.C) c.WWISEC_AkStmStatus,
-        wait_for_pending_operation: *const fn (iself: *IAkStdStream) callconv(.C) c.WWISEC_AkStmStatus,
+        destroy: *const fn (self: *IAkStdStream) callconv(.C) void,
+        get_info: *const fn (self: *IAkStdStream, out_info: *c.WWISEC_AkStreamInfo) callconv(.C) void,
+        get_file_descriptor: *const fn (self: *IAkStdStream) callconv(.C) ?*anyopaque,
+        set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
+        get_block_size: *const fn (self: *IAkStdStream) callconv(.C) u32,
+        read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
+        write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: c.WWISEC_AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) c.WWISEC_AKRESULT,
+        get_position: *const fn (self: *IAkStdStream, out_end_of_stream: *bool) callconv(.C) u64,
+        set_position: *const fn (self: *IAkStdStream, in_move_offset: i64, in_move_method: c.WWISEC_AkMoveMethod, out_real_offset: *i64) callconv(.C) c.WWISEC_AKRESULT,
+        cancel: *const fn (self: *IAkStdStream) callconv(.C) void,
+        get_data: *const fn (self: *IAkStdStream, out_size: *u32) callconv(.C) ?*anyopaque,
+        get_status: *const fn (self: *IAkStdStream) callconv(.C) c.WWISEC_AkStmStatus,
+        wait_for_pending_operation: *const fn (self: *IAkStdStream) callconv(.C) c.WWISEC_AkStmStatus,
     };
 
     pub fn Methods(comptime T: type) type {
         return extern struct {
-            pub inline fn toSelf(iself: *const IAkStdStream) *const T {
-                return @as(*const T, @ptrCast(iself));
+            pub inline fn toSelf(self: *const IAkStdStream) *const T {
+                return @as(*const T, @ptrCast(self));
             }
 
-            pub inline fn toMutableSelf(iself: *IAkStdStream) *T {
-                return @as(*T, @ptrCast(iself));
+            pub inline fn toMutableSelf(self: *IAkStdStream) *T {
+                return @as(*T, @ptrCast(self));
             }
 
             pub inline fn deinit(self: *T) void {
@@ -573,33 +562,33 @@ pub const IAkAutoStream = extern struct {
 
     pub const VTable = extern struct {
         virtual_destructor: common.VirtualDestructor(IAkAutoStream) = .{},
-        destroy: *const fn (iself: *IAkAutoStream) callconv(.C) void,
-        get_info: *const fn (iself: *IAkAutoStream, out_info: *c.WWISEC_AkStreamInfo) callconv(.C) void,
-        get_file_descriptor: *const fn (iself: *IAkAutoStream) callconv(.C) ?*anyopaque,
-        get_heuristics: *const fn (iself: *IAkAutoStream, out_heuristics: *c.WWISEC_AkAutoStmHeuristics) callconv(.C) void,
-        set_heuristics: *const fn (iself: *IAkAutoStream, in_heuristics: *c.WWISEC_AkAutoStmHeuristics) callconv(.C) void,
-        set_minimal_buffer_size: *const fn (iself: *IAkAutoStream, in_min_buffer_size: u32) callconv(.C) void,
-        set_min_target_buffer_size: *const fn (iself: *IAkAutoStream, in_min_target_buffer_size: u32) callconv(.C) void,
-        set_stream_name: *const fn (iself: *IAkAutoStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
-        get_block_size: *const fn (iself: *IAkAutoStream) callconv(.C) u32,
-        query_buffering_status: *const fn (iself: *IAkAutoStream, out_num_bytes_available: *u32) callconv(.C) c.WWISEC_AKRESULT,
-        get_nominal_buffering: *const fn (iself: *IAkAutoStream) callconv(.C) u32,
-        start: *const fn (iself: *IAkAutoStream) callconv(.C) c.WWISEC_AKRESULT,
-        stop: *const fn (iself: *IAkAutoStream) callconv(.C) c.WWISEC_AKRESULT,
-        get_position: *const fn (iself: *IAkAutoStream, out_end_of_stream: *bool) callconv(.C) u64,
-        set_position: *const fn (iself: *IAkAutoStream, in_move_offset: i64, in_move_method: c.WWISEC_AkMoveMethod, out_real_offset: *i64) callconv(.C) c.WWISEC_AKRESULT,
-        get_buffer: *const fn (iself: *IAkAutoStream, out_buffer: *?*anyopaque, out_size: *u32, in_wait: bool) callconv(.C) c.WWISEC_AKRESULT,
-        release_buffer: *const fn (iself: *IAkAutoStream) callconv(.C) c.WWISEC_AKRESULT,
+        destroy: *const fn (self: *IAkAutoStream) callconv(.C) void,
+        get_info: *const fn (self: *IAkAutoStream, out_info: *c.WWISEC_AkStreamInfo) callconv(.C) void,
+        get_file_descriptor: *const fn (self: *IAkAutoStream) callconv(.C) ?*anyopaque,
+        get_heuristics: *const fn (self: *IAkAutoStream, out_heuristics: *c.WWISEC_AkAutoStmHeuristics) callconv(.C) void,
+        set_heuristics: *const fn (self: *IAkAutoStream, in_heuristics: *c.WWISEC_AkAutoStmHeuristics) callconv(.C) void,
+        set_minimal_buffer_size: *const fn (self: *IAkAutoStream, in_min_buffer_size: u32) callconv(.C) void,
+        set_min_target_buffer_size: *const fn (self: *IAkAutoStream, in_min_target_buffer_size: u32) callconv(.C) void,
+        set_stream_name: *const fn (self: *IAkAutoStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) c.WWISEC_AKRESULT,
+        get_block_size: *const fn (self: *IAkAutoStream) callconv(.C) u32,
+        query_buffering_status: *const fn (self: *IAkAutoStream, out_num_bytes_available: *u32) callconv(.C) c.WWISEC_AKRESULT,
+        get_nominal_buffering: *const fn (self: *IAkAutoStream) callconv(.C) u32,
+        start: *const fn (self: *IAkAutoStream) callconv(.C) c.WWISEC_AKRESULT,
+        stop: *const fn (self: *IAkAutoStream) callconv(.C) c.WWISEC_AKRESULT,
+        get_position: *const fn (self: *IAkAutoStream, out_end_of_stream: *bool) callconv(.C) u64,
+        set_position: *const fn (self: *IAkAutoStream, in_move_offset: i64, in_move_method: c.WWISEC_AkMoveMethod, out_real_offset: *i64) callconv(.C) c.WWISEC_AKRESULT,
+        get_buffer: *const fn (self: *IAkAutoStream, out_buffer: *?*anyopaque, out_size: *u32, in_wait: bool) callconv(.C) c.WWISEC_AKRESULT,
+        release_buffer: *const fn (self: *IAkAutoStream) callconv(.C) c.WWISEC_AKRESULT,
     };
 
     pub fn Methods(comptime T: type) type {
         return extern struct {
-            pub inline fn toSelf(iself: *const IAkAutoStream) *const T {
-                return @as(*const T, @ptrCast(iself));
+            pub inline fn toSelf(self: *const IAkAutoStream) *const T {
+                return @as(*const T, @ptrCast(self));
             }
 
-            pub inline fn toMutableSelf(iself: *IAkAutoStream) *T {
-                return @as(*T, @ptrCast(iself));
+            pub inline fn toMutableSelf(self: *IAkAutoStream) *T {
+                return @as(*T, @ptrCast(self));
             }
 
             pub inline fn deinit(self: *T) void {
@@ -786,12 +775,12 @@ pub const IAkStreamMgr = extern struct {
 
     pub fn Methods(comptime T: type) type {
         return extern struct {
-            pub inline fn toSelf(iself: *const IAkStreamMgr) *const T {
-                return @as(*const T, @ptrCast(iself));
+            pub inline fn toSelf(self: *const IAkStreamMgr) *const T {
+                return @as(*const T, @ptrCast(self));
             }
 
-            pub inline fn toMutableSelf(iself: *IAkStreamMgr) *T {
-                return @as(*T, @ptrCast(iself));
+            pub inline fn toMutableSelf(self: *IAkStreamMgr) *T {
+                return @as(*T, @ptrCast(self));
             }
 
             pub inline fn deinit(self: *T) void {

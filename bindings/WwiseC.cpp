@@ -1451,6 +1451,117 @@ void WWISEC_AK_IAkStreamProfile_ClearNew(WWISEC_AK_IAkStreamProfile* instance)
     reinterpret_cast<AK::IAkStreamProfile*>(instance)->ClearNew();
 }
 
+//
+class WWISEC_AK_IAkDeviceProfile_Wrapper : public AK::IAkDeviceProfile
+{
+  public:
+    WWISEC_AK_IAkDeviceProfile_Wrapper(void* instance, const WWISEC_AK_IAkDeviceProfile_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkDeviceProfile_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void OnProfileStart() override
+    {
+        _functions.OnProfileStart(_instance);
+    }
+
+    void OnProfileEnd() override
+    {
+        _functions.OnProfileEnd(_instance);
+    }
+
+    void GetDesc(AkDeviceDesc& out_deviceDesc) override
+    {
+        _functions.GetDesc(_instance, reinterpret_cast<WWISEC_AkDeviceDesc*>(&out_deviceDesc));
+    }
+
+    void GetData(AkDeviceData& out_deviceData) override
+    {
+        _functions.GetData(_instance, reinterpret_cast<WWISEC_AkDeviceData*>(&out_deviceData));
+    }
+
+    bool IsNew() override
+    {
+        return _functions.IsNew(_instance);
+    }
+
+    void ClearNew() override
+    {
+        _functions.ClearNew(_instance);
+    }
+
+    AkUInt32 GetNumStreams() override
+    {
+        return _functions.GetNumStreams(_instance);
+    }
+
+    AK::IAkStreamProfile* GetStreamProfile(AkUInt32 in_uStreamIndex) override
+    {
+        return reinterpret_cast<AK::IAkStreamProfile*>(_functions.GetStreamProfile(_instance, in_uStreamIndex));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkDeviceProfile_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkDeviceProfile* WWISEC_AK_IAkDeviceProfile_CreateInstance(void* instance, const WWISEC_AK_IAkDeviceProfile_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkDeviceProfile*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkDeviceProfile_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkDeviceProfile_DestroyInstance(WWISEC_AK_IAkStreamProfile* instance)
+{
+    WWISEC_AK_IAkDeviceProfile_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkDeviceProfile_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkDeviceProfile_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkDeviceProfile_OnProfileStart(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->OnProfileStart();
+}
+
+void WWISEC_AK_IAkDeviceProfile_OnProfileEnd(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->OnProfileEnd();
+}
+
+void WWISEC_AK_IAkDeviceProfile_GetDesc(WWISEC_AK_IAkDeviceProfile* instance, WWISEC_AkDeviceDesc* out_deviceDesc)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetDesc(*reinterpret_cast<AkDeviceDesc*>(out_deviceDesc));
+}
+
+void WWISEC_AK_IAkDeviceProfile_GetData(WWISEC_AK_IAkDeviceProfile* instance, WWISEC_AkDeviceData* out_deviceData)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetData(*reinterpret_cast<AkDeviceData*>(out_deviceData));
+}
+
+bool WWISEC_AK_IAkDeviceProfile_IsNew(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    return reinterpret_cast<AK::IAkDeviceProfile*>(instance)->IsNew();
+}
+
+void WWISEC_AK_IAkDeviceProfile_ClearNew(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->ClearNew();
+}
+
+AkUInt32 WWISEC_AK_IAkDeviceProfile_GetNumStreams(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    return reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetNumStreams();
+}
+
+WWISEC_AK_IAkStreamProfile* WWISEC_AK_IAkDeviceProfile_GetStreamProfile(WWISEC_AK_IAkDeviceProfile* instance, AkUInt32 in_uStreamIndex)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamProfile*>(reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetStreamProfile(in_uStreamIndex));
+}
+
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get()
 {
     return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AK::IAkStreamMgr::Get());
