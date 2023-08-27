@@ -131,11 +131,11 @@ pub const AkIoHeuristics = extern struct {
 
 pub const IAkLowLevelIOHook = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (iself: *IAkLowLevelIOHook) callconv(.C) void,
-        close: *const fn (iself: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
-        get_block_size: *const fn (iself: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkLowLevelIOHook, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
-        get_device_data: *const fn (iself: *IAkLowLevelIOHook) callconv(.C) u32,
+        destructor: *const fn (self: *IAkLowLevelIOHook) callconv(.C) void,
+        close: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (self: *IAkLowLevelIOHook, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
+        get_device_data: *const fn (self: *IAkLowLevelIOHook) callconv(.C) u32,
     };
 
     pub fn close(self: *IAkLowLevelIOHook, in_file_desc: *const AkFileDesc) common.WwiseError!void {
@@ -178,20 +178,20 @@ pub const IAkLowLevelIOHook = opaque {
 // Inherits from IAkLowLevelIOHook
 pub const IAkIOHookBlocking = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (iself: *IAkIOHookBlocking) callconv(.C) void,
-        close: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
-        get_block_size: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
-        get_device_data: *const fn (iself: *IAkIOHookBlocking) callconv(.C) u32,
+        destructor: *const fn (self: *IAkIOHookBlocking) callconv(.C) void,
+        close: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (self: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
+        get_device_data: *const fn (self: *IAkIOHookBlocking) callconv(.C) u32,
         read: *const fn (
-            iself: *IAkIOHookBlocking,
+            self: *IAkIOHookBlocking,
             in_file_desc: *AkFileDesc,
             in_heuristics: *AkIoHeuristics,
             out_buffer: ?*anyopaque,
             in_transfer_info: *AkIOTransferInfo,
         ) callconv(.C) common.AKRESULT,
         write: *const fn (
-            iself: *IAkIOHookBlocking,
+            self: *IAkIOHookBlocking,
             in_file_desc: *AkFileDesc,
             in_heuristics: *AkIoHeuristics,
             in_data: ?*anyopaque,
@@ -263,27 +263,27 @@ pub const IAkIOHookBlocking = opaque {
 // Inherits from IAkLowLevelIOHook
 pub const IAkIOHookDeferredBatch = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (iself: *IAkIOHookBlocking) callconv(.C) void,
-        close: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
-        get_block_size: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
-        get_device_data: *const fn (iself: *IAkIOHookBlocking) callconv(.C) u32,
+        destructor: *const fn (self: *IAkIOHookBlocking) callconv(.C) void,
+        close: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (self: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
+        get_device_data: *const fn (self: *IAkIOHookBlocking) callconv(.C) u32,
         batch_read: *const fn (
-            iself: *IAkIOHookDeferredBatch,
+            self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
             io_dispatch_results: [*]common.AKRESULT,
         ) callconv(.C) common.AKRESULT,
         batch_write: *const fn (
-            iself: *IAkIOHookDeferredBatch,
+            self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
             io_dispatch_results: [*]common.AKRESULT,
         ) callconv(.C) common.AKRESULT,
         batch_cancel: *const fn (
-            iself: *IAkIOHookDeferredBatch,
+            self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             io_cancel_all_transfers_for_this_file: [*]*bool,
@@ -398,45 +398,45 @@ pub const IAkIOHookDeferredBatch = opaque {
 // Inherits from IAkIOHookDeferredBatch
 pub const IAkIOHookDeferred = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (iself: *IAkIOHookBlocking) callconv(.C) void,
-        close: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
-        get_block_size: *const fn (iself: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (iself: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
-        get_device_data: *const fn (iself: *IAkIOHookBlocking) callconv(.C) u32,
+        destructor: *const fn (self: *IAkIOHookBlocking) callconv(.C) void,
+        close: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (self: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
+        get_device_data: *const fn (self: *IAkIOHookBlocking) callconv(.C) u32,
         batch_read: ?*const fn (
-            iself: *IAkIOHookDeferredBatch,
+            self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
             io_dispatch_results: [*]common.AKRESULT,
         ) callconv(.C) common.AKRESULT = null,
         batch_write: ?*const fn (
-            iself: *IAkIOHookDeferredBatch,
+            self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
             io_dispatch_results: [*]common.AKRESULT,
         ) callconv(.C) common.AKRESULT = null,
         batch_cancel: ?*const fn (
-            iself: *IAkIOHookDeferredBatch,
+            self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             io_cancel_all_transfers_for_this_file: [*]*bool,
         ) callconv(.C) void = null,
         read: *const fn (
-            iself: *IAkIOHookDeferred,
+            self: *IAkIOHookDeferred,
             in_file_desc: *AkFileDesc,
             in_heuristics: *AkIoHeuristics,
             io_transferInfo: *AkAsyncIOTransferInfo,
         ) callconv(.C) common.AKRESULT,
         write: *const fn (
-            iself: *IAkIOHookDeferred,
+            self: *IAkIOHookDeferred,
             in_file_desc: *AkFileDesc,
             in_heuristics: *AkIoHeuristics,
             io_transferInfo: *AkAsyncIOTransferInfo,
         ) callconv(.C) common.AKRESULT,
         cancel: *const fn (
-            iself: *IAkIOHookDeferred,
+            self: *IAkIOHookDeferred,
             in_file_desc: *AkFileDesc,
             io_transferInfo: *AkAsyncIOTransferInfo,
             io_bCancelAllTransfersForThisFile: *bool,
@@ -577,22 +577,22 @@ pub const IAkIOHookDeferred = opaque {
 
 pub const IAkFileLocationResolver = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (iself: *IAkFileLocationResolver) callconv(.C) void,
+        destructor: *const fn (self: *IAkFileLocationResolver) callconv(.C) void,
         open_string: *const fn (
             self: *IAkFileLocationResolver,
             in_file_name: [*]const common.AkOSChar,
-            in_openMode: stream_interfaces.AkOpenMode,
+            in_open_mode: stream_interfaces.AkOpenMode,
             in_flags: ?*stream_interfaces.AkFileSystemFlags,
-            io_syncOpen: *bool,
-            io_fileDesc: *AkFileDesc,
+            io_sync_open: *bool,
+            io_file_desc: *AkFileDesc,
         ) callconv(.C) common.AKRESULT,
         open_id: *const fn (
             self: *IAkFileLocationResolver,
-            in_fileID: c.WWISEC_AkFileID,
-            in_openMode: stream_interfaces.AkOpenMode,
+            in_fileID: common.AkFileID,
+            in_open_mode: stream_interfaces.AkOpenMode,
             in_flags: ?*stream_interfaces.AkFileSystemFlags,
-            io_syncOpen: *bool,
-            io_fileDesc: *AkFileDesc,
+            io_sync_open: *bool,
+            io_file_desc: *AkFileDesc,
         ) callconv(.C) common.AKRESULT,
         output_searched_paths_string: ?*const fn (
             self: *IAkFileLocationResolver,

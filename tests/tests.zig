@@ -328,6 +328,14 @@ test "AkMusicEngine init" {
     defer AK.MusicEngine.term();
 }
 
+const DummyFileHandle = struct {
+    file_size: usize = 1024,
+    bytes_read: usize = 0,
+    bytes_written: usize = 0,
+    is_writing: bool = false,
+    is_string: bool = false,
+};
+
 const ZigTestIAkOHookBlocking = struct {
     destructor_called: bool = false,
     close_called: bool = false,
@@ -372,12 +380,15 @@ const ZigTestIAkOHookBlocking = struct {
     }
 
     pub fn read(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc, in_heuristics: *AK.StreamMgr.AkIoHeuristics, out_buffer: ?*anyopaque, in_transfer_info: *AK.StreamMgr.AkIOTransferInfo) callconv(.C) AK.AKRESULT {
-        _ = in_transfer_info;
         _ = in_file_desc;
-        _ = out_buffer;
         _ = in_heuristics;
 
         self.read_called = true;
+
+        if (out_buffer) |checked_buffer| {
+            var read_buffer = @as([*]u8, @ptrCast(checked_buffer));
+            @memset(read_buffer[in_transfer_info.file_position..in_transfer_info.requested_size], 0xC1);
+        }
 
         return .success;
     }
@@ -404,6 +415,115 @@ const ZigTestIAkOHookBlocking = struct {
                 .get_device_data = @ptrCast(&getDeviceData),
                 .read = @ptrCast(&read),
                 .write = @ptrCast(&write),
+            },
+        );
+    }
+};
+
+const ZigTestIAkFileLocationResolver = struct {
+    open_string_called: bool = false,
+    open_id_called: bool = false,
+    output_searched_paths_string_called: bool = false,
+    output_searched_paths_id_called: bool = false,
+    area_allocator: std.heap.ArenaAllocator = undefined,
+
+    pub fn destructor(self: *ZigTestIAkFileLocationResolver) callconv(.C) void {
+        self.area_allocator.deinit();
+    }
+
+    pub fn openString(
+        self: *ZigTestIAkFileLocationResolver,
+        in_file_name: [*]const AK.AkOSChar,
+        in_open_mode: AK.AkOpenMode,
+        in_flags: ?*AK.AkFileSystemFlags,
+        io_sync_open: *bool,
+        io_file_desc: *AK.StreamMgr.AkFileDesc,
+    ) callconv(.C) AK.AKRESULT {
+        _ = io_sync_open;
+        _ = in_flags;
+        _ = in_file_name;
+
+        self.open_string_called = true;
+
+        var file_handle = self.area_allocator.allocator().create(DummyFileHandle) catch return .insufficient_memory;
+        file_handle.* = DummyFileHandle{ .is_string = true, .is_writing = (in_open_mode == .write or in_open_mode == .write_ovrwr or in_open_mode == .read_write) };
+
+        io_file_desc.file_size = @intCast(file_handle.file_size);
+        io_file_desc.file_handle = file_handle;
+
+        return .success;
+    }
+
+    pub fn openID(
+        self: *ZigTestIAkFileLocationResolver,
+        in_file_id: AK.AkFileID,
+        in_open_mode: AK.AkOpenMode,
+        in_flags: ?*AK.AkFileSystemFlags,
+        io_sync_open: *bool,
+        io_file_desc: *AK.StreamMgr.AkFileDesc,
+    ) callconv(.C) AK.AKRESULT {
+        _ = io_sync_open;
+        _ = in_flags;
+        _ = in_file_id;
+
+        self.open_id_called = true;
+
+        var file_handle = self.area_allocator.allocator().create(DummyFileHandle) catch return .insufficient_memory;
+        file_handle.* = DummyFileHandle{ .is_string = false, .is_writing = (in_open_mode == .write or in_open_mode == .write_ovrwr or in_open_mode == .read_write) };
+
+        io_file_desc.file_size = @intCast(file_handle.file_size);
+        io_file_desc.file_handle = file_handle;
+
+        return .success;
+    }
+
+    pub fn outputSearchedPathsString(
+        self: *ZigTestIAkFileLocationResolver,
+        in_result: *const AK.AKRESULT,
+        in_file_name: [*]const AK.AkOSChar,
+        in_flags: ?*AK.AkFileSystemFlags,
+        in_open_mode: AK.AkOpenMode,
+        out_searched_path: *[*]const AK.AkOSChar,
+        in_path_size: i32,
+    ) callconv(.C) AK.AKRESULT {
+        _ = in_path_size;
+        _ = out_searched_path;
+        _ = in_open_mode;
+        _ = in_flags;
+        _ = in_file_name;
+        _ = in_result;
+        _ = self;
+        return .not_implemented;
+    }
+
+    pub fn outputSearchedPathsID(
+        self: *ZigTestIAkFileLocationResolver,
+        in_result: *const AK.AKRESULT,
+        in_file_id: AK.AkFileID,
+        in_flags: ?*AK.AkFileSystemFlags,
+        in_open_mode: AK.AkOpenMode,
+        out_searched_path: *[*]const AK.AkOSChar,
+        in_path_size: i32,
+    ) callconv(.C) AK.AKRESULT {
+        _ = in_path_size;
+        _ = out_searched_path;
+        _ = in_open_mode;
+        _ = in_flags;
+        _ = in_file_id;
+        _ = in_result;
+        _ = self;
+        return .not_implemented;
+    }
+
+    pub fn createIAkFileLocationResolver(self: *ZigTestIAkFileLocationResolver) *AK.StreamMgr.IAkFileLocationResolver {
+        return AK.StreamMgr.IAkFileLocationResolver.createInstance(
+            self,
+            &AK.StreamMgr.IAkFileLocationResolver.FunctionTable{
+                .destructor = @ptrCast(&destructor),
+                .open_string = @ptrCast(&openString),
+                .open_id = @ptrCast(&openID),
+                .output_searched_paths_string = @ptrCast(&outputSearchedPathsString),
+                .output_searched_paths_id = @ptrCast(&outputSearchedPathsID),
             },
         );
     }
@@ -459,4 +579,65 @@ test "Verify IAkIOHookBlocking Zig inheritance from and to C++ by itself" {
     }
 
     try std.testing.expect(zig_io_blocking.destructor_called);
+}
+
+test "Dummy I/O Hook works" {
+    var zig_io_blocking = ZigTestIAkOHookBlocking{};
+    var zig_file_resolver = ZigTestIAkFileLocationResolver{};
+
+    {
+        var memory_settings: AK.AkMemSettings = .{};
+        AK.MemoryMgr.getDefaultSettings(&memory_settings);
+
+        try AK.MemoryMgr.init(&memory_settings);
+        defer AK.MemoryMgr.term();
+
+        var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
+        AK.StreamMgr.getDefaultSettings(&stream_settings);
+
+        var stream_mgr = AK.StreamMgr.create(&stream_settings);
+        try std.testing.expect(stream_mgr != null);
+        try std.testing.expect(AK.IAkStreamMgr.get() != null);
+
+        var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
+        AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
+
+        // Init file location resolver
+
+        zig_file_resolver.area_allocator = std.heap.ArenaAllocator.init(std.testing.allocator);
+
+        var native_file_resolver = zig_file_resolver.createIAkFileLocationResolver();
+        defer AK.StreamMgr.IAkFileLocationResolver.destroyInstance(native_file_resolver);
+
+        AK.StreamMgr.setFileLocationResolver(native_file_resolver);
+
+        var native_io_blocking = zig_io_blocking.createIAkIOHookBlocking();
+        defer AK.StreamMgr.IAkIOHookBlocking.destroyInstance(native_io_blocking);
+
+        var device_id = AK.StreamMgr.createDevice(&device_settings, @ptrCast(native_io_blocking));
+        defer AK.StreamMgr.destroyDevice(device_id) catch {};
+
+        var init_settings: AK.AkInitSettings = .{};
+        try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
+
+        var platform_init_settings: AK.AkPlatformInitSettings = .{};
+        AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
+
+        try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
+        defer AK.SoundEngine.term();
+
+        const load_bank_error = AK.SoundEngine.loadBankString(std.testing.allocator, "test.bnk", .{});
+        try std.testing.expectError(AK.WwiseError.InvalidFile, load_bank_error);
+    }
+
+    try std.testing.expect(zig_io_blocking.close_called);
+    try std.testing.expect(zig_io_blocking.get_block_size_called);
+    try std.testing.expect(!zig_io_blocking.get_device_desc_called);
+    try std.testing.expect(zig_io_blocking.read_called);
+    try std.testing.expect(zig_io_blocking.destructor_called);
+    try std.testing.expect(!zig_io_blocking.write_called);
+    try std.testing.expectEqual(@as(i64, 1024), zig_io_blocking.close_size);
+
+    try std.testing.expect(zig_file_resolver.open_string_called);
+    try std.testing.expect(!zig_file_resolver.open_id_called);
 }
