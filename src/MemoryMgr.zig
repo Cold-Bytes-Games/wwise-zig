@@ -66,6 +66,7 @@ pub const AkMemSettings = extern struct {
     free_device: AkMemFreeVM = null,
     vm_page_size: u32 = 0,
     device_page_size: u32 = 0,
+    max_thread_local_heap_alloc_size: u32 = 0,
     debug_malloc: AkMemDebugMalloc = null,
     debug_malign: AkMemDebugMalign = null,
     debug_realloc: AkMemDebugRealloc = null,

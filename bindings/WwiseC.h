@@ -1268,12 +1268,13 @@ extern "C"
 
         /// @name Page allocation hooks, used by rpmalloc. Default to AKPLATFORM::AllocVM et al.
         //@{
-        WWISEC_AkMemAllocVM pfAllocVM;     ///< Virtual page allocation hook.
-        WWISEC_AkMemFreeVM pfFreeVM;       ///< Virtual page allocation hook.
-        WWISEC_AkMemAllocVM pfAllocDevice; ///< Device page allocation hook.
-        WWISEC_AkMemFreeVM pfFreeDevice;   ///< Device page allocation hook.
-        AkUInt32 uVMPageSize;              ///< Virtual memory page size. Defaults to 0 which means auto-detect.
-        AkUInt32 uDevicePageSize;          ///< Device memory page size. Defaults to 0 which means auto-detect.
+        WWISEC_AkMemAllocVM pfAllocVM;         ///< Virtual page allocation hook.
+        WWISEC_AkMemFreeVM pfFreeVM;           ///< Virtual page allocation hook.
+        WWISEC_AkMemAllocVM pfAllocDevice;     ///< Device page allocation hook.
+        WWISEC_AkMemFreeVM pfFreeDevice;       ///< Device page allocation hook.
+        AkUInt32 uVMPageSize;                  ///< Virtual memory page size. Defaults to 0 which means auto-detect.
+        AkUInt32 uDevicePageSize;              ///< Device memory page size. Defaults to 0 which means auto-detect.
+        AkUInt32 uMaxThreadLocalHeapAllocSize; ///< All memory allocations of sizes larger than this value will go to a global heap shared across all threads. Defaults to 0 which means all allocations go to a global heap.
         //@}
 
         /// @name Memory allocation debugging.

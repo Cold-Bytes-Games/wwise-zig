@@ -1,4 +1,4 @@
-# wwise-zig - Zig bindings to Audiokinetic Wwise
+# wwise-zig - Zig bindings to Audiokinetic Wwise (2022.1.7)
 
 This package implement a native [Zig](https://ziglang.org/) binding for [Audiokinetic Wwise](https://www.audiokinetic.com/en/products/wwise). The included C binding is designed only to be used by the Zig binding. If you want to expand the C binding to be fully functional please submit any pull requests.
 
