@@ -1991,6 +1991,157 @@ WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_ReleaseBuffer(WWISEC_AK_IAkAutoStream* i
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->ReleaseBuffer());
 }
 
+class WWISEC_AK_IAkStreamMgr_Wrapper : public AK::IAkStreamMgr
+{
+  public:
+    WWISEC_AK_IAkStreamMgr_Wrapper(void* instance, const WWISEC_AK_IAkStreamMgr_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+        m_pStreamMgr = this;
+    }
+
+    ~WWISEC_AK_IAkStreamMgr_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Destroy() override
+    {
+        _functions.Destroy(_instance);
+    }
+
+    AK::IAkStreamMgrProfile* GetStreamMgrProfile() override
+    {
+        return reinterpret_cast<AK::IAkStreamMgrProfile*>(_functions.GetStreamMgrProfile(_instance));
+    }
+
+    AKRESULT CreateStd(const AkOSChar* in_pszFileName, AkFileSystemFlags* in_pFSFlags, AkOpenMode in_eOpenMode, AK::IAkStdStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateStdString(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateStd(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, AkOpenMode in_eOpenMode, AK::IAkStdStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateStdID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateAuto(const AkOSChar* in_pszFileName, AkFileSystemFlags* in_pFSFlags, const AkAutoStmHeuristics& in_heuristics, AkAutoStmBufSettings* in_pBufferSettings, AK::IAkAutoStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateAutoString(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateAuto(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, const AkAutoStmHeuristics& in_heuristics, AkAutoStmBufSettings* in_pBufferSettings, AK::IAkAutoStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateAutoID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateAuto(void* in_pBuffer, AkUInt64 in_uSize, const AkAutoStmHeuristics& in_heuristics, AK::IAkAutoStream*& out_pStream) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateAutoMemory(_instance, in_pBuffer, in_uSize, reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream)));
+    }
+
+    AKRESULT PinFileInCache(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, AkPriority in_uPriority) override
+    {
+        return static_cast<AKRESULT>(_functions.PinFileInCache(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkPriority>(in_uPriority)));
+    }
+
+    AKRESULT UnpinFileInCache(AkFileID in_fileID, AkPriority in_uPriority) override
+    {
+        return static_cast<AKRESULT>(_functions.UnpinFileInCache(_instance, in_fileID, static_cast<WWISEC_AkPriority>(in_uPriority)));
+    }
+
+    AKRESULT UpdateCachingPriority(AkFileID in_fileID, AkPriority in_uPriority, AkPriority in_uOldPriority) override
+    {
+        return static_cast<AKRESULT>(_functions.UpdateCachingPriority(_instance, in_fileID, static_cast<WWISEC_AkPriority>(in_uPriority), static_cast<WWISEC_AkPriority>(in_uOldPriority)));
+    }
+
+    AKRESULT GetBufferStatusForPinnedFile(AkFileID in_fileID, AkReal32& out_fPercentBuffered, bool& out_bCacheFull) override
+    {
+        return static_cast<AKRESULT>(_functions.GetBufferStatusForPinnedFile(_instance, in_fileID, &out_fPercentBuffered, &out_bCacheFull));
+    }
+
+    AKRESULT RelocateMemoryStream(AK::IAkAutoStream* in_pStream, AkUInt8* in_pNewStart) override
+    {
+        return static_cast<AKRESULT>(_functions.RelocateMemoryStream(_instance, reinterpret_cast<WWISEC_AK_IAkAutoStream*>(in_pStream), in_pNewStart));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkStreamMgr_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_CreateInstance(void* instance, const WWISEC_AK_IAkStreamMgr_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkStreamMgr_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkStreamMgr_DestroyInstance(WWISEC_AK_IAkStreamMgr* instance)
+{
+    WWISEC_AK_IAkStreamMgr_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkStreamMgr_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkStreamMgr_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkStreamMgr_Destroy(WWISEC_AK_IAkStreamMgr* instance)
+{
+    reinterpret_cast<AK::IAkStreamMgr*>(instance)->Destroy();
+}
+
+WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(WWISEC_AK_IAkStreamMgr* instance)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamMgrProfile*>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->GetStreamMgrProfile());
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateStd(in_pszFileName, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkOpenMode>(in_eOpenMode), *reinterpret_cast<AK::IAkStdStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateStd(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkOpenMode>(in_eOpenMode), *reinterpret_cast<AK::IAkStdStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_pszFileName, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), reinterpret_cast<AkAutoStmBufSettings*>(in_pBufferSettings), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), reinterpret_cast<AkAutoStmBufSettings*>(in_pBufferSettings), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoMemory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_pBuffer, in_uSize, *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkPriority in_uPriority)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->PinFileInCache(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkPriority>(in_uPriority)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->UnpinFileInCache(in_fileID, static_cast<AkPriority>(in_uPriority)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority, WWISEC_AkPriority in_uOldPriority)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->UpdateCachingPriority(in_fileID, static_cast<AkPriority>(in_uPriority), static_cast<AkPriority>(in_uOldPriority)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, AkReal32* out_fPercentBuffered, bool* out_bCacheFull)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->GetBufferStatusForPinnedFile(in_fileID, *out_fPercentBuffered, *out_bCacheFull));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_RelocateMemoryStream(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AK_IAkAutoStream* in_pStream, AkUInt8* in_pNewStart)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->RelocateMemoryStream(reinterpret_cast<AK::IAkAutoStream*>(in_pStream), in_pNewStart));
+}
+
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get()
 {
     return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AK::IAkStreamMgr::Get());

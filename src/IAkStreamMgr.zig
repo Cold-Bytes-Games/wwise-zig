@@ -690,11 +690,9 @@ pub const IAkAutoStream = opaque {
     }
 };
 
-pub const IAkStreamMgr = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
-        virtual_destructor: common.VirtualDestructor(IAkStreamMgr) = .{},
+pub const IAkStreamMgr = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (self: *IAkStreamMgr) callconv(.C) void,
         destroy: *const fn (
             self: *IAkStreamMgr,
         ) callconv(.C) void,
@@ -703,319 +701,284 @@ pub const IAkStreamMgr = extern struct {
         ) callconv(.C) ?*IAkStreamMgrProfile,
         create_str_id: *const fn (
             self: *IAkStreamMgr,
-            in_fileID: c.WWISEC_AkFileID,
-            in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
-            in_eOpenMode: AkOpenMode,
-            out_pStream: *?*IAkStdStream,
-            in_bSyncOpen: bool,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_id: common.AkFileID,
+            in_fs_flags: ?*AkFileSystemFlags,
+            in_open_mode: AkOpenMode,
+            out_stream: *?*IAkStdStream,
+            in_sync_open: bool,
+        ) callconv(.C) common.AKRESULT,
         create_std_string: *const fn (
             self: *IAkStreamMgr,
-            in_pszFileName: [*c]const common.AkOSChar,
-            in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
-            in_eOpenMode: AkOpenMode,
-            out_pStream: *?*IAkStdStream,
-            in_bSyncOpen: bool,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_name: [*c]const common.AkOSChar,
+            in_fs_flags: ?*AkFileSystemFlags,
+            in_open_mode: AkOpenMode,
+            out_stream: *?*IAkStdStream,
+            in_sync_open: bool,
+        ) callconv(.C) common.AKRESULT,
         create_auto_string: *const fn (
             self: *IAkStreamMgr,
-            in_pszFileName: [*c]const common.AkOSChar,
-            in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
-            in_heuristics: *const c.WWISEC_AkAutoStmHeuristics,
-            in_pBufferSettings: ?*c.WWISEC_AkAutoStmBufSettings,
-            out_pStream: *?*IAkAutoStream,
-            in_bSyncOpen: bool,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_name: [*c]const common.AkOSChar,
+            in_fs_flags: ?*AkFileSystemFlags,
+            in_heuristics: *const AkAutoStmHeuristics,
+            in_buffer_settings: ?*AkAutoStmBufSettings,
+            out_stream: *?*IAkAutoStream,
+            in_sync_open: bool,
+        ) callconv(.C) common.AKRESULT,
         create_auto_id: *const fn (
             self: *IAkStreamMgr,
-            in_fileID: c.WWISEC_AkFileID,
-            in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
-            in_heuristics: *const c.WWISEC_AkAutoStmHeuristics,
-            in_pBufferSettings: ?*c.WWISEC_AkAutoStmBufSettings,
-            out_pStream: *?*IAkAutoStream,
-            in_bSyncOpen: bool,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_id: common.AkFileID,
+            in_fs_flags: ?*AkFileSystemFlags,
+            in_heuristics: *const AkAutoStmHeuristics,
+            in_buffer_settings: ?*AkAutoStmBufSettings,
+            out_stream: *?*IAkAutoStream,
+            in_sync_open: bool,
+        ) callconv(.C) common.AKRESULT,
         create_auto_memory: *const fn (
             self: *IAkStreamMgr,
-            in_pBuffer: ?*anyopaque,
-            in_uSize: c.AkUInt64,
-            in_heuristics: *const c.WWISEC_AkAutoStmHeuristics,
-            out_pStream: *?*IAkAutoStream,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_buffer: ?*anyopaque,
+            in_size: u64,
+            in_heuristics: *const AkAutoStmHeuristics,
+            out_stream: *?*IAkAutoStream,
+        ) callconv(.C) common.AKRESULT,
         pin_file_in_cache: *const fn (
             self: *IAkStreamMgr,
-            in_fileID: c.WWISEC_AkFileID,
-            in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
-            in_uPriority: c.WWISEC_AkPriority,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_id: common.AkFileID,
+            in_fs_flags: ?*AkFileSystemFlags,
+            in_priority: common.AkPriority,
+        ) callconv(.C) common.AKRESULT,
         unpin_file_in_cache: *const fn (
             self: *IAkStreamMgr,
-            in_fileID: c.WWISEC_AkFileID,
-            in_uPriority: c.WWISEC_AkPriority,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_id: common.AkFileID,
+            in_priority: common.AkPriority,
+        ) callconv(.C) common.AKRESULT,
         update_caching_priority: *const fn (
             self: *IAkStreamMgr,
-            in_fileID: c.WWISEC_AkFileID,
-            in_uPriority: c.WWISEC_AkPriority,
-            in_uOldPriority: c.WWISEC_AkPriority,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_id: common.AkFileID,
+            in_priority: common.AkPriority,
+            in_old_priority: common.AkPriority,
+        ) callconv(.C) common.AKRESULT,
         get_buffer_status_for_pinned_file: *const fn (
             self: *IAkStreamMgr,
-            in_fileID: c.WWISEC_AkFileID,
-            out_fPercentBuffered: *c.AkReal32,
-            out_bCacheFull: *bool,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_file_id: common.AkFileID,
+            out_percent_buffered: *f32,
+            out_cache_full: *bool,
+        ) callconv(.C) common.AKRESULT,
         relocate_memory_stream: *const fn (
             self: *IAkStreamMgr,
-            in_pStream: *IAkAutoStream,
-            in_pNewStart: ?*anyopaque,
-        ) callconv(.C) c.WWISEC_AKRESULT,
+            in_stream: *IAkAutoStream,
+            in_new_start: ?*u8,
+        ) callconv(.C) common.AKRESULT,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(self: *const IAkStreamMgr) *const T {
-                return @as(*const T, @ptrCast(self));
-            }
-
-            pub inline fn toMutableSelf(self: *IAkStreamMgr) *T {
-                return @as(*T, @ptrCast(self));
-            }
-
-            pub inline fn deinit(self: *T) void {
-                @as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).virtual_destructor.call(@as(*IAkStreamMgr, @ptrCast(self)));
-            }
-
-            pub inline fn destroy(self: *T) void {
-                @as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).destroy(@as(*IAkStreamMgr, @ptrCast(self)));
-            }
-
-            pub inline fn getStreamMgrProfile(self: *T) ?*IAkStreamMgrProfile {
-                return @as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).get_stream_mgr_profile(@as(*IAkStreamMgr, @ptrCast(self)));
-            }
-
-            pub fn createStdString(
-                self: *T,
-                fallback_allocator: std.mem.Allocator,
-                in_pszFileName: []const u8,
-                in_pFSFlags: ?AkFileSystemFlags,
-                in_eOpenMode: AkOpenMode,
-                out_pStream: *?*IAkStdStream,
-                in_bSyncOpen: bool,
-            ) common.WwiseError!void {
-                var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-                var allocator = stack_char_allocator.get();
-
-                const filename_oschar = common.toOSChar(allocator, in_pszFileName) catch return common.WwiseError.Fail;
-                defer allocator.free(filename_oschar);
-
-                var raw_fsflags_ptr: ?*c.WWISEC_AkFileSystemFlags = blk: {
-                    if (in_pFSFlags) |fs_flags| {
-                        var raw_fsflags = fs_flags.toC();
-                        break :blk &raw_fsflags;
-                    }
-                    break :blk null;
-                };
-
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).create_std_string(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    @as([*]const common.AkOSChar, @ptrCast(filename_oschar)),
-                    raw_fsflags_ptr,
-                    in_eOpenMode,
-                    out_pStream,
-                    in_bSyncOpen,
-                ));
-            }
-
-            pub inline fn createStdId(
-                self: *T,
-                in_fileID: c.WWISEC_AkFileID,
-                in_pFSFlags: ?*c.WWISEC_AkFileSystemFlags,
-                in_eOpenMode: AkOpenMode,
-                out_pStream: *?*IAkStdStream,
-                in_bSyncOpen: bool,
-            ) common.WwiseError!void {
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).create_str_id(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_fileID,
-                    in_pFSFlags,
-                    in_eOpenMode,
-                    out_pStream,
-                    in_bSyncOpen,
-                ));
-            }
-
-            pub fn createAutoString(
-                self: *T,
-                fallback_allocator: std.mem.Allocator,
-                in_pszFileName: []const u8,
-                in_pFSFlags: ?AkFileSystemFlags,
-                in_heuristics: AkAutoStmHeuristics,
-                in_pBufferSettings: ?AkAutoStmBufSettings,
-                out_pStream: *?*IAkAutoStream,
-                in_bSyncOpen: bool,
-            ) common.WwiseError!void {
-                var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-                var allocator = stack_char_allocator.get();
-
-                const filename_oschar = common.toOSChar(allocator, in_pszFileName) catch return common.WwiseError.Fail;
-                defer allocator.free(filename_oschar);
-
-                const raw_heuristics = in_heuristics.toC();
-
-                var raw_fsflags_ptr: ?*c.WWISEC_AkFileSystemFlags = blk: {
-                    if (in_pFSFlags) |fs_flags| {
-                        var raw_fsflags = fs_flags.toC();
-                        break :blk &raw_fsflags;
-                    }
-                    break :blk null;
-                };
-
-                var raw_buffer_settings: ?*c.WWISEC_AkAutoStmBufSettings = blk: {
-                    if (in_pBufferSettings) |buffer_settings| {
-                        var raw_settings = buffer_settings.toC();
-                        break :blk &raw_settings;
-                    }
-                    break :blk null;
-                };
-
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).create_auto_string(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    filename_oschar,
-                    raw_fsflags_ptr,
-                    &raw_heuristics,
-                    raw_buffer_settings,
-                    out_pStream,
-                    in_bSyncOpen,
-                ));
-            }
-
-            pub fn createAutoId(
-                self: *T,
-                in_fileID: c.WWISEC_AkFileID,
-                in_pFSFlags: ?AkFileSystemFlags,
-                in_heuristics: AkAutoStmHeuristics,
-                in_pBufferSettings: ?*c.WWISEC_AkAutoStmBufSettings,
-                out_pStream: *?*IAkAutoStream,
-                in_bSyncOpen: bool,
-            ) common.WwiseError!void {
-                var raw_fsflags_ptr: ?*c.WWISEC_AkFileSystemFlags = blk: {
-                    if (in_pFSFlags) |fs_flags| {
-                        var raw_fsflags = fs_flags.toC();
-                        break :blk &raw_fsflags;
-                    }
-                    break :blk null;
-                };
-
-                const raw_heuristics = in_heuristics.toC();
-
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).create_auto_id(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_fileID,
-                    raw_fsflags_ptr,
-                    &raw_heuristics,
-                    in_pBufferSettings,
-                    out_pStream,
-                    in_bSyncOpen,
-                ));
-            }
-
-            pub inline fn createAutoMemory(
-                self: *T,
-                in_pBuffer: ?*anyopaque,
-                in_uSize: c.AkUInt64,
-                in_heuristics: AkAutoStmHeuristics,
-                out_pStream: *?*IAkAutoStream,
-            ) common.WwiseError!void {
-                const raw_heuristics = in_heuristics.toC();
-
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).create_auto_memory(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_pBuffer,
-                    in_uSize,
-                    &raw_heuristics,
-                    out_pStream,
-                ));
-            }
-
-            pub inline fn pinFileInCache(
-                self: *T,
-                in_fileID: c.WWISEC_AkFileID,
-                in_pFSFlags: ?AkFileSystemFlags,
-                in_uPriority: c.WWISEC_AkPriority,
-            ) common.WwiseError!void {
-                var raw_fsflags_ptr: ?*c.WWISEC_AkFileSystemFlags = blk: {
-                    if (in_pFSFlags) |fs_flags| {
-                        var raw_fsflags = fs_flags.toC();
-                        break :blk &raw_fsflags;
-                    }
-                    break :blk null;
-                };
-
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).pin_file_in_cache(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_fileID,
-                    raw_fsflags_ptr,
-                    in_uPriority,
-                ));
-            }
-
-            pub inline fn unpinFileInCache(
-                self: *T,
-                in_fileID: c.WWISEC_AkFileID,
-                in_uPriority: c.WWISEC_AkPriority,
-            ) common.WwiseError!void {
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).unpin_file_in_cache(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_fileID,
-                    in_uPriority,
-                ));
-            }
-
-            pub inline fn updateCachingPriority(
-                self: *T,
-                in_fileID: c.WWISEC_AkFileID,
-                in_uPriority: c.WWISEC_AkPriority,
-                in_uOldPriority: c.WWISEC_AkPriority,
-            ) common.WwiseError!void {
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).update_caching_priority(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_fileID,
-                    in_uPriority,
-                    in_uOldPriority,
-                ));
-            }
-
-            pub inline fn getBufferStatusForPinnedFile(
-                self: *T,
-                in_fileID: c.WWISEC_AkFileID,
-                out_fPercentBuffered: *c.AkReal32,
-                out_bCacheFull: *bool,
-            ) common.WwiseError!void {
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).get_buffer_status_for_pinned_file(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_fileID,
-                    out_fPercentBuffered,
-                    out_bCacheFull,
-                ));
-            }
-
-            pub inline fn relocateMemoryStream(
-                self: *T,
-                in_pStream: *IAkAutoStream,
-                in_pNewStart: ?*anyopaque,
-            ) common.WwiseError!void {
-                return common.handleAkResult(@as(*const IAkStreamMgr.VTable, @ptrCast(self.__v)).relocate_memory_stream(
-                    @as(*IAkStreamMgr, @ptrCast(self)),
-                    in_pStream,
-                    in_pNewStart,
-                ));
-            }
-        };
+    pub fn destroy(self: *IAkStreamMgr) void {
+        c.WWISEC_AK_IAkStreamMgr_Destroy(@ptrCast(self));
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn getStreamMgrProfile(self: *IAkStreamMgr) ?*IAkStreamMgrProfile {
+        return @ptrCast(
+            c.WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(@ptrCast(self)),
+        );
+    }
+
+    pub fn createStdString(
+        self: *IAkStreamMgr,
+        fallback_allocator: std.mem.Allocator,
+        in_file_name: []const u8,
+        in_fs_flags: ?*AkFileSystemFlags,
+        in_open_mode: AkOpenMode,
+        out_stream: *?*IAkStdStream,
+        in_sync_open: bool,
+    ) common.WwiseError!void {
+        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+        var allocator = stack_char_allocator.get();
+
+        const filename_oschar = common.toOSChar(allocator, in_file_name) catch return common.WwiseError.Fail;
+        defer allocator.free(filename_oschar);
+
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_CreateStdString(
+                @ptrCast(self),
+                filename_oschar,
+                @ptrCast(in_fs_flags),
+                @intFromEnum(in_open_mode),
+                @ptrCast(out_stream),
+                in_sync_open,
+            ),
+        );
+    }
+
+    pub fn createStdId(
+        self: *IAkStreamMgr,
+        in_file_id: common.AkFileID,
+        in_fs_flags: ?*AkFileSystemFlags,
+        in_open_mode: AkOpenMode,
+        out_stream: *?*IAkStdStream,
+        in_sync_open: bool,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_CreateStdID(
+                @ptrCast(self),
+                in_file_id,
+                @ptrCast(in_fs_flags),
+                @intFromEnum(in_open_mode),
+                @ptrCast(out_stream),
+                in_sync_open,
+            ),
+        );
+    }
+
+    pub fn createAutoString(
+        self: *IAkStreamMgr,
+        fallback_allocator: std.mem.Allocator,
+        in_file_name: []const u8,
+        in_fs_flags: ?*AkFileSystemFlags,
+        in_heuristics: *const AkAutoStmHeuristics,
+        in_buffer_settings: ?*AkAutoStmBufSettings,
+        out_stream: *?*IAkAutoStream,
+        in_sync_open: bool,
+    ) common.WwiseError!void {
+        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+        var allocator = stack_char_allocator.get();
+
+        const filename_oschar = common.toOSChar(allocator, in_file_name) catch return common.WwiseError.Fail;
+        defer allocator.free(filename_oschar);
+
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_CreateAutoString(
+                @ptrCast(self),
+                filename_oschar,
+                @ptrCast(in_fs_flags),
+                @ptrCast(in_heuristics),
+                @ptrCast(in_buffer_settings),
+                @ptrCast(out_stream),
+                in_sync_open,
+            ),
+        );
+    }
+
+    pub fn createAutoId(
+        self: *IAkStreamMgr,
+        in_file_id: common.AkFileID,
+        in_fs_flags: ?*AkFileSystemFlags,
+        in_heuristics: *const AkAutoStmHeuristics,
+        in_buffer_settings: ?*AkAutoStmBufSettings,
+        out_streamm: *?*IAkAutoStream,
+        in_sync_open: bool,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_CreateAutoID(
+                @ptrCast(self),
+                in_file_id,
+                @ptrCast(in_fs_flags),
+                @ptrCast(in_heuristics),
+                @ptrCast(in_buffer_settings),
+                @ptrCast(out_streamm),
+                in_sync_open,
+            ),
+        );
+    }
+
+    pub fn createAutoMemory(
+        self: *IAkStreamMgr,
+        in_buffer: ?*anyopaque,
+        in_size: u64,
+        in_heuristics: *const AkAutoStmHeuristics,
+        out_stream: *?*IAkAutoStream,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_CreateAutoMemory(
+                @ptrCast(self),
+                in_buffer,
+                in_size,
+                @ptrCast(in_heuristics),
+                @ptrCast(out_stream),
+            ),
+        );
+    }
+
+    pub fn pinFileInCache(
+        self: *IAkStreamMgr,
+        in_file_id: common.AkFileID,
+        in_fs_flags: ?*AkFileSystemFlags,
+        in_priority: common.AkPriority,
+    ) common.WwiseError!void {
+        return common.handleAkResult(c.WWISEC_AK_IAkStreamMgr_PinFileInCache(
+            @ptrCast(self),
+            in_file_id,
+            @ptrCast(in_fs_flags),
+            in_priority,
+        ));
+    }
+
+    pub fn unpinFileInCache(
+        self: *IAkStreamMgr,
+        in_file_id: common.AkFileID,
+        in_priority: common.AkPriority,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_UnpinFileInCache(
+                @ptrCast(self),
+                in_file_id,
+                in_priority,
+            ),
+        );
+    }
+
+    pub fn updateCachingPriority(
+        self: *IAkStreamMgr,
+        in_file_id: common.AkFileID,
+        in_priority: common.AkPriority,
+        in_old_priority: common.AkPriority,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(
+                @ptrCast(self),
+                in_file_id,
+                in_priority,
+                in_old_priority,
+            ),
+        );
+    }
+
+    pub fn getBufferStatusForPinnedFile(
+        self: *IAkStreamMgr,
+        in_file_id: common.AkFileID,
+        out_percent_buffered: *f32,
+        out_cache_full: *bool,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(
+                @ptrCast(self),
+                in_file_id,
+                out_percent_buffered,
+                out_cache_full,
+            ),
+        );
+    }
+
+    pub fn relocateMemoryStream(
+        self: *IAkStreamMgr,
+        in_stream: *IAkAutoStream,
+        in_new_start: ?*u8,
+    ) common.WwiseError!void {
+        return common.handleAkResult(
+            c.WWISEC_AK_IAkStreamMgr_RelocateMemoryStream(
+                @ptrCast(self),
+                @ptrCast(in_stream),
+                in_new_start,
+            ),
+        );
+    }
+
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IAkStreamMgr {
+        return @ptrCast(
+            c.WWISEC_AK_IAkStreamMgr_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_IAkStreamMgr_DestroyInstance(@ptrCast(instance));
+    }
 
     pub fn get() ?*IAkStreamMgr {
         return @ptrCast(@alignCast(c.WWISEC_AK_IAkStreamMgr_Get()));

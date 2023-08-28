@@ -2512,6 +2512,112 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_GetBuffer(WWISEC_AK_IAkAutoStream* instance, void** out_pBuffer, AkUInt32* out_uSize, bool in_bWait);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_ReleaseBuffer(WWISEC_AK_IAkAutoStream* instance);
 
+    typedef struct WWISEC_AK_IAkStreamMgr WWISEC_AK_IAkStreamMgr;
+
+    typedef struct WWISEC_AK_IAkStreamMgr_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        void (*Destroy)(void* instance);
+
+        WWISEC_AK_IAkStreamMgrProfile* (*GetStreamMgrProfile)(void* instance);
+
+        WWISEC_AKRESULT(*CreateStdString)
+        (
+            void* instance,
+            const AkOSChar* in_pszFileName,
+            WWISEC_AkFileSystemFlags* in_pFSFlags,
+            WWISEC_AkOpenMode in_eOpenMode,
+            WWISEC_AK_IAkStdStream** out_pStream,
+            bool in_bSyncOpen);
+
+        WWISEC_AKRESULT(*CreateStdID)
+        (
+            void* instance,
+            WWISEC_AkFileID in_fileID,
+            WWISEC_AkFileSystemFlags* in_pFSFlags,
+            WWISEC_AkOpenMode in_eOpenMode,
+            WWISEC_AK_IAkStdStream** out_pStream,
+            bool in_bSyncOpen);
+
+        WWISEC_AKRESULT(*CreateAutoString)
+        (
+            void* instance,
+            const AkOSChar* in_pszFileName,
+            WWISEC_AkFileSystemFlags* in_pFSFlags,
+            const WWISEC_AkAutoStmHeuristics* in_heuristics,
+            WWISEC_AkAutoStmBufSettings* in_pBufferSettings,
+            WWISEC_AK_IAkAutoStream** out_pStream,
+            bool in_bSyncOpen);
+
+        WWISEC_AKRESULT(*CreateAutoID)
+        (
+            void* instance,
+            WWISEC_AkFileID in_fileID,
+            WWISEC_AkFileSystemFlags* in_pFSFlags,
+            const WWISEC_AkAutoStmHeuristics* in_heuristics,
+            WWISEC_AkAutoStmBufSettings* in_pBufferSettings,
+            WWISEC_AK_IAkAutoStream** out_pStream,
+            bool in_bSyncOpen);
+
+        WWISEC_AKRESULT(*CreateAutoMemory)
+        (
+            void* instance,
+            void* in_pBuffer,
+            AkUInt64 in_uSize,
+            const WWISEC_AkAutoStmHeuristics* in_heuristics,
+            WWISEC_AK_IAkAutoStream** out_pStream);
+
+        WWISEC_AKRESULT(*PinFileInCache)
+        (
+            void* instance,
+            WWISEC_AkFileID in_fileID,
+            WWISEC_AkFileSystemFlags* in_pFSFlags,
+            WWISEC_AkPriority in_uPriority);
+
+        WWISEC_AKRESULT(*UnpinFileInCache)
+        (
+            void* instance,
+            WWISEC_AkFileID in_fileID,
+            WWISEC_AkPriority in_uPriority);
+
+        WWISEC_AKRESULT(*UpdateCachingPriority)
+        (
+            void* instance,
+            WWISEC_AkFileID in_fileID,
+            WWISEC_AkPriority in_uPriority,
+            WWISEC_AkPriority in_uOldPriority);
+
+        WWISEC_AKRESULT(*GetBufferStatusForPinnedFile)
+        (
+            void* instance,
+            WWISEC_AkFileID in_fileID,
+            AkReal32* out_fPercentBuffered,
+            bool* out_bCacheFull);
+
+        WWISEC_AKRESULT(*RelocateMemoryStream)
+        (
+            void* instance,
+            WWISEC_AK_IAkAutoStream* in_pStream,
+            AkUInt8* in_pNewStart);
+    } WWISEC_AK_IAkStreamMgr_FunctionTable;
+
+    WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_CreateInstance(void* instance, const WWISEC_AK_IAkStreamMgr_FunctionTable* functionTable);
+    void WWISEC_AK_IAkStreamMgr_DestroyInstance(WWISEC_AK_IAkStreamMgr* instance);
+
+    void WWISEC_AK_IAkStreamMgr_Destroy(WWISEC_AK_IAkStreamMgr* instance);
+    WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(WWISEC_AK_IAkStreamMgr* instance);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoMemory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkPriority in_uPriority);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority, WWISEC_AkPriority in_uOldPriority);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, AkReal32* out_fPercentBuffered, bool* out_bCacheFull);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_RelocateMemoryStream(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AK_IAkAutoStream* in_pStream, AkUInt8* in_pNewStart);
+
     WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get();
     // END IAkStreamMgr
 

@@ -846,31 +846,6 @@ pub fn stackCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackF
 }
 
 // TODO: Remove
-pub fn VirtualDestructor(comptime T: type) type {
-    return switch (builtin.abi) {
-        .msvc => extern struct {
-            destructor: ?*const fn (self: *T) callconv(.C) void = null,
-
-            pub fn call(self: @This(), instance: *T) void {
-                if (self.destructor) |dtor| {
-                    dtor(instance);
-                }
-            }
-        },
-        else => extern struct {
-            destructor: ?*const fn (iself: *T) callconv(.C) void = null,
-            destructor_with_delete: ?*const fn (iself: *T) callconv(.C) void = null,
-
-            pub fn call(self: @This(), instance: *T) void {
-                if (self.destructor) |dtor| {
-                    dtor(instance);
-                }
-            }
-        },
-    };
-}
-
-// TODO: Remove
 pub fn CastMethods(comptime T: type) type {
     return extern struct {
         pub inline fn cast(instance: ?*anyopaque) ?*T {
