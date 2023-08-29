@@ -2,56 +2,42 @@ const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
 
-pub const IReadBytes = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
+pub const IReadBytes = opaque {
+    pub const FunctionTable = extern struct {
         read_bytes: *const fn (self: *IReadBytes, in_data: ?*anyopaque, in_count_bytes: i32, out_read: *i32) callconv(.C) bool,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IReadBytes) *const T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn toMutableSelf(iself: *IReadBytes) *T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn readBytes(self: *T, in_data: ?*anyopaque, in_count_bytes: i32, out_read: *i32) bool {
-                return @as(*const IReadBytes.VTable, @ptrCast(self.__v)).read_bytes(@ptrCast(self), in_data, in_count_bytes, out_read);
-            }
-        };
+    pub fn readBytes(self: *IReadBytes, in_data: ?*anyopaque, in_count_bytes: i32, out_read: *i32) bool {
+        return c.WWISEC_AK_IReadBytes_ReadBytes(@ptrCast(self), in_data, in_count_bytes, out_read);
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IReadBytes {
+        return @ptrCast(
+            c.WWISEC_AK_IReadBytes_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_IReadBytes_DestroyInstance(@ptrCast(instance));
+    }
 };
 
-pub const IWriteBytes = extern struct {
-    __v: *const VTable,
-
-    pub const VTable = extern struct {
+pub const IWriteBytes = opaque {
+    pub const FunctionTable = extern struct {
         write_bytes: *const fn (self: *IWriteBytes, in_data: ?*const anyopaque, in_count_bytes: i32, out_written: *i32) callconv(.C) bool,
     };
 
-    pub fn Methods(comptime T: type) type {
-        return extern struct {
-            pub inline fn toSelf(iself: *const IWriteBytes) *const T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn toMutableSelf(iself: *IWriteBytes) *T {
-                return @ptrCast(iself);
-            }
-
-            pub inline fn readBytes(self: *T, in_data: ?*const anyopaque, in_count_bytes: i32, out_written: *i32) bool {
-                return @as(*const IWriteBytes.VTable, @ptrCast(self.__v)).write_bytes(@ptrCast(self), in_data, in_count_bytes, out_written);
-            }
-        };
+    pub fn writeBytes(self: *IWriteBytes, in_data: ?*const anyopaque, in_count_bytes: i32, out_written: *i32) bool {
+        return c.WWISE_AK_IWriteBytes_WriteBytes(@ptrCast(self), in_data, in_count_bytes, out_written);
     }
 
-    pub usingnamespace Methods(@This());
-    pub usingnamespace common.CastMethods(@This());
+    pub fn createInstance(instance: *anyopaque, function_table: *const FunctionTable) *IWriteBytes {
+        return @ptrCast(
+            c.WWISEC_AK_IWriteBytes_CreateInstance(instance, @ptrCast(function_table)),
+        );
+    }
+
+    pub fn destroyInstance(instance: *anyopaque) void {
+        c.WWISEC_AK_IWriteBytes_DestroyInstance(@ptrCast(instance));
+    }
 };

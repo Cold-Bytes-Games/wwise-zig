@@ -845,19 +845,6 @@ pub fn stackCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackF
     return std.heap.stackFallback(wwise_options.string_stack_size, fallback_allocator);
 }
 
-// TODO: Remove
-pub fn CastMethods(comptime T: type) type {
-    return extern struct {
-        pub inline fn cast(instance: ?*anyopaque) ?*T {
-            return @ptrCast(@alignCast(instance));
-        }
-
-        pub inline fn constCast(instance: ?*const anyopaque) ?*const T {
-            return @ptrCast(@alignCast(instance));
-        }
-    };
-}
-
 pub const DefaultEnumType = switch (builtin.abi) {
     .msvc => i32,
     else => u32,

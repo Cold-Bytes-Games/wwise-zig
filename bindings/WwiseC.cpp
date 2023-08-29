@@ -23,6 +23,8 @@ SOFTWARE.
 */
 #include "WwiseC.h"
 
+#include <AK/IBytes.h>
+
 #include <AK/MusicEngine/Common/AkMusicEngine.h>
 
 #include <AK/SoundEngine/Common/AkCallback.h>
@@ -82,6 +84,84 @@ static_assert(offsetof(WWISEC_AkMIDIPost, NoteOnOff.byVelocity) == offsetof(AkMI
 static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uCmd) == offsetof(AkMIDIPost, WwiseCmd.uCmd));
 static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uArg) == offsetof(AkMIDIPost, WwiseCmd.uArg));
 // END AkMidiTypes
+
+// BEGIN IBytes
+class WWISEC_AK_IReadBytes_Wrapper : public AK::IReadBytes
+{
+  public:
+    WWISEC_AK_IReadBytes_Wrapper(void* instance, const WWISEC_AK_IReadBytes_FunctionTable* functions)
+        : _instance(instance), _functions(*functions)
+    {
+    }
+
+    bool ReadBytes(
+        void* in_pData,
+        AkInt32 in_cBytes,
+        AkInt32& out_cRead) override
+    {
+        return _functions.ReadBytes(_instance, in_pData, in_cBytes, &out_cRead);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IReadBytes_FunctionTable _functions;
+};
+
+WWISEC_AK_IReadBytes* WWISEC_AK_IReadBytes_CreateInstance(void* instance, const WWISEC_AK_IReadBytes_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IReadBytes*>(AkNew(AkMemID_Integration, WWISEC_AK_IReadBytes_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IReadBytes_DestroyInstance(WWISEC_AK_IReadBytes* instance)
+{
+    WWISEC_AK_IReadBytes_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IReadBytes_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IReadBytes_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+bool WWISEC_AK_IReadBytes_ReadBytes(WWISEC_AK_IReadBytes* instance, void* in_pData, AkInt32 in_cBytes, AkInt32* out_cRead)
+{
+    return reinterpret_cast<AK::IReadBytes*>(instance)->ReadBytes(in_pData, in_cBytes, *out_cRead);
+}
+
+class WWISEC_AK_IWriteBytes_Wrapper : public AK::IWriteBytes
+{
+  public:
+    WWISEC_AK_IWriteBytes_Wrapper(void* instance, const WWISEC_AK_IWriteBytes_FunctionTable* functions)
+        : _instance(instance), _functions(*functions)
+    {
+    }
+
+    bool WriteBytes(
+        const void* in_pData,
+        AkInt32 in_cBytes,
+        AkInt32& out_cWritten) override
+    {
+        return _functions.WriteBytes(_instance, in_pData, in_cBytes, &out_cWritten);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IWriteBytes_FunctionTable _functions;
+};
+
+WWISEC_AK_IWriteBytes* WWISEC_AK_IWriteBytes_CreateInstance(void* instance, const WWISEC_AK_IWriteBytes_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IWriteBytes*>(AkNew(AkMemID_Integration, WWISEC_AK_IWriteBytes_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IWriteBytes_DestroyInstance(WWISEC_AK_IWriteBytes* instance)
+{
+    WWISEC_AK_IWriteBytes_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IWriteBytes_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IWriteBytes_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+bool WWISE_AK_IWriteBytes_WriteBytes(WWISEC_AK_IWriteBytes* instance, const void* in_pData, AkInt32 in_cBytes, AkInt32* out_cWritten)
+{
+    return reinterpret_cast<AK::IWriteBytes*>(instance)->WriteBytes(in_pData, in_cBytes, *out_cWritten);
+}
+// END IBytes
 
 // BEGIN AkCommonDefs
 static_assert(WWISEC_AK_INT == AK_INT);

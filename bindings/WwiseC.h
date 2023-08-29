@@ -781,8 +781,29 @@ extern "C"
     // END AkMonitorError
 
     // BEGIN IBytes
-    typedef struct WWISE_AK_IReadBytes WWISEC_AK_IReadBytes;
-    typedef struct WWISE_AK_IWriteBytes WWISEC_AK_IWriteBytes;
+    typedef struct WWISEC_AK_IReadBytes WWISEC_AK_IReadBytes;
+
+    typedef struct WWISEC_AK_IReadBytes_FunctionTable
+    {
+        bool (*ReadBytes)(void* instance, void* in_pData, AkInt32 in_cBytes, AkInt32* out_cRead);
+    } WWISEC_AK_IReadBytes_FunctionTable;
+
+    WWISEC_AK_IReadBytes* WWISEC_AK_IReadBytes_CreateInstance(void* instance, const WWISEC_AK_IReadBytes_FunctionTable* functionTable);
+    void WWISEC_AK_IReadBytes_DestroyInstance(WWISEC_AK_IReadBytes* instance);
+
+    bool WWISEC_AK_IReadBytes_ReadBytes(WWISEC_AK_IReadBytes* instance, void* in_pData, AkInt32 in_cBytes, AkInt32* out_cRead);
+
+    typedef struct WWISEC_AK_IWriteBytes WWISEC_AK_IWriteBytes;
+
+    typedef struct WWISEC_AK_IWriteBytes_FunctionTable
+    {
+        bool (*WriteBytes)(void* instance, const void* in_pData, AkInt32 in_cBytes, AkInt32* out_cWritten);
+    } WWISEC_AK_IWriteBytes_FunctionTable;
+
+    WWISEC_AK_IWriteBytes* WWISEC_AK_IWriteBytes_CreateInstance(void* instance, const WWISEC_AK_IWriteBytes_FunctionTable* functionTable);
+    void WWISEC_AK_IWriteBytes_DestroyInstance(WWISEC_AK_IWriteBytes* instance);
+
+    bool WWISE_AK_IWriteBytes_WriteBytes(WWISEC_AK_IWriteBytes* instance, const void* in_pData, AkInt32 in_cBytes, AkInt32* out_cWritten);
     // END IBytes
 
     // BEGIN AkCommonDefs
