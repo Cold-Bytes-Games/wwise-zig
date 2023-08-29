@@ -23,6 +23,8 @@ SOFTWARE.
 */
 #include "WwiseC.h"
 
+#include <AK/IBytes.h>
+
 #include <AK/MusicEngine/Common/AkMusicEngine.h>
 
 #include <AK/SoundEngine/Common/AkCallback.h>
@@ -82,6 +84,84 @@ static_assert(offsetof(WWISEC_AkMIDIPost, NoteOnOff.byVelocity) == offsetof(AkMI
 static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uCmd) == offsetof(AkMIDIPost, WwiseCmd.uCmd));
 static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uArg) == offsetof(AkMIDIPost, WwiseCmd.uArg));
 // END AkMidiTypes
+
+// BEGIN IBytes
+class WWISEC_AK_IReadBytes_Wrapper : public AK::IReadBytes
+{
+  public:
+    WWISEC_AK_IReadBytes_Wrapper(void* instance, const WWISEC_AK_IReadBytes_FunctionTable* functions)
+        : _instance(instance), _functions(*functions)
+    {
+    }
+
+    bool ReadBytes(
+        void* in_pData,
+        AkInt32 in_cBytes,
+        AkInt32& out_cRead) override
+    {
+        return _functions.ReadBytes(_instance, in_pData, in_cBytes, &out_cRead);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IReadBytes_FunctionTable _functions;
+};
+
+WWISEC_AK_IReadBytes* WWISEC_AK_IReadBytes_CreateInstance(void* instance, const WWISEC_AK_IReadBytes_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IReadBytes*>(AkNew(AkMemID_Integration, WWISEC_AK_IReadBytes_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IReadBytes_DestroyInstance(WWISEC_AK_IReadBytes* instance)
+{
+    WWISEC_AK_IReadBytes_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IReadBytes_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IReadBytes_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+bool WWISEC_AK_IReadBytes_ReadBytes(WWISEC_AK_IReadBytes* instance, void* in_pData, AkInt32 in_cBytes, AkInt32* out_cRead)
+{
+    return reinterpret_cast<AK::IReadBytes*>(instance)->ReadBytes(in_pData, in_cBytes, *out_cRead);
+}
+
+class WWISEC_AK_IWriteBytes_Wrapper : public AK::IWriteBytes
+{
+  public:
+    WWISEC_AK_IWriteBytes_Wrapper(void* instance, const WWISEC_AK_IWriteBytes_FunctionTable* functions)
+        : _instance(instance), _functions(*functions)
+    {
+    }
+
+    bool WriteBytes(
+        const void* in_pData,
+        AkInt32 in_cBytes,
+        AkInt32& out_cWritten) override
+    {
+        return _functions.WriteBytes(_instance, in_pData, in_cBytes, &out_cWritten);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IWriteBytes_FunctionTable _functions;
+};
+
+WWISEC_AK_IWriteBytes* WWISEC_AK_IWriteBytes_CreateInstance(void* instance, const WWISEC_AK_IWriteBytes_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IWriteBytes*>(AkNew(AkMemID_Integration, WWISEC_AK_IWriteBytes_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IWriteBytes_DestroyInstance(WWISEC_AK_IWriteBytes* instance)
+{
+    WWISEC_AK_IWriteBytes_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IWriteBytes_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IWriteBytes_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+bool WWISE_AK_IWriteBytes_WriteBytes(WWISEC_AK_IWriteBytes* instance, const void* in_pData, AkInt32 in_cBytes, AkInt32* out_cWritten)
+{
+    return reinterpret_cast<AK::IWriteBytes*>(instance)->WriteBytes(in_pData, in_cBytes, *out_cWritten);
+}
+// END IBytes
 
 // BEGIN AkCommonDefs
 static_assert(WWISEC_AK_INT == AK_INT);
@@ -1381,6 +1461,766 @@ static_assert(sizeof(WWISEC_AkDeviceDesc) == sizeof(AkDeviceDesc));
 static_assert(sizeof(WWISEC_AkDeviceData) == sizeof(AkDeviceData));
 static_assert(sizeof(WWISEC_AkStreamRecord) == sizeof(AkStreamRecord));
 static_assert(sizeof(WWISEC_AkStreamData) == sizeof(AkStreamData));
+
+class WWISEC_AK_IAkStreamProfile_Wrapper : public AK::IAkStreamProfile
+{
+  public:
+    WWISEC_AK_IAkStreamProfile_Wrapper(void* instance, const WWISEC_AK_IAkStreamProfile_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkStreamProfile_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void GetStreamRecord(AkStreamRecord& out_streamRecord) override
+    {
+        _functions.GetStreamRecord(_instance, reinterpret_cast<WWISEC_AkStreamRecord*>(&out_streamRecord));
+    }
+
+    void GetStreamData(AkStreamData& out_streamData) override
+    {
+        _functions.GetStreamData(_instance, reinterpret_cast<WWISEC_AkStreamData*>(&out_streamData));
+    }
+
+    bool IsNew() override
+    {
+        return _functions.IsNew(_instance);
+    }
+
+    void ClearNew() override
+    {
+        return _functions.ClearNew(_instance);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkStreamProfile_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkStreamProfile* WWISEC_AK_IAkStreamProfile_CreateInstance(void* instance, const WWISEC_AK_IAkStreamProfile_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamProfile*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkStreamProfile_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkStreamProfile_DestroyInstance(WWISEC_AK_IAkStreamProfile* instance)
+{
+    WWISEC_AK_IAkStreamProfile_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkStreamProfile_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkStreamProfile_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkStreamProfile_GetStreamRecord(WWISEC_AK_IAkStreamProfile* instance, WWISEC_AkStreamRecord* out_streamRecord)
+{
+    reinterpret_cast<AK::IAkStreamProfile*>(instance)->GetStreamRecord(*reinterpret_cast<AkStreamRecord*>(out_streamRecord));
+}
+
+void WWISEC_AK_IAkStreamProfile_GetStreamData(WWISEC_AK_IAkStreamProfile* instance, WWISEC_AkStreamData* out_streamData)
+{
+    reinterpret_cast<AK::IAkStreamProfile*>(instance)->GetStreamData(*reinterpret_cast<AkStreamData*>(out_streamData));
+}
+bool WWISEC_AK_IAkStreamProfile_IsNew(WWISEC_AK_IAkStreamProfile* instance)
+{
+    return reinterpret_cast<AK::IAkStreamProfile*>(instance)->IsNew();
+}
+
+void WWISEC_AK_IAkStreamProfile_ClearNew(WWISEC_AK_IAkStreamProfile* instance)
+{
+    reinterpret_cast<AK::IAkStreamProfile*>(instance)->ClearNew();
+}
+
+class WWISEC_AK_IAkDeviceProfile_Wrapper : public AK::IAkDeviceProfile
+{
+  public:
+    WWISEC_AK_IAkDeviceProfile_Wrapper(void* instance, const WWISEC_AK_IAkDeviceProfile_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkDeviceProfile_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void OnProfileStart() override
+    {
+        _functions.OnProfileStart(_instance);
+    }
+
+    void OnProfileEnd() override
+    {
+        _functions.OnProfileEnd(_instance);
+    }
+
+    void GetDesc(AkDeviceDesc& out_deviceDesc) override
+    {
+        _functions.GetDesc(_instance, reinterpret_cast<WWISEC_AkDeviceDesc*>(&out_deviceDesc));
+    }
+
+    void GetData(AkDeviceData& out_deviceData) override
+    {
+        _functions.GetData(_instance, reinterpret_cast<WWISEC_AkDeviceData*>(&out_deviceData));
+    }
+
+    bool IsNew() override
+    {
+        return _functions.IsNew(_instance);
+    }
+
+    void ClearNew() override
+    {
+        _functions.ClearNew(_instance);
+    }
+
+    AkUInt32 GetNumStreams() override
+    {
+        return _functions.GetNumStreams(_instance);
+    }
+
+    AK::IAkStreamProfile* GetStreamProfile(AkUInt32 in_uStreamIndex) override
+    {
+        return reinterpret_cast<AK::IAkStreamProfile*>(_functions.GetStreamProfile(_instance, in_uStreamIndex));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkDeviceProfile_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkDeviceProfile* WWISEC_AK_IAkDeviceProfile_CreateInstance(void* instance, const WWISEC_AK_IAkDeviceProfile_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkDeviceProfile*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkDeviceProfile_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkDeviceProfile_DestroyInstance(WWISEC_AK_IAkStreamProfile* instance)
+{
+    WWISEC_AK_IAkDeviceProfile_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkDeviceProfile_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkDeviceProfile_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkDeviceProfile_OnProfileStart(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->OnProfileStart();
+}
+
+void WWISEC_AK_IAkDeviceProfile_OnProfileEnd(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->OnProfileEnd();
+}
+
+void WWISEC_AK_IAkDeviceProfile_GetDesc(WWISEC_AK_IAkDeviceProfile* instance, WWISEC_AkDeviceDesc* out_deviceDesc)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetDesc(*reinterpret_cast<AkDeviceDesc*>(out_deviceDesc));
+}
+
+void WWISEC_AK_IAkDeviceProfile_GetData(WWISEC_AK_IAkDeviceProfile* instance, WWISEC_AkDeviceData* out_deviceData)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetData(*reinterpret_cast<AkDeviceData*>(out_deviceData));
+}
+
+bool WWISEC_AK_IAkDeviceProfile_IsNew(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    return reinterpret_cast<AK::IAkDeviceProfile*>(instance)->IsNew();
+}
+
+void WWISEC_AK_IAkDeviceProfile_ClearNew(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    reinterpret_cast<AK::IAkDeviceProfile*>(instance)->ClearNew();
+}
+
+AkUInt32 WWISEC_AK_IAkDeviceProfile_GetNumStreams(WWISEC_AK_IAkDeviceProfile* instance)
+{
+    return reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetNumStreams();
+}
+
+WWISEC_AK_IAkStreamProfile* WWISEC_AK_IAkDeviceProfile_GetStreamProfile(WWISEC_AK_IAkDeviceProfile* instance, AkUInt32 in_uStreamIndex)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamProfile*>(reinterpret_cast<AK::IAkDeviceProfile*>(instance)->GetStreamProfile(in_uStreamIndex));
+}
+
+class WWISEC_AK_IAkStreamMgrProfile_Wrapper : public AK::IAkStreamMgrProfile
+{
+  public:
+    WWISEC_AK_IAkStreamMgrProfile_Wrapper(void* instance, const WWISEC_AK_IAkStreamMgrProfile_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkStreamMgrProfile_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    AKRESULT StartMonitoring() override
+    {
+        return static_cast<AKRESULT>(_functions.StartMonitoring(_instance));
+    }
+
+    void StopMonitoring() override
+    {
+        _functions.StopMonitoring(_instance);
+    }
+
+    AkUInt32 GetNumDevices() override
+    {
+        return _functions.GetNumDevices(_instance);
+    }
+
+    AK::IAkDeviceProfile* GetDeviceProfile(AkUInt32 in_uDeviceIndex) override
+    {
+        return reinterpret_cast<AK::IAkDeviceProfile*>(_functions.GetDeviceProfile(_instance, in_uDeviceIndex));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkStreamMgrProfile_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgrProfile_CreateInstance(void* instance, const WWISEC_AK_IAkStreamMgrProfile_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamMgrProfile*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkStreamMgrProfile_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkStreamMgrProfile_DestroyInstance(WWISEC_AK_IAkStreamMgrProfile* instance)
+{
+    WWISEC_AK_IAkStreamMgrProfile_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkStreamMgrProfile_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkStreamMgrProfile_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgrProfile_StartMonitoring(WWISEC_AK_IAkStreamMgrProfile* instance)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgrProfile*>(instance)->StartMonitoring());
+}
+
+void WWISEC_AK_IAkStreamMgrProfile_StopMonitoring(WWISEC_AK_IAkStreamMgrProfile* instance)
+{
+    reinterpret_cast<AK::IAkStreamMgrProfile*>(instance)->StopMonitoring();
+}
+
+AkUInt32 WWISEC_AK_IAkStreamMgrProfile_GetNumDevices(WWISEC_AK_IAkStreamMgrProfile* instance)
+{
+    return reinterpret_cast<AK::IAkStreamMgrProfile*>(instance)->GetNumDevices();
+}
+
+WWISEC_AK_IAkDeviceProfile* WWISEC_AK_IAkStreamMgrProfile_GetDeviceProfile(WWISEC_AK_IAkStreamMgrProfile* instance, AkUInt32 in_uDeviceIndex)
+{
+    return reinterpret_cast<WWISEC_AK_IAkDeviceProfile*>(reinterpret_cast<AK::IAkStreamMgrProfile*>(instance)->GetDeviceProfile(in_uDeviceIndex));
+}
+
+class WWISEC_AK_IAkStdStream_Wrapper : public AK::IAkStdStream
+{
+  public:
+    WWISEC_AK_IAkStdStream_Wrapper(void* instance, const WWISEC_AK_IAkStdStream_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkStdStream_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Destroy() override
+    {
+        _functions.Destroy(_instance);
+    }
+
+    void GetInfo(AkStreamInfo& out_info) override
+    {
+        _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkStreamInfo*>(&out_info));
+    }
+
+    void* GetFileDescriptor() override
+    {
+        return _functions.GetFileDescriptor(_instance);
+    }
+
+    AKRESULT SetStreamName(const AkOSChar* in_pszStreamName) override
+    {
+        return static_cast<AKRESULT>(_functions.SetStreamName(_instance, in_pszStreamName));
+    }
+
+    AkUInt32 GetBlockSize() override
+    {
+        return _functions.GetBlockSize(_instance);
+    }
+
+    AKRESULT Read(void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32& out_uSize) override
+    {
+        return static_cast<AKRESULT>(_functions.Read(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<WWISEC_AkPriority>(in_priority), in_fDeadline, &out_uSize));
+    }
+
+    AKRESULT Write(void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32& out_uSize) override
+    {
+        return static_cast<AKRESULT>(_functions.Write(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<WWISEC_AkPriority>(in_priority), in_fDeadline, &out_uSize));
+    }
+
+    AkUInt64 GetPosition(bool* out_pbEndOfStream) override
+    {
+        return _functions.GetPosition(_instance, out_pbEndOfStream);
+    }
+
+    AKRESULT SetPosition(AkInt64 in_iMoveOffset, AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset) override
+    {
+        return static_cast<AKRESULT>(_functions.SetPosition(_instance, in_iMoveOffset, static_cast<WWISEC_AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+    }
+
+    void Cancel() override
+    {
+        _functions.Cancel(_instance);
+    }
+
+    void* GetData(AkUInt32& out_uSize) override
+    {
+        return _functions.GetData(_instance, &out_uSize);
+    }
+
+    AkStmStatus GetStatus() override
+    {
+        return static_cast<AkStmStatus>(_functions.GetStatus(_instance));
+    }
+
+    AkStmStatus WaitForPendingOperation() override
+    {
+        return static_cast<AkStmStatus>(_functions.WaitForPendingOperation(_instance));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkStdStream_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkStdStream* WWISEC_AK_IAkStdStream_CreateInstance(void* instance, const WWISEC_AK_IAkStdStream_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStdStream*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkStdStream_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkStdStream_DestroyInstance(WWISEC_AK_IAkStdStream* instance)
+{
+    WWISEC_AK_IAkStdStream_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkStdStream_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkStdStream_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkStdStream_Destroy(WWISEC_AK_IAkStdStream* instance)
+{
+    reinterpret_cast<AK::IAkStdStream*>(instance)->Destroy();
+}
+
+void WWISEC_AK_IAkStdStream_GetInfo(WWISEC_AK_IAkStdStream* instance, WWISEC_AkStreamInfo* out_info)
+{
+    reinterpret_cast<AK::IAkStdStream*>(instance)->GetInfo(*reinterpret_cast<AkStreamInfo*>(out_info));
+}
+
+void* WWISEC_AK_IAkStdStream_GetFileDescriptor(WWISEC_AK_IAkStdStream* instance)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetFileDescriptor();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetStreamName(WWISEC_AK_IAkStdStream* instance, const AkOSChar* in_pszStreamName)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->SetStreamName(in_pszStreamName));
+}
+
+AkUInt32 WWISEC_AK_IAkStdStream_GetBlockSize(WWISEC_AK_IAkStdStream* instance)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetBlockSize();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Read(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->Read(in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, *out_uSize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Write(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->Write(in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, *out_uSize));
+}
+
+AkUInt64 WWISEC_AK_IAkStdStream_GetPosition(WWISEC_AK_IAkStdStream* instance, bool* out_pbEndOfStream)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetPosition(out_pbEndOfStream);
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetPosition(WWISEC_AK_IAkStdStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->SetPosition(in_iMoveOffset, static_cast<AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+}
+
+void WWISEC_AK_IAkStdStream_Cancel(WWISEC_AK_IAkStdStream* instance)
+{
+    reinterpret_cast<AK::IAkStdStream*>(instance)->Cancel();
+}
+
+void* WWISEC_AK_IAkStdStream_GetData(WWISEC_AK_IAkStdStream* instance, AkUInt32* out_uSize)
+{
+    return reinterpret_cast<AK::IAkStdStream*>(instance)->GetData(*out_uSize);
+}
+
+WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_GetStatus(WWISEC_AK_IAkStdStream* instance)
+{
+    return static_cast<WWISEC_AkStmStatus>(reinterpret_cast<AK::IAkStdStream*>(instance)->GetStatus());
+}
+
+WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_WaitForPendingOperation(WWISEC_AK_IAkStdStream* instance)
+{
+    return static_cast<WWISEC_AkStmStatus>(reinterpret_cast<AK::IAkStdStream*>(instance)->WaitForPendingOperation());
+}
+
+class WWISEC_AK_IAkAutoStream_Wrapper : public AK::IAkAutoStream
+{
+  public:
+    WWISEC_AK_IAkAutoStream_Wrapper(void* instance, const WWISEC_AK_IAkAutoStream_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+    }
+
+    ~WWISEC_AK_IAkAutoStream_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Destroy() override
+    {
+        _functions.Destroy(_instance);
+    }
+
+    void GetInfo(AkStreamInfo& out_info) override
+    {
+        _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkStreamInfo*>(&out_info));
+    }
+
+    void* GetFileDescriptor() override
+    {
+        return _functions.GetFileDescriptor(_instance);
+    }
+
+    void GetHeuristics(AkAutoStmHeuristics& out_heuristics) override
+    {
+        _functions.GetHeuristics(_instance, reinterpret_cast<WWISEC_AkAutoStmHeuristics*>(&out_heuristics));
+    }
+
+    AKRESULT SetHeuristics(const AkAutoStmHeuristics& in_heuristics) override
+    {
+        return static_cast<AKRESULT>(_functions.SetHeuristics(_instance, reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics)));
+    }
+
+    AKRESULT SetMinimalBufferSize(AkUInt32 in_uMinBufferSize) override
+    {
+        return static_cast<AKRESULT>(_functions.SetMinimalBufferSize(_instance, in_uMinBufferSize));
+    }
+
+    AKRESULT SetMinTargetBufferSize(AkUInt32 in_uMinTargetBufferSize) override
+    {
+        return static_cast<AKRESULT>(_functions.SetMinTargetBufferSize(_instance, in_uMinTargetBufferSize));
+    }
+
+    AKRESULT SetStreamName(const AkOSChar* in_pszStreamName) override
+    {
+        return static_cast<AKRESULT>(_functions.SetStreamName(_instance, in_pszStreamName));
+    }
+
+    AkUInt32 GetBlockSize() override
+    {
+        return _functions.GetBlockSize(_instance);
+    }
+
+    AKRESULT QueryBufferingStatus(AkUInt32& out_uNumBytesAvailable) override
+    {
+        return static_cast<AKRESULT>(_functions.QueryBufferingStatus(_instance, &out_uNumBytesAvailable));
+    }
+
+    AkUInt32 GetNominalBuffering() override
+    {
+        return _functions.GetNominalBuffering(_instance);
+    }
+
+    AKRESULT Start() override
+    {
+        return static_cast<AKRESULT>(_functions.Start(_instance));
+    }
+
+    AKRESULT Stop() override
+    {
+        return static_cast<AKRESULT>(_functions.Stop(_instance));
+    }
+
+    AkUInt64 GetPosition(bool* out_pbEndOfStream) override
+    {
+        return _functions.GetPosition(_instance, out_pbEndOfStream);
+    }
+
+    AKRESULT SetPosition(AkInt64 in_iMoveOffset, AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset) override
+    {
+        return static_cast<AKRESULT>(_functions.SetPosition(_instance, in_iMoveOffset, static_cast<WWISEC_AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+    }
+
+    AKRESULT GetBuffer(void*& out_pBuffer, AkUInt32& out_uSize, bool in_bWait) override
+    {
+        return static_cast<AKRESULT>(_functions.GetBuffer(_instance, &out_pBuffer, &out_uSize, in_bWait));
+    }
+
+    AKRESULT ReleaseBuffer() override
+    {
+        return static_cast<AKRESULT>(_functions.ReleaseBuffer(_instance));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkAutoStream_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkAutoStream* WWISEC_AK_IAkAutoStream_CreateInstance(void* instance, const WWISEC_AK_IAkAutoStream_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkAutoStream*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkAutoStream_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkAutoStream_DestroyInstance(WWISEC_AK_IAkAutoStream* instance)
+{
+    WWISEC_AK_IAkAutoStream_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkAutoStream_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkAutoStream_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkAutoStream_Destroy(WWISEC_AK_IAkAutoStream* instance)
+{
+    reinterpret_cast<AK::IAkAutoStream*>(instance)->Destroy();
+}
+
+void WWISEC_AK_IAkAutoStream_GetInfo(WWISEC_AK_IAkAutoStream* instance, WWISEC_AkStreamInfo* out_info)
+{
+    reinterpret_cast<AK::IAkAutoStream*>(instance)->GetInfo(*reinterpret_cast<AkStreamInfo*>(out_info));
+}
+
+void* WWISEC_AK_IAkAutoStream_GetFileDescriptor(WWISEC_AK_IAkAutoStream* instance)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetFileDescriptor();
+}
+
+void WWISEC_AK_IAkAutoStream_GetHeuristics(WWISEC_AK_IAkAutoStream* instance, WWISEC_AkAutoStmHeuristics* out_heuristics)
+{
+    reinterpret_cast<AK::IAkAutoStream*>(instance)->GetHeuristics(*reinterpret_cast<AkAutoStmHeuristics*>(out_heuristics));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetHeuristics(WWISEC_AK_IAkAutoStream* instance, const WWISEC_AkAutoStmHeuristics* in_heuristics)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetHeuristics(*reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinimalBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinBufferSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetMinimalBufferSize(in_uMinBufferSize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinTargetBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinTargetBufferSize)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetMinTargetBufferSize(in_uMinTargetBufferSize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetStreamName(WWISEC_AK_IAkAutoStream* instance, const AkOSChar* in_pszStreamName)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetStreamName(in_pszStreamName));
+}
+
+AkUInt32 WWISEC_AK_IAkAutoStream_GetBlockSize(WWISEC_AK_IAkAutoStream* instance)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetBlockSize();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_QueryBufferingStatus(WWISEC_AK_IAkAutoStream* instance, AkUInt32* out_uNumBytesAvailable)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->QueryBufferingStatus(*out_uNumBytesAvailable));
+}
+
+AkUInt32 WWISEC_AK_IAkAutoStream_GetNominalBuffering(WWISEC_AK_IAkAutoStream* instance)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetNominalBuffering();
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Start(WWISEC_AK_IAkAutoStream* instance)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->Start());
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Stop(WWISEC_AK_IAkAutoStream* instance)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->Stop());
+}
+
+AkUInt64 WWISEC_AK_IAkAutoStream_GetPosition(WWISEC_AK_IAkAutoStream* instance, bool* out_pbEndOfStream)
+{
+    return reinterpret_cast<AK::IAkAutoStream*>(instance)->GetPosition(out_pbEndOfStream);
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetPosition(WWISEC_AK_IAkAutoStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->SetPosition(in_iMoveOffset, static_cast<AkMoveMethod>(in_eMoveMethod), out_piRealOffset));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_GetBuffer(WWISEC_AK_IAkAutoStream* instance, void** out_pBuffer, AkUInt32* out_uSize, bool in_bWait)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->GetBuffer(*out_pBuffer, *out_uSize, in_bWait));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_ReleaseBuffer(WWISEC_AK_IAkAutoStream* instance)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkAutoStream*>(instance)->ReleaseBuffer());
+}
+
+class WWISEC_AK_IAkStreamMgr_Wrapper : public AK::IAkStreamMgr
+{
+  public:
+    WWISEC_AK_IAkStreamMgr_Wrapper(void* instance, const WWISEC_AK_IAkStreamMgr_FunctionTable* functionTable)
+        : _instance(instance), _functions(*functionTable)
+    {
+        m_pStreamMgr = this;
+    }
+
+    ~WWISEC_AK_IAkStreamMgr_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Destroy() override
+    {
+        _functions.Destroy(_instance);
+    }
+
+    AK::IAkStreamMgrProfile* GetStreamMgrProfile() override
+    {
+        return reinterpret_cast<AK::IAkStreamMgrProfile*>(_functions.GetStreamMgrProfile(_instance));
+    }
+
+    AKRESULT CreateStd(const AkOSChar* in_pszFileName, AkFileSystemFlags* in_pFSFlags, AkOpenMode in_eOpenMode, AK::IAkStdStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateStdString(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateStd(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, AkOpenMode in_eOpenMode, AK::IAkStdStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateStdID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateAuto(const AkOSChar* in_pszFileName, AkFileSystemFlags* in_pFSFlags, const AkAutoStmHeuristics& in_heuristics, AkAutoStmBufSettings* in_pBufferSettings, AK::IAkAutoStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateAutoString(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateAuto(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, const AkAutoStmHeuristics& in_heuristics, AkAutoStmBufSettings* in_pBufferSettings, AK::IAkAutoStream*& out_pStream, bool in_bSyncOpen) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateAutoID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
+    }
+
+    AKRESULT CreateAuto(void* in_pBuffer, AkUInt64 in_uSize, const AkAutoStmHeuristics& in_heuristics, AK::IAkAutoStream*& out_pStream) override
+    {
+        return static_cast<AKRESULT>(_functions.CreateAutoMemory(_instance, in_pBuffer, in_uSize, reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream)));
+    }
+
+    AKRESULT PinFileInCache(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, AkPriority in_uPriority) override
+    {
+        return static_cast<AKRESULT>(_functions.PinFileInCache(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkPriority>(in_uPriority)));
+    }
+
+    AKRESULT UnpinFileInCache(AkFileID in_fileID, AkPriority in_uPriority) override
+    {
+        return static_cast<AKRESULT>(_functions.UnpinFileInCache(_instance, in_fileID, static_cast<WWISEC_AkPriority>(in_uPriority)));
+    }
+
+    AKRESULT UpdateCachingPriority(AkFileID in_fileID, AkPriority in_uPriority, AkPriority in_uOldPriority) override
+    {
+        return static_cast<AKRESULT>(_functions.UpdateCachingPriority(_instance, in_fileID, static_cast<WWISEC_AkPriority>(in_uPriority), static_cast<WWISEC_AkPriority>(in_uOldPriority)));
+    }
+
+    AKRESULT GetBufferStatusForPinnedFile(AkFileID in_fileID, AkReal32& out_fPercentBuffered, bool& out_bCacheFull) override
+    {
+        return static_cast<AKRESULT>(_functions.GetBufferStatusForPinnedFile(_instance, in_fileID, &out_fPercentBuffered, &out_bCacheFull));
+    }
+
+    AKRESULT RelocateMemoryStream(AK::IAkAutoStream* in_pStream, AkUInt8* in_pNewStart) override
+    {
+        return static_cast<AKRESULT>(_functions.RelocateMemoryStream(_instance, reinterpret_cast<WWISEC_AK_IAkAutoStream*>(in_pStream), in_pNewStart));
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AK_IAkStreamMgr_FunctionTable _functions;
+};
+
+WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_CreateInstance(void* instance, const WWISEC_AK_IAkStreamMgr_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(AkNew(AkMemID_Integration, WWISEC_AK_IAkStreamMgr_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AK_IAkStreamMgr_DestroyInstance(WWISEC_AK_IAkStreamMgr* instance)
+{
+    WWISEC_AK_IAkStreamMgr_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IAkStreamMgr_Wrapper*>(instance);
+    wrapper->~WWISEC_AK_IAkStreamMgr_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AK_IAkStreamMgr_Destroy(WWISEC_AK_IAkStreamMgr* instance)
+{
+    reinterpret_cast<AK::IAkStreamMgr*>(instance)->Destroy();
+}
+
+WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(WWISEC_AK_IAkStreamMgr* instance)
+{
+    return reinterpret_cast<WWISEC_AK_IAkStreamMgrProfile*>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->GetStreamMgrProfile());
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateStd(in_pszFileName, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkOpenMode>(in_eOpenMode), *reinterpret_cast<AK::IAkStdStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateStd(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkOpenMode>(in_eOpenMode), *reinterpret_cast<AK::IAkStdStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_pszFileName, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), reinterpret_cast<AkAutoStmBufSettings*>(in_pBufferSettings), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), reinterpret_cast<AkAutoStmBufSettings*>(in_pBufferSettings), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream), in_bSyncOpen));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoMemory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_pBuffer, in_uSize, *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkPriority in_uPriority)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->PinFileInCache(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkPriority>(in_uPriority)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->UnpinFileInCache(in_fileID, static_cast<AkPriority>(in_uPriority)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority, WWISEC_AkPriority in_uOldPriority)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->UpdateCachingPriority(in_fileID, static_cast<AkPriority>(in_uPriority), static_cast<AkPriority>(in_uOldPriority)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, AkReal32* out_fPercentBuffered, bool* out_bCacheFull)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->GetBufferStatusForPinnedFile(in_fileID, *out_fPercentBuffered, *out_bCacheFull));
+}
+
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_RelocateMemoryStream(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AK_IAkAutoStream* in_pStream, AkUInt8* in_pNewStart)
+{
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->RelocateMemoryStream(reinterpret_cast<AK::IAkAutoStream*>(in_pStream), in_pNewStart));
+}
 
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get()
 {
