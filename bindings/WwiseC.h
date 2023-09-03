@@ -3661,7 +3661,11 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 #if defined(AK_ANDROID)
     WWISEC_SLObjectItf WWISEC_AK_SoundEngine_GetWwiseOpenSLInterface();
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetFastPathSettings(WWISEC_AkInitSettings *in_settings, WWISEC_AkPlatformInitSettings *in_pfSettings);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetFastPathSettings(WWISEC_AkInitSettings* in_settings, WWISEC_AkPlatformInitSettings* in_pfSettings);
+#endif
+
+#if defined(AK_IOS)
+    void WWISEC_AK_SoundEngine_iOS_ChangeAudioSessionProperties(const WWISEC_AkAudioSessionProperties* in_properties);
 #endif
     // END Platform-specific AkSoundEngine functions
 

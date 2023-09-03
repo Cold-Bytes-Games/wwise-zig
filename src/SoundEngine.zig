@@ -15,6 +15,7 @@ pub const DynamicDialogue = @import("DynamicDialogue.zig");
 pub const DynamicSequence = @import("DynamicSequence.zig");
 
 pub usingnamespace if (wwise_options.platform == .android) @import("android_sound_engine.zig") else struct {};
+pub const iOS = if (wwise_options.platform == .ios) @import("ios_sound_engine.zig") else struct {};
 
 pub const AkSourceSettings = extern struct {
     source_id: common.AkUniqueID = 0,
