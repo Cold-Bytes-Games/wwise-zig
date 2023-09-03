@@ -3676,3 +3676,32 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateHFDamping(WWISEC
 }
 // END AkReverbEstimation
 #endif
+
+// BEGIN Platform-specific AkSoundEngine functions
+#if defined(AK_WIN)
+AkUInt32 WWISEC_AK_GetDeviceID(IMMDevice* in_pDevice)
+{
+    return AK::GetDeviceID(in_pDevice);
+}
+
+AkUInt32 WWISEC_AK_GetDeviceIDFromName(wchar_t* in_szToken)
+{
+    return AK::GetDeviceIDFromName(in_szToken);
+}
+
+const wchar_t* WWISEC_AK_GetWindowsDeviceName(AkInt32 index, AkUInt32* out_uDeviceID, WWISEC_AkAudioDeviceState uDeviceStateMask)
+{
+    return AK::GetWindowsDeviceName(index, *out_uDeviceID, static_cast<AkAudioDeviceState>(uDeviceStateMask));
+}
+
+AkUInt32 WWISEC_AK_GetWindowsDeviceCount(WWISEC_AkAudioDeviceState uDeviceStateMask)
+{
+    return AK::GetWindowsDeviceCount(static_cast<AkAudioDeviceState>(uDeviceStateMask));
+}
+
+bool WWISEC_AK_GetWindowsDevice(AkInt32 in_index, AkUInt32* out_uDeviceID, IMMDevice** out_ppDevice, WWISEC_AkAudioDeviceState uDeviceStateMask)
+{
+    return AK::GetWindowsDevice(in_index, *out_uDeviceID, out_ppDevice, static_cast<AkAudioDeviceState>(uDeviceStateMask));
+}
+#endif
+// END Platform-specific AkSoundEngine functions
