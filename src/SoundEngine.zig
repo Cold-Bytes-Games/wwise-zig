@@ -9,9 +9,12 @@ const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
+const wwise_options = @import("wwise_options");
 
 pub const DynamicDialogue = @import("DynamicDialogue.zig");
 pub const DynamicSequence = @import("DynamicSequence.zig");
+
+pub usingnamespace if (wwise_options.platform == .android) @import("android_sound_engine.zig") else struct {};
 
 pub const AkSourceSettings = extern struct {
     source_id: common.AkUniqueID = 0,

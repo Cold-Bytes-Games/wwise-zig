@@ -3657,6 +3657,12 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     bool WWISEC_AK_GetWindowsDevice(AkInt32 in_index, AkUInt32* out_uDeviceID, IMMDevice** out_ppDevice, WWISEC_AkAudioDeviceState uDeviceStateMask);
 #endif
+
+#if defined(AK_ANDROID)
+    WWISEC_SLObjectItf WWISEC_AK_SoundEngine_GetWwiseOpenSLInterface();
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetFastPathSettings(WWISEC_AkInitSettings *in_settings, WWISEC_AkPlatformInitSettings *in_pfSettings);
+#endif
     // END Platform-specific AkSoundEngine functions
 
 #ifdef __cplusplus

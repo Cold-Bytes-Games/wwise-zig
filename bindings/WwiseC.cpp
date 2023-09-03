@@ -3704,4 +3704,16 @@ bool WWISEC_AK_GetWindowsDevice(AkInt32 in_index, AkUInt32* out_uDeviceID, IMMDe
     return AK::GetWindowsDevice(in_index, *out_uDeviceID, out_ppDevice, static_cast<AkAudioDeviceState>(uDeviceStateMask));
 }
 #endif
+
+#if defined(AK_ANDROID)
+WWISEC_SLObjectItf WWISEC_AK_SoundEngine_GetWwiseOpenSLInterface()
+{
+    return reinterpret_cast<WWISEC_SLObjectItf>(AK::SoundEngine::GetWwiseOpenSLInterface());
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetFastPathSettings(WWISEC_AkInitSettings* in_settings, WWISEC_AkPlatformInitSettings* in_pfSettings)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetFastPathSettings(*reinterpret_cast<AkInitSettings*>(in_settings), *reintepret_cast<AkPlatformInitSettings*>(in_pfSettings));
+}
+#endif
 // END Platform-specific AkSoundEngine functions
