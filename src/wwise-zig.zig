@@ -14,6 +14,7 @@ pub const StreamMgr = @import("StreamMgr.zig");
 pub usingnamespace @import("callbacks.zig");
 pub usingnamespace @import("common.zig");
 pub usingnamespace @import("common_defs.zig");
+pub usingnamespace @import("error_message_translator.zig");
 pub usingnamespace @import("IAkPlugin.zig");
 pub usingnamespace @import("IAkPluginMemAlloc.zig");
 pub usingnamespace @import("IAkStreamMgr.zig");

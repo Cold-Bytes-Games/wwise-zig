@@ -3034,6 +3034,45 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPlayingID in_playingID);
 // END AkDynamicSequence
 
+// BEGIN AkErrorMessageTranslator
+#define WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE 150
+#define WWISEC_AK_MAX_ERROR_LENGTH 1000
+
+    typedef struct WWISEC_AkErrorMessageTranslator_TagInformation
+    {
+        const AkOSChar* m_pTag;
+        const AkOSChar* m_pStartBlock;
+        const char* m_args;
+        AkOSChar m_parsedInfo[WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE];
+        AkUInt32 m_argSize;
+        AkUInt16 m_len;
+        bool m_infoIsParsed;
+    } WWISEC_AkErrorMessageTranslator_TagInformation;
+
+    typedef struct WWISEC_AkErrorMessageTranslator WWISEC_AkErrorMessageTranslator;
+    typedef struct WWISEC_AkErrorMessageTranslator_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        void (*Term)(void* instance);
+
+        bool (*Translate)(void* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize);
+
+        bool (*GetInfo)(void* instance, WWISEC_AkErrorMessageTranslator_TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32* out_uTranslated);
+    } WWISEC_AkErrorMessageTranslator_FunctionTable;
+
+    WWISEC_AkErrorMessageTranslator* WWISEC_AkErrorMessageTranslator_CreateInstance(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functionTable);
+    void WWISEC_AkErrorMessageTranslator_DestroyInstance(WWISEC_AkErrorMessageTranslator* instance);
+
+    void WWISEC_AkErrorMessageTranslator_Term(WWISEC_AkErrorMessageTranslator* instance);
+    void WWISEC_AkErrorMessageTranslator_SetFallBackTranslator(WWISEC_AkErrorMessageTranslator* instance, WWISEC_AkErrorMessageTranslator* in_fallBackTranslator);
+    bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize);
+// END AkErrorMessageTranslator
+
+// BEGIN AkMonitorError
+
+// END AkMonitorError
+
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
     size_t WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof();

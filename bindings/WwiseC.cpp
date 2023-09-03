@@ -30,6 +30,7 @@ SOFTWARE.
 #include <AK/SoundEngine/Common/AkCallback.h>
 #include <AK/SoundEngine/Common/AkDynamicDialogue.h>
 #include <AK/SoundEngine/Common/AkDynamicSequence.h>
+#include <AK/SoundEngine/Common/AkErrorMessageTranslator.h>
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>
 #include <AK/SoundEngine/Common/AkModule.h>
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
@@ -3189,6 +3190,72 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPl
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::UnlockPlaylist(in_playingID));
 }
 // END AkDynamicSequence
+
+// BEGIN AkErrorMessageTranslator
+static_assert(WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE == AK_TRANSLATOR_MAX_NAME_SIZE);
+static_assert(WWISEC_AK_MAX_ERROR_LENGTH == AK_MAX_ERROR_LENGTH);
+
+class WWISEC_AkErrorMessageTranslator_Wrapper : public AkErrorMessageTranslator
+{
+  public:
+    WWISEC_AkErrorMessageTranslator_Wrapper(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functions)
+        : _instance(instance), _functions(*functions)
+    {
+    }
+
+    ~WWISEC_AkErrorMessageTranslator_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Term() override
+    {
+        _functions.Term(_instance);
+    }
+
+    bool Translate(const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize) override
+    {
+        return _functions.Translate(_instance, in_pszError, out_translatedPszError, in_maxPszErrorSize, in_args, in_uArgSize);
+    }
+
+  protected:
+    bool GetInfo(TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32& out_uTranslated)
+    {
+        return _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkErrorMessageTranslator_TagInformation*>(in_pTagList), in_uCount, &out_uTranslated);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AkErrorMessageTranslator_FunctionTable _functions;
+};
+
+WWISEC_AkErrorMessageTranslator* WWISEC_AkErrorMessageTranslator_CreateInstance(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AkErrorMessageTranslator*>(AkNew(AkMemID_Integration, WWISEC_AkErrorMessageTranslator_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AkErrorMessageTranslator_DestroyInstance(WWISEC_AkErrorMessageTranslator* instance)
+{
+    WWISEC_AkErrorMessageTranslator_Wrapper* wrapper = reinterpret_cast<WWISEC_AkErrorMessageTranslator_Wrapper*>(instance);
+    wrapper->~WWISEC_AkErrorMessageTranslator_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AkErrorMessageTranslator_Term(WWISEC_AkErrorMessageTranslator* instance)
+{
+    reinterpret_cast<AkErrorMessageTranslator*>(instance)->Term();
+}
+
+void WWISEC_AkErrorMessageTranslator_SetFallBackTranslator(WWISEC_AkErrorMessageTranslator* instance, WWISEC_AkErrorMessageTranslator* in_fallBackTranslator)
+{
+    reinterpret_cast<AkErrorMessageTranslator*>(instance)->SetFallBackTranslator(reinterpret_cast<AkErrorMessageTranslator*>(in_fallBackTranslator));
+}
+
+bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize)
+{
+    return reinterpret_cast<AkErrorMessageTranslator*>(instance)->Translate(in_pszError, out_translatedPszError, in_maxPszErrorSize, in_args, in_uArgSize);
+}
+// END AkErrorMessageTranslator
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
