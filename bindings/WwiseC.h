@@ -770,7 +770,50 @@ extern "C"
     typedef const AkReal32* WWISEC_AK_SpeakerVolumes_ConstMatrixPtr; ///< Constant volume matrix. Access each input channel vector with AK::SpeakerVolumes::Matrix::GetChannel().
     // END AkSpeakerVolumes
 
+// BEGIN AkErrorMessageTranslator
+#define WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE 150
+#define WWISEC_AK_MAX_ERROR_LENGTH 1000
+
+    typedef struct WWISEC_AkErrorMessageTranslator_TagInformation
+    {
+        const AkOSChar* m_pTag;
+        const AkOSChar* m_pStartBlock;
+        const char* m_args;
+        AkOSChar m_parsedInfo[WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE];
+        AkUInt32 m_argSize;
+        AkUInt16 m_len;
+        bool m_infoIsParsed;
+    } WWISEC_AkErrorMessageTranslator_TagInformation;
+
+    typedef struct WWISEC_AkErrorMessageTranslator WWISEC_AkErrorMessageTranslator;
+    typedef struct WWISEC_AkErrorMessageTranslator_FunctionTable
+    {
+        void (*Destructor)(void* instance);
+
+        void (*Term)(void* instance);
+
+        bool (*Translate)(void* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize);
+
+        bool (*GetInfo)(void* instance, WWISEC_AkErrorMessageTranslator_TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32* out_uTranslated);
+    } WWISEC_AkErrorMessageTranslator_FunctionTable;
+
+    WWISEC_AkErrorMessageTranslator* WWISEC_AkErrorMessageTranslator_CreateInstance(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functionTable);
+    void WWISEC_AkErrorMessageTranslator_DestroyInstance(WWISEC_AkErrorMessageTranslator* instance);
+
+    void WWISEC_AkErrorMessageTranslator_Term(WWISEC_AkErrorMessageTranslator* instance);
+    void WWISEC_AkErrorMessageTranslator_SetFallBackTranslator(WWISEC_AkErrorMessageTranslator* instance, WWISEC_AkErrorMessageTranslator* in_fallBackTranslator);
+    bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize);
+    // END AkErrorMessageTranslator
+
     // BEGIN AkMonitorError
+    typedef struct WWISEC_AK_Monitor_MsgContext
+    {
+        WWISEC_AkPlayingID in_playingID;    ///< Related Playing ID if applicable
+        WWISEC_AkGameObjectID in_gameObjID; ///< Related Game Object ID if applicable, AK_INVALID_GAME_OBJECT otherwise
+        WWISEC_AkUniqueID in_soundID;       ///< Related Audio Node ID if applicable, AK_INVALID_UNIQUE_ID otherwise
+        bool in_bIsBus;                     ///< true if in_audioNodeID is a bus
+    } WWISEC_AK_Monitor_MsgContext;
+
     typedef enum WWISEC_AK_Monitor_ErrorLevel
     {
         WWISEC_AK_Monitor_ErrorLevel_Message = (1 << 0), // used as bitfield
@@ -778,6 +821,313 @@ extern "C"
 
         WWISEC_AK_Monitor_ErrorLevel_All = WWISEC_AK_Monitor_ErrorLevel_Message | WWISEC_AK_Monitor_ErrorLevel_Error
     } WWISEC_AK_Monitor_ErrorLevel;
+
+    /// ErrorCode
+    typedef enum WWISEC_AK_Monitor_ErrorCode
+    {
+        WWISEC_AK_Monitor_ErrorCode_NoError = 0, // 0-based index into AK::Monitor::s_aszMonitorErrorInfos table
+        WWISEC_AK_Monitor_ErrorCode_FileNotFound,
+        WWISEC_AK_Monitor_ErrorCode_CannotOpenFile,
+        WWISEC_AK_Monitor_ErrorCode_CannotStartStreamNoMemory,
+        WWISEC_AK_Monitor_ErrorCode_IODevice,
+        WWISEC_AK_Monitor_ErrorCode_IncompatibleIOSettings,
+
+        WWISEC_AK_Monitor_ErrorCode_PluginUnsupportedChannelConfiguration,
+        WWISEC_AK_Monitor_ErrorCode_PluginMediaUnavailable,
+        WWISEC_AK_Monitor_ErrorCode_PluginInitialisationFailed,
+        WWISEC_AK_Monitor_ErrorCode_PluginProcessingFailed,
+        WWISEC_AK_Monitor_ErrorCode_PluginExecutionInvalid,
+        WWISEC_AK_Monitor_ErrorCode_PluginAllocationFailed,
+
+        WWISEC_AK_Monitor_ErrorCode_VorbisSeekTableRecommended,
+
+        WWISEC_AK_Monitor_ErrorCode_VorbisDecodeError,
+
+        WWISEC_AK_Monitor_ErrorCode_ATRAC9DecodeFailed,
+        WWISEC_AK_Monitor_ErrorCode_ATRAC9LoopSectionTooSmall,
+
+        WWISEC_AK_Monitor_ErrorCode_InvalidAudioFileHeader,
+        WWISEC_AK_Monitor_ErrorCode_AudioFileHeaderTooLarge,
+        WWISEC_AK_Monitor_ErrorCode_LoopTooSmall,
+
+        WWISEC_AK_Monitor_ErrorCode_TransitionNotAccurateChannel,
+        WWISEC_AK_Monitor_ErrorCode_TransitionNotAccuratePluginMismatch,
+        WWISEC_AK_Monitor_ErrorCode_TransitionNotAccurateRejectedByPlugin,
+        WWISEC_AK_Monitor_ErrorCode_TransitionNotAccurateStarvation,
+        WWISEC_AK_Monitor_ErrorCode_TransitionNotAccurateCodecError,
+        WWISEC_AK_Monitor_ErrorCode_NothingToPlay,
+        WWISEC_AK_Monitor_ErrorCode_PlayFailed,
+
+        WWISEC_AK_Monitor_ErrorCode_StingerCouldNotBeScheduled,
+        WWISEC_AK_Monitor_ErrorCode_TooLongSegmentLookAhead,
+        WWISEC_AK_Monitor_ErrorCode_CannotScheduleMusicSwitch,
+        WWISEC_AK_Monitor_ErrorCode_TooManySimultaneousMusicSegments,
+        WWISEC_AK_Monitor_ErrorCode_PlaylistStoppedForEditing,
+        WWISEC_AK_Monitor_ErrorCode_MusicClipsRescheduledAfterTrackEdit,
+
+        WWISEC_AK_Monitor_ErrorCode_CannotPlaySource_Create,
+        WWISEC_AK_Monitor_ErrorCode_CannotPlaySource_VirtualOff,
+        WWISEC_AK_Monitor_ErrorCode_CannotPlaySource_TimeSkip,
+        WWISEC_AK_Monitor_ErrorCode_CannotPlaySource_InconsistentState,
+        WWISEC_AK_Monitor_ErrorCode_MediaNotLoaded,
+        WWISEC_AK_Monitor_ErrorCode_VoiceStarving,
+        WWISEC_AK_Monitor_ErrorCode_StreamingSourceStarving,
+        WWISEC_AK_Monitor_ErrorCode_XMADecoderSourceStarving,
+        WWISEC_AK_Monitor_ErrorCode_XMADecodingError,
+        WWISEC_AK_Monitor_ErrorCode_InvalidXMAData,
+
+        WWISEC_AK_Monitor_ErrorCode_PluginNotRegistered,
+        WWISEC_AK_Monitor_ErrorCode_CodecNotRegistered,
+        WWISEC_AK_Monitor_ErrorCode_PluginVersionMismatch,
+
+        WWISEC_AK_Monitor_ErrorCode_EventIDNotFound,
+
+        WWISEC_AK_Monitor_ErrorCode_InvalidGroupID,
+        WWISEC_AK_Monitor_ErrorCode_SelectedNodeNotAvailable,
+        WWISEC_AK_Monitor_ErrorCode_SelectedMediaNotAvailable,
+        WWISEC_AK_Monitor_ErrorCode_NoValidSwitch,
+
+        WWISEC_AK_Monitor_ErrorCode_BankLoadFailed,
+        WWISEC_AK_Monitor_ErrorCode_ErrorWhileLoadingBank,
+        WWISEC_AK_Monitor_ErrorCode_InsufficientSpaceToLoadBank,
+
+        WWISEC_AK_Monitor_ErrorCode_LowerEngineCommandListFull,
+
+        WWISEC_AK_Monitor_ErrorCode_SeekNoMarker,
+        WWISEC_AK_Monitor_ErrorCode_CannotSeekContinuous,
+        WWISEC_AK_Monitor_ErrorCode_SeekAfterEof,
+
+        WWISEC_AK_Monitor_ErrorCode_UnknownGameObject,
+        WWISEC_AK_Monitor_ErrorCode_GameObjectNeverRegistered, // To be used by the Capture Log to replace ErrorCode_UnknownGameObject
+        WWISEC_AK_Monitor_ErrorCode_DeadGameObject,            // To be used by the Capture Log to replace ErrorCode_UnknownGameObject
+        WWISEC_AK_Monitor_ErrorCode_GameObjectIsNotEmitter,
+
+        WWISEC_AK_Monitor_ErrorCode_ExternalSourceNotResolved,
+        WWISEC_AK_Monitor_ErrorCode_FileFormatMismatch,
+
+        WWISEC_AK_Monitor_ErrorCode_CommandQueueFull,
+        WWISEC_AK_Monitor_ErrorCode_CommandTooLarge,
+
+        WWISEC_AK_Monitor_ErrorCode_XMACreateDecoderLimitReached,
+        WWISEC_AK_Monitor_ErrorCode_XMAStreamBufferTooSmall,
+
+        WWISEC_AK_Monitor_ErrorCode_ModulatorScopeError_Inst,
+        WWISEC_AK_Monitor_ErrorCode_ModulatorScopeError_Obj,
+
+        WWISEC_AK_Monitor_ErrorCode_SeekAfterEndOfPlaylist,
+
+        WWISEC_AK_Monitor_ErrorCode_OpusRequireSeekTable,
+        WWISEC_AK_Monitor_ErrorCode_OpusDecodeError,
+
+        WWISEC_AK_Monitor_ErrorCode_SourcePluginNotFound,
+
+        WWISEC_AK_Monitor_ErrorCode_VirtualVoiceLimit,
+
+        WWISEC_AK_Monitor_ErrorCode_NotEnoughMemoryToStart,
+        WWISEC_AK_Monitor_ErrorCode_UnknownOpusError, // Deprecated Opus error.
+
+        WWISEC_AK_Monitor_ErrorCode_AudioDeviceInitFailure,
+        WWISEC_AK_Monitor_ErrorCode_AudioDeviceRemoveFailure,
+        WWISEC_AK_Monitor_ErrorCode_AudioDeviceNotFound,
+        WWISEC_AK_Monitor_ErrorCode_AudioDeviceNotValid,
+
+        WWISEC_AK_Monitor_ErrorCode_SpatialAudio_ListenerAutomationNotSupported,
+        WWISEC_AK_Monitor_ErrorCode_MediaDuplicationLength,
+
+        WWISEC_AK_Monitor_ErrorCode_HwVoicesSystemInitFailed,  // When the hardware-accelerated subsystem fails to initialize
+        WWISEC_AK_Monitor_ErrorCode_HwVoicesDecodeBatchFailed, // When a grouping of hardware-accelerated voices fail to decode collectively
+        WWISEC_AK_Monitor_ErrorCode_HwVoiceLimitReached,       // Cannot create any more hardware-accelerated voices
+        WWISEC_AK_Monitor_ErrorCode_HwVoiceInitFailed,         // A hardware-accelerated voice fails to be created, but not because the max number of voices was reached
+
+        WWISEC_AK_Monitor_ErrorCode_OpusHWCommandFailed,
+
+        WWISEC_AK_Monitor_ErrorCode_AddOutputListenerIdWithZeroListeners,
+
+        WWISEC_AK_Monitor_ErrorCode_3DObjectLimitExceeded,
+
+        WWISEC_AK_Monitor_ErrorCode_OpusHWFatalError,
+        WWISEC_AK_Monitor_ErrorCode_OpusHWDecodeUnavailable,
+        WWISEC_AK_Monitor_ErrorCode_OpusHWTimeout,
+
+        WWISEC_AK_Monitor_ErrorCode_SystemAudioObjectsUnavailable,
+
+        WWISEC_AK_Monitor_ErrorCode_AddOutputNoDistinctListener,
+
+        WWISEC_AK_Monitor_ErrorCode_PluginCannotRunOnObjectConfig,
+        WWISEC_AK_Monitor_ErrorCode_SpatialAudio_ReflectionBusError,
+
+        WWISEC_AK_Monitor_ErrorCode_VorbisHWDecodeUnavailable,
+        WWISEC_AK_Monitor_ErrorCode_ExternalSourceNoMemorySize,
+
+        WWISEC_AK_Monitor_ErrorCode_MonitorQueueFull,
+        WWISEC_AK_Monitor_ErrorCode_MonitorMsgTooLarge,
+
+        WWISEC_AK_Monitor_ErrorCode_NonCompliantDeviceMemory,
+
+        WWISEC_AK_Monitor_ErrorCode_JobWorkerFuncCallMismatch,
+        WWISEC_AK_Monitor_ErrorCode_JobMgrOutOfMemory,
+
+        WWISEC_AK_Monitor_ErrorCode_InvalidFileSize,
+        WWISEC_AK_Monitor_ErrorCode_PluginMsg,
+
+        WWISEC_AK_Monitor_ErrorCode_SinkOpenSL,
+        WWISEC_AK_Monitor_ErrorCode_AudioOutOfRange,
+        WWISEC_AK_Monitor_ErrorCode_AudioOutOfRangeOnBus,
+        WWISEC_AK_Monitor_ErrorCode_AudioOutOfRangeOnBusFx,
+        WWISEC_AK_Monitor_ErrorCode_AudioOutOfRangeRay,
+        WWISEC_AK_Monitor_ErrorCode_UnknownDialogueEvent,
+        WWISEC_AK_Monitor_ErrorCode_FailedPostingEvent,
+        WWISEC_AK_Monitor_ErrorCode_OutputDeviceInitializationFailed,
+        WWISEC_AK_Monitor_ErrorCode_UnloadBankFailed,
+
+        WWISEC_AK_Monitor_ErrorCode_PluginFileNotFound,
+        WWISEC_AK_Monitor_ErrorCode_PluginFileIncompatible,
+        WWISEC_AK_Monitor_ErrorCode_PluginFileNotEnoughMemoryToStart,
+        WWISEC_AK_Monitor_ErrorCode_PluginFileInvalid,
+        WWISEC_AK_Monitor_ErrorCode_PluginFileRegisterFailed,
+
+        WWISEC_AK_Monitor_ErrorCode_UnknownArgument,
+
+        WWISEC_AK_Monitor_ErrorCode_DynamicSequenceAlreadyClosed,
+        WWISEC_AK_Monitor_ErrorCode_PendingActionDestroyed,
+        WWISEC_AK_Monitor_ErrorCode_CrossFadeTransitionIgnored,
+        WWISEC_AK_Monitor_ErrorCode_MusicRendererSeekingFailed,
+
+        // MONITOR_ERRORMSG
+        WWISEC_AK_Monitor_ErrorCode_DynamicSequenceIdNotFound,
+        WWISEC_AK_Monitor_ErrorCode_BusNotFoundByName,
+        WWISEC_AK_Monitor_ErrorCode_AudioDeviceShareSetNotFound,
+        WWISEC_AK_Monitor_ErrorCode_AudioDeviceShareSetNotFoundByName,
+
+        WWISEC_AK_Monitor_ErrorCode_SoundEngineTooManyGameObjects,
+        WWISEC_AK_Monitor_ErrorCode_SoundEngineTooManyPositions,
+        WWISEC_AK_Monitor_ErrorCode_SoundEngineCantCallOnChildBus,
+        WWISEC_AK_Monitor_ErrorCode_SoundEnginePlayingIdNotFound,
+        WWISEC_AK_Monitor_ErrorCode_SoundEngineInvalidTransform,
+        WWISEC_AK_Monitor_ErrorCode_SoundEngineTooManyEventPosts,
+
+        WWISEC_AK_Monitor_ErrorCode_AudioSubsystemStoppedResponding,
+
+        WWISEC_AK_Monitor_ErrorCode_NotEnoughMemInFunction,
+        WWISEC_AK_Monitor_ErrorCode_FXNotFound,
+        WWISEC_AK_Monitor_ErrorCode_SetMixerNotABus,
+        WWISEC_AK_Monitor_ErrorCode_AudioNodeNotFound,
+        WWISEC_AK_Monitor_ErrorCode_SetMixerFailed,
+        WWISEC_AK_Monitor_ErrorCode_SetBusConfigUnsupported,
+        WWISEC_AK_Monitor_ErrorCode_BusNotFound,
+
+        WWISEC_AK_Monitor_ErrorCode_MismatchingMediaSize,
+        WWISEC_AK_Monitor_ErrorCode_IncompatibleBankVersion,
+        WWISEC_AK_Monitor_ErrorCode_UnexpectedPrepareGameSyncsCall,
+        WWISEC_AK_Monitor_ErrorCode_MusicEngineNotInitialized,
+        WWISEC_AK_Monitor_ErrorCode_LoadingBankMismatch,
+
+        WWISEC_AK_Monitor_ErrorCode_MasterBusStructureNotLoaded,
+        WWISEC_AK_Monitor_ErrorCode_TooManyChildren,
+        WWISEC_AK_Monitor_ErrorCode_BankContainUneditableEffect,
+        WWISEC_AK_Monitor_ErrorCode_MemoryAllocationFailed,
+        WWISEC_AK_Monitor_ErrorCode_InvalidFloatPriority,
+        WWISEC_AK_Monitor_ErrorCode_SoundLoadFailedInsufficientMemory,
+        WWISEC_AK_Monitor_ErrorCode_NXDeviceRegistrationFailed,
+        WWISEC_AK_Monitor_ErrorCode_MixPluginOnObjectBus,
+
+        WWISEC_AK_Monitor_ErrorCode_XboxXMAVoiceResetFailed,
+        WWISEC_AK_Monitor_ErrorCode_XboxACPMessage,
+        WWISEC_AK_Monitor_ErrorCode_XboxFrameDropped,
+        WWISEC_AK_Monitor_ErrorCode_XboxACPError,
+        WWISEC_AK_Monitor_ErrorCode_XboxXMAFatalError,
+        WWISEC_AK_Monitor_ErrorCode_MissingMusicNodeParent,
+        WWISEC_AK_Monitor_ErrorCode_HardwareOpusDecoderError,
+        WWISEC_AK_Monitor_ErrorCode_SetGeometryTooManyTriangleConnected,
+        WWISEC_AK_Monitor_ErrorCode_SetGeometryTriangleTooLarge,
+        WWISEC_AK_Monitor_ErrorCode_SetGeometryFailed,
+        WWISEC_AK_Monitor_ErrorCode_RemovingGeometrySetFailed,
+        WWISEC_AK_Monitor_ErrorCode_SetGeometryInstanceFailed,
+        WWISEC_AK_Monitor_ErrorCode_RemovingGeometryInstanceFailed,
+
+        WWISEC_AK_Monitor_ErrorCode_RevertingToDefaultAudioDevice,
+        WWISEC_AK_Monitor_ErrorCode_RevertingToDummyAudioDevice,
+        WWISEC_AK_Monitor_ErrorCode_AudioThreadSuspended,
+        WWISEC_AK_Monitor_ErrorCode_AudioThreadResumed,
+        WWISEC_AK_Monitor_ErrorCode_ResetPlaylistActionIgnoredGlobalScope,
+        WWISEC_AK_Monitor_ErrorCode_ResetPlaylistActionIgnoredContinuous,
+        WWISEC_AK_Monitor_ErrorCode_PlayingTriggerRateNotSupported,
+        WWISEC_AK_Monitor_ErrorCode_SetGeometryTriangleIsSkipped,
+        WWISEC_AK_Monitor_ErrorCode_SetGeometryInstanceInvalidTransform,
+
+        // AkSpatialAudio:AkMonitorError_WithID
+        WWISEC_AK_Monitor_ErrorCode_SetGameObjectRadiusSizeError,
+        WWISEC_AK_Monitor_ErrorCode_SetPortalNonDistinctRoom,
+        WWISEC_AK_Monitor_ErrorCode_SetPortalInvalidExtent,
+        WWISEC_AK_Monitor_ErrorCode_SpatialAudio_PortalNotFound,
+
+        // Invalid float
+        WWISEC_AK_Monitor_ErrorCode_InvalidFloatInFunction,
+        WWISEC_AK_Monitor_ErrorCode_FLTMAXNotSupported,
+
+        WWISEC_AK_Monitor_ErrorCode_CannotInitializeAmbisonicChannelConfiguration,
+        WWISEC_AK_Monitor_ErrorCode_CannotInitializePassthrough,
+        WWISEC_AK_Monitor_ErrorCode_3DAudioUnsupportedSize,
+        WWISEC_AK_Monitor_ErrorCode_AmbisonicNotAvailable,
+
+        WWISEC_AK_Monitor_ErrorCode_NoAudioDevice,
+
+        WWISEC_AK_Monitor_ErrorCode_Support,
+        WWISEC_AK_Monitor_ErrorCode_ReplayMessage,
+        WWISEC_AK_Monitor_ErrorCode_GameMessage,
+        WWISEC_AK_Monitor_ErrorCode_TestMessage,
+        WWISEC_AK_Monitor_ErrorCode_TranslatorStandardTagTest,
+        WWISEC_AK_Monitor_ErrorCode_TranslatorWwiseTagTest,
+        WWISEC_AK_Monitor_ErrorCode_TranslatorStringSizeTest,
+
+        WWISEC_AK_Monitor_ErrorCode_InvalidParameter,
+
+        WWISEC_AK_Monitor_ErrorCode_MaxAudioObjExceeded,
+        WWISEC_AK_Monitor_ErrorCode_MMSNotEnabled,
+        WWISEC_AK_Monitor_ErrorCode_NotEnoughSystemObj,
+        WWISEC_AK_Monitor_ErrorCode_NotEnoughSystemObjWin,
+
+        WWISEC_AK_Monitor_ErrorCode_TransitionNotAccurateSourceTooShort,
+
+        WWISEC_AK_Monitor_ErrorCode_AlreadyInitialized,
+        WWISEC_AK_Monitor_ErrorCode_WrongNumberOfArguments,
+        WWISEC_AK_Monitor_ErrorCode_DataAlignement,
+        WWISEC_AK_Monitor_ErrorCode_PluginMsgWithShareSet,
+        WWISEC_AK_Monitor_ErrorCode_SoundEngineNotInit,
+        WWISEC_AK_Monitor_ErrorCode_NoDefaultSwitch,
+        WWISEC_AK_Monitor_ErrorCode_CantSetBoundSwitch,
+        WWISEC_AK_Monitor_ErrorCode_IODeviceInitFailed,
+        WWISEC_AK_Monitor_ErrorCode_SwitchListEmpty,
+        WWISEC_AK_Monitor_ErrorCode_NoSwitchSelected,
+
+        // ALWAYS ADD NEW CODES AT THE END !!!!!!!
+        // Otherwise it may break comm compatibility in a patch
+
+        WWISEC_AK_Monitor_Num_ErrorCodes // THIS STAYS AT END OF ENUM
+    } WWISEC_AK_Monitor_ErrorCode;
+
+    AK_CALLBACK(void, WWISEC_AK_Monitor_LocalOutputFunc)
+    (
+        WWISEC_AK_Monitor_ErrorCode in_eErrorCode,   ///< Error code number value
+        const AkOSChar* in_pszError,                 ///< Message or error string to be displayed
+        WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, ///< Specifies whether it should be displayed as a message or an error
+        WWISEC_AkPlayingID in_playingID,             ///< Related Playing ID if applicable, AK_INVALID_PLAYING_ID otherwise
+        WWISEC_AkGameObjectID in_gameObjID           ///< Related Game Object ID if applicable, AK_INVALID_GAME_OBJECT otherwise
+    );
+
+    typedef struct WWISEC_AkStreamMgrSettings WWISEC_AkStreamMgrSettings;
+    typedef struct WWISEC_AkDeviceSettings WWISEC_AkDeviceSettings;
+
+    WWISEC_AKRESULT WWISEC_AK_Monitor_PostCode(WWISEC_AK_Monitor_ErrorCode in_eError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus);
+    WWISEC_AKRESULT WWISEC_AK_Monitor_PostString(const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus);
+    WWISEC_AKRESULT WWISEC_AK_Monitor_SetLocalOutput(AkUInt32 in_uErrorLevel, WWISEC_AK_Monitor_LocalOutputFunc in_pMonitorFunc);
+    WWISEC_AKRESULT WWISEC_AK_Monitor_AddTranslator(WWISEC_AkErrorMessageTranslator* translator, bool overridePreviousTranslators);
+    WWISEC_AKRESULT WWISEC_AK_Monitor_ResetTranslator();
+    WWISEC_AkTimeMs WWISEC_AK_Monitor_GetTimeStamp();
+    void WWISEC_AK_Monitor_MonitorStreamMgrInit(const WWISEC_AkStreamMgrSettings* in_streamMgrSettings);
+    void WWISEC_AK_Monitor_MonitorStreamingDeviceInit(WWISEC_AkDeviceID in_deviceID, const WWISEC_AkDeviceSettings* in_deviceSettings);
+    void WWISEC_AK_Monitor_MonitorStreamingDeviceDestroyed(WWISEC_AkDeviceID in_deviceID);
+    void WWISEC_AK_Monitor_MonitorStreamMgrTerm();
     // END AkMonitorError
 
     // BEGIN IBytes
@@ -3033,45 +3383,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPlayingID in_playingID);
 // END AkDynamicSequence
-
-// BEGIN AkErrorMessageTranslator
-#define WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE 150
-#define WWISEC_AK_MAX_ERROR_LENGTH 1000
-
-    typedef struct WWISEC_AkErrorMessageTranslator_TagInformation
-    {
-        const AkOSChar* m_pTag;
-        const AkOSChar* m_pStartBlock;
-        const char* m_args;
-        AkOSChar m_parsedInfo[WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE];
-        AkUInt32 m_argSize;
-        AkUInt16 m_len;
-        bool m_infoIsParsed;
-    } WWISEC_AkErrorMessageTranslator_TagInformation;
-
-    typedef struct WWISEC_AkErrorMessageTranslator WWISEC_AkErrorMessageTranslator;
-    typedef struct WWISEC_AkErrorMessageTranslator_FunctionTable
-    {
-        void (*Destructor)(void* instance);
-
-        void (*Term)(void* instance);
-
-        bool (*Translate)(void* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize);
-
-        bool (*GetInfo)(void* instance, WWISEC_AkErrorMessageTranslator_TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32* out_uTranslated);
-    } WWISEC_AkErrorMessageTranslator_FunctionTable;
-
-    WWISEC_AkErrorMessageTranslator* WWISEC_AkErrorMessageTranslator_CreateInstance(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functionTable);
-    void WWISEC_AkErrorMessageTranslator_DestroyInstance(WWISEC_AkErrorMessageTranslator* instance);
-
-    void WWISEC_AkErrorMessageTranslator_Term(WWISEC_AkErrorMessageTranslator* instance);
-    void WWISEC_AkErrorMessageTranslator_SetFallBackTranslator(WWISEC_AkErrorMessageTranslator* instance, WWISEC_AkErrorMessageTranslator* in_fallBackTranslator);
-    bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize);
-// END AkErrorMessageTranslator
-
-// BEGIN AkMonitorError
-
-// END AkMonitorError
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)

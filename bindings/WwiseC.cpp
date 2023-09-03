@@ -40,6 +40,8 @@ SOFTWARE.
 #include <Ak/SoundEngine/Common/AkVirtualAcoustics.h>
 #include <Ak/SoundEngine/Common/IAkPlugin.h>
 
+#include <AK/Tools/Common/AkMonitorError.h>
+
 #include <new>
 
 extern "C" void WWISEC_HACK_RegisterAllPlugins();
@@ -85,6 +87,127 @@ static_assert(offsetof(WWISEC_AkMIDIPost, NoteOnOff.byVelocity) == offsetof(AkMI
 static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uCmd) == offsetof(AkMIDIPost, WwiseCmd.uCmd));
 static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uArg) == offsetof(AkMIDIPost, WwiseCmd.uArg));
 // END AkMidiTypes
+
+// BEGIN AkErrorMessageTranslator
+static_assert(WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE == AK_TRANSLATOR_MAX_NAME_SIZE);
+static_assert(WWISEC_AK_MAX_ERROR_LENGTH == AK_MAX_ERROR_LENGTH);
+
+class WWISEC_AkErrorMessageTranslator_Wrapper : public AkErrorMessageTranslator
+{
+  public:
+    WWISEC_AkErrorMessageTranslator_Wrapper(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functions)
+        : _instance(instance), _functions(*functions)
+    {
+    }
+
+    ~WWISEC_AkErrorMessageTranslator_Wrapper()
+    {
+        _functions.Destructor(_instance);
+    }
+
+    void Term() override
+    {
+        _functions.Term(_instance);
+    }
+
+    bool Translate(const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize) override
+    {
+        return _functions.Translate(_instance, in_pszError, out_translatedPszError, in_maxPszErrorSize, in_args, in_uArgSize);
+    }
+
+  protected:
+    bool GetInfo(TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32& out_uTranslated)
+    {
+        return _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkErrorMessageTranslator_TagInformation*>(in_pTagList), in_uCount, &out_uTranslated);
+    }
+
+  private:
+    void* _instance = nullptr;
+    WWISEC_AkErrorMessageTranslator_FunctionTable _functions;
+};
+
+WWISEC_AkErrorMessageTranslator* WWISEC_AkErrorMessageTranslator_CreateInstance(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functionTable)
+{
+    return reinterpret_cast<WWISEC_AkErrorMessageTranslator*>(AkNew(AkMemID_Integration, WWISEC_AkErrorMessageTranslator_Wrapper)(instance, functionTable));
+}
+
+void WWISEC_AkErrorMessageTranslator_DestroyInstance(WWISEC_AkErrorMessageTranslator* instance)
+{
+    WWISEC_AkErrorMessageTranslator_Wrapper* wrapper = reinterpret_cast<WWISEC_AkErrorMessageTranslator_Wrapper*>(instance);
+    wrapper->~WWISEC_AkErrorMessageTranslator_Wrapper();
+    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
+}
+
+void WWISEC_AkErrorMessageTranslator_Term(WWISEC_AkErrorMessageTranslator* instance)
+{
+    reinterpret_cast<AkErrorMessageTranslator*>(instance)->Term();
+}
+
+void WWISEC_AkErrorMessageTranslator_SetFallBackTranslator(WWISEC_AkErrorMessageTranslator* instance, WWISEC_AkErrorMessageTranslator* in_fallBackTranslator)
+{
+    reinterpret_cast<AkErrorMessageTranslator*>(instance)->SetFallBackTranslator(reinterpret_cast<AkErrorMessageTranslator*>(in_fallBackTranslator));
+}
+
+bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize)
+{
+    return reinterpret_cast<AkErrorMessageTranslator*>(instance)->Translate(in_pszError, out_translatedPszError, in_maxPszErrorSize, in_args, in_uArgSize);
+}
+// END AkErrorMessageTranslator
+
+// BEGIN AkMonitor
+static_assert(sizeof(WWISEC_AK_Monitor_MsgContext) == sizeof(AK::Monitor::MsgContext));
+static_assert(WWISEC_AK_Monitor_Num_ErrorCodes == AK::Monitor::Num_ErrorCodes);
+
+WWISEC_AKRESULT WWISEC_AK_Monitor_PostCode(WWISEC_AK_Monitor_ErrorCode in_eError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::Monitor::PostCode(static_cast<AK::Monitor::ErrorCode>(in_eError), static_cast<AK::Monitor::ErrorLevel>(in_eErrorLevel), in_playingID, in_gameObjID, in_audioNodeID, in_bIsBus));
+}
+
+WWISEC_AKRESULT WWISEC_AK_Monitor_PostString(const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::Monitor::PostString(in_pszError, static_cast<AK::Monitor::ErrorLevel>(in_eErrorLevel), in_playingID, in_gameObjID, in_audioNodeID, in_bIsBus));
+}
+
+WWISEC_AKRESULT WWISEC_AK_Monitor_SetLocalOutput(AkUInt32 in_uErrorLevel, WWISEC_AK_Monitor_LocalOutputFunc in_pMonitorFunc)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::Monitor::SetLocalOutput(in_uErrorLevel, reinterpret_cast<AK::Monitor::LocalOutputFunc>(in_pMonitorFunc)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_Monitor_AddTranslator(WWISEC_AkErrorMessageTranslator* translator, bool overridePreviousTranslators)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::Monitor::AddTranslator(reinterpret_cast<AkErrorMessageTranslator*>(translator), overridePreviousTranslators));
+}
+
+WWISEC_AKRESULT WWISEC_AK_Monitor_ResetTranslator()
+{
+    return static_cast<WWISEC_AKRESULT>(AK::Monitor::ResetTranslator());
+}
+
+WWISEC_AkTimeMs WWISEC_AK_Monitor_GetTimeStamp()
+{
+    return AK::Monitor::GetTimeStamp();
+}
+
+void WWISEC_AK_Monitor_MonitorStreamMgrInit(const WWISEC_AkStreamMgrSettings* in_streamMgrSettings)
+{
+    AK::Monitor::MonitorStreamMgrInit(*reinterpret_cast<const AkStreamMgrSettings*>(in_streamMgrSettings));
+}
+
+void WWISEC_AK_Monitor_MonitorStreamingDeviceInit(WWISEC_AkDeviceID in_deviceID, const WWISEC_AkDeviceSettings* in_deviceSettings)
+{
+    AK::Monitor::MonitorStreamingDeviceInit(in_deviceID, *reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings));
+}
+
+void WWISEC_AK_Monitor_MonitorStreamingDeviceDestroyed(WWISEC_AkDeviceID in_deviceID)
+{
+    AK::Monitor::MonitorStreamingDeviceDestroyed(in_deviceID);
+}
+
+void WWISEC_AK_Monitor_MonitorStreamMgrTerm()
+{
+    AK::Monitor::MonitorStreamMgrTerm();
+}
+// END AkMonitor
 
 // BEGIN IBytes
 class WWISEC_AK_IReadBytes_Wrapper : public AK::IReadBytes
@@ -3190,72 +3313,6 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPl
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::UnlockPlaylist(in_playingID));
 }
 // END AkDynamicSequence
-
-// BEGIN AkErrorMessageTranslator
-static_assert(WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE == AK_TRANSLATOR_MAX_NAME_SIZE);
-static_assert(WWISEC_AK_MAX_ERROR_LENGTH == AK_MAX_ERROR_LENGTH);
-
-class WWISEC_AkErrorMessageTranslator_Wrapper : public AkErrorMessageTranslator
-{
-  public:
-    WWISEC_AkErrorMessageTranslator_Wrapper(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functions)
-        : _instance(instance), _functions(*functions)
-    {
-    }
-
-    ~WWISEC_AkErrorMessageTranslator_Wrapper()
-    {
-        _functions.Destructor(_instance);
-    }
-
-    void Term() override
-    {
-        _functions.Term(_instance);
-    }
-
-    bool Translate(const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize) override
-    {
-        return _functions.Translate(_instance, in_pszError, out_translatedPszError, in_maxPszErrorSize, in_args, in_uArgSize);
-    }
-
-  protected:
-    bool GetInfo(TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32& out_uTranslated)
-    {
-        return _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkErrorMessageTranslator_TagInformation*>(in_pTagList), in_uCount, &out_uTranslated);
-    }
-
-  private:
-    void* _instance = nullptr;
-    WWISEC_AkErrorMessageTranslator_FunctionTable _functions;
-};
-
-WWISEC_AkErrorMessageTranslator* WWISEC_AkErrorMessageTranslator_CreateInstance(void* instance, const WWISEC_AkErrorMessageTranslator_FunctionTable* functionTable)
-{
-    return reinterpret_cast<WWISEC_AkErrorMessageTranslator*>(AkNew(AkMemID_Integration, WWISEC_AkErrorMessageTranslator_Wrapper)(instance, functionTable));
-}
-
-void WWISEC_AkErrorMessageTranslator_DestroyInstance(WWISEC_AkErrorMessageTranslator* instance)
-{
-    WWISEC_AkErrorMessageTranslator_Wrapper* wrapper = reinterpret_cast<WWISEC_AkErrorMessageTranslator_Wrapper*>(instance);
-    wrapper->~WWISEC_AkErrorMessageTranslator_Wrapper();
-    AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
-}
-
-void WWISEC_AkErrorMessageTranslator_Term(WWISEC_AkErrorMessageTranslator* instance)
-{
-    reinterpret_cast<AkErrorMessageTranslator*>(instance)->Term();
-}
-
-void WWISEC_AkErrorMessageTranslator_SetFallBackTranslator(WWISEC_AkErrorMessageTranslator* instance, WWISEC_AkErrorMessageTranslator* in_fallBackTranslator)
-{
-    reinterpret_cast<AkErrorMessageTranslator*>(instance)->SetFallBackTranslator(reinterpret_cast<AkErrorMessageTranslator*>(in_fallBackTranslator));
-}
-
-bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* instance, const AkOSChar* in_pszError, AkOSChar* out_translatedPszError, AkInt32 in_maxPszErrorSize, char* in_args, AkUInt32 in_uArgSize)
-{
-    return reinterpret_cast<AkErrorMessageTranslator*>(instance)->Translate(in_pszError, out_translatedPszError, in_maxPszErrorSize, in_args, in_uArgSize);
-}
-// END AkErrorMessageTranslator
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
