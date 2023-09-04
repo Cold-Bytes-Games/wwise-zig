@@ -33,6 +33,7 @@ SOFTWARE.
 #include <AK/SoundEngine/Common/AkErrorMessageTranslator.h>
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>
 #include <AK/SoundEngine/Common/AkModule.h>
+#include <AK/SoundEngine/Common/AkQueryParameters.h>
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
 #include <AK/SoundEngine/Common/AkStreamMgrModule.h>
 #include <AK/SoundEngine/Common/AkTypes.h>
@@ -116,7 +117,7 @@ class WWISEC_AkErrorMessageTranslator_Wrapper : public AkErrorMessageTranslator
     }
 
   protected:
-    bool GetInfo(TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32& out_uTranslated)
+    bool GetInfo(TagInformation* in_pTagList, AkUInt32 in_uCount, AkUInt32& out_uTranslated) override
     {
         return _functions.GetInfo(_instance, reinterpret_cast<WWISEC_AkErrorMessageTranslator_TagInformation*>(in_pTagList), in_uCount, &out_uTranslated);
     }
@@ -2221,27 +2222,27 @@ class WWISEC_AK_IAkStreamMgr_Wrapper : public AK::IAkStreamMgr
 
     AKRESULT CreateStd(const AkOSChar* in_pszFileName, AkFileSystemFlags* in_pFSFlags, AkOpenMode in_eOpenMode, AK::IAkStdStream*& out_pStream, bool in_bSyncOpen) override
     {
-        return static_cast<AKRESULT>(_functions.CreateStdString(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
+        return static_cast<AKRESULT>(_functions.CreateStd_String(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
     }
 
     AKRESULT CreateStd(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, AkOpenMode in_eOpenMode, AK::IAkStdStream*& out_pStream, bool in_bSyncOpen) override
     {
-        return static_cast<AKRESULT>(_functions.CreateStdID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
+        return static_cast<AKRESULT>(_functions.CreateStd_ID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkOpenMode>(in_eOpenMode), reinterpret_cast<WWISEC_AK_IAkStdStream**>(&out_pStream), in_bSyncOpen));
     }
 
     AKRESULT CreateAuto(const AkOSChar* in_pszFileName, AkFileSystemFlags* in_pFSFlags, const AkAutoStmHeuristics& in_heuristics, AkAutoStmBufSettings* in_pBufferSettings, AK::IAkAutoStream*& out_pStream, bool in_bSyncOpen) override
     {
-        return static_cast<AKRESULT>(_functions.CreateAutoString(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
+        return static_cast<AKRESULT>(_functions.CreateAuto_String(_instance, in_pszFileName, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
     }
 
     AKRESULT CreateAuto(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, const AkAutoStmHeuristics& in_heuristics, AkAutoStmBufSettings* in_pBufferSettings, AK::IAkAutoStream*& out_pStream, bool in_bSyncOpen) override
     {
-        return static_cast<AKRESULT>(_functions.CreateAutoID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
+        return static_cast<AKRESULT>(_functions.CreateAuto_ID(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AkAutoStmBufSettings*>(in_pBufferSettings), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream), in_bSyncOpen));
     }
 
     AKRESULT CreateAuto(void* in_pBuffer, AkUInt64 in_uSize, const AkAutoStmHeuristics& in_heuristics, AK::IAkAutoStream*& out_pStream) override
     {
-        return static_cast<AKRESULT>(_functions.CreateAutoMemory(_instance, in_pBuffer, in_uSize, reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream)));
+        return static_cast<AKRESULT>(_functions.CreateAuto_Memory(_instance, in_pBuffer, in_uSize, reinterpret_cast<const WWISEC_AkAutoStmHeuristics*>(&in_heuristics), reinterpret_cast<WWISEC_AK_IAkAutoStream**>(&out_pStream)));
     }
 
     AKRESULT PinFileInCache(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, AkPriority in_uPriority) override
@@ -2296,27 +2297,27 @@ WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(WWISEC
     return reinterpret_cast<WWISEC_AK_IAkStreamMgrProfile*>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->GetStreamMgrProfile());
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd_String(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateStd(in_pszFileName, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkOpenMode>(in_eOpenMode), *reinterpret_cast<AK::IAkStdStream**>(out_pStream), in_bSyncOpen));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd_ID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateStd(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkOpenMode>(in_eOpenMode), *reinterpret_cast<AK::IAkStdStream**>(out_pStream), in_bSyncOpen));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_String(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_pszFileName, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), reinterpret_cast<AkAutoStmBufSettings*>(in_pBufferSettings), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream), in_bSyncOpen));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_ID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), reinterpret_cast<AkAutoStmBufSettings*>(in_pBufferSettings), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream), in_bSyncOpen));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoMemory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_Memory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_pBuffer, in_uSize, *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream)));
 }
@@ -2830,7 +2831,7 @@ class WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper : public AK::StreamMgr
         AkFileDesc& io_fileDesc) override
     {
         return static_cast<AKRESULT>(
-            _functions.OpenString(
+            _functions.Open_String(
                 _instance,
                 in_pszFileName,
                 static_cast<WWISEC_AkOpenMode>(in_eOpenMode),
@@ -2847,7 +2848,7 @@ class WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper : public AK::StreamMgr
         AkFileDesc& io_fileDesc) override
     {
         return static_cast<AKRESULT>(
-            _functions.OpenID(
+            _functions.Open_ID(
                 _instance,
                 in_fileID,
                 static_cast<WWISEC_AkOpenMode>(in_eOpenMode),
@@ -2864,13 +2865,13 @@ class WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper : public AK::StreamMgr
         AkOSChar* out_searchedPath,
         AkInt32 in_pathSize) override
     {
-        if (!_functions.OutputSearchedPathsString)
+        if (!_functions.OutputSearchedPaths_String)
         {
             return AK::StreamMgr::IAkFileLocationResolver::OutputSearchedPaths(in_result, in_pszFileName, in_pFlags, in_eOpenMode, out_searchedPath, in_pathSize);
         }
 
         return static_cast<AKRESULT>(
-            _functions.OutputSearchedPathsString(
+            _functions.OutputSearchedPaths_String(
                 _instance,
                 reinterpret_cast<const WWISEC_AKRESULT*>(&in_result),
                 in_pszFileName,
@@ -2888,13 +2889,13 @@ class WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper : public AK::StreamMgr
         AkOSChar* out_searchedPath,
         AkInt32 in_pathSize) override
     {
-        if (!_functions.OutputSearchedPathsID)
+        if (!_functions.OutputSearchedPaths_ID)
         {
             return AK::StreamMgr::IAkFileLocationResolver::OutputSearchedPaths(in_result, in_fileID, in_pFlags, in_eOpenMode, out_searchedPath, in_pathSize);
         }
 
         return static_cast<AKRESULT>(
-            _functions.OutputSearchedPathsID(
+            _functions.OutputSearchedPaths_ID(
                 _instance,
                 reinterpret_cast<const WWISEC_AKRESULT*>(&in_result),
                 in_fileID,
@@ -2920,7 +2921,7 @@ void WWISEC_AK_StreamMgr_IAkFileLocationResolver_DestroyInstance(WWISEC_AK_Strea
     AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
 }
 
-WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc)
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_Open_String(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc)
 {
     return static_cast<WWISEC_AKRESULT>(
         reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->Open(
@@ -2931,7 +2932,7 @@ WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenString(WWISEC_AK
             *reinterpret_cast<AkFileDesc*>(io_fileDesc)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc)
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_Open_ID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc)
 {
     return static_cast<WWISEC_AKRESULT>(
         reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->Open(
@@ -2942,7 +2943,7 @@ WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenID(WWISEC_AK_Str
             *reinterpret_cast<AkFileDesc*>(io_fileDesc)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize)
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPaths_String(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize)
 {
     return static_cast<WWISEC_AKRESULT>(
         reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->OutputSearchedPaths(
@@ -2954,7 +2955,7 @@ WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsS
             in_pathSize));
 }
 
-WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize)
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPaths_ID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize)
 {
     return static_cast<WWISEC_AKRESULT>(
         reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->OutputSearchedPaths(
@@ -3313,6 +3314,139 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPl
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::UnlockPlaylist(in_playingID));
 }
 // END AkDynamicSequence
+
+// BEGIN AkQueryParameters
+static_assert(sizeof(WWISEC_AkPositioningInfo) == sizeof(AkPositioningInfo));
+static_assert(sizeof(WWISEC_AkObjectInfo) == sizeof(AkObjectInfo));
+static_assert(sizeof(WWISEC_AK_SoundEngine_Query_AkGameObjectsList) == sizeof(AK::SoundEngine::Query::AkGameObjectsList));
+static_assert(sizeof(WWISEC_AK_SoundEngine_Query_GameObjDst) == sizeof(AK::SoundEngine::Query::GameObjDst));
+static_assert(sizeof(WWISEC_AK_SoundEngine_Query_AkRadiusList) == sizeof(AK::SoundEngine::Query::AkRadiusList));
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetPosition(in_GameObjectID, *reinterpret_cast<AkSoundPosition*>(out_rPosition)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListeners(in_GameObjectID, out_ListenerObjectIDs, *oi_uNumListeners));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uIndex, WWISEC_AkListenerPosition* out_rPosition)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerPosition(in_uIndex, *reinterpret_cast<AkListenerPosition*>(out_rPosition)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(AkUInt32 in_uIndex, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerSpatialization(in_uIndex, *out_rbSpatialized, *out_pVolumeOffsets, *reinterpret_cast<AkChannelConfig*>(out_channelConfig)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetRTPCValue(in_rtpcID, in_gameObjectID, in_playingID, *out_rValue, *reinterpret_cast<AK::SoundEngine::Query::RTPCValue_type*>(io_rValueType)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetRTPCValue(in_pszRtpcName, in_gameObjectID, in_playingID, *out_rValue, *reinterpret_cast<AK::SoundEngine::Query::RTPCValue_type*>(io_rValueType)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkSwitchStateID* out_rSwitchState)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetSwitch(in_switchGroup, in_gameObjectID, *reinterpret_cast<AkSwitchStateID*>(out_rSwitchState)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_String(const char* in_pstrSwitchGroupName, WWISEC_AkGameObjectID in_GameObj, WWISEC_AkSwitchStateID* out_rSwitchState)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetSwitch(in_pstrSwitchGroupName, in_GameObj, *reinterpret_cast<AkSwitchStateID*>(out_rSwitchState)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_ID(WWISEC_AkStateGroupID in_stateGroup, WWISEC_AkStateID* out_rState)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetState(in_stateGroup, *reinterpret_cast<AkStateGroupID*>(out_rState)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_String(const char* in_pstrStateGroupName, WWISEC_AkStateID* out_rState)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetState(in_pstrStateGroupName, *reinterpret_cast<AkStateGroupID*>(out_rState)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* out_paAuxSendValues, AkUInt32* io_ruNumSendValues)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetGameObjectAuxSendValues(in_gameObjectID, reinterpret_cast<AkAuxSendValue*>(out_paAuxSendValues), *io_ruNumSendValues));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectDryLevelValue(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfControlValue)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetGameObjectDryLevelValue(in_EmitterID, in_ListenerID, *out_rfControlValue));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfObstructionLevel, AkReal32* out_rfOcclusionLevel)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetObjectObstructionAndOcclusion(in_EmitterID, in_ListenerID, *out_rfObstructionLevel, *out_rfOcclusionLevel));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_ID(WWISEC_AkUniqueID in_eventID, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::QueryAudioObjectIDs(in_eventID, *io_ruNumItems, reinterpret_cast<AkObjectInfo*>(out_aObjectInfos)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_String(const char* in_pszEventName, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::QueryAudioObjectIDs(in_pszEventName, *io_ruNumItems, reinterpret_cast<AkObjectInfo*>(out_aObjectInfos)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPositioningInfo(WWISEC_AkUniqueID in_ObjectID, WWISEC_AkPositioningInfo* out_rPositioningInfo)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetPositioningInfo(in_ObjectID, *reinterpret_cast<AkPositioningInfo*>(out_rPositioningInfo)));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetActiveGameObjects(WWISEC_AK_SoundEngine_Query_AkGameObjectsList* io_GameObjectList)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetActiveGameObjects(*reinterpret_cast<AK::SoundEngine::Query::AkGameObjectsList*>(io_GameObjectList)));
+}
+
+bool WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(WWISEC_AkGameObjectID in_GameObjId)
+{
+    return AK::SoundEngine::Query::GetIsGameObjectActive(in_GameObjId);
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetMaxRadius_List(WWISEC_AK_SoundEngine_Query_AkRadiusList* io_RadiusList)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetMaxRadius(*reinterpret_cast<AK::SoundEngine::Query::AkRadiusList*>(io_RadiusList)));
+}
+
+AkReal32 WWISEC_AK_SoundEngine_Query_GetMaxRadius_Single(WWISEC_AkGameObjectID in_GameObjId)
+{
+    return AK::SoundEngine::Query::GetMaxRadius(in_GameObjId);
+}
+
+WWISEC_AkUniqueID WWISEC_AK_SoundEngine_Query_GetEventIDFromPlayingID(WWISEC_AkPlayingID in_playingID)
+{
+    return AK::SoundEngine::Query::GetEventIDFromPlayingID(in_playingID);
+}
+
+WWISEC_AkGameObjectID WWISEC_AK_SoundEngine_Query_GetGameObjectFromPlayingID(WWISEC_AkPlayingID in_playingID)
+{
+    return AK::SoundEngine::Query::GetGameObjectFromPlayingID(in_playingID);
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPlayingIDsFromGameObject(WWISEC_AkGameObjectID in_GameObjId, AkUInt32* io_ruNumIDs, WWISEC_AkPlayingID* out_aPlayingIDs)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetPlayingIDsFromGameObject(in_GameObjId, *io_ruNumIDs, out_aPlayingIDs));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Int(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkInt32* out_iValue)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetCustomPropertyValue(in_ObjectID, in_uPropID, *out_iValue));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Float(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkReal32* out_fValue)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetCustomPropertyValue(in_ObjectID, in_uPropID, *out_fValue));
+}
+// END AkQueryParameters
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)

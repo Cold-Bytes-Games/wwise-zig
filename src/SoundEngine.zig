@@ -13,6 +13,7 @@ const wwise_options = @import("wwise_options");
 
 pub const DynamicDialogue = @import("DynamicDialogue.zig");
 pub const DynamicSequence = @import("DynamicSequence.zig");
+pub const Query = @import("Query.zig");
 
 pub usingnamespace if (wwise_options.platform == .android) @import("android_sound_engine.zig") else struct {};
 pub const iOS = if (wwise_options.platform == .ios) @import("ios_sound_engine.zig") else struct {};

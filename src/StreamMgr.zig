@@ -630,7 +630,7 @@ pub const IAkFileLocationResolver = opaque {
         defer allocator.free(raw_file_name);
 
         try common.handleAkResult(
-            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenString(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_Open_String(
                 @ptrCast(self),
                 raw_file_name,
                 @intFromEnum(in_open_mode),
@@ -650,7 +650,7 @@ pub const IAkFileLocationResolver = opaque {
         io_file_desc: *AkFileDesc,
     ) common.WwiseError!void {
         try common.handleAkResult(
-            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenID(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_Open_ID(
                 @ptrCast(self),
                 in_file_id,
                 @intFromEnum(in_open_mode),
@@ -680,7 +680,7 @@ pub const IAkFileLocationResolver = opaque {
         defer allocator.free(raw_out_searched_path);
 
         try common.handleAkResult(
-            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsString(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPaths_String(
                 @ptrCast(self),
                 @ptrCast(&in_result),
                 raw_filename,
@@ -707,7 +707,7 @@ pub const IAkFileLocationResolver = opaque {
         defer allocator.free(raw_out_searched_path);
 
         try common.handleAkResult(
-            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsID(
+            c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPaths_ID(
                 @ptrCast(self),
                 @ptrCast(&in_result),
                 in_file_id,

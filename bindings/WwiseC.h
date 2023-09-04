@@ -255,11 +255,37 @@ extern "C"
         WWISEC_AkSetPositionFlags_Default = (WWISEC_AkSetPositionFlags_Emitter | WWISEC_AkSetPositionFlags_Listener) // Default: set both emitter and listener component positions.
     } WWISEC_AkSetPositionFlags;
 
+    enum
+    {
+        WWISEC_AkSpeakerPanningType_AK_DirectSpeakerAssignment = 0, ///< No panning: route to matching channels between input and output.
+        WWISEC_AkSpeakerPanningType_AK_BalanceFadeHeight = 1,       ///< Balance-Fade-Height: Traditional "box" or "car"-like panner.
+        WWISEC_AkSpeakerPanningType_AK_SteeringPanner = 2           ///< Steering panner.
+    };
+    typedef AkUInt8 WWISEC_AkSpeakerPanningType;
+
+    /// 3D position type: defines what acts as the emitter position for computing spatialization against the listener. Used when Ak3DSpatializationMode is AK_SpatializationMode_PositionOnly or AK_SpatializationMode_PositionAndOrientation.
+    enum
+    {
+        WWISEC_Ak3DPositionType_AK_3DPositionType_Emitter = 0,               ///< 3D spatialization is computed directly from the emitter game object position.
+        WWISEC_Ak3DPositionType_AK_3DPositionType_EmitterWithAutomation = 1, ///< 3D spatialization is computed from the emitter game object position, translated by user-defined automation.
+        WWISEC_Ak3DPositionType_AK_3DPositionType_ListenerWithAutomation = 2 ///< 3D spatialization is computed from the listener game object position, translated by user-defined automation.
+    };
+    typedef AkUInt8 WWISEC_Ak3DPositionType;
+
     typedef enum WWISEC_AkPanningRule
     {
         WWISEC_AkPanningRule_Speakers = 0,  ///< Left and right positioned 60 degrees apart (by default - see AK::SoundEngine::GetSpeakerAngles()).
         WWISEC_AkPanningRule_Headphones = 1 ///< Left and right positioned 180 degrees apart.
     } WWISEC_AkPanningRule;
+
+    /// 3D spatialization mode.
+    enum
+    {
+        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_None = 0,                  ///< No spatialization
+        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionOnly = 1,          ///< Spatialization based on emitter position only.
+        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionAndOrientation = 2 ///< Spatialization based on both emitter position and emitter orientation.
+    };
+    typedef AkUInt8 WWISEC_Ak3DSpatializationMode;
 
     typedef AkUInt8 WWISEC_AkMeteringFlags;
 
@@ -2893,7 +2919,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
         WWISEC_AK_IAkStreamMgrProfile* (*GetStreamMgrProfile)(void* instance);
 
-        WWISEC_AKRESULT(*CreateStdString)
+        WWISEC_AKRESULT(*CreateStd_String)
         (
             void* instance,
             const AkOSChar* in_pszFileName,
@@ -2902,7 +2928,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
             WWISEC_AK_IAkStdStream** out_pStream,
             bool in_bSyncOpen);
 
-        WWISEC_AKRESULT(*CreateStdID)
+        WWISEC_AKRESULT(*CreateStd_ID)
         (
             void* instance,
             WWISEC_AkFileID in_fileID,
@@ -2911,7 +2937,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
             WWISEC_AK_IAkStdStream** out_pStream,
             bool in_bSyncOpen);
 
-        WWISEC_AKRESULT(*CreateAutoString)
+        WWISEC_AKRESULT(*CreateAuto_String)
         (
             void* instance,
             const AkOSChar* in_pszFileName,
@@ -2921,7 +2947,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
             WWISEC_AK_IAkAutoStream** out_pStream,
             bool in_bSyncOpen);
 
-        WWISEC_AKRESULT(*CreateAutoID)
+        WWISEC_AKRESULT(*CreateAuto_ID)
         (
             void* instance,
             WWISEC_AkFileID in_fileID,
@@ -2931,7 +2957,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
             WWISEC_AK_IAkAutoStream** out_pStream,
             bool in_bSyncOpen);
 
-        WWISEC_AKRESULT(*CreateAutoMemory)
+        WWISEC_AKRESULT(*CreateAuto_Memory)
         (
             void* instance,
             void* in_pBuffer,
@@ -2978,11 +3004,11 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     void WWISEC_AK_IAkStreamMgr_Destroy(WWISEC_AK_IAkStreamMgr* instance);
     WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(WWISEC_AK_IAkStreamMgr* instance);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStdID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoString(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAutoMemory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd_String(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd_ID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_String(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_ID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_Memory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkPriority in_uPriority);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority, WWISEC_AkPriority in_uOldPriority);
@@ -3213,26 +3239,26 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     {
         void (*Destructor)(void* instance);
 
-        WWISEC_AKRESULT(*OpenString)
+        WWISEC_AKRESULT(*Open_String)
         (void* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
 
-        WWISEC_AKRESULT(*OpenID)
+        WWISEC_AKRESULT(*Open_ID)
         (void* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
 
-        WWISEC_AKRESULT(*OutputSearchedPathsString)
+        WWISEC_AKRESULT(*OutputSearchedPaths_String)
         (void* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
 
-        WWISEC_AKRESULT(*OutputSearchedPathsID)
+        WWISEC_AKRESULT(*OutputSearchedPaths_ID)
         (void* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
 
     } WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable;
     WWISEC_AK_StreamMgr_IAkFileLocationResolver* WWISEC_AK_StreamMgr_IAkFileLocationResolver_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable* functionTable);
     void WWISEC_AK_StreamMgr_IAkFileLocationResolver_DestroyInstance(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance);
 
-    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
-    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OpenID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
-    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsString(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
-    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPathsID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_Open_String(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const AkOSChar* in_pszFileName, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_Open_ID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkFileID in_fileID, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AkFileSystemFlags* in_pFlags, bool* io_bSyncOpen, WWISEC_AkFileDesc* io_fileDesc);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPaths_String(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_OutputSearchedPaths_ID(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, const WWISEC_AKRESULT* in_result, const WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFlags, WWISEC_AkOpenMode in_eOpenMode, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
 
     void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings);
     void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings);
@@ -3382,7 +3408,101 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AK_SoundEngine_DynamicSequence_Playlist* WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(WWISEC_AkPlayingID in_playingID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPlayingID in_playingID);
-// END AkDynamicSequence
+    // END AkDynamicSequence
+
+    // BEGIN AkQueryParameters
+
+    /// Positioning information obtained from an object
+    typedef struct WWISEC_AkPositioningInfo
+    {
+        AkReal32 fCenterPct;                                 ///< Center % [0..1]
+        WWISEC_AkSpeakerPanningType pannerType;              ///< Speaker panning type: type of panning logic when object is not 3D spatialized.
+        WWISEC_Ak3DPositionType e3dPositioningType;          ///< 3D position type: defines what acts as the emitter position for computing spatialization against the listener.
+        bool bHoldEmitterPosAndOrient;                       ///< Hold emitter position and orientation values when starting playback.
+        WWISEC_Ak3DSpatializationMode e3DSpatializationMode; ///< Spatialization mode
+        bool bEnableAttenuation;                             ///< Attenuation parameter set is active.
+
+        bool bUseConeAttenuation;     ///< Use the cone attenuation
+        AkReal32 fInnerAngle;         ///< Inner angle
+        AkReal32 fOuterAngle;         ///< Outer angle
+        AkReal32 fConeMaxAttenuation; ///< Cone max attenuation
+        WWISEC_AkLPFType LPFCone;     ///< Cone low pass filter value
+        WWISEC_AkLPFType HPFCone;     ///< Cone low pass filter value
+
+        AkReal32 fMaxDistance;              ///< Maximum distance
+        AkReal32 fVolDryAtMaxDist;          ///< Volume dry at maximum distance
+        AkReal32 fVolAuxGameDefAtMaxDist;   ///< Volume wet at maximum distance (if any) (based on the Game defined distance attenuation)
+        AkReal32 fVolAuxUserDefAtMaxDist;   ///< Volume wet at maximum distance (if any) (based on the User defined distance attenuation)
+        WWISEC_AkLPFType LPFValueAtMaxDist; ///< Low pass filter value at max distance (if any)
+        WWISEC_AkLPFType HPFValueAtMaxDist; ///< High pass filter value at max distance (if any)
+    } WWISEC_AkPositioningInfo;
+
+    /// Object information structure for QueryAudioObjectsIDs
+    typedef struct WWISEC_AkObjectInfo
+    {
+        WWISEC_AkUniqueID objID;    ///< Object ID
+        WWISEC_AkUniqueID parentID; ///< Object ID of the parent
+        AkInt32 iDepth;             ///< Depth in tree
+    } WWISEC_AkObjectInfo;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uIndex, WWISEC_AkListenerPosition* out_rPosition);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(AkUInt32 in_uIndex, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig);
+
+    typedef enum WWISEC_AK_SoundEngine_Query_RTPCValue_type
+    {
+        WWISEC_AK_SoundEngine_Query_RTPCValue_type_RTPCValue_Default,    ///< The value is the Default RTPC.
+        WWISEC_AK_SoundEngine_Query_RTPCValue_type_RTPCValue_Global,     ///< The value is the Global RTPC.
+        WWISEC_AK_SoundEngine_Query_RTPCValue_type_RTPCValue_GameObject, ///< The value is the game object specific RTPC.
+        WWISEC_AK_SoundEngine_Query_RTPCValue_type_RTPCValue_PlayingID,  ///< The value is the playing ID specific RTPC.
+        WWISEC_AK_SoundEngine_Query_RTPCValue_type_RTPCValue_Unavailable ///< The value is not available for the RTPC specified.
+    } WWISEC_AK_SoundEngine_Query_RTPCValue_type;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkSwitchStateID* out_rSwitchState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_String(const char* in_pstrSwitchGroupName, WWISEC_AkGameObjectID in_GameObj, WWISEC_AkSwitchStateID* out_rSwitchState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_ID(WWISEC_AkStateGroupID in_stateGroup, WWISEC_AkStateID* out_rState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_String(const char* in_pstrStateGroupName, WWISEC_AkStateID* out_rState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* out_paAuxSendValues, AkUInt32* io_ruNumSendValues);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectDryLevelValue(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfControlValue);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfObstructionLevel, AkReal32* out_rfOcclusionLevel);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_ID(WWISEC_AkUniqueID in_eventID, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_String(const char* in_pszEventName, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPositioningInfo(WWISEC_AkUniqueID in_ObjectID, WWISEC_AkPositioningInfo* out_rPositioningInfo);
+
+    typedef struct WWISEC_AK_SoundEngine_Query_AkGameObjectsList
+    {
+        WWISEC_AkGameObjectID* items;
+        AkUInt32 length;
+        AkUInt32 reserved;
+    } WWISEC_AK_SoundEngine_Query_AkGameObjectsList;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetActiveGameObjects(WWISEC_AK_SoundEngine_Query_AkGameObjectsList* io_GameObjectList);
+    bool WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(WWISEC_AkGameObjectID in_GameObjId);
+
+    typedef struct WWISEC_AK_SoundEngine_Query_GameObjDst
+    {
+        WWISEC_AkGameObjectID m_gameObjID; ///< Game object ID
+        AkReal32 m_dst;                    ///< MaxDistance
+    } WWISEC_AK_SoundEngine_Query_GameObjDst;
+
+    typedef struct WWISEC_AK_SoundEngine_Query_AkRadiusList
+    {
+        WWISEC_AK_SoundEngine_Query_GameObjDst* items;
+        AkUInt32 length;
+        AkUInt32 reserved;
+    } WWISEC_AK_SoundEngine_Query_AkRadiusList;
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetMaxRadius_List(WWISEC_AK_SoundEngine_Query_AkRadiusList* io_RadiusList);
+    AkReal32 WWISEC_AK_SoundEngine_Query_GetMaxRadius_Single(WWISEC_AkGameObjectID in_GameObjId);
+    WWISEC_AkUniqueID WWISEC_AK_SoundEngine_Query_GetEventIDFromPlayingID(WWISEC_AkPlayingID in_playingID);
+    WWISEC_AkGameObjectID WWISEC_AK_SoundEngine_Query_GetGameObjectFromPlayingID(WWISEC_AkPlayingID in_playingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPlayingIDsFromGameObject(WWISEC_AkGameObjectID in_GameObjId, AkUInt32* io_ruNumIDs, WWISEC_AkPlayingID* out_aPlayingIDs);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Int(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkInt32* out_iValue);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Float(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkReal32* out_fValue);
+// END AkQueryParameters
 
 // BEGIN IO Hooks
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)

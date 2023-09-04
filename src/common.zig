@@ -484,9 +484,27 @@ pub const AkSetPositionFlags = packed struct(u8) {
     }
 };
 
+pub const AkSpeakerPanningType = enum(u8) {
+    direct_speaker_assignment = c.WWISEC_AkSpeakerPanningType_AK_DirectSpeakerAssignment,
+    balance_fadee_height = c.WWISEC_AkSpeakerPanningType_AK_BalanceFadeHeight,
+    steering_panner = c.WWISEC_AkSpeakerPanningType_AK_SteeringPanner,
+};
+
+pub const Ak3DPositionType = enum(u8) {
+    emitter = c.WWISEC_Ak3DPositionType_AK_3DPositionType_Emitter,
+    emitter_with_automation = c.WWISEC_Ak3DPositionType_AK_3DPositionType_EmitterWithAutomation,
+    listener_with_automation = c.WWISEC_Ak3DPositionType_AK_3DPositionType_ListenerWithAutomation,
+};
+
 pub const AkPanningRule = enum(u8) {
     speakers = c.WWISEC_AkPanningRule_Speakers,
     headphones = c.WWISEC_AkPanningRule_Headphones,
+};
+
+pub const Ak3DSpatializationMode = enum(u8) {
+    none = c.WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_None,
+    position_only = c.WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionOnly,
+    position_and_orientation = c.WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionAndOrientation,
 };
 
 pub const AkMeteringFlags = packed struct(u8) {

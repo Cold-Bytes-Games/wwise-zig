@@ -796,7 +796,7 @@ pub const IAkStreamMgr = opaque {
         defer allocator.free(filename_oschar);
 
         return common.handleAkResult(
-            c.WWISEC_AK_IAkStreamMgr_CreateStdString(
+            c.WWISEC_AK_IAkStreamMgr_CreateStd_String(
                 @ptrCast(self),
                 filename_oschar,
                 @ptrCast(in_fs_flags),
@@ -816,7 +816,7 @@ pub const IAkStreamMgr = opaque {
         in_sync_open: bool,
     ) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_IAkStreamMgr_CreateStdID(
+            c.WWISEC_AK_IAkStreamMgr_CreateStd_ID(
                 @ptrCast(self),
                 in_file_id,
                 @ptrCast(in_fs_flags),
@@ -844,7 +844,7 @@ pub const IAkStreamMgr = opaque {
         defer allocator.free(filename_oschar);
 
         return common.handleAkResult(
-            c.WWISEC_AK_IAkStreamMgr_CreateAutoString(
+            c.WWISEC_AK_IAkStreamMgr_CreateAuto_String(
                 @ptrCast(self),
                 filename_oschar,
                 @ptrCast(in_fs_flags),
@@ -866,7 +866,7 @@ pub const IAkStreamMgr = opaque {
         in_sync_open: bool,
     ) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_IAkStreamMgr_CreateAutoID(
+            c.WWISEC_AK_IAkStreamMgr_CreateAuto_ID(
                 @ptrCast(self),
                 in_file_id,
                 @ptrCast(in_fs_flags),
@@ -886,7 +886,7 @@ pub const IAkStreamMgr = opaque {
         out_stream: *?*IAkAutoStream,
     ) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_IAkStreamMgr_CreateAutoMemory(
+            c.WWISEC_AK_IAkStreamMgr_CreateAuto_Memory(
                 @ptrCast(self),
                 in_buffer,
                 in_size,
