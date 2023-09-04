@@ -10,6 +10,19 @@ The library assumes that you installed Wwise using the Wwise Launcher. We do not
 
 This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
+## Versioning info
+
+This binding mimic the versioning of Wwise but add the Zig binding version at the end.
+
+Example:
+
+2022.1.7-zig0
+
+* 2022 = year
+* 1 = major Wwise version
+* 7 = minor Wwise version
+* -zig0 = Zig binding version
+
 ## Supported platforms
 
 | Platform | Architecture                   |  Tested |
@@ -105,7 +118,6 @@ pub fn main() !void {
 
 You can also look at the Integration Demo ported to Zig here for how the API is used in a sample application: https://github.com/Cold-Bytes-Games/wwise-zig-demo
 
-
 ### Handling AkOsChar and C null-terminated strings
 
 `wwise-zig` is trying to save allocations when calling functions that accepts strings by using stack-allocated space to convert to `const AkOsChar*`/`const char*` or use a fallback allocator if the string is bigger than the stack size.
@@ -125,9 +137,150 @@ pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !
 }
 ```
 
-### Handling C++ interfaces and inheritance
+### Handling C++ inheritance
 
-TODO
+You can create derivated Zig struct from Wwise C++ clases that have virtual methods. Each binded class has a `FunctionTable` object like `IAkIOHookDeferredBatch` here:
+
+```zig
+pub const IAkIOHookDeferredBatch = opaque {
+    pub const FunctionTable = extern struct {
+        destructor: *const fn (self: *IAkIOHookBlocking) callconv(.C) void,
+        close: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
+        get_device_desc: *const fn (self: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
+        get_device_data: *const fn (self: *IAkIOHookBlocking) callconv(.C) u32,
+        batch_read: *const fn (
+            self: *IAkIOHookDeferredBatch,
+            in_num_transfers: u32,
+            in_transfer_items: [*]BatchIoTransferItem,
+            in_batch_io_callback: AkBatchIOCallback,
+            io_dispatch_results: [*]common.AKRESULT,
+        ) callconv(.C) common.AKRESULT,
+        batch_write: *const fn (
+            self: *IAkIOHookDeferredBatch,
+            in_num_transfers: u32,
+            in_transfer_items: [*]BatchIoTransferItem,
+            in_batch_io_callback: AkBatchIOCallback,
+            io_dispatch_results: [*]common.AKRESULT,
+        ) callconv(.C) common.AKRESULT,
+        batch_cancel: *const fn (
+            self: *IAkIOHookDeferredBatch,
+            in_num_transfers: u32,
+            in_transfer_items: [*]BatchIoTransferItem,
+            io_cancel_all_transfers_for_this_file: [*]*bool,
+        ) callconv(.C) void,
+    };
+}
+```
+On the glue side, we inherit from the interface and call those functions with the instance of your Zig struct.
+
+Each class has a method `createInstance()` and `destroyInstance` that are used to create an instance of your own derivated struct. It uses AK memory manager function to allocate the instance with the `AkMemID_Integration` memory tag.
+
+```zig
+var zig_io_blocking = ZigTestIAkOHookBlocking{};
+var native_io_blocking = AK.StreamMgr.IAkIOHookBlocking.createInstance(
+            &zig_io_blocking,
+            &AK.StreamMgr.IAkIOHookBlocking.FunctionTable{
+                .destructor = @ptrCast(&ZigTestIAkOHookBlocking.destructor),
+                .close = @ptrCast(&ZigTestIAkOHookBlocking.close),
+                .get_block_size = @ptrCast(&ZigTestIAkOHookBlocking.getBlockSize),
+                .get_device_desc = @ptrCast(&ZigTestIAkOHookBlocking.getDeviceDesc),
+                .get_device_data = @ptrCast(&ZigTestIAkOHookBlocking.getDeviceData),
+                .read = @ptrCast(&read),
+                .write = @ptrCast(&write),
+            },
+        );
+defer AK.StreamMgr.IAkIOHookBlocking.destroyInstance(native_io_blocking);
+```
+
+However we recommend creating a helper function in your struct to create the correct instance with the function table properly filled.
+
+Here's a quick sample of a derivated `IAkOHookBlocking` struct from our test suite:
+```zig
+const ZigTestIAkOHookBlocking = struct {
+    destructor_called: bool = false,
+    close_called: bool = false,
+    get_block_size_called: bool = false,
+    get_device_desc_called: bool = false,
+    get_device_data_called: bool = false,
+    read_called: bool = false,
+    write_called: bool = false,
+    close_size: i64 = 0,
+
+    pub fn destructor(self: *ZigTestIAkOHookBlocking) callconv(.C) void {
+        self.destructor_called = true;
+    }
+
+    pub fn close(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.C) AK.AKRESULT {
+        self.close_size = in_file_desc.file_size;
+        self.close_called = true;
+
+        return .success;
+    }
+
+    pub fn getBlockSize(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.C) u32 {
+        _ = in_file_desc;
+        self.get_block_size_called = true;
+        return 512;
+    }
+
+    pub fn getDeviceDesc(self: *ZigTestIAkOHookBlocking, out_device_desc: *AK.NativeAkDeviceDesc) callconv(.C) void {
+        self.get_device_desc_called = true;
+
+        var zig_device_desc = AK.AkDeviceDesc{};
+        zig_device_desc.can_write = false;
+        zig_device_desc.can_read = true;
+        zig_device_desc.device_name = "wwise-zig IO";
+
+        out_device_desc.* = zig_device_desc.toC() catch unreachable;
+    }
+
+    pub fn getDeviceData(self: *ZigTestIAkOHookBlocking) callconv(.C) u32 {
+        self.get_device_data_called = true;
+        return 4269;
+    }
+
+    pub fn read(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc, in_heuristics: *AK.StreamMgr.AkIoHeuristics, out_buffer: ?*anyopaque, in_transfer_info: *AK.StreamMgr.AkIOTransferInfo) callconv(.C) AK.AKRESULT {
+        _ = in_file_desc;
+        _ = in_heuristics;
+
+        self.read_called = true;
+
+        if (out_buffer) |checked_buffer| {
+            var read_buffer = @as([*]u8, @ptrCast(checked_buffer));
+            @memset(read_buffer[in_transfer_info.file_position..in_transfer_info.requested_size], 0xC1);
+        }
+
+        return .success;
+    }
+
+    pub fn write(self: *ZigTestIAkOHookBlocking, in_file_desc: *AK.StreamMgr.AkFileDesc, in_heuristics: *AK.StreamMgr.AkIoHeuristics, in_data: ?*anyopaque, in_transfer_info: *AK.StreamMgr.AkIOTransferInfo) callconv(.C) AK.AKRESULT {
+        _ = in_heuristics;
+        _ = in_transfer_info;
+        _ = in_data;
+        _ = in_file_desc;
+
+        self.write_called = true;
+
+        return .success;
+    }
+
+    pub fn createIAkIOHookBlocking(self: *ZigTestIAkOHookBlocking) *AK.StreamMgr.IAkIOHookBlocking {
+        return AK.StreamMgr.IAkIOHookBlocking.createInstance(
+            self,
+            &AK.StreamMgr.IAkIOHookBlocking.FunctionTable{
+                .destructor = @ptrCast(&destructor),
+                .close = @ptrCast(&close),
+                .get_block_size = @ptrCast(&getBlockSize),
+                .get_device_desc = @ptrCast(&getDeviceDesc),
+                .get_device_data = @ptrCast(&getDeviceData),
+                .read = @ptrCast(&read),
+                .write = @ptrCast(&write),
+            },
+        );
+    }
+};
+```
 
 ### Use the default I/O hook(s) from the SDK
 
@@ -220,19 +373,6 @@ pub fn build(b: *std.Build) !void {
 
     exe.addModule("wwise-ids", wwise_id_module);
 ```
-
-## Versioning info
-
-This binding mimic the versioning of Wwise but add the Zig binding version at the end.
-
-Example:
-
-2022.1.4-zig0
-
-* 2022 = year
-* 1 = major Wwise version
-* 4 = minor Wwise version
-* -zig0 = Zig binding version
 
 ## License
 
