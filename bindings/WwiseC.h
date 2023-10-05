@@ -3447,8 +3447,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition);
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uIndex, WWISEC_AkListenerPosition* out_rPosition);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(AkUInt32 in_uIndex, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(WWISEC_AkGameObjectID in_uListenerID, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig);
 
     typedef enum WWISEC_AK_SoundEngine_Query_RTPCValue_type
     {

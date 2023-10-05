@@ -78,12 +78,12 @@ pub fn getListeners(in_game_object_id: common.AkGameObjectID, out_listener_objec
     );
 }
 
-pub fn getListenerPosition(in_index: common.AkGameObjectID) common.WwiseError!common.AkListenerPosition {
+pub fn getListenerPosition(in_listener_id: common.AkGameObjectID) common.WwiseError!common.AkListenerPosition {
     var result: common.AkListenerPosition = .{};
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetListenerPosition(
-            in_index,
+            in_listener_id,
             @ptrCast(&result),
         ),
     );
@@ -91,10 +91,10 @@ pub fn getListenerPosition(in_index: common.AkGameObjectID) common.WwiseError!co
     return result;
 }
 
-pub fn getListenerSpatialization(in_index: u32, out_spatialized: *bool, out_volume_offsets: *[*]SpeakerVolumes.VectorPtr, out_channel_config: *speaker_config.AkChannelConfig) common.WwiseError!void {
+pub fn getListenerSpatialization(in_listener_id: common.AkGameObjectID, out_spatialized: *bool, out_volume_offsets: *[*]SpeakerVolumes.VectorPtr, out_channel_config: *speaker_config.AkChannelConfig) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(
-            in_index,
+            in_listener_id,
             out_spatialized,
             @ptrCast(out_volume_offsets),
             @ptrCast(out_channel_config),

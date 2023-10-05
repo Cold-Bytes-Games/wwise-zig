@@ -3332,14 +3332,14 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(WWISEC_AkGameObjectID i
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListeners(in_GameObjectID, out_ListenerObjectIDs, *oi_uNumListeners));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uIndex, WWISEC_AkListenerPosition* out_rPosition)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerPosition(in_uIndex, *reinterpret_cast<AkListenerPosition*>(out_rPosition)));
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerPosition(in_uListenerID, *reinterpret_cast<AkListenerPosition*>(out_rPosition)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(AkUInt32 in_uIndex, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(WWISEC_AkGameObjectID in_uListenerID, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerSpatialization(in_uIndex, *out_rbSpatialized, *out_pVolumeOffsets, *reinterpret_cast<AkChannelConfig*>(out_channelConfig)));
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerSpatialization(in_uListenerID, *out_rbSpatialized, *out_pVolumeOffsets, *reinterpret_cast<AkChannelConfig*>(out_channelConfig)));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType)
