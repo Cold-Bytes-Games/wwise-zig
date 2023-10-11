@@ -10,6 +10,8 @@ The library assumes that you installed Wwise using the Wwise Launcher. We do not
 
 This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
+[![Join our Discord!](https://discordapp.com/api/guilds/1161009516771549374/widget.png?style=banner2)](https://discord.gg/jMxttNCBys)
+
 ## Versioning info
 
 This binding mimic the versioning of Wwise but add the Zig binding version at the end.
