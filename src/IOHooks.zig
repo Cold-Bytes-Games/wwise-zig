@@ -35,7 +35,7 @@ pub const CAkDefaultIOHookBlocking = if (wwise_options.include_default_io_hook_b
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -47,7 +47,7 @@ pub const CAkDefaultIOHookBlocking = if (wwise_options.include_default_io_hook_b
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -91,7 +91,7 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -103,7 +103,7 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -147,7 +147,7 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -159,7 +159,7 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -177,7 +177,7 @@ pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_pack
         var stack_oschar_allocator = common.stackCharAllocator(falllback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_file_package_name = common.toOSChar(allocator, file_package_name) catch return common.WwiseError.Fail;
+        const raw_file_package_name = common.toOSChar(allocator, file_package_name) catch return common.WwiseError.Fail;
         defer allocator.free(raw_file_package_name);
 
         try common.handleAkResult(
@@ -235,7 +235,7 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -247,7 +247,7 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
+        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return common.handleAkResult(
@@ -265,7 +265,7 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
         var stack_oschar_allocator = common.stackCharAllocator(falllback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_file_package_name = common.toOSChar(allocator, file_package_name) catch return common.WwiseError.Fail;
+        const raw_file_package_name = common.toOSChar(allocator, file_package_name) catch return common.WwiseError.Fail;
         defer allocator.free(raw_file_package_name);
 
         try common.handleAkResult(

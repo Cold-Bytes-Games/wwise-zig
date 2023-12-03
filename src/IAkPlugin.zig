@@ -264,7 +264,7 @@ pub const IAkGlobalPluginContext = opaque {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_char_allocator.get();
 
-        var raw_string = try common.toCString(allocator, in_string);
+        const raw_string = try common.toCString(allocator, in_string);
         defer allocator.free(raw_string);
 
         return c.WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(@ptrCast(self), raw_string);

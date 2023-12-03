@@ -48,11 +48,11 @@ pub const AkErrorMessageTranslator = opaque {
 
         var allocator = area_allocator.allocator();
 
-        var raw_error = try common.toOSChar(allocator, in_error);
+        const raw_error = try common.toOSChar(allocator, in_error);
 
-        var raw_out_translated_error = try allocator.allocSentinel(common.AkOSChar, @intCast(max_error_size), 0);
+        const raw_out_translated_error = try allocator.allocSentinel(common.AkOSChar, @intCast(max_error_size), 0);
 
-        var raw_args = try common.toCString(allocator, in_args);
+        const raw_args = try common.toCString(allocator, in_args);
 
         const result = c.WWISEC_AkErrorMessageTranslator_Translate(@ptrCast(self), raw_error, raw_out_translated_error, max_error_size, raw_args, in_arg_size);
 

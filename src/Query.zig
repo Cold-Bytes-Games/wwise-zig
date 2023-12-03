@@ -126,7 +126,7 @@ pub fn getRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: [
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return common.handleAkResult(
@@ -158,7 +158,7 @@ pub fn getSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group_na
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_switch_group_name = common.toCString(allocator, in_switch_group_name) catch return common.WwiseError.Fail;
+    const raw_switch_group_name = common.toCString(allocator, in_switch_group_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_switch_group_name);
 
     var result: common.AkSwitchStateID = 0;
@@ -191,7 +191,7 @@ pub fn getStateString(fallback_allocator: std.mem.Allocator, in_state_group_name
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_state_group_name = common.toCString(allocator, in_state_group_name) catch return common.WwiseError.Fail;
+    const raw_state_group_name = common.toCString(allocator, in_state_group_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_state_group_name);
 
     var result: common.AkStateID = 0;
@@ -255,7 +255,7 @@ pub fn queryAudioObjectIDsString(fallback_allocator: std.mem.Allocator, in_event
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return common.handleAkResult(

@@ -81,7 +81,7 @@ pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var native_init_settings_ptr = blk: {
+    const native_init_settings_ptr = blk: {
         if (init_settings_opt) |init_settings| {
             var native_init_settings = init_settings.toC(allocator) catch return common.WwiseError.Fail;
             break :blk &native_init_settings;
@@ -98,7 +98,7 @@ pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings
         }
     }
 
-    var native_platform_init_settings_ptr = blk: {
+    const native_platform_init_settings_ptr = blk: {
         if (platform_init_settings_opt) |platform_init_settings| {
             break :blk @as(?*c.WWISEC_AkPlatformInitSettings, @ptrCast(platform_init_settings));
         }
@@ -216,14 +216,14 @@ pub fn registerPlugin(in_type: common.AkPluginType, in_company_id: u32, in_plugi
 
 pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []const u8, in_dll_path_opt: ?[]const u8) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-    var allocator = stack_char_allocator.get();
+    const allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(allocator);
     defer area_allocator.deinit();
 
-    var raw_in_dll_name = common.toOSChar(area_allocator.allocator(), in_dll_name) catch return common.WwiseError.Fail;
+    const raw_in_dll_name = common.toOSChar(area_allocator.allocator(), in_dll_name) catch return common.WwiseError.Fail;
 
-    var raw_in_dll_path = blk: {
+    const raw_in_dll_path = blk: {
         if (in_dll_path_opt) |in_dll_path| {
             break :blk @as([*c]const common.AkOSChar, common.toOSChar(area_allocator.allocator(), in_dll_path) catch return common.WwiseError.Fail);
         }
@@ -298,7 +298,7 @@ pub fn getIDFromString(fallback_allocator: std.mem.Allocator, string: []const u8
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_string = try common.toCString(allocator, string);
+    const raw_string = try common.toCString(allocator, string);
     defer allocator.free(raw_string);
 
     return c.WWISEC_AK_SoundEngine_GetIDFromString(raw_string);
@@ -370,7 +370,7 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var char_allocator = stack_char_allocator.get();
 
-    var raw_event_name = try common.toCString(char_allocator, in_event_name);
+    const raw_event_name = try common.toCString(char_allocator, in_event_name);
     defer char_allocator.free(raw_event_name);
 
     var num_external_sources: u32 = 0;
@@ -453,7 +453,7 @@ pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_even
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return common.handleAkResult(
@@ -528,7 +528,7 @@ pub fn pinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_eve
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return common.handleAkResult(
@@ -550,7 +550,7 @@ pub fn unpinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_e
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return common.handleAkResult(
@@ -572,7 +572,7 @@ pub fn getBufferStatusForPinnedEventString(fallback_allocator: std.mem.Allocator
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return common.handleAkResult(
@@ -605,7 +605,7 @@ pub fn seekOnEventTimeString(fallback_allocator: std.mem.Allocator, in_event_nam
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return common.handleAkResult(
@@ -635,7 +635,7 @@ pub fn seekOnEventPercentString(fallback_allocator: std.mem.Allocator, in_event_
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return common.handleAkResult(
@@ -775,7 +775,7 @@ pub fn registerGameObjWithName(fallback_allocator: std.mem.Allocator, in_game_ob
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_name = common.toCString(allocator, in_name) catch return common.WwiseError.Fail;
+    const raw_name = common.toCString(allocator, in_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_name);
 
     return common.handleAkResult(
@@ -870,7 +870,7 @@ pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []con
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     var out_bank_id: common.AkBankID = common.AK_INVALID_BANK_ID;
@@ -944,7 +944,7 @@ pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: 
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     var out_bank_id: common.AkBankID = common.AK_INVALID_BANK_ID;
@@ -1028,7 +1028,7 @@ pub fn unloadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []c
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return common.handleAkResult(
@@ -1046,7 +1046,7 @@ pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return common.handleAkResult(
@@ -1090,7 +1090,7 @@ pub fn prepareBankString(
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return common.handleAkResult(
@@ -1129,7 +1129,7 @@ pub fn prepareBankAsyncString(
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return common.handleAkResult(
@@ -1171,18 +1171,18 @@ pub fn clearPreparedEvents() common.WwiseError!void {
 
 pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_type: PreparationType, in_event_names: []const []const u8) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-    var char_allocator = stack_char_allocator.get();
+    const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
     defer area_allocator.deinit();
 
-    var allocator = area_allocator.allocator();
+    const allocator = area_allocator.allocator();
 
     var raw_event_names_list = std.ArrayList([*:0]const u8).init(allocator);
     defer raw_event_names_list.deinit();
 
     for (in_event_names) |event_name| {
-        var raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
+        const raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
         raw_event_names_list.append(raw_event_name) catch return common.WwiseError.Fail;
     }
 
@@ -1213,18 +1213,18 @@ pub fn prepareEventAsyncString(
     in_cookie: ?*anyopaque,
 ) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-    var char_allocator = stack_char_allocator.get();
+    const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
     defer area_allocator.deinit();
 
-    var allocator = area_allocator.allocator();
+    const allocator = area_allocator.allocator();
 
     var raw_event_names_list = std.ArrayList([*:0]const u8).init(allocator);
     defer raw_event_names_list.deinit();
 
     for (in_event_names) |event_name| {
-        var raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
+        const raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
         raw_event_names_list.append(raw_event_name) catch return common.WwiseError.Fail;
     }
 
@@ -1292,20 +1292,20 @@ pub fn prepareGameSyncsString(
     in_game_sync_names: [][]const u8,
 ) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-    var char_allocator = stack_char_allocator.get();
+    const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
     defer area_allocator.deinit();
 
-    var allocator = area_allocator.allocator();
+    const allocator = area_allocator.allocator();
 
-    var raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
+    const raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
 
     var raw_game_sync_names_list = std.ArrayList([*:0]const u8).init(allocator);
     defer raw_game_sync_names_list.deinit();
 
     for (in_game_sync_names) |game_sync_name| {
-        var raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
+        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
         raw_game_sync_names_list.append(raw_game_sync_name) catch return common.WwiseError.Fail;
     }
 
@@ -1347,20 +1347,20 @@ pub fn prepareGameSyncsAsyncString(
     in_cookie: ?*anyopaque,
 ) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-    var char_allocator = stack_char_allocator.get();
+    const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
     defer area_allocator.deinit();
 
-    var allocator = area_allocator.allocator();
+    const allocator = area_allocator.allocator();
 
-    var raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
+    const raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
 
     var raw_game_sync_names_list = std.ArrayList([*:0]const u8).init(allocator);
     defer raw_game_sync_names_list.deinit();
 
     for (in_game_sync_names) |game_sync_name| {
-        var raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
+        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
         raw_game_sync_names_list.append(raw_game_sync_name) catch return common.WwiseError.Fail;
     }
 
@@ -1487,7 +1487,7 @@ pub fn setRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: [
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return common.handleAkResult(
@@ -1536,7 +1536,7 @@ pub fn setRTPCValueByPlayingIDString(
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return common.handleAkResult(
@@ -1574,7 +1574,7 @@ pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name:
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return common.handleAkResult(
@@ -1598,10 +1598,10 @@ pub fn setSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group: [
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_switch_group = common.toCString(allocator, in_switch_group) catch return common.WwiseError.Fail;
+    const raw_switch_group = common.toCString(allocator, in_switch_group) catch return common.WwiseError.Fail;
     defer allocator.free(raw_switch_group);
 
-    var raw_switch_state = common.toCString(allocator, in_switch_state) catch return common.WwiseError.Fail;
+    const raw_switch_state = common.toCString(allocator, in_switch_state) catch return common.WwiseError.Fail;
     defer allocator.free(raw_switch_state);
 
     return common.handleAkResult(
@@ -1619,7 +1619,7 @@ pub fn postTriggerString(fallback_allocator: std.mem.Allocator, in_trigger_name:
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_trigger_name = common.toCString(allocator, in_trigger_name) catch return common.WwiseError.Fail;
+    const raw_trigger_name = common.toCString(allocator, in_trigger_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_trigger_name);
 
     return common.handleAkResult(
@@ -1637,10 +1637,10 @@ pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []c
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_state_group = common.toCString(allocator, in_state_group) catch return common.WwiseError.Fail;
+    const raw_state_group = common.toCString(allocator, in_state_group) catch return common.WwiseError.Fail;
     defer allocator.free(raw_state_group);
 
-    var raw_state = common.toCString(allocator, in_state) catch return common.WwiseError.Fail;
+    const raw_state = common.toCString(allocator, in_state) catch return common.WwiseError.Fail;
     defer allocator.free(raw_state);
 
     return common.handleAkResult(
@@ -1719,7 +1719,7 @@ pub fn setBusEffectString(fallback_allocatr: std.mem.Allocator, in_bus_name: []c
     var stack_char_allocator = common.stackCharAllocator(fallback_allocatr);
     var allocator = stack_char_allocator.get();
 
-    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
     return common.handleAkResult(
@@ -1743,7 +1743,7 @@ pub fn setMixerString(fallback_allocator: std.mem.Allocator, in_bus_name: []cons
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
     return common.handleAkResult(
@@ -1761,7 +1761,7 @@ pub fn setBusConfigString(fallback_allocator: std.mem.Allocator, in_bus_name: []
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
     return common.handleAkResult(
@@ -1802,7 +1802,7 @@ pub fn startOutputCapture(fallback_allocator: std.mem.Allocator, in_capture_file
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
+    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_capture_file_name);
 
     return common.handleAkResult(
@@ -1818,9 +1818,9 @@ pub fn stopOutputCapture() common.WwiseError!void {
 
 pub fn addOutputCaptureMarker(fallback_allocator: std.mem.Allocator, in_marker_text: []const u8) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-    var allocator = stack_char_allocator.get();
+    const allocator = stack_char_allocator.get();
 
-    var raw_marker_text = common.toCString(allocator, in_marker_text) catch return common.WwiseError.Fail;
+    const raw_marker_text = common.toCString(allocator, in_marker_text) catch return common.WwiseError.Fail;
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutputCaptureMarker(raw_marker_text),
@@ -1865,7 +1865,7 @@ pub fn startProfilerCapture(fallback_allocator: std.mem.Allocator, in_capture_fi
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
+    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_capture_file_name);
 
     return common.handleAkResult(
@@ -1926,7 +1926,7 @@ pub fn getOuputIDString(fallback_allocator: std.mem.Allocator, in_share_set: []c
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_share_set = try common.toCString(allocator, in_share_set);
+    const raw_share_set = try common.toCString(allocator, in_share_set);
     defer allocator.free(raw_share_set);
 
     return c.WWISEC_AK_SoundEngine_GetOutputID_String(raw_share_set, in_id_device);
@@ -1942,10 +1942,10 @@ pub fn setBusDeviceString(fallback_allocator: std.mem.Allocator, in_bus_name: []
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
-    var raw_device_name = common.toCString(allocator, in_device_name) catch return common.WwiseError.Fail;
+    const raw_device_name = common.toCString(allocator, in_device_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_device_name);
 
     return common.handleAkResult(
@@ -1959,9 +1959,9 @@ pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_
 
     var area_allocator = area_allocator_instance.allocator();
 
-    var raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
+    const raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
-            var raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
+            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
             break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 
@@ -1992,9 +1992,9 @@ pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share
 
     var area_allocator = area_allocator_instance.allocator();
 
-    var raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
+    const raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
-            var raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
+            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
             break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 

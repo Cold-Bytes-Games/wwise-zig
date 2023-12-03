@@ -23,14 +23,14 @@ pub fn resolveDialogueEventID(in_event_id: common.AkUniqueID, in_argument_values
 
 pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_argument_value_names: []const []const u8, optional_args: ResolveDialogueEventOptionalArgs) !common.AkUniqueID {
     var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
-    var char_allocator = stack_oschar_allocator.get();
+    const char_allocator = stack_oschar_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
     defer area_allocator.deinit();
 
-    var allocator = area_allocator.allocator();
+    const allocator = area_allocator.allocator();
 
-    var raw_event_name = try common.toCString(allocator, in_event_name);
+    const raw_event_name = try common.toCString(allocator, in_event_name);
 
     var raw_argument_value_list = std.ArrayList([*:0]const u8).init(allocator);
     defer raw_argument_value_list.deinit();

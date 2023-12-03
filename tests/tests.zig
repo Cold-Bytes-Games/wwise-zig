@@ -32,7 +32,7 @@ test "AkSoundEngine init" {
     var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-    var stream_mgr = AK.StreamMgr.create(&stream_settings);
+    const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -97,7 +97,7 @@ test "CAkDefaultIOHookBlocking create" {
     var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-    var stream_mgr = AK.StreamMgr.create(&stream_settings);
+    const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -136,7 +136,7 @@ test "CAkDefaultIOHookDeferred create" {
     var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-    var stream_mgr = AK.StreamMgr.create(&stream_settings);
+    const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -176,7 +176,7 @@ test "CAkFilePackageLowLevelIOBlocking create" {
     var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-    var stream_mgr = AK.StreamMgr.create(&stream_settings);
+    const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -218,7 +218,7 @@ test "CAkFilePackageLowLevelIODeferred create" {
     var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-    var stream_mgr = AK.StreamMgr.create(&stream_settings);
+    const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -261,7 +261,7 @@ test "AkCommunication init" {
     var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-    var stream_mgr = AK.StreamMgr.create(&stream_settings);
+    const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -303,7 +303,7 @@ test "AkMusicEngine init" {
     var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
     AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-    var stream_mgr = AK.StreamMgr.create(&stream_settings);
+    const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -445,7 +445,7 @@ const ZigTestIAkFileLocationResolver = struct {
 
         self.open_string_called = true;
 
-        var file_handle = self.area_allocator.allocator().create(DummyFileHandle) catch return .insufficient_memory;
+        const file_handle = self.area_allocator.allocator().create(DummyFileHandle) catch return .insufficient_memory;
         file_handle.* = DummyFileHandle{ .is_string = true, .is_writing = (in_open_mode == .write or in_open_mode == .write_ovrwr or in_open_mode == .read_write) };
 
         io_file_desc.file_size = @intCast(file_handle.file_size);
@@ -468,7 +468,7 @@ const ZigTestIAkFileLocationResolver = struct {
 
         self.open_id_called = true;
 
-        var file_handle = self.area_allocator.allocator().create(DummyFileHandle) catch return .insufficient_memory;
+        const file_handle = self.area_allocator.allocator().create(DummyFileHandle) catch return .insufficient_memory;
         file_handle.* = DummyFileHandle{ .is_string = false, .is_writing = (in_open_mode == .write or in_open_mode == .write_ovrwr or in_open_mode == .read_write) };
 
         io_file_desc.file_size = @intCast(file_handle.file_size);
@@ -595,7 +595,7 @@ test "Dummy I/O Hook works" {
         var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
         AK.StreamMgr.getDefaultSettings(&stream_settings);
 
-        var stream_mgr = AK.StreamMgr.create(&stream_settings);
+        const stream_mgr = AK.StreamMgr.create(&stream_settings);
         try std.testing.expect(stream_mgr != null);
         try std.testing.expect(AK.IAkStreamMgr.get() != null);
 
@@ -606,15 +606,15 @@ test "Dummy I/O Hook works" {
 
         zig_file_resolver.area_allocator = std.heap.ArenaAllocator.init(std.testing.allocator);
 
-        var native_file_resolver = zig_file_resolver.createIAkFileLocationResolver();
+        const native_file_resolver = zig_file_resolver.createIAkFileLocationResolver();
         defer AK.StreamMgr.IAkFileLocationResolver.destroyInstance(native_file_resolver);
 
         AK.StreamMgr.setFileLocationResolver(native_file_resolver);
 
-        var native_io_blocking = zig_io_blocking.createIAkIOHookBlocking();
+        const native_io_blocking = zig_io_blocking.createIAkIOHookBlocking();
         defer AK.StreamMgr.IAkIOHookBlocking.destroyInstance(native_io_blocking);
 
-        var device_id = AK.StreamMgr.createDevice(&device_settings, @ptrCast(native_io_blocking));
+        const device_id = AK.StreamMgr.createDevice(&device_settings, @ptrCast(native_io_blocking));
         defer AK.StreamMgr.destroyDevice(device_id) catch {};
 
         var init_settings: AK.AkInitSettings = .{};

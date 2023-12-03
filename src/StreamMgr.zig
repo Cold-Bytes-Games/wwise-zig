@@ -626,7 +626,7 @@ pub const IAkFileLocationResolver = opaque {
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_file_name = common.toOSChar(allocator, in_file_name) catch return common.WwiseError.Fail;
+        const raw_file_name = common.toOSChar(allocator, in_file_name) catch return common.WwiseError.Fail;
         defer allocator.free(raw_file_name);
 
         try common.handleAkResult(
@@ -673,10 +673,10 @@ pub const IAkFileLocationResolver = opaque {
         var stack_oschar_allocator = common.stackCharAllocator(allocator);
         var oschar_allocator = stack_oschar_allocator.get();
 
-        var raw_filename = common.toOSChar(oschar_allocator, in_filename) catch return common.WwiseError.Fail;
+        const raw_filename = common.toOSChar(oschar_allocator, in_filename) catch return common.WwiseError.Fail;
         defer oschar_allocator.free(raw_filename);
 
-        var raw_out_searched_path = allocator.allocSentinel(common.AkOSChar, out_searched_path.len, 0) catch return common.WwiseError.Fail;
+        const raw_out_searched_path = allocator.allocSentinel(common.AkOSChar, out_searched_path.len, 0) catch return common.WwiseError.Fail;
         defer allocator.free(raw_out_searched_path);
 
         try common.handleAkResult(
@@ -703,7 +703,7 @@ pub const IAkFileLocationResolver = opaque {
         in_open_mode: stream_interfaces.AkOpenMode,
         out_searched_path: *[]u8,
     ) common.WwiseError!void {
-        var raw_out_searched_path = allocator.allocSentinel(common.AkOSChar, out_searched_path.len, 0) catch return common.WwiseError.Fail;
+        const raw_out_searched_path = allocator.allocSentinel(common.AkOSChar, out_searched_path.len, 0) catch return common.WwiseError.Fail;
         defer allocator.free(raw_out_searched_path);
 
         try common.handleAkResult(
@@ -772,7 +772,7 @@ pub fn setCurrentLanguage(fallback_allocator: std.mem.Allocator, language_name: 
     var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_oschar_allocator.get();
 
-    var raw_language_name = common.toOSChar(allocator, language_name) catch return common.WwiseError.Fail;
+    const raw_language_name = common.toOSChar(allocator, language_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_language_name);
 
     return common.handleAkResult(

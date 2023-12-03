@@ -356,7 +356,7 @@ pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: common.A
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_name = common.toCString(allocator, in_name) catch return common.WwiseError.Fail;
+    const raw_name = common.toCString(allocator, in_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_name);
 
     return common.handleAkResult(

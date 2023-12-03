@@ -12,7 +12,7 @@ pub fn getDeviceIDFromName(fallback_allocator: std.mem.Allocator, in_token: []co
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_token = try common.toOSCharUtf16(allocator, in_token);
+    const raw_token = try common.toOSCharUtf16(allocator, in_token);
     defer allocator.free(raw_token);
 
     return c.WWISEC_AK_GetDeviceIDFromName(raw_token);

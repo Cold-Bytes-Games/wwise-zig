@@ -287,7 +287,7 @@ pub fn postString(fallback_allocator: std.mem.Allocator, in_error: []const u8, i
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    var raw_error = common.toCString(allocator, in_error) catch return common.WwiseError.Fail;
+    const raw_error = common.toCString(allocator, in_error) catch return common.WwiseError.Fail;
     defer allocator.free(raw_error);
 
     return common.handleAkResult(

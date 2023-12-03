@@ -479,7 +479,7 @@ pub const IAkStdStream = opaque {
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_stream_name = common.toOSChar(allocator, stream_name) catch return common.WwiseError.Fail;
+        const raw_stream_name = common.toOSChar(allocator, stream_name) catch return common.WwiseError.Fail;
         defer allocator.free(raw_stream_name);
 
         return common.handleAkResult(
@@ -623,7 +623,7 @@ pub const IAkAutoStream = opaque {
         var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        var raw_stream_name = common.toOSChar(allocator, stream_name) catch return common.WwiseError.Fail;
+        const raw_stream_name = common.toOSChar(allocator, stream_name) catch return common.WwiseError.Fail;
         defer allocator.free(raw_stream_name);
 
         return common.handleAkResult(
