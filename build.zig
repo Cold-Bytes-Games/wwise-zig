@@ -12,20 +12,6 @@ pub const WwiseConfiguration = enum {
     release,
 };
 
-pub const WwiseConfigOptions = struct {
-    use_communication: bool = true,
-    use_default_job_worker: bool = false,
-    use_spatial_audio: bool = false,
-    wwise_sdk_path: ?[]const u8 = null,
-    use_static_crt: bool = true,
-    configuration: WwiseConfiguration = .profile,
-    include_default_io_hook_blocking: bool = false,
-    include_default_io_hook_deferred: bool = false,
-    include_file_package_io_blocking: bool = false,
-    include_file_package_io_deferred: bool = false,
-    static_plugins: []const []const u8 = &.{},
-};
-
 pub const WwiseBuildOptions = struct {
     platform: WwisePlatform,
     wwise_sdk_path: []const u8,
@@ -50,46 +36,13 @@ pub const WwiseBuildOptions = struct {
     }
 };
 
-pub const WwisePackage = struct {
-    options: WwiseBuildOptions,
-    module: *std.build.Module,
-    c_library: *std.build.Step.Compile,
-};
-
 const CppFlags: []const []const u8 = &.{ "-std=c++17", "-DUNICODE", "-Wall", "-Wpedantic", "-fno-sanitize=alignment" };
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const wwise_package = try package(b, target, optimize, .{});
-
-    const wwise_test = b.addTest(.{
-        .name = "wwise_zig_test",
-        .root_source_file = .{
-            .path = thisDir() ++ "/tests/tests.zig",
-        },
-        .target = target,
-        .optimize = optimize,
-    });
-    try wwiseLink(wwise_test, wwise_package.options);
-    wwise_test.linkLibrary(wwise_package.c_library);
-    wwise_test.addModule("wwise-zig", wwise_package.module);
-    b.installArtifact(wwise_test);
-
-    const run_test_cmd = b.addRunArtifact(wwise_test);
-    run_test_cmd.step.dependOn(b.getInstallStep());
-
-    const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&run_test_cmd.step);
-
-    const build_only_test_step = b.step("test_build_only", "Build the tests but does not run it");
-    build_only_test_step.dependOn(&wwise_test.step);
-    build_only_test_step.dependOn(b.getInstallStep());
-}
-
-pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin.Mode, config_options: WwiseConfigOptions) !WwisePackage {
-    if (target.getOsTag() == .windows and target.getAbi() == .gnu) {
+    if (target.result.os.tag == .windows and target.result.abi == .gnu) {
         return error.GnuAbiNotSupported;
     }
 
@@ -108,28 +61,28 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
 
     const wwise_static_plugins_option = b.option([]const []const u8, "static_plugins", "List of builtin static plugins to build");
 
-    const wwise_configuration = wwise_configuration_option orelse config_options.configuration;
+    const wwise_configuration = wwise_configuration_option orelse .profile;
 
     const wwise_build_options = WwiseBuildOptions{
         .platform = try getWwisePlatform(target),
         .wwise_sdk_path = getWwiseSDKPath(b, override_wwise_sdk_path_option),
         .configuration = wwise_configuration,
-        .use_static_crt = wwise_use_static_crt_option orelse config_options.use_static_crt,
+        .use_static_crt = wwise_use_static_crt_option orelse true,
         .use_communication = blk: {
             if (wwise_configuration == .release) {
                 break :blk false;
             }
 
-            break :blk wwise_use_communication_option orelse config_options.use_communication;
+            break :blk wwise_use_communication_option orelse true;
         },
-        .use_default_job_worker = wwise_use_default_job_worker_option orelse config_options.use_default_job_worker,
-        .use_spatial_audio = wwise_use_spatial_audio_option orelse config_options.use_spatial_audio,
-        .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null or config_options.include_default_io_hook_blocking or config_options.include_file_package_io_blocking,
-        .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null or config_options.include_default_io_hook_deferred or config_options.include_file_package_io_deferred,
-        .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse config_options.include_file_package_io_blocking,
-        .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse config_options.include_file_package_io_deferred,
+        .use_default_job_worker = wwise_use_default_job_worker_option orelse false,
+        .use_spatial_audio = wwise_use_spatial_audio_option orelse false,
+        .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null,
+        .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null,
+        .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse false,
+        .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse false,
         .string_stack_size = wwise_string_stack_size_option orelse 256,
-        .static_plugins = wwise_static_plugins_option orelse config_options.static_plugins,
+        .static_plugins = wwise_static_plugins_option orelse &.{},
     };
 
     const wwise_c = b.addStaticLibrary(.{
@@ -159,13 +112,13 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
         wwise_c.linkSystemLibrary(static_plugin);
     }
 
-    try wwiseLink(wwise_c, wwise_build_options);
+    try wwiseLinkModule(&wwise_c.root_module, wwise_build_options);
     wwise_c.linkLibC();
-    if (target.getOsTag() != .windows) {
+    if (target.result.os.tag != .windows) {
         wwise_c.linkLibCpp();
     }
 
-    if (target.getOsTag() == .windows) {
+    if (target.result.os.tag == .windows) {
         wwise_c.defineCMacro("UNICODE", null);
     }
 
@@ -197,53 +150,77 @@ pub fn package(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin
     const wwise_compile_options = option_step.createModule();
 
     const wwise_zig_module = b.addModule("wwise-zig", .{
-        .source_file = .{
+        .root_source_file = .{
             .path = thisDir() ++ "/src/wwise-zig.zig",
         },
-        .dependencies = &.{
+        .imports = &.{
             .{ .name = "wwise_options", .module = wwise_compile_options },
         },
+        .target = target,
+        .optimize = optimize,
     });
 
-    return .{
-        .options = wwise_build_options,
-        .module = wwise_zig_module,
-        .c_library = wwise_c,
-    };
+    wwise_zig_module.linkLibrary(wwise_c);
+    try wwiseLinkModule(wwise_zig_module, wwise_build_options);
+
+    const wwise_test = b.addTest(.{
+        .name = "wwise_zig_test",
+        .root_source_file = .{
+            .path = thisDir() ++ "/tests/tests.zig",
+        },
+        .target = target,
+        .optimize = optimize,
+    });
+    wwise_test.root_module.addImport("wwise-zig", wwise_zig_module);
+    b.installArtifact(wwise_test);
+
+    const run_test_cmd = b.addRunArtifact(wwise_test);
+    run_test_cmd.step.dependOn(b.getInstallStep());
+
+    const test_step = b.step("test", "Run library tests");
+    test_step.dependOn(&run_test_cmd.step);
+
+    const build_only_test_step = b.step("test_build_only", "Build the tests but does not run it");
+    build_only_test_step.dependOn(&wwise_test.step);
+    build_only_test_step.dependOn(b.getInstallStep());
 }
 
-pub fn wwiseLink(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
-    const wwise_library_relative_path = try getWwiseLibraryPath(compile_step.step.owner, compile_step.target, wwise_build_options);
+fn wwiseLinkModule(module: *std.Build.Module, wwise_build_options: WwiseBuildOptions) !void {
+    const wwise_library_relative_path = try getWwiseLibraryPath(module.owner, module.resolved_target.?, wwise_build_options);
 
-    compile_step.addSystemIncludePath(.{
-        .path = compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" }),
+    module.addSystemIncludePath(.{
+        .path = module.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" }),
     });
-    compile_step.addIncludePath(.{
+    module.addIncludePath(.{
         .path = thisDir() ++ "/bindings",
     });
-    compile_step.addLibraryPath(.{
-        .path = compile_step.step.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path }),
+    module.addLibraryPath(.{
+        .path = module.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path }),
     });
 
     if (wwise_build_options.use_communication) {
-        compile_step.linkSystemLibrary("CommunicationCentral");
+        module.linkSystemLibrary("CommunicationCentral", .{ .needed = true });
 
-        if (compile_step.target.getOsTag() == .windows) {
-            compile_step.linkSystemLibrary("ws2_32");
+        if (module.resolved_target) |target| {
+            if (target.result.os.tag == .windows) {
+                module.linkSystemLibrary("ws2_32", .{ .needed = true });
+            }
         }
     }
 
     if (wwise_build_options.use_spatial_audio) {
-        compile_step.linkSystemLibrary("AkSpatialAudio");
+        module.linkSystemLibrary("AkSpatialAudio", .{ .needed = true });
     }
 
-    compile_step.linkSystemLibrary("AkSoundEngine");
-    compile_step.linkSystemLibrary("AkStreamMgr");
-    compile_step.linkSystemLibrary("AkMemoryMgr");
-    compile_step.linkSystemLibrary("AkMusicEngine");
+    module.linkSystemLibrary("AkSoundEngine", .{ .needed = true });
+    module.linkSystemLibrary("AkStreamMgr", .{ .needed = true });
+    module.linkSystemLibrary("AkMemoryMgr", .{ .needed = true });
+    module.linkSystemLibrary("AkMusicEngine", .{ .needed = true });
 
-    if (compile_step.target.getOsTag() == .windows) {
-        compile_step.linkSystemLibrary("user32");
+    if (module.resolved_target) |target| {
+        if (target.result.os.tag == .windows) {
+            module.linkSystemLibrary("user32", .{ .needed = true });
+        }
     }
 }
 
@@ -359,10 +336,10 @@ fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []co
     return "";
 }
 
-fn getWwisePlatform(target: std.zig.CrossTarget) !WwisePlatform {
-    return switch (target.getOsTag()) {
+fn getWwisePlatform(target: std.Build.ResolvedTarget) !WwisePlatform {
+    return switch (target.result.os.tag) {
         .windows => .windows,
-        .linux => if (target.getAbi() == .android) .android else .linux,
+        .linux => if (target.result.abi == .android) .android else .linux,
         .macos => .macos,
         .ios => .ios,
         .tvos => .tvos,
@@ -370,7 +347,7 @@ fn getWwisePlatform(target: std.zig.CrossTarget) !WwisePlatform {
     };
 }
 
-fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_options: WwiseBuildOptions) ![]const u8 {
+fn getWwiseLibraryPath(b: *std.Build, target: std.Build.ResolvedTarget, wwise_build_options: WwiseBuildOptions) ![]const u8 {
     const config_string = switch (wwise_build_options.configuration) {
         .debug => "Debug",
         .profile => "Profile",
@@ -379,7 +356,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
 
     switch (wwise_build_options.platform) {
         .windows => {
-            const arch_string = switch (target.getCpuArch()) {
+            const arch_string = switch (target.result.cpu.arch) {
                 .x86 => "Win32",
                 .x86_64 => "x64",
                 else => return error.ArchNotSupported,
@@ -390,7 +367,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
             return b.fmt("{s}_vc170/{s}{s}/lib", .{ arch_string, config_string, static_crt_string });
         },
         .android => {
-            const arch_string = switch (target.getCpuArch()) {
+            const arch_string = switch (target.result.cpu.arch) {
                 .aarch64 => "arm64-v8a",
                 .arm => "armeabi-v7a",
                 .x86 => "x86",
@@ -401,7 +378,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
             return b.fmt("Android_{s}/{s}/lib", .{ arch_string, config_string });
         },
         .linux => {
-            const arch_string = switch (target.getCpuArch()) {
+            const arch_string = switch (target.result.cpu.arch) {
                 .x86_64 => "x64",
                 .aarch64 => "aarch64",
                 else => return error.ArchNotSupported,
@@ -413,7 +390,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
             return b.fmt("Mac/{s}/lib", .{config_string});
         },
         .ios => {
-            const abi_string = switch (target.getAbi()) {
+            const abi_string = switch (target.result.abi) {
                 .simulator => "iphonesimulator",
                 else => "iphoneos",
             };
@@ -421,7 +398,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
             return b.fmt("iOS/{s}-{s}/lib", .{ config_string, abi_string });
         },
         .tvos => {
-            const abi_string = switch (target.getAbi()) {
+            const abi_string = switch (target.result.abi) {
                 .simulator => "appletvsimulator",
                 else => "appletvos",
             };
@@ -436,7 +413,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.zig.CrossTarget, wwise_build_o
     return "";
 }
 
-fn handleDefaultWwiseSystems(compile_step: *std.Build.CompileStep, wwise_build_options: WwiseBuildOptions) !void {
+fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_options: WwiseBuildOptions) !void {
     if (!wwise_build_options.useDefaultIoHooks() and !wwise_build_options.use_default_job_worker) {
         return;
     }
