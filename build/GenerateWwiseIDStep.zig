@@ -1,5 +1,5 @@
 const std = @import("std");
-const Step = std.build.Step;
+const Step = std.Build.Step;
 
 const GenerateWwiseIDStep = @This();
 

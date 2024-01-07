@@ -1,4 +1,4 @@
-# wwise-zig - Zig bindings to Audiokinetic Wwise (2022.1.8)
+# wwise-zig - Zig bindings to Audiokinetic Wwise (2022.1.9)
 
 This package implement a native [Zig](https://ziglang.org/) binding for [Audiokinetic Wwise](https://www.audiokinetic.com/en/products/wwise). The included C binding is designed only to be used by the Zig binding. If you want to expand the C binding to be fully functional please submit any pull requests.
 
@@ -18,11 +18,11 @@ This binding mimic the versioning of Wwise but add the Zig binding version at th
 
 Example:
 
-2022.1.8-zig0
+2022.1.9-zig0
 
 * 2022 = year
 * 1 = major Wwise version
-* 8 = minor Wwise version
+* 9 = minor Wwise version
 * -zig0 = Zig binding version
 
 ## Supported platforms
@@ -56,20 +56,26 @@ Example:
     .hash = "12201c5e8343fcdc4ad3b33f2ae0961ea9a14153a17ed7c6920b63260e11c1daba0b",
 },
 ```
-2. Import the dependency in your `build.zig`. We currently don't support the default `dependency()` way due to limitations in the Zig build system. See the Usage section for the list of available options.
+2. Import the dependency in your `build.zig`. See the Usage section for the list of available options.
 
 ```zig
 const std = @import("std");
 const wwise_zig = @import("wwise-zig");
 
 pub fn build(b: *std.Build) !void {
-    const wwise_package = try wwise_zig.package(b, target, optimize, .{
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const wwise_dependency = b.dependency("wwise-zig", .{
+        .target = target,
+        .optimize = optimize,
         .use_communication = true,
         .use_default_job_worker = true,
+        .use_spatial_audio = true,
         .use_static_crt = true,
         .include_file_package_io_blocking = true,
         .configuration = .profile,
-        .static_plugins = &.{
+        .static_plugins = @as([]const []const u8, &.{
             "AkToneSource",
             "AkParametricEQFX",
             "AkDelayFX",
@@ -79,12 +85,17 @@ pub fn build(b: *std.Build) !void {
             "AkSynthOneSource",
             "AkAudioInputSource",
             "AkVorbisDecoder",
-        },
+        }),
     });
 
-    exe.addModule("wwise-zig", wwise_package.module);
-    exe.linkLibrary(wwise_package.c_library);
-    try wwise_zig.wwiseLink(exe, wwise_package.options);
+    const exe = b.addExecutable(.{
+        .name = "wwise-zig-demo",
+        .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+
+    exe.root_module.addImport("wwise-zig", wwise_dependency.module("wwise-zig"));
 }
 ```
 
@@ -104,6 +115,7 @@ Available options:
 | `include_default_io_hook_deferred` | `bool` | Include the Default IO Hook Deferred (Default: false) |
 | `include_file_package_io_blocking` | `bool` | Include the File Package IO Hook Blocking (Default: false) |
 | `include_file_package_io_deferred` | `bool` | Include the File Package IO Hook Deferred (Default: false) |
+| `static_plugins` | []const []const u8 | List of static plugins to link to (Default: empty) |
 
 We recommend using `AK` as your import name to match closely with the C++ API.
 
