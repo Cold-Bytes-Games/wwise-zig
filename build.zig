@@ -313,10 +313,10 @@ pub fn generateWwiseIDModule(b: *std.Build, wwise_id_file_path: []const u8, wwis
     }
 
     const id_module = b.createModule(.{
-        .source_file = .{
+        .root_source_file = .{
             .generated = &generate_id_module_step.output_file,
         },
-        .dependencies = &.{
+        .imports = &.{
             .{ .name = "wwise-zig", .module = wwise_zig_module },
         },
     });
