@@ -52,8 +52,8 @@ Example:
 1. Add this repo in your `build.zig.zon` file, you'll need to add the hash and update the commit hash to the latest commit in the branch
 ```zig
 .@"wwise-zig" = .{
-    .url = "https://github.com/Cold-Bytes-Games/wwise-zig/archive/e4a2700f9953480dd8d653a148198c6c1fdb867b.tar.gz",
-    .hash = "12201c5e8343fcdc4ad3b33f2ae0961ea9a14153a17ed7c6920b63260e11c1daba0b",
+    .url = "https://github.com/Cold-Bytes-Games/wwise-zig/archive/90cdc6877369b55af3ee2dfcf091dc547ed59f03.tar.gz",
+    .hash = "122053d2ec67ebe8a47b45ac32ddf41283b27c3519196b6730d9b826a463d1294299",
 },
 ```
 2. Import the dependency in your `build.zig`. See the Usage section for the list of available options.
