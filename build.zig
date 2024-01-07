@@ -232,7 +232,7 @@ pub const GenerateSoundBanksArgs = struct {
     /// Explicit list of the languages to generate, if not specified it will build all the languages
     languages: []const []const u8 = &.{},
     /// Instead of passing the platforms, you can use the target from Zig
-    target: ?std.zig.CrossTarget = null,
+    target: ?std.Build.ResolvedTarget = null,
     /// Output folder of the sound banks, will use the default in the project if omitted
     output_folder: ?[]const u8 = null,
     /// List of sound banks to generate, if not specified it will build all the sound banks
