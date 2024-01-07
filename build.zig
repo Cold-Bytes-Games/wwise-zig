@@ -303,7 +303,7 @@ pub const GenerateWwiseIDModuleOptions = struct {
     previous_step: ?*std.Build.Step = null,
 };
 
-pub fn generateWwiseIDModule(b: *std.Build, wwise_id_file_path: []const u8, wwise_zig_module: *std.Build.Module, options: GenerateWwiseIDModuleOptions) *std.build.Module {
+pub fn generateWwiseIDModule(b: *std.Build, wwise_id_file_path: []const u8, wwise_zig_module: *std.Build.Module, options: GenerateWwiseIDModuleOptions) *std.Build.Module {
     const generate_id_module_step = GenerateWwiseIDStep.create(b, .{
         .id_file_path = wwise_id_file_path,
     });
