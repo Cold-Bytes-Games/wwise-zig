@@ -24,6 +24,7 @@ pub const AkMemID = enum(common.DefaultEnumType) {
     sound_engine = c.WWISEC_AkMemID_SoundEngine,
     integration = c.WWISEC_AkMemID_Integration,
     job_mgr = c.WWISEC_AkMemID_JobMgr,
+    temp_audio_render = c.WWISEC_AkMemID_TempAudioRender,
 };
 
 pub const AkMemType_Media = c.WWISEC_AkMemType_Media;

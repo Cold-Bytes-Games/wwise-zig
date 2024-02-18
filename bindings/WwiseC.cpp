@@ -435,8 +435,11 @@ static_assert(sizeof(WWISEC_AkAcousticTexture) == sizeof(AkAcousticTexture));
 
 // BEGIN AkMemoryMgr
 WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
+static_assert(WWISEC_AK_TempAlloc_Type_NUM == AK::TempAlloc::Type_NUM);
 static_assert(sizeof(WWISEC_AK_MemoryMgr_CategoryStats) == sizeof(AK::MemoryMgr::CategoryStats));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_GlobalStats) == sizeof(AK::MemoryMgr::GlobalStats));
+static_assert(sizeof(WWISEC_AK_TempAlloc_Stats) == sizeof(AK::TempAlloc::Stats));
+static_assert(sizeof(WWISEC_AK_TempAlloc_InitSettings) == sizeof(AK::TempAlloc::InitSettings));
 
 bool WWISEC_AK_MemoryMgr_IsInitialized()
 {
@@ -501,6 +504,16 @@ AkUInt64 WWISEC_AK_MemoryMgr_StopProfileThreadUsage()
 void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename)
 {
     AK::MemoryMgr::DumpToFile(pszFilename);
+}
+
+void WWISEC_AK_TempAlloc_GetStats(WWISEC_AK_TempAlloc_Type in_eType, WWISEC_AK_TempAlloc_Stats* out_stats)
+{
+    AK::TempAlloc::GetStats(static_cast<AK::TempAlloc::Type>(in_eType), *reinterpret_cast<AK::TempAlloc::Stats*>(out_stats));
+}
+
+void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType, const AkOSChar* pszFilename)
+{
+    AK::TempAlloc::DumpTempAllocsToFile(static_cast<AK::TempAlloc::Type>(in_eType), pszFilename);
 }
 // END AkMemoryMgr
 

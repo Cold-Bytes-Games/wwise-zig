@@ -11,6 +11,7 @@ pub const SoundEngine = @import("SoundEngine.zig");
 pub const SpatialAudio = if (wwise_options.use_spatial_audio) @import("SpatialAudio.zig") else void;
 pub const SpeakerVolumes = @import("SpeakerVolumes.zig");
 pub const StreamMgr = @import("StreamMgr.zig");
+pub const TempAlloc = @import("TempAlloc.zig");
 pub usingnamespace @import("callbacks.zig");
 pub usingnamespace @import("common.zig");
 pub usingnamespace @import("common_defs.zig");

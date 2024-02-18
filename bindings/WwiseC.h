@@ -1516,6 +1516,7 @@ extern "C"
         WWISEC_AkMemID_SoundEngine,          ///< Base sound engine allocations (managers, etc).
         WWISEC_AkMemID_Integration,          ///< Game engine integration allocations.
         WWISEC_AkMemID_JobMgr,               ///< Allocations for Sound Engine jobs and job dependencies.
+        WWISEC_AkMemID_TempAudioRender,      ///< Temporary allocations for audio render.
 
         WWISEC_AkMemID_NUM,               ///< Category count.
         WWISEC_AkMemID_MASK = 0x1FFFFFFF, ///< Mask for category IDs.
@@ -1557,6 +1558,53 @@ extern "C"
     void WWISEC_AK_MemoryMgr_StartProfileThreadUsage();
     AkUInt64 WWISEC_AK_MemoryMgr_StopProfileThreadUsage();
     void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename);
+
+    ////////////////////////////////////////////////////////////////////////
+    /// @name TempAlloc systems
+    //@{
+
+    /// Temp-alloc memory statistics. Whenever these are fetched, they represent the last completed temp-alloc "tick".
+    /// \remarks These statistics are not collected in the Release configuration of the memory mgr.
+    typedef struct WWISEC_AK_TempAlloc_Stats
+    {
+        AkUInt32 uMemUsed;      ///< Used memory (in bytes).
+        AkUInt32 uMemAllocated; ///< Allocated memory (in bytes).
+        AkUInt32 uBlocksUsed;   ///< Number of individual blocks used.
+
+        AkUInt32 uPeakMemUsed;      ///< The peak value for uMemUsed since initialization.
+        AkUInt32 uPeakMemAllocated; ///< The peak value for uMemAllocated since initialization.
+        AkUInt32 uPeakBlocksUsed;   ///< The peak value for uBlocksUsed since initialization.
+        AkUInt32 uPeakBlockUsed;    ///< The peak amount of used memory in any single block since initialization.
+    } WWISEC_AK_TempAlloc_Stats;
+
+    /// IDs of temporary memory pools used by the sound engine.
+    typedef enum WWISEC_AK_TempAlloc_Type
+    {
+        WWISEC_AK_TempAlloc_Type_AudioRender,
+        WWISEC_AK_TempAlloc_Type_NUM, // end of the enum list
+    } WWISEC_AK_TempAlloc_Type;
+
+    /// Initialization settings for temporary-memory pools. Separate settings are specified for each temporary-memory pool.
+    typedef struct WWISEC_AK_TempAlloc_InitSettings
+    {
+        AkUInt32 uMinimumBlockCount;   ///< The number of blocks of memory the system is initialized with and is the minimum kept around forever. Defaults to 1. Higher values increase upfront memory use, but can reduce, or eliminate, the creation and destruction of memory blocks over time.
+        AkUInt32 uMinimumBlockSize;    ///< The minimum size of each block. If a new allocation requests a new block of memory, then the new block is the size of the requested allocation times four, and then rounded up to the next multiple of this value. Defaults to 2MiB.
+        AkUInt32 uMaximumUnusedBlocks; ///< The maximum number of blocks that the system keeps in an unused state, and avoids freeing. Defaults to 1. Higher values do not increase the peak memory use, but do prevent unused memory from being freed, in order to reduce creation and destruction of memory blocks.
+
+        // Various debug options for monitoring and analyzing potential issues in usage of the TempAlloc system. All of these are ignored (treated as disabled) in Release configurations.
+        bool bDebugDetailedStats;    ///< Enable to track detailed stats and include them in the detailed stat dump. Detailed stats include the size and quantity of each type of allocation from the system. Disabled by default.
+        bool bDebugClearMemory;      ///< Enable to clear any allocation to a deterministic garbage value. Useful to make sure memory is initialized properly. Disabled by default.
+        bool bDebugEnableSentinels;  ///< Enable to write out sentinels between most allocations to help detect memory overwrites, verified at the end of a tick. Enabled by default. Increases memory usage of blocks slightly.
+        bool bDebugFlushBlocks;      ///< Enable to forcefully release all blocks at the end of a tick and recreate them from scratch every tick. Useful to ensure stale memory is not being accessed. Disabled by default. This might interfere with some stats reporting due to blocks being released between ticks.
+        bool bDebugStandaloneAllocs; ///< Enable to force the block size to be as small as possible for each allocation (smaller than can be achieved by just setting uMinimumBlockSize to very low values). Useful to investigate memory overruns in-depth, especially in conjunction with other options like bDebugFlushBlocks and the MemoryMgr's stomp allocator. If enabled, bDebugDetailedStats and bDebugEnableSentinels will be disabled. Greatly increases CPU and memory usage.
+    } WWISEC_AK_TempAlloc_InitSettings;
+
+    /// Get simple statistics for a given temporary-memory pool
+    void WWISEC_AK_TempAlloc_GetStats(WWISEC_AK_TempAlloc_Type in_eType, WWISEC_AK_TempAlloc_Stats* out_stats);
+
+    /// Get a detailed listing of the allocations into the temp-alloc pool, and output them to a file.
+    /// \note TempAllocInitSettings::bTrackDetailedStats must be enabled for the specified type to get detailed information about the underlying allocs. Otherwise, only the simple stats are listed.
+    void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType, const AkOSChar* pszFilename);
     // END AkMemoryMgr
 
     // BEGIN AkModule
