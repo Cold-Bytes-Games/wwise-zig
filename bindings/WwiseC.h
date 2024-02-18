@@ -1131,7 +1131,28 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_IODeviceInitFailed,
         WWISEC_AK_Monitor_ErrorCode_SwitchListEmpty,
         WWISEC_AK_Monitor_ErrorCode_NoSwitchSelected,
+        WWISEC_AK_Monitor_ErrorCode_FilePermissionError,
 
+        WWISEC_AK_Monitor_ErrorCode_SetEffectOnRendered,
+        WWISEC_AK_Monitor_ErrorCode_GeometryNotWatertight,
+
+        WWISEC_AK_Monitor_ErrorCode_CannotInitialize3DAudio,
+        WWISEC_AK_Monitor_ErrorCode_CannotInitializeInputCallbacks,
+        WWISEC_AK_Monitor_ErrorCode_CannotConnectAVAudioEngineSource,
+
+        WWISEC_AK_Monitor_ErrorCode_ChannelConfigRequestDenied,
+        WWISEC_AK_Monitor_ErrorCode_MediaUpdatedFromWwise,
+        WWISEC_AK_Monitor_ErrorCode_MediaErrorFromWwise,
+        WWISEC_AK_Monitor_ErrorCode_OutputAlreadyExists,
+        WWISEC_AK_Monitor_ErrorCode_UnknownStateGroup,
+        WWISEC_AK_Monitor_ErrorCode_MediaErrorWwiseMRUFull,
+        WWISEC_AK_Monitor_ErrorCode_AudioOut2ContextCreateError,
+        WWISEC_AK_Monitor_ErrorCode_AudioOut2UserCreateError,
+
+        WWISEC_AK_Monitor_ErrorCode_FeedbackOnAudioObjectsBus,
+        WWISEC_AK_Monitor_ErrorCode_AssetSwapEnabled,
+
+        WWISEC_AK_Monitor_ErrorCode_SpatialAudio_SiblingPortal,
         // ALWAYS ADD NEW CODES AT THE END !!!!!!!
         // Otherwise it may break comm compatibility in a patch
 

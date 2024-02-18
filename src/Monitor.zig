@@ -252,6 +252,23 @@ pub const ErrorCode = enum(common.DefaultEnumType) {
     io_device_init_failed = c.WWISEC_AK_Monitor_ErrorCode_IODeviceInitFailed,
     switch_list_empty = c.WWISEC_AK_Monitor_ErrorCode_SwitchListEmpty,
     no_switch_selected = c.WWISEC_AK_Monitor_ErrorCode_NoSwitchSelected,
+    file_permission_error = c.WWISEC_AK_Monitor_ErrorCode_FilePermissionError,
+    set_effect_on_rendered = c.WWISEC_AK_Monitor_ErrorCode_SetEffectOnRendered,
+    geometry_not_watertight = c.WWISEC_AK_Monitor_ErrorCode_GeometryNotWatertight,
+    cannot_initialize3d_audio = c.WWISEC_AK_Monitor_ErrorCode_CannotInitialize3DAudio,
+    cannot_initialize_input_callbacks = c.WWISEC_AK_Monitor_ErrorCode_CannotInitializeInputCallbacks,
+    cannot_connect_av_audio_engine_source = c.WWISEC_AK_Monitor_ErrorCode_CannotConnectAVAudioEngineSource,
+    channel_config_request_denied = c.WWISEC_AK_Monitor_ErrorCode_ChannelConfigRequestDenied,
+    media_updated_from_wwise = c.WWISEC_AK_Monitor_ErrorCode_MediaUpdatedFromWwise,
+    media_error_from_wwise = c.WWISEC_AK_Monitor_ErrorCode_MediaErrorFromWwise,
+    output_already_exists = c.WWISEC_AK_Monitor_ErrorCode_OutputAlreadyExists,
+    unknown_state_group = c.WWISEC_AK_Monitor_ErrorCode_UnknownStateGroup,
+    media_error_wwise_mru_full = c.WWISEC_AK_Monitor_ErrorCode_MediaErrorWwiseMRUFull,
+    audio_out2_context_create_error = c.WWISEC_AK_Monitor_ErrorCode_AudioOut2ContextCreateError,
+    audio_out2_user_create_error = c.WWISEC_AK_Monitor_ErrorCode_AudioOut2UserCreateError,
+    feedback_on_audio_objects_bus = c.WWISEC_AK_Monitor_ErrorCode_FeedbackOnAudioObjectsBus,
+    asset_swap_enabled = c.WWISEC_AK_Monitor_ErrorCode_AssetSwapEnabled,
+    spatial_audio_sibling_portal = c.WWISEC_AK_Monitor_ErrorCode_SpatialAudio_SiblingPortal,
 };
 
 pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const common.AkOSChar, in_error_level: ErrorLevel, in_playing_id: common.AkPlayingID, in_game_object_id: common.AkGameObjectID) callconv(.C) void;
