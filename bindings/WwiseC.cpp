@@ -3961,9 +3961,9 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstRefle
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ReverbEstimation::EstimateTimeToFirstReflection(convertedAkVector, *out_timeToFirstReflectionMs, in_speedOfSound));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateHFDamping(WWISEC_AkAcousticTexture* in_textures, float* in_surfaceAreas, int in_numTextures, AkReal32* out_hfDamping)
+AkReal32 WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateHFDamping(WWISEC_AkAcousticTexture* in_textures, float* in_surfaceAreas, int in_numTextures)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ReverbEstimation::EstimateHFDamping(reinterpret_cast<AkAcousticTexture*>(in_textures), in_surfaceAreas, in_numTextures, *out_hfDamping));
+    return AK::SpatialAudio::ReverbEstimation::EstimateHFDamping(reinterpret_cast<AkAcousticTexture*>(in_textures), in_surfaceAreas, in_numTextures);
 }
 // END AkReverbEstimation
 #endif

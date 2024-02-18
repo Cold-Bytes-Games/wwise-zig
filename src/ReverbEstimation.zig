@@ -45,17 +45,10 @@ pub fn estimateTimeToFirstReflection(in_environment_extent_meters: common.AkVect
     );
 }
 
-pub fn estimateHFDamping(in_texture: ?[*]virtual_acoustics.AkAcousticTexture, in_surface_areas: ?*f32, in_num_textures: i32) common.WwiseError!f32 {
-    var out_hf_damping: f32 = 0.0;
-
-    try common.handleAkResult(
-        c.WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateHFDamping(
-            @ptrCast(in_texture),
-            in_surface_areas,
-            in_num_textures,
-            &out_hf_damping,
-        ),
+pub fn estimateHFDamping(in_texture: ?[*]virtual_acoustics.AkAcousticTexture, in_surface_areas: ?*f32, in_num_textures: i32) f32 {
+    return c.WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateHFDamping(
+        @ptrCast(in_texture),
+        in_surface_areas,
+        in_num_textures,
     );
-
-    return out_hf_damping;
 }
