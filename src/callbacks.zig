@@ -107,6 +107,7 @@ pub const AkMarkerCallbackInfo = extern struct {
     identifier: u32 = 0,
     position: u32 = 0,
     str_label: ?[*:0]const u8 = null,
+    label_size: u32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkMarkerCallbackInfo) AkMarkerCallbackInfo {
         return @bitCast(value);
@@ -168,7 +169,6 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
     output_config: speaker_config.AkChannelConfig = .{},
     base_volume: [*]f32,
     emitter_listener_volume: [*]f32,
-    context: ?*IAkPlugin.IAkMixerInputContext = null,
     mixer_context: ?*IAkPlugin.IAkMixerPluginContext = null,
 
     pub inline fn fromC(value: c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {

@@ -1304,6 +1304,7 @@ extern "C"
         AkUInt32 uIdentifier; ///< Cue point identifier
         AkUInt32 uPosition;   ///< Position in the cue point (unit: sample frames)
         const char* strLabel; ///< Label of the marker, read from the file
+        AkUInt32 uLabelSize;  ///< Size of the label string (including the terminating null character)
     } WWISEC_AkMarkerCallbackInfo;
 
     typedef struct WWISEC_AkDurationCallbackInfo
@@ -1332,7 +1333,6 @@ extern "C"
         WWISEC_AkChannelConfig outputConfig;            ///< Channel configuration of the output bus.
         AkReal32* pfBaseVolume;                         ///< Base volume, common to all channels.
         AkReal32* pfEmitterListenerVolume;              ///< Emitter-listener pair-specific gain. When there are multiple emitter-listener pairs, this volume is set to that of the loudest pair, and the relative gain of other pairs is applied directly on the channel volume matrix pVolumes.
-        WWISEC_AK_IAkMixerInputContext* pContext;       ///< Context of the current voice/bus about to be mixed into the output bus with specified base volume and volume matrix.
         WWISEC_AK_IAkMixerPluginContext* pMixerContext; ///< Output mixing bus context. Use it to access a few useful panning and mixing services, as well as the ID of the output bus. NULL if pContext is the master audio bus.
     } WWISEC_AkSpeakerVolumeMatrixCallbackInfo;
 
