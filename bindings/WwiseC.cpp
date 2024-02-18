@@ -3092,6 +3092,11 @@ const WWISEC_AkCommSettings* WWISEC_AK_Comm_GetCurrentSettings()
 {
     return reinterpret_cast<const WWISEC_AkCommSettings*>(&AK::Comm::GetCurrentSettings());
 }
+
+AkUInt16 WWISEC_AK_Comm_GetCommandPort()
+{
+    return AK::Comm::GetCommandPort();
+}
 #endif
 // END AkCommunication
 

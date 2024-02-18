@@ -3334,6 +3334,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_Comm_Term();
     WWISEC_AKRESULT WWISEC_AK_Comm_Reset();
     const WWISEC_AkCommSettings* WWISEC_AK_Comm_GetCurrentSettings();
+    AkUInt16 WWISEC_AK_Comm_GetCommandPort();
 #endif
     // END AkCommunication
 

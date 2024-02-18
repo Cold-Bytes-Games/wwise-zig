@@ -83,3 +83,7 @@ pub fn reset() common.WwiseError!void {
 pub fn getCurrentSettings() *const AkCommSettings {
     return @ptrCast(c.WWISEC_AK_Comm_GetCurrentSettings());
 }
+
+pub fn getCommandPort() u16 {
+    return c.WWISEC_AK_Comm_GetCommandPort();
+}
