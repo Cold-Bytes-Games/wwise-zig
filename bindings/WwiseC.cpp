@@ -505,6 +505,7 @@ void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename)
 // END AkMemoryMgr
 
 // BEGIN AkModule
+static_assert(WWISEC_AkSpanCount_END == AkSpanCount_END);
 static_assert(sizeof(WWISEC_AkMemSettings) == sizeof(AkMemSettings));
 
 WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings)

@@ -1642,6 +1642,20 @@ extern "C"
         size_t extra,
         size_t release);
 
+    typedef enum WWISEC_AkSpanCount
+    {
+        // Span count attempts to be as low as possible. Offers lowest memory usage, but reduces CPU performance due to increased calls to pfAllocVM and other memory allocation hooks.
+        WWISEC_AkSpanCount_Small = 0,
+
+        // Span count attempts to match 512KiB mappings. Offers moderate balance between memory and CPU usage.
+        WWISEC_AkSpanCount_Medium,
+
+        // Span count attempts to match 2MiB, or AK_VM_HUGE_PAGE_SIZE, mappings. Offers best overall CPU performance due to use of 2MiB page mappings, but increased memory usage.
+        WWISEC_AkSpanCount_Huge,
+
+        WWISEC_AkSpanCount_END,
+    } WWISEC_AkSpanCount;
+
     typedef struct WWISEC_AkMemSettings
     {
         /// @name High-level memory allocation hooks. When not NULL, redirect allocations normally forwarded to rpmalloc.
@@ -1686,6 +1700,8 @@ extern "C"
 
         // Moved to end-of-struct to maintain stability across 2022.1 modules.
         WWISEC_AkMemTrimForThread pfTrimForThread; ///< (Optional) Thread-specific allocator "trimming" hook.
+        WWISEC_AkSpanCount uVMSpanCount;
+        WWISEC_AkSpanCount uDeviceSpanCount;
     } WWISEC_AkMemSettings;
 
     WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings);

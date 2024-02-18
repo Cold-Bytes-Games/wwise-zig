@@ -48,6 +48,12 @@ pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaqu
 pub const AkMemAllocVM = ?*const fn (size: usize, extra: ?*usize) callconv(.C) ?*anyopaque;
 pub const AkMemFreeVM = ?*const fn (address: ?*anyopaque, size: usize, extra: usize, release: usize) callconv(.C) void;
 
+pub const AkSpanCount = enum(common.DefaultEnumType) {
+    small,
+    medium,
+    huge,
+};
+
 pub const AkMemSettings = extern struct {
     init_for_thread: AkMemInitForThread = null,
     term_for_thread: AkMemTermForThread = null,
@@ -74,6 +80,8 @@ pub const AkMemSettings = extern struct {
     debug_free: AkMemDebugFree = null,
     memory_debug_level: u32 = 0,
     trim_for_thread: AkMemTrimForThread = null,
+    vm_span_count: AkSpanCount = .huge,
+    device_span_count: AkSpanCount = .huge,
 
     pub inline fn fromC(value: c.WWISEC_AkMemSettings) AkMemSettings {
         return @bitCast(value);
