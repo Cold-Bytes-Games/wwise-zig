@@ -1835,6 +1835,13 @@ extern "C"
                                           ///< Supported by AkAPI_PulseAudio only.
     } WWISEC_LINUX_AkPlatformInitSettings;
 
+    typedef enum WWISEC_AkAudioAPIMac
+    {
+        WWISEC_AkAudioAPI_AVAudioEngine = 1 << 0,                                                  ///< Use AVFoundation framework (modern, has more capabilities, available only for macOS 10.15 or above)
+        WWISEC_AkAudioAPI_AudioUnit = 1 << 1,                                                      ///< Use AudioUnit framework (basic functionality, compatible with all macOS devices)
+        WWISEC_AkAudioAPI_Default = WWISEC_AkAudioAPI_AVAudioEngine | WWISEC_AkAudioAPI_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
+    } WWISEC_AkAudioAPIMac;
+
     /// \cond !(Web)
     /// Platform specific initialization settings
     /// \sa AK::SoundEngine::Init
@@ -1850,6 +1857,9 @@ extern "C"
         AkUInt32 uSampleRate; ///< Sampling Rate. Default 48000 Hz
         // Voices.
         AkUInt16 uNumRefillsInVoice; ///< Number of refill buffers in voice buffer. 2 == double-buffered, defaults to 4.
+        WWISEC_AkAudioAPIMac eAudioAPI;
+        AkUInt32 uNumSpatialAudioPointSources;
+        bool bVerboseSystemOutput;
     } WWISEC_MACOSX_AkPlatformInitSettings;
 
     /// \cond !(Web)
@@ -1977,12 +1987,12 @@ extern "C"
         WWISEC_IOS_AkAudioSessionBehaviorOptions eAudioSessionBehavior; ///< Flags to change the default Sound Engine behavior related to the management of the iOS Audio Session with regards to application lifecycle events. \sa AkAudioSessionBehaviorFlags
     } WWISEC_IOS_AkAudioSessionProperties;
 
-    typedef enum WWISEC_IOS_AkAudioAPIiOS
+    typedef enum WWISEC_AkAudioAPIiOS
     {
-        WWISEC_IOS_AkAudioAPI_AVAudioEngine = 1 << 0,                                                          ///< Use AVFoundation framework (modern, has more capabilities, available only for iOS/tvOS 13 or above)
-        WWISEC_IOS_AkAudioAPI_AudioUnit = 1 << 1,                                                              ///< Use AudioUnit framework (basic functionality, compatible with all iOS devices)
-        WWISEC_IOS_AkAudioAPI_Default = WWISEC_IOS_AkAudioAPI_AVAudioEngine | WWISEC_IOS_AkAudioAPI_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
-    } WWISEC_IOS_AkAudioAPIiOS;
+        WWISEC_AkAudioAPI_AVAudioEngine = 1 << 0,                                                  ///< Use AVFoundation framework (modern, has more capabilities, available only for iOS/tvOS 13 or above)
+        WWISEC_AkAudioAPI_AudioUnit = 1 << 1,                                                      ///< Use AudioUnit framework (basic functionality, compatible with all iOS devices)
+        WWISEC_AkAudioAPI_Default = WWISEC_AkAudioAPI_AVAudioEngine | WWISEC_AkAudioAPI_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
+    } WWISEC_AkAudioAPIiOS;
 
     typedef struct WWISEC_AudioBufferList WWISEC_AudioBufferList;
 

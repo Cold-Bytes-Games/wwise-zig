@@ -296,6 +296,22 @@ pub const LINUX_AkPlatformInitSettings = extern struct {
     }
 };
 
+pub const AkAudioAPIMac = packed struct(common.DefaultEnumType) {
+    av_audio_engine: bool = false,
+    audio_unit: bool = false,
+    padding: u30 = 0,
+
+    pub const Default = .{ .av_audio_engine = true, .audio_unit = true };
+
+    pub fn fromC(value: c.WWISEC_AkAudioAPIMac) AkAudioAPIMac {
+        return @bitCast(value);
+    }
+
+    pub fn toC(self: AkAudioAPIMac) c.WWISEC_AkAudioAPIMac {
+        return @bitCast(self);
+    }
+};
+
 pub const MACOSX_AkPlatformInitSettings = extern struct {
     thread_l_engine: POSIX_AkThreadProperties = .{},
     thread_output_mgr: POSIX_AkThreadProperties = .{},
@@ -304,6 +320,10 @@ pub const MACOSX_AkPlatformInitSettings = extern struct {
 
     sample_rate: u32 = 0,
     num_refills_in_voice: u16 = 0,
+
+    audio_api: AkAudioAPIMac = AkAudioAPIMac.Default,
+    num_spatial_audio_point_sources: u32 = 0,
+    verbose_system_output = false,
 
     pub inline fn fromC(value: c.WWISEC_MACOSX_AkPlatformInitSettings) MACOSX_AkPlatformInitSettings {
         return @bitCast(value);
