@@ -1710,6 +1710,7 @@ extern "C"
         //@{
         WWISEC_AkMemInitForThread pfInitForThread;                     ///< (Optional) Thread-specific allocator initialization hook.
         WWISEC_AkMemTermForThread pfTermForThread;                     ///< (Optional) Thread-specific allocator termination hook.
+        WWISEC_AkMemTrimForThread pfTrimForThread;                     ///< (Optional) Thread-specific allocator "trimming" hook.
         WWISEC_AkMemMalloc pfMalloc;                                   ///< (Optional) Memory allocation hook.
         WWISEC_AkMemMalign pfMalign;                                   ///< (Optional) Memory allocation hook.
         WWISEC_AkMemRealloc pfRealloc;                                 ///< (Optional) Memory allocation hook.
@@ -1722,7 +1723,8 @@ extern "C"
         /// @name Configuration.
         //@{
         AkUInt64 uMemAllocationSizeLimit; ///< When non-zero, limits the total amount of virtual and device memory allocated by AK::MemoryMgr.
-        bool bUseDeviceMemAlways;         ///< Use device memory for all allocations (on applicable platforms).
+        bool bEnableSeparateDeviceHeap;   ///< Enable use of device memory heap for all allocations (on applicable platforms).
+        WWISEC_AK_TempAlloc_InitSettings tempAllocSettings[WWISEC_AK_TempAlloc_Type_NUM];
         //@}
 
         /// @name Page allocation hooks, used by rpmalloc. Default to AKPLATFORM::AllocVM et al.
@@ -1746,10 +1748,8 @@ extern "C"
         AkUInt32 uMemoryDebugLevel;                            ///< Default 0 disabled. 1 debug enabled. 2 stomp allocator enabled. 3 stomp allocator and debug enabled. User implementations may use multiple non-zero values to offer different features.
         //@}
 
-        // Moved to end-of-struct to maintain stability across 2022.1 modules.
-        WWISEC_AkMemTrimForThread pfTrimForThread; ///< (Optional) Thread-specific allocator "trimming" hook.
-        WWISEC_AkSpanCount uVMSpanCount;
-        WWISEC_AkSpanCount uDeviceSpanCount;
+        // WWISEC_AkSpanCount uVMSpanCount; // will be there in 2023.1.1
+        // WWISEC_AkSpanCount uDeviceSpanCount; // will be there in 2023.1.1
     } WWISEC_AkMemSettings;
 
     WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings);

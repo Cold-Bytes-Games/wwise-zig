@@ -26,7 +26,7 @@ pub const Stats = extern struct {
 };
 
 pub const Type = enum(common.DefaultEnumType) {
-    audio_render,
+    audio_render = c.WWISEC_AK_TempAlloc_Type_AudioRender,
 };
 
 pub const InitSettings = extern struct {

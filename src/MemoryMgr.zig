@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
+const TempAlloc = @import("TempAlloc.zig");
 
 pub const AkMemPoolId = c.WWISEC_AkMemPoolId;
 
@@ -49,6 +50,7 @@ pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaqu
 pub const AkMemAllocVM = ?*const fn (size: usize, extra: ?*usize) callconv(.C) ?*anyopaque;
 pub const AkMemFreeVM = ?*const fn (address: ?*anyopaque, size: usize, extra: usize, release: usize) callconv(.C) void;
 
+// Will be there in 2023.1.1
 pub const AkSpanCount = enum(common.DefaultEnumType) {
     small,
     medium,
@@ -58,6 +60,7 @@ pub const AkSpanCount = enum(common.DefaultEnumType) {
 pub const AkMemSettings = extern struct {
     init_for_thread: AkMemInitForThread = null,
     term_for_thread: AkMemTermForThread = null,
+    trim_for_thread: AkMemTrimForThread = null,
     malloc: AkMemMalloc = null,
     malign: AkMemMalign = null,
     realloc: AkMemRealloc = null,
@@ -66,7 +69,8 @@ pub const AkMemSettings = extern struct {
     total_reserved_memory_size: AkMemTotalReservedMemorySize = null,
     size_of_memory: AkMemSizeOfMemory = null,
     mem_allocation_size_limit: u64 = 0,
-    use_device_mem_always: bool = false,
+    enable_separate_device_heap: bool = false,
+    temp_alloc_settings: [std.meta.fields(TempAlloc.Type).len]TempAlloc.InitSettings = [_]TempAlloc.InitSettings{} ** std.meta.fields(TempAlloc.Type).len,
     alloc_vm: AkMemAllocVM = null,
     free_vm: AkMemFreeVM = null,
     alloc_device: AkMemAllocVM = null,
@@ -80,9 +84,8 @@ pub const AkMemSettings = extern struct {
     debug_realloc_aligned: AkMemDebugReallocAligned = null,
     debug_free: AkMemDebugFree = null,
     memory_debug_level: u32 = 0,
-    trim_for_thread: AkMemTrimForThread = null,
-    vm_span_count: AkSpanCount = .huge,
-    device_span_count: AkSpanCount = .huge,
+    // vm_span_count: AkSpanCount = .huge, // will be there in 2023.1.1
+    // device_span_count: AkSpanCount = .huge, // will be there in 2023.1.1
 
     pub inline fn fromC(value: c.WWISEC_AkMemSettings) AkMemSettings {
         return @bitCast(value);
