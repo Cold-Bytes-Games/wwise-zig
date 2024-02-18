@@ -1252,7 +1252,6 @@ extern "C"
     // END AkCommonDefs
 
     typedef struct WWISEC_AK_IAkStreamMgr WWISEC_AK_IAkStreamMgr;
-    typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
     typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
     typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
     typedef struct WWISEC_AK_IAkPlugin WWISEC_AK_IAkPlugin;
@@ -2088,6 +2087,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AK_PluginServiceType_RNG = 1,
         WWISEC_AK_PluginServiceType_AudioObjectAttenuation = 2,
         WWISEC_AK_PluginServiceType_AudioObjectPriority = 3,
+        PluginServiceType_HashTable = 4,
+        PluginServiceType_Markers = 5,
         WWISEC_AK_PluginServiceType_MAX,
     } WWISEC_AK_AkPluginServiceType;
 

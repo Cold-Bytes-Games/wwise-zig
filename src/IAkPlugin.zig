@@ -21,11 +21,12 @@ pub const AkPluginServiceType = enum(common.DefaultEnumType) {
     rng = c.WWISEC_AK_PluginServiceType_RNG,
     audio_object_attenuation = c.WWISEC_AK_PluginServiceType_AudioObjectAttenuation,
     audio_object_priority = c.WWISEC_AK_PluginServiceType_AudioObjectPriority,
+    hash_table = c.WWISEC_AK_PluginServiceType_HashTable,
+    markers = c.WWISEC_AK_PluginServiceType_Markers,
 };
 
 pub const IAkPluginService = opaque {};
 
-pub const IAkMixerInputContext = opaque {};
 pub const IAkMixerPluginContext = opaque {};
 
 pub const IAkGlobalPluginContext = opaque {

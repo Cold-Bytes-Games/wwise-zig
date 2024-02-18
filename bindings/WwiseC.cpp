@@ -536,6 +536,8 @@ void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettin
 // END AkModule
 
 // BEGIN IAkPlugin
+static_assert(WWISEC_AK_PluginServiceType_MAX == AK::PluginServiceType_MAX);
+
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkGlobalPluginContext_GetStreamMgr(const WWISEC_AK_IAkGlobalPluginContext* self)
 {
     return reinterpret_cast<WWISEC_AK_IAkStreamMgr*>(reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetStreamMgr());
