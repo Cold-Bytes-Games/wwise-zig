@@ -2061,7 +2061,7 @@ extern "C"
         WWISEC_IOS_AkAudioSessionProperties audioSession; ///< iOS audio session properties
         WWISEC_IOS_AkAudioCallbacks audioCallbacks;       ///< iOS audio callbacks
 
-        WWISEC_IOS_AkAudioAPIiOS eAudioAPI; ///< Main audio API to use. Leave to AkAPI_Default for the default sink (default value).
+        WWISEC_AkAudioAPIiOS eAudioAPI; ///< Main audio API to use. Leave to AkAPI_Default for the default sink (default value).
 
         AkUInt32 uNumSpatialAudioPointSources; ///< Number of Apple Spatial Audio point sources to allocate for 3D audio use (each point source is a system audio object). Default: 128
 
@@ -2712,6 +2712,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         const AkOSChar* pszName;    ///< User-defined stream name (specified through AK::IAkStdStream::SetStreamName() or AK::IAkAutoStream::SetStreamName())
         AkUInt64 uSize;             ///< Total stream/file size in bytes
         bool bIsOpen;               ///< True when the file is open (implementations may defer file opening)
+        bool bIsLanguageSpecific;   ///< True when the file was found in a language specific location
     } WWISEC_AkStreamInfo;
 
     /// Automatic streams heuristics.
@@ -2780,8 +2781,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUtf16 szStreamName[WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH]; ///< Stream name
         AkUInt32 uStringSize;                                         ///< Stream name string's size (number of characters)
         AkUInt64 uFileSize;                                           ///< File size
-        AkUInt32 uCustomParamSize;                                    ///< File descriptor's uCustomParamSize
-        AkUInt32 uCustomParam;                                        ///< File descriptor's pCustomParam (on 32 bits)
         bool bIsAutoStream;                                           ///< True for auto streams
         bool bIsCachingStream;                                        ///< True for caching streams
     } WWISEC_AkStreamRecord;
@@ -2803,6 +2802,13 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         bool bActive;                         ///< True if this stream has been active (that is, was ready for I/O or had at least one pending I/O transfer, uncached or not) in the previous frame
     } WWISEC_AkStreamData;
 
+    typedef struct WWISEC_AkFileOpenData
+    {
+        const AkOSChar* pszFileName;      ///< File name. Only one of pszFileName or fileID should be valid (pszFileName null while fileID is not AK_INVALID_FILE_ID, or vice versa)
+        WWISEC_AkFileID fileID;           ///< File ID. Only one of pszFileName or fileID should be valid (pszFileName null while fileID is not AK_INVALID_FILE_ID, or vice versa)
+        WWISEC_AkFileSystemFlags* pFlags; ///< Flags for opening, null when unused
+        WWISEC_AkOpenMode eOpenMode;      ///< Open mode.
+    } WWISEC_AkFileOpenData;
 #pragma pack(pop)
 
     typedef struct WWISEC_AK_IAkStreamProfile WWISEC_AK_IAkStreamProfile;
@@ -2911,7 +2917,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUInt64 (*GetPosition)(void* instance, bool* out_pbEndOfStream);
 
         WWISEC_AKRESULT(*SetPosition)
-        (void* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset);
+        (void* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod);
 
         void (*Cancel)(void* instance);
         void* (*GetData)(void* instance, AkUInt32* out_uSize);
@@ -2930,7 +2936,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Read(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize);
     WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Write(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize);
     AkUInt64 WWISEC_AK_IAkStdStream_GetPosition(WWISEC_AK_IAkStdStream* instance, bool* out_pbEndOfStream);
-    WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetPosition(WWISEC_AK_IAkStdStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset);
+    WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetPosition(WWISEC_AK_IAkStdStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod);
     void WWISEC_AK_IAkStdStream_Cancel(WWISEC_AK_IAkStdStream* instance);
     void* WWISEC_AK_IAkStdStream_GetData(WWISEC_AK_IAkStdStream* instance, AkUInt32* out_uSize);
     WWISEC_AkStmStatus WWISEC_AK_IAkStdStream_GetStatus(WWISEC_AK_IAkStdStream* instance);
@@ -2953,9 +2959,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AKRESULT(*SetMinimalBufferSize)
         (void* instance, AkUInt32 in_uMinBufferSize);
 
-        WWISEC_AKRESULT(*SetMinTargetBufferSize)
-        (void* instance, AkUInt32 in_uMinTargetBufferSize);
-
         WWISEC_AKRESULT(*SetStreamName)
         (void* instance, const AkOSChar* in_pszStreamName);
 
@@ -2975,7 +2978,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUInt64 (*GetPosition)(void* instance, bool* out_pbEndOfStream);
 
         WWISEC_AKRESULT(*SetPosition)
-        (void* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset);
+        (void* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod);
 
         WWISEC_AKRESULT(*GetBuffer)
         (void* instance, void** out_pBuffer, AkUInt32* out_uSize, bool in_bWait);
@@ -2993,7 +2996,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_IAkAutoStream_GetHeuristics(WWISEC_AK_IAkAutoStream* instance, WWISEC_AkAutoStmHeuristics* out_heuristics);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetHeuristics(WWISEC_AK_IAkAutoStream* instance, const WWISEC_AkAutoStmHeuristics* in_heuristics);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinimalBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinBufferSize);
-    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetMinTargetBufferSize(WWISEC_AK_IAkAutoStream* instance, AkUInt32 in_uMinTargetBufferSize);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetStreamName(WWISEC_AK_IAkAutoStream* instance, const AkOSChar* in_pszStreamName);
     AkUInt32 WWISEC_AK_IAkAutoStream_GetBlockSize(WWISEC_AK_IAkAutoStream* instance);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_QueryBufferingStatus(WWISEC_AK_IAkAutoStream* instance, AkUInt32* out_uNumBytesAvailable);
@@ -3001,7 +3003,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Start(WWISEC_AK_IAkAutoStream* instance);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_Stop(WWISEC_AK_IAkAutoStream* instance);
     AkUInt64 WWISEC_AK_IAkAutoStream_GetPosition(WWISEC_AK_IAkAutoStream* instance, bool* out_pbEndOfStream);
-    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetPosition(WWISEC_AK_IAkAutoStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod, AkInt64* out_piRealOffset);
+    WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_SetPosition(WWISEC_AK_IAkAutoStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_GetBuffer(WWISEC_AK_IAkAutoStream* instance, void** out_pBuffer, AkUInt32* out_uSize, bool in_bWait);
     WWISEC_AKRESULT WWISEC_AK_IAkAutoStream_ReleaseBuffer(WWISEC_AK_IAkAutoStream* instance);
 
@@ -3015,43 +3017,22 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
         WWISEC_AK_IAkStreamMgrProfile* (*GetStreamMgrProfile)(void* instance);
 
-        WWISEC_AKRESULT(*CreateStd_String)
+        WWISEC_AKRESULT(*CreateStd)
         (
             void* instance,
-            const AkOSChar* in_pszFileName,
-            WWISEC_AkFileSystemFlags* in_pFSFlags,
-            WWISEC_AkOpenMode in_eOpenMode,
+            const WWISEC_AkFileOpenData* in_FileOpen,
             WWISEC_AK_IAkStdStream** out_pStream,
             bool in_bSyncOpen);
 
-        WWISEC_AKRESULT(*CreateStd_ID)
+        WWISEC_AKRESULT(*CreateAuto_AkFileOpenData)
         (
             void* instance,
-            WWISEC_AkFileID in_fileID,
-            WWISEC_AkFileSystemFlags* in_pFSFlags,
-            WWISEC_AkOpenMode in_eOpenMode,
-            WWISEC_AK_IAkStdStream** out_pStream,
-            bool in_bSyncOpen);
-
-        WWISEC_AKRESULT(*CreateAuto_String)
-        (
-            void* instance,
-            const AkOSChar* in_pszFileName,
-            WWISEC_AkFileSystemFlags* in_pFSFlags,
+            const WWISEC_AkFileOpenData* in_FileOpen,
             const WWISEC_AkAutoStmHeuristics* in_heuristics,
             WWISEC_AkAutoStmBufSettings* in_pBufferSettings,
             WWISEC_AK_IAkAutoStream** out_pStream,
-            bool in_bSyncOpen);
-
-        WWISEC_AKRESULT(*CreateAuto_ID)
-        (
-            void* instance,
-            WWISEC_AkFileID in_fileID,
-            WWISEC_AkFileSystemFlags* in_pFSFlags,
-            const WWISEC_AkAutoStmHeuristics* in_heuristics,
-            WWISEC_AkAutoStmBufSettings* in_pBufferSettings,
-            WWISEC_AK_IAkAutoStream** out_pStream,
-            bool in_bSyncOpen);
+            bool in_bSyncOpen,
+            bool in_bCaching);
 
         WWISEC_AKRESULT(*CreateAuto_Memory)
         (
@@ -3100,9 +3081,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     void WWISEC_AK_IAkStreamMgr_Destroy(WWISEC_AK_IAkStreamMgr* instance);
     WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(WWISEC_AK_IAkStreamMgr* instance);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd_String(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd_ID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkOpenMode in_eOpenMode, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_String(WWISEC_AK_IAkStreamMgr* instance, const AkOSChar* in_pszFileName, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd(WWISEC_AK_IAkStreamMgr* instance, const WWISEC_AkFileOpenData* in_FileOpen, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_AkFileOpenData(WWISEC_AK_IAkStreamMgr* instance, const WWISEC_AkFileOpenData* in_FileOpen, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen, bool in_bCaching);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_ID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_Memory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkPriority in_uPriority);
