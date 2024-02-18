@@ -1977,6 +1977,13 @@ extern "C"
         WWISEC_IOS_AkAudioSessionBehaviorOptions eAudioSessionBehavior; ///< Flags to change the default Sound Engine behavior related to the management of the iOS Audio Session with regards to application lifecycle events. \sa AkAudioSessionBehaviorFlags
     } WWISEC_IOS_AkAudioSessionProperties;
 
+    typedef enum WWISEC_IOS_AkAudioAPIiOS
+    {
+        WWISEC_IOS_AkAudioAPI_AVAudioEngine = 1 << 0,                                                          ///< Use AVFoundation framework (modern, has more capabilities, available only for iOS/tvOS 13 or above)
+        WWISEC_IOS_AkAudioAPI_AudioUnit = 1 << 1,                                                              ///< Use AudioUnit framework (basic functionality, compatible with all iOS devices)
+        WWISEC_IOS_AkAudioAPI_Default = WWISEC_IOS_AkAudioAPI_AVAudioEngine | WWISEC_IOS_AkAudioAPI_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
+    } WWISEC_IOS_AkAudioAPIiOS;
+
     typedef struct WWISEC_AudioBufferList WWISEC_AudioBufferList;
 
     /// iOS-only callback function prototype used for audio input source plugin. Implement this function to transfer the
@@ -1986,10 +1993,10 @@ extern "C"
     /// \sa
     /// - \ref AkPlatformInitSettings
     typedef WWISEC_AKRESULT (*WWISEC_IOS_AudioInputCallbackFunc)(
-        WWISEC_AudioBufferList* io_Data, ///< An exposed CoreAudio structure that holds the input audio samples generated from
-                                         ///< audio input hardware. The buffer is pre-allocated by the sound engine and the buffer
-                                         ///< size can be obtained from the structure. Refer to the microphone demo of the IntegrationDemo for an example of usage.
-        void* in_pCookie                 ///< User-provided data, e.g., a user structure.
+        const WWISEC_AudioBufferList* io_Data, ///< An exposed CoreAudio structure that holds the input audio samples generated from
+                                               ///< audio input hardware. The buffer is pre-allocated by the sound engine and the buffer
+                                               ///< size can be obtained from the structure. Refer to the microphone demo of the IntegrationDemo for an example of usage.
+        void* in_pCookie                       ///< User-provided data, e.g., a user structure.
     );
 
     /// iOS-only callback function prototype used for handling audio session interruptions.
@@ -2044,6 +2051,10 @@ extern "C"
         WWISEC_IOS_AkAudioSessionProperties audioSession; ///< iOS audio session properties
         WWISEC_IOS_AkAudioCallbacks audioCallbacks;       ///< iOS audio callbacks
 
+        WWISEC_IOS_AkAudioAPIiOS eAudioAPI; ///< Main audio API to use. Leave to AkAPI_Default for the default sink (default value).
+
+        AkUInt32 uNumSpatialAudioPointSources; ///< Number of Apple Spatial Audio point sources to allocate for 3D audio use (each point source is a system audio object). Default: 128
+
         bool bVerboseSystemOutput; ///< Print additional debugging information specific to iOS to the system output log.
     } WWISEC_IOS_AkPlatformInitSettings;
 
@@ -2087,8 +2098,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AK_PluginServiceType_RNG = 1,
         WWISEC_AK_PluginServiceType_AudioObjectAttenuation = 2,
         WWISEC_AK_PluginServiceType_AudioObjectPriority = 3,
-        PluginServiceType_HashTable = 4,
-        PluginServiceType_Markers = 5,
+        WWISEC_AK_PluginServiceType_HashTable = 4,
+        WWISEC_AK_PluginServiceType_Markers = 5,
         WWISEC_AK_PluginServiceType_MAX,
     } WWISEC_AK_AkPluginServiceType;
 

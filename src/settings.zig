@@ -371,6 +371,22 @@ pub const IOS_AkAudioSessionProperties = extern struct {
     }
 };
 
+pub const AkAudioAPIiOs = packed struct(common.DefaultEnumType) {
+    av_audio_engine: bool = false,
+    audio_unit: bool = false,
+    padding: u30 = 0,
+
+    pub const Default = .{ .av_audio_engine = true, .audio_unit = true };
+
+    pub fn fromC(value: c.WWISEC_AkAudioAPIiOS) AkAudioAPIiOs {
+        return @bitCast(value);
+    }
+
+    pub fn toC(self: AkAudioAPIiOs) c.WWISEC_AkAudioAPIiOS {
+        return @bitCast(self);
+    }
+};
+
 pub const IOS_AudioInputCallbackFunc = c.WWISEC_IOS_AudioInputCallbackFunc;
 pub const IOS_AudioInterruptionCallbackFunc = c.WWISEC_IOS_AudioInterruptionCallbackFunc;
 
@@ -402,6 +418,8 @@ pub const IOS_AkPlatformInitSettings = extern struct {
     num_refills_in_voice: u16 = 0,
     audio_session: IOS_AkAudioSessionProperties = .{},
     audio_callbacks: IOS_AkAudioCallbacks = .{},
+    audio_api: AkAudioAPIiOs = AkAudioAPIiOs.Default,
+    num_spatial_audio_point_sources: u32 = 0,
     verbose_system_output: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_IOS_AkPlatformInitSettings) IOS_AkPlatformInitSettings {
