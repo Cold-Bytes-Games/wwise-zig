@@ -440,6 +440,7 @@ pub const AkEmitterListenerPair = extern struct {
     spread: f32 = 0.0,
     aperture: f32 = 100.0,
     scaling_factor: f32 = 1.0,
+    path_gain: f32 = 1.0,
     emitter_channel_mask: AkChannelMask = 0xFFFFFFFF,
     id: AkRayID = 0,
     listener_id: AkGameObjectID = 0,

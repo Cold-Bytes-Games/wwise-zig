@@ -401,6 +401,7 @@ extern "C"
         AkReal32 fSpread;                         ///< Emitter-listener-pair-specific spread
         AkReal32 fAperture;                       ///< Emitter-listener-pair-specific aperture
         AkReal32 fScalingFactor;                  ///< Combined scaling factor due to both emitter and listener.
+        AkReal32 fPathGain;                       ///< Emitter-listener-pair-specific overall gain that scales fDryMixGain, fGameDefAuxMixGain and fUserDefAuxMixGain
         WWISEC_AkChannelMask uEmitterChannelMask; ///< Channels of the emitter that apply to this ray.
         WWISEC_AkRayID id;                        ///< ID of this emitter-listener pair, unique for a given emitter.
         WWISEC_AkGameObjectID m_uListenerID;      ///< Listener game object ID.
@@ -2247,7 +2248,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
         WWISEC_AkBackgroundMusicChangeCallbackFunc BGMCallback; ///< Application-defined audio source change event callback function.
         void* BGMCallbackCookie;                                ///< Application-defined user data for the audio source change event callback function.
-        AkOSChar* szPluginDLLPath;                              ///< When using DLLs for plugins, specify their path. Leave NULL if DLLs are in the same folder as the game executable.
+        const AkOSChar* szPluginDLLPath;                        ///< When using DLLs for plugins, specify their path. Leave NULL if DLLs are in the same folder as the game executable.
 
         WWISEC_AkFloorPlane eFloorPlane; ///< Define the orientation of the the floor plane with respect to the X,Y,Z axes, and which axes represent the side, front and up vectors as a basis for rotations in Wwise.
                                          ///< AkFloorPlane is used in to orient the Game Object 3D Viewer in Wwise, and in the transformation of geometry instances in Wwise Spatial Audio.
@@ -2342,6 +2343,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterPlugin(WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkCreatePluginCallback in_pCreateFunc, WWISEC_AkCreateParamCallback in_pCreateParamFunc);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterPluginDLL(const AkOSChar* in_DllName, const AkOSChar* in_DllPath);
+
+    bool WWISEC_AK_SoundEngine_IsPluginRegistered(WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGlobalCallback(WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation, void* in_pCookie, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID);
 
@@ -2582,6 +2585,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopOutputCapture();
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureMarker(const char* in_MarkerText);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureBinaryMarker(void* in_pMarkerData, AkUInt32 in_uMarkerDataSize);
 
     AkUInt32 WWISEC_AK_SoundEngine_GetSampleRate();
 

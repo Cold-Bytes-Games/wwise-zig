@@ -787,6 +787,11 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterPluginDLL(const AkOSChar* in_DllNa
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterPluginDLL(in_DllName, in_DllPath));
 }
 
+bool WWISEC_AK_SoundEngine_IsPluginRegistered(WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID)
+{
+    return AK::SoundEngine::IsPluginRegistered(static_cast<AkPluginType>(in_eType), in_ulCompanyID, in_ulPluginID);
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGlobalCallback(WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation, void* in_pCookie, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterGlobalCallback(reinterpret_cast<AkGlobalCallbackFunc>(in_pCallback), in_eLocation, in_pCookie, static_cast<AkPluginType>(in_eType), in_ulCompanyID, in_ulPluginID));
@@ -1477,6 +1482,11 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopOutputCapture()
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureMarker(const char* in_MarkerText)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutputCaptureMarker(in_MarkerText));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureBinaryMarker(void* in_pMarkerData, AkUInt32 in_uMarkerDataSize)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutputCaptureBinaryMarker(in_pMarkerData, in_uMarkerDataSize));
 }
 
 AkUInt32 WWISEC_AK_SoundEngine_GetSampleRate()

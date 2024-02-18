@@ -236,6 +236,10 @@ pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []c
     );
 }
 
+pub fn isPluginRegistered(in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32) bool {
+    return c.WWISEC_AK_SoundEngine_IsPluginRegistered(@intFrom(in_type), in_company_id, in_plugin_id);
+}
+
 pub const RegisterGlobalCallbackOptionalArgs = struct {
     location: callbacks.AkGlobalCallbackLocation = .{ .begin_render = true },
     cookie: ?*anyopaque = null,
@@ -1824,6 +1828,15 @@ pub fn addOutputCaptureMarker(fallback_allocator: std.mem.Allocator, in_marker_t
 
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutputCaptureMarker(raw_marker_text),
+    );
+}
+
+pub fn addOutputCaptureBinaryMarker(in_marker_data: []const u8) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_AddOutputCaptureBinaryMarker(
+            @ptrCast(in_marker_data),
+            @truncate(in_marker_data.len),
+        ),
     );
 }
 
