@@ -553,7 +553,7 @@ pub const AKRESULT = enum(DefaultEnumType) {
     invalid_state_group = 20,
     child_already_has_a_parent = 21,
     invalid_language = 22,
-    cannot_add_itsefl_as_a_child = 23,
+    cannot_add_itself_as_a_child = 23,
     invalid_parameter = 31,
     element_already_in_list = 35,
     path_not_found = 36,
@@ -610,6 +610,11 @@ pub const AKRESULT = enum(DefaultEnumType) {
     not_initialized = 102,
     file_permission_error = 103,
     unknown_file_error = 104,
+    too_many_concurrent_operations = 105,
+    invalid_file_size = 106,
+    deferred = 107,
+    file_path_too_long = 108,
+    invalid_state = 109,
 };
 
 pub const AkGroupType = enum(DefaultEnumType) {
@@ -681,7 +686,7 @@ pub const WwiseError = error{
     InvalidStateGroup,
     ChildAlreadyHasAParent,
     InvalidLanguage,
-    CannotAddItseflAsAChild,
+    CannotAddItselfAsAChild,
     InvalidParameter,
     ElementAlreadyInList,
     PathNotFound,
@@ -738,6 +743,11 @@ pub const WwiseError = error{
     NotInitialized,
     FilePermissionError,
     UnknownFileError,
+    TooManyConcurrentOperations,
+    InvalidFileSize,
+    Deferred,
+    FilePathTooLong,
+    InvalidState,
 };
 
 pub inline fn handleAkResult(result: c.WWISEC_AKRESULT) WwiseError!void {
