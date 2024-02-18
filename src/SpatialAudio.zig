@@ -96,7 +96,8 @@ pub const AkSpatialAudioInitSettings = extern struct {
     number_of_primary_rays: u32 = 100,
     max_reflection_order: u32 = 1,
     max_diffraction_order: u32 = 8,
-    diffraction_on_reflections_or: u32 = 2,
+    max_emitter_room_aux_sends: u32 = 3,
+    diffraction_on_reflections_order: u32 = 2,
     max_path_length: f32 = 10000.0,
     cpu_limit_percentage: f32 = 0.0,
     load_balancing_spread: u32 = 1,
@@ -213,6 +214,7 @@ pub const AkDiffractionPathInfo = extern struct {
     transmission_loss: f32 = 0.0,
     tot_length: f32 = 0.0,
     obstruction_value: f32 = 0.0,
+    occlusion_value: f32 = 0.0,
 
     pub fn fromC(value: c.WWISEC_AkDiffractionPathInfo) AkDiffractionPathInfo {
         return @bitCast(value);
@@ -229,6 +231,7 @@ pub const AkPortalParams = extern struct {
     enabled: bool = false,
     front_room: AkRoomID = .{},
     back_room: AkRoomID = .{},
+    room_priority: u32 = 100,
 
     pub fn fromC(value: c.WWISEC_AkPortalParams) AkPortalParams {
         return @bitCast(value);
@@ -267,7 +270,6 @@ pub const AkGeometryParams = extern struct {
     num_surfaces: AkSurfIdx = 0,
     enable_diffraction: bool = false,
     enable_diffraction_on_boundary_edges: bool = false,
-    enable_triangles: bool = true,
 
     pub fn fromC(value: c.WWISEC_AkGeometryParams) AkGeometryParams {
         return @bitCast(value);
@@ -313,6 +315,7 @@ pub const AkGeometryInstanceParams = extern struct {
     },
     geometry_set_id: AkGeometrySetID = .{},
     room_id: AkRoomID = .{},
+    use_for_reflection_and_diffraction: bool = true,
 
     pub fn fromC(value: c.WWISEC_AkGeometryInstanceParams) AkGeometryInstanceParams {
         return @bitCast(value);
@@ -529,9 +532,27 @@ pub fn removePortal(in_portal_id: AkPortalID) common.WwiseError!void {
     );
 }
 
+pub fn setReverbZone(in_reverb_zone: AkRoomID, in_parent_room: AkRoomID, in_transition_region_width: f32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_SetReverbZone(in_reverb_zone.toC(), in_parent_room.toC(), in_transition_region_width),
+    );
+}
+
+pub fn removeReverbZone(in_reverb_zone: AkRoomID) !common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_RemoveReverbZone(in_reverb_zone.toC()),
+    );
+}
+
 pub fn setGameObjectInRoom(in_game_object_id: common.AkGameObjectID, in_current_room_id: AkRoomID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetGameObjectInRoom(in_game_object_id, in_current_room_id.toC()),
+    );
+}
+
+pub fn unsetGameObjectInRoom(in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(in_game_object_id),
     );
 }
 
@@ -545,6 +566,12 @@ pub fn setDiffractionOrder(in_diffraction_order: u32, in_update_paths: bool) com
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetDiffractionOrder(in_diffraction_order, in_update_paths),
     );
+}
+
+pub fn setMaxEmitterRoomAuxSends(in_max_emitter_room_aux_sends: u32) common.WwiseError!void {
+    return common.handleAkResult{
+        c.WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(in_max_emitter_room_aux_sends),
+    };
 }
 
 pub fn setNumberOfPrimaryRays(in_nb_primary_rays: u32) common.WwiseError!void {

@@ -3869,9 +3869,24 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemovePortal(WWISEC_AkPortalID in_PortalI
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemovePortal(in_PortalID.id));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReverbZone(WWISEC_AkRoomID in_ReverbZone, WWISEC_AkRoomID in_ParentRoom, AkReal32 in_transitionRegionWidth)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetReverbZone(in_ReverbZone.id, in_ParentRoom.id, in_transitionRegionWidth));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveReverbZone(WWISEC_AkRoomID in_ReverbZone)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveReberbZone(in_ReverbZone.id));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGameObjectInRoom(in_gameObjectID, in_CurrentRoomID.id));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::UnsetGameObjectInRoom(in_gameObjectID));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflectionsOrder, bool in_bUpdatePaths)
@@ -3882,6 +3897,11 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflecti
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffractionOrder, bool in_bUpdatePaths)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetDiffractionOrder(in_uDiffractionOrder, in_bUpdatePaths));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(AkUInt32 in_uMaxEmitterRoomAuxSends)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxEmitterRoomAuxSends(in_uMaxEmmiterRoomAuxSends));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPrimaryRays)

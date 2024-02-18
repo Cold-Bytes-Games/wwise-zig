@@ -3791,7 +3791,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     typedef struct WWISEC_AkSpatialAudioInitSettings
     {
         AkUInt32 uMaxSoundPropagationDepth;              ///< Maximum number of portals that sound can propagate through; must be less than or equal to AK_MAX_SOUND_PROPAGATION_DEPTH.
-        AkReal32 fMovementThreshold;                     ///< Amount that an emitter or listener has to move to trigger a recalculation of reflections/diffraction. Larger values can reduce the CPU load at the cost of reduced accuracy.
+        AkReal32 fMovementThreshold;                     ///< Amount that an emitter or listener has to move to trigger a validation of reflections/diffraction. Larger values can reduce the CPU load at the cost of reduced accuracy. Note that the ray tracing itself is not affected by this value. Rays are cast each time a Spatial Audio update is executed.
         AkUInt32 uNumberOfPrimaryRays;                   ///< The number of primary rays used in the ray tracing engine. A larger number of rays will increase the chances of finding reflection and diffraction paths, but will result in higher CPU usage. When CPU limit is active (see \ref AkSpatialAudioInitSettings::fCPULimitPercentage), this setting represents the maximum allowed number of primary rays.
         AkUInt32 uMaxReflectionOrder;                    ///< Maximum reflection order [1, 4] - the number of 'bounces' in a reflection path. A high reflection order renders more details at the expense of higher CPU usage.
         AkUInt32 uMaxDiffractionOrder;                   ///< Maximum diffraction order [1, 8] - the number of 'bends' in a diffraction path. A high diffraction order accommodates more complex geometry at the expense of higher CPU usage.
@@ -3801,9 +3801,12 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
                                                          ///< For example, if box-shaped geometry is used exclusively, and only a single box is expected between an emitter and then listener, limiting \c uMaxDiffractionOrder to 2 may be sufficient.
                                                          ///< A diffraction path search starts from the listener, so when the maximum diffraction order is exceeded, the remaining geometry between the end of the path and the emitter is ignored.
                                                          ///< In such case, where the search is terminated before reaching the emitter, the diffraction coefficient will be underestimated. It is calculated from a partial path, ignoring any remaining geometry.
+        AkUInt32 uMaxEmitterRoomAuxSends;                ///< The maximum number of game-defined auxiliary sends that can originate from a single emitter. An emitter can send to its own room, and to all adjacent rooms if the emitter and listener are in the same room. If a limit is set, the most prominent sends are kept, based on spread to the adjacent portal from the emitters perspective.
+                                                         ///< Set to 1 to only allow emitters to send directly to their current room, and to the room a listener is transitioning to if inside a portal. Set to 0 to disable the limit.
         AkUInt32 uDiffractionOnReflectionsOrder;         ///< The maximum possible number of diffraction points at each end of a reflection path. Diffraction on reflection allows reflections to fade in and out smoothly as the listener or emitter moves in and out of the reflection's shadow zone.
                                                          ///< When greater than zero, diffraction rays are sent from the listener to search for reflections around one or more corners from the listener.
                                                          ///< Diffraction must be enabled on the geometry to find diffracted reflections (refer to \c AkGeometryParams). Set to 0 to disable diffraction on reflections.
+                                                         ///< To allow reflections to propagate through portals without being cut off, set \c uDiffractionOnReflectionsOrder to 2 or greater.
         AkReal32 fMaxPathLength;                         ///< The total length of a path composed of a sequence of segments (or rays) cannot exceed the defined maximum path length. High values compute longer paths but increase the CPU cost.
                                                          ///< Each individual sound is also affected by its maximum attenuation distance, specified in the Authoring tool. Reflection or diffraction paths, calculated inside Spatial Audio, will never exceed a sound's maximum attenuation distance.
                                                          ///< Note, however, that attenuation is considered infinite if the furthest point is above the audibility threshold.
@@ -3979,6 +3982,10 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// Obstruction value for this path
         /// This value includes the accumulated portal obstruction for all portals along the path.
         AkReal32 obstructionValue;
+
+        /// Occlusion value for this path
+        /// This value includes the accumulated portal occlusion for all portals along the path.
+        AkReal32 occlusionValue;
     } WWISEC_AkDiffractionPathInfo;
 
     /// Parameters passed to \c SetPortal
@@ -4078,6 +4085,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// - \ref spatial_audio_roomsportals_apiconfigroomgeometry
         /// - \ref AkGeometryParams
         WWISEC_AkGeometrySetID GeometryInstanceID;
+
+        AkUInt32 RoomPriority;
     } WWISEC_AkRoomParams;
 
     /// Parameters passed to \c SetGeometry
@@ -4118,12 +4127,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
         /// Switch to enable or disable geometric diffraction on boundary edges for this Geometry.  Boundary edges are edges that are connected to only one triangle.
         bool EnableDiffractionOnBoundaryEdges;
-
-        /// Switch to enable or disable the use of the triangles for this Geometry. When enabled, the geometry triangles are indexed for ray computation and used to computed reflection and diffraction.
-        /// Set EnableTriangles to false when using a geometry set only to describe a room, and not for reflection and diffraction calculation.
-        ///	\sa
-        /// - \ref AkRoomParams
-        bool EnableTriangles;
     } WWISEC_AkGeometryParams;
 
 #define WWISEC_AK_DEFAULT_GEOMETRY_POSITION_X (0.0)
@@ -4168,6 +4171,13 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         ///	- \ref AK::SpatialAudio::SetRoom
         ///	- \ref AkRoomParams
         WWISEC_AkRoomID RoomID;
+
+        /// When enabled, the geometry instance is indexed for ray computation and used to compute reflection, diffraction, and transmission.
+        /// If the geometry instance is used only for room containment, this flag must be set to false.
+        ///	- \ref AK::SpatialAudio::SetRoom
+        ///	- \ref AkRoomParams
+        ///
+        bool UseForReflectionAndDiffraction;
     } WWISEC_AkGeometryInstanceParams;
 
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_Init(const WWISEC_AkSpatialAudioInitSettings* in_initSettings);
@@ -4186,9 +4196,13 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveRoom(WWISEC_AkRoomID in_RoomID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortal(WWISEC_AkPortalID in_PortalID, const WWISEC_AkPortalParams* in_Params, const char* in_PortalName);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemovePortal(WWISEC_AkPortalID in_PortalID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReverbZone(WWISEC_AkRoomID in_ReverbZone, WWISEC_AkRoomID in_ParentRoom, AkReal32 in_transitionRegionWidth);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveReverbZone(WWISEC_AkRoomID in_ReverbZone);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflectionsOrder, bool in_bUpdatePaths);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffractionOrder, bool in_bUpdatePaths);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(AkUInt32 in_uMaxEmitterRoomAuxSends);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPrimaryRays);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(AkUInt32 in_uNbFrames);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID);
