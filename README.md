@@ -1,4 +1,4 @@
-# wwise-zig - Zig bindings to Audiokinetic Wwise (2022.1.10)
+# wwise-zig - Zig bindings to Audiokinetic Wwise (2023.1.0)
 
 This package implement a native [Zig](https://ziglang.org/) binding for [Audiokinetic Wwise](https://www.audiokinetic.com/en/products/wwise). The included C binding is designed only to be used by the Zig binding. If you want to expand the C binding to be fully functional please submit any pull requests.
 
@@ -26,11 +26,11 @@ This binding mimic the versioning of Wwise but add the Zig binding version at th
 
 Example:
 
-2022.1.9-zig0
+2023.1.0-zig0
 
-* 2022 = year
+* 2023 = year
 * 1 = major Wwise version
-* 9 = minor Wwise version
+* 0 = minor Wwise version
 * -zig0 = Zig binding version
 
 ## Supported platforms
@@ -51,8 +51,6 @@ Example:
 
 - On Windows, the default GNU ABI is not supported, always use the MSVC ABI
 - On Windows, we always use the latest supported Visual Studio (currently 2022)
-- On Linux, the default I/O hooks are currently not supported (see #1)
-- UWP is gonna be deprecated so it is not supported
 - No support for consoles yet
 
 ## Import it in your project
