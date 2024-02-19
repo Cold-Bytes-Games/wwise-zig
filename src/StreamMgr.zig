@@ -104,26 +104,27 @@ pub const AkAsyncIOTransferInfo = extern struct {
     }
 };
 
-pub const AkFileOpenCallback = ?*const fn (in_open_info: ?*NativeAkSyncFileOpenData, in_result: common.AKRESULT) callconv(.C) void;
+// The first parameter is NativeAkAsyncFileOpenData but it introduce a dependency loop
+pub const AkFileOpenCallback = ?*const fn (in_open_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.C) void;
 
-pub const NativeAkSyncFileOpenData = extern struct {
+pub const NativeAkAsyncFileOpenData = extern struct {
     base: stream_interfaces.NativeAkFileOpenData,
-    callback: ?*AkFileOpenCallback,
+    callback: AkFileOpenCallback,
     cookie: ?*anyopaque,
-    file_desc: AkFileDesc,
+    file_desc: ?*AkFileDesc,
     custom_data: ?*anyopaque,
-    stream_name: [*]const common.AkOSChar,
+    stream_name: [*:0]const common.AkOSChar,
 
-    pub inline fn fromC(value: c.WWISEC_AkAsyncFileOpenData) NativeAkSyncFileOpenData {
+    pub inline fn fromC(value: c.WWISEC_AkAsyncFileOpenData) NativeAkAsyncFileOpenData {
         return @bitCast(value);
     }
 
-    pub fn toC(self: NativeAkSyncFileOpenData) c.WWISEC_AkAsyncFileOpenData {
+    pub fn toC(self: NativeAkAsyncFileOpenData) c.WWISEC_AkAsyncFileOpenData {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(NativeAkSyncFileOpenData) == @sizeOf(c.WWISEC_AkAsyncFileOpenData));
+        std.debug.assert(@sizeOf(NativeAkAsyncFileOpenData) == @sizeOf(c.WWISEC_AkAsyncFileOpenData));
     }
 };
 
@@ -152,20 +153,20 @@ pub const IAkLowLevelIOHook = opaque {
         get_device_desc: *const fn (self: *IAkLowLevelIOHook, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
         get_device_data: *const fn (self: *IAkLowLevelIOHook) callconv(.C) u32,
         batch_open: *const fn (
-            self: IAkLowLevelIOHook,
+            self: *IAkLowLevelIOHook,
             in_num_files: u32,
-            in_items: [*]*NativeAkSyncFileOpenData,
+            in_items: [*]*NativeAkAsyncFileOpenData,
         ) callconv(.C) void,
         batch_read: *const fn (
             self: *IAkLowLevelIOHook,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.C) void,
         batch_write: *const fn (
             self: *IAkLowLevelIOHook,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.C) void,
         batch_cancel: *const fn (
             self: *IAkLowLevelIOHook,
             in_num_transfers: u32,
@@ -228,7 +229,7 @@ pub const IAkLowLevelIOHook = opaque {
     pub fn batchOpen(
         self: *IAkLowLevelIOHook,
         in_num_files: u32,
-        in_items: [*]*NativeAkSyncFileOpenData,
+        in_items: [*]*NativeAkAsyncFileOpenData,
     ) void {
         c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchOpen(
             @ptrCast(self),
@@ -241,13 +242,11 @@ pub const IAkLowLevelIOHook = opaque {
         self: *IAkLowLevelIOHook,
         in_num_transfers: u32,
         in_transfer_items: [*]BatchIoTransferItem,
-    ) common.WwiseError!void {
-        return common.handleAkResult(
-            c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchRead(
-                @ptrCast(self),
-                in_num_transfers,
-                @ptrCast(in_transfer_items),
-            ),
+    ) void {
+        c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchRead(
+            @ptrCast(self),
+            in_num_transfers,
+            @ptrCast(in_transfer_items),
         );
     }
 
@@ -255,13 +254,11 @@ pub const IAkLowLevelIOHook = opaque {
         self: *IAkLowLevelIOHook,
         in_num_transfers: u32,
         in_transfer_items: [*]BatchIoTransferItem,
-    ) common.WwiseError!void {
-        return common.handleAkResult(
-            c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchWrite(
-                @ptrCast(self),
-                in_num_transfers,
-                @ptrCast(in_transfer_items),
-            ),
+    ) void {
+        c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchWrite(
+            @ptrCast(self),
+            in_num_transfers,
+            @ptrCast(in_transfer_items),
         );
     }
 
@@ -288,14 +285,15 @@ pub const IAkLowLevelIOHook = opaque {
         in_path_size: i32,
     ) common.WwiseError!void {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_char_allocator.get();
+         const char_allocator = stack_char_allocator.get();
+        var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+        defer area_allocator.deinit();
 
-        const native_file_open = in_file_open.toC(allocator) catch return common.WwiseError.Fail;
-        defer allocator.free(native_file_open.file);
+        const native_file_open = in_file_open.toC(area_allocator.allocator()) catch return common.WwiseError.Fail;
 
         return common.handleAkResult(c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_OutputSearchedPaths(
             @ptrCast(self),
-            in_result,
+            @intFromEnum(in_result),
             @ptrCast(&native_file_open),
             out_searched_path,
             in_path_size,
@@ -316,10 +314,10 @@ pub const IAkLowLevelIOHook = opaque {
 pub const IAkFileLocationResolver = opaque {
     pub const FunctionTable = extern struct {
         destructor: *const fn (self: *IAkFileLocationResolver) callconv(.C) void,
-        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkSyncFileOpenData, io_id_device: *common.AkDeviceID) callconv(.C) common.AKRESULT,
+        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *common.AkDeviceID) callconv(.C) common.AKRESULT,
     };
 
-    pub fn getNextPreferredDevice(self: *IAkFileLocationResolver, in_file_open: *NativeAkSyncFileOpenData, io_id_device: *common.AkDeviceID) common.WwiseError!void {
+    pub fn getNextPreferredDevice(self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *common.AkDeviceID) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(
                 @ptrCast(self),

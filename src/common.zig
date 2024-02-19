@@ -769,7 +769,7 @@ pub inline fn handleAkResult(result: c.WWISEC_AKRESULT) WwiseError!void {
         c.WWISEC_AK_InvalidStateGroup => return WwiseError.InvalidStateGroup,
         c.WWISEC_AK_ChildAlreadyHasAParent => return WwiseError.ChildAlreadyHasAParent,
         c.WWISEC_AK_InvalidLanguage => return WwiseError.InvalidLanguage,
-        c.WWISEC_AK_CannotAddItseflAsAChild => return WwiseError.CannotAddItseflAsAChild,
+        c.WWISEC_AK_CannotAddItselfAsAChild => return WwiseError.CannotAddItselfAsAChild,
         c.WWISEC_AK_InvalidParameter => return WwiseError.InvalidParameter,
         c.WWISEC_AK_ElementAlreadyInList => return WwiseError.ElementAlreadyInList,
         c.WWISEC_AK_PathNotFound => return WwiseError.PathNotFound,

@@ -20,19 +20,17 @@ pub const WwiseBuildOptions = struct {
     use_communication: bool,
     use_default_job_worker: bool,
     use_spatial_audio: bool,
-    include_default_io_hook_blocking: bool,
     include_default_io_hook_deferred: bool,
-    include_file_package_io_blocking: bool,
     include_file_package_io_deferred: bool,
     string_stack_size: usize = 0,
     static_plugins: []const []const u8,
 
     pub fn useDefaultIoHooks(self: WwiseBuildOptions) bool {
-        return self.include_default_io_hook_blocking or self.include_default_io_hook_deferred or self.include_file_package_io_blocking or self.include_default_io_hook_deferred;
+        return self.include_default_io_hook_deferred or self.include_file_package_io_deferred;
     }
 
     pub fn useFilePackageIO(self: WwiseBuildOptions) bool {
-        return self.include_file_package_io_blocking or self.include_file_package_io_deferred;
+        return self.include_file_package_io_deferred;
     }
 };
 
@@ -54,9 +52,7 @@ pub fn build(b: *std.Build) !void {
     const wwise_use_spatial_audio_option = b.option(bool, "use_spatial_audio", "Enable usagee of the Spatial Audio module (Default: false)");
     const wwise_string_stack_size_option = b.option(usize, "string_stack_size", "Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default: 256)");
 
-    const wwise_include_default_io_hook_blocking_option = b.option(bool, "include_default_io_hook_blocking", "Include the Default IO Hook Blocking");
     const wwise_include_default_io_hook_deferred_option = b.option(bool, "include_default_io_hook_deferred", "Include the Default IO Hook Deferred");
-    const wwise_include_file_package_io_blocking_option = b.option(bool, "include_file_package_io_blocking", "Include the File Package IO Hook Blocking");
     const wwise_include_file_package_io_deferred_option = b.option(bool, "include_file_package_io_deferred", "Include the File Package IO Hook Deferred");
 
     const wwise_static_plugins_option = b.option([]const []const u8, "static_plugins", "List of builtin static plugins to build");
@@ -77,9 +73,7 @@ pub fn build(b: *std.Build) !void {
         },
         .use_default_job_worker = wwise_use_default_job_worker_option orelse false,
         .use_spatial_audio = wwise_use_spatial_audio_option orelse false,
-        .include_default_io_hook_blocking = wwise_include_default_io_hook_blocking_option != null or wwise_include_file_package_io_blocking_option != null,
         .include_default_io_hook_deferred = wwise_include_default_io_hook_deferred_option != null or wwise_include_file_package_io_deferred_option != null,
-        .include_file_package_io_blocking = wwise_include_file_package_io_blocking_option orelse false,
         .include_file_package_io_deferred = wwise_include_file_package_io_deferred_option orelse false,
         .string_stack_size = wwise_string_stack_size_option orelse 256,
         .static_plugins = wwise_static_plugins_option orelse &.{},
@@ -141,9 +135,7 @@ pub fn build(b: *std.Build) !void {
     option_step.addOption(bool, "use_communication", wwise_build_options.use_communication);
     option_step.addOption(bool, "use_default_job_worker", wwise_build_options.use_default_job_worker);
     option_step.addOption(bool, "use_spatial_audio", wwise_build_options.use_spatial_audio);
-    option_step.addOption(bool, "include_default_io_hook_blocking", wwise_build_options.include_default_io_hook_blocking);
     option_step.addOption(bool, "include_default_io_hook_deferred", wwise_build_options.include_default_io_hook_deferred);
-    option_step.addOption(bool, "include_file_package_io_blocking", wwise_build_options.include_file_package_io_blocking);
     option_step.addOption(bool, "include_file_package_io_deferred", wwise_build_options.include_file_package_io_deferred);
     option_step.addOption(WwisePlatform, "platform", wwise_build_options.platform);
 
@@ -447,26 +439,12 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_
         });
     }
 
-    if (wwise_build_options.include_default_io_hook_blocking) {
-        compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING", null);
-        compile_step.addCSourceFile(.{
-            .file = .{
-                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookBlocking.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }),
-            },
-            .flags = CppFlags,
-        });
-    }
-
     if (wwise_build_options.include_default_io_hook_deferred) {
         compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", null);
         compile_step.addCSourceFile(.{
             .file = .{ .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }) },
             .flags = CppFlags,
         });
-    }
-
-    if (wwise_build_options.include_file_package_io_blocking) {
-        compile_step.defineCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING", null);
     }
 
     if (wwise_build_options.include_file_package_io_deferred) {

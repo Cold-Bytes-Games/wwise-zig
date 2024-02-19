@@ -4,62 +4,6 @@ const common = @import("common.zig");
 const wwise_options = @import("wwise_options");
 const StreamMgr = @import("StreamMgr.zig");
 
-pub const CAkDefaultIOHookBlocking = if (wwise_options.include_default_io_hook_blocking) opaque {
-    const Alignment = @alignOf(*CAkDefaultIOHookBlocking);
-
-    pub fn create(allocator: std.mem.Allocator) !*CAkDefaultIOHookBlocking {
-        const instance_size_of = c.WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof();
-        const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
-        return @ptrCast(c.WWISEC_AK_CAkDefaultIOHookBlocking_Create(@ptrCast(buffer[0..instance_size_of])));
-    }
-
-    pub fn destroy(self: *CAkDefaultIOHookBlocking, allocator: std.mem.Allocator) void {
-        c.WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(self);
-
-        const instance_size_of = c.WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof();
-        const buffer: [*]align(Alignment) u8 = @ptrCast(@alignCast(self));
-        allocator.free(buffer[0..instance_size_of]);
-    }
-
-    pub inline fn init(self: *CAkDefaultIOHookBlocking, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookBlocking_Init(self, @ptrCast(in_device_settings), in_async_open),
-        );
-    }
-
-    pub inline fn term(self: *CAkDefaultIOHookBlocking) void {
-        c.WWISEC_AK_CAkDefaultIOHookBlocking_Term(self);
-    }
-
-    pub fn setBasePath(self: *CAkDefaultIOHookBlocking, fallback_allocator: std.mem.Allocator, base_path: []const u8) common.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_oschar_allocator.get();
-
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
-        defer allocator.free(raw_base_path);
-
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookBlocking_SetBasePath(self, raw_base_path),
-        );
-    }
-
-    pub fn addBasePath(self: *CAkDefaultIOHookBlocking, fallback_allocator: std.mem.Allocator, base_path: []const u8) common.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_oschar_allocator.get();
-
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
-        defer allocator.free(raw_base_path);
-
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookBlocking_AddBasePath(self, raw_base_path),
-        );
-    }
-
-    pub inline fn setUseSubfoldering(self: *CAkDefaultIOHookBlocking, use_sub_foldering: bool) void {
-        c.WWISEC_CAkDefaultIOHookBlocking_SetUseSubfoldering(self, use_sub_foldering);
-    }
-} else void;
-
 pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_deferred) opaque {
     const Alignment = @alignOf(*CAkDefaultIOHookDeferred);
 
@@ -77,9 +21,9 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
         allocator.free(buffer[0..instance_size_of]);
     }
 
-    pub inline fn init(self: *CAkDefaultIOHookDeferred, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
+    pub inline  fn init(self: *CAkDefaultIOHookDeferred, in_device_settings: *const StreamMgr.AkDeviceSettings) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkDefaultIOHookDeferred_Init(self, @ptrCast(in_device_settings), in_async_open),
+            c.WWISEC_AK_CAkDefaultIOHookDeferred_Init(self, @ptrCast(in_device_settings)),
         );
     }
 
@@ -116,94 +60,6 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
     }
 } else void;
 
-pub const CAkFilePackageLowLevelIOBlocking = if (wwise_options.include_file_package_io_blocking) opaque {
-    const Alignment = @alignOf(*CAkFilePackageLowLevelIOBlocking);
-
-    pub fn create(allocator: std.mem.Allocator) !*CAkFilePackageLowLevelIOBlocking {
-        const instance_size_of = c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof();
-        const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
-        return @ptrCast(c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Create(@ptrCast(buffer[0..instance_size_of])));
-    }
-
-    pub fn destroy(self: *CAkFilePackageLowLevelIOBlocking, allocator: std.mem.Allocator) void {
-        c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(self);
-
-        const instance_size_of = c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof();
-        const buffer: [*]align(Alignment) u8 = @ptrCast(@alignCast(self));
-        allocator.free(buffer[0..instance_size_of]);
-    }
-
-    pub inline fn init(self: *CAkFilePackageLowLevelIOBlocking, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(self, @ptrCast(in_device_settings), in_async_open),
-        );
-    }
-
-    pub inline fn term(self: *CAkFilePackageLowLevelIOBlocking) void {
-        c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(self);
-    }
-
-    pub fn setBasePath(self: *CAkFilePackageLowLevelIOBlocking, fallback_allocator: std.mem.Allocator, base_path: []const u8) common.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_oschar_allocator.get();
-
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
-        defer allocator.free(raw_base_path);
-
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(self, @ptrCast(raw_base_path)),
-        );
-    }
-
-    pub fn addBasePath(self: *CAkFilePackageLowLevelIOBlocking, fallback_allocator: std.mem.Allocator, base_path: []const u8) common.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_oschar_allocator.get();
-
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return common.WwiseError.Fail;
-        defer allocator.free(raw_base_path);
-
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_AddBasePath(self, raw_base_path),
-        );
-    }
-
-    pub inline fn setUseSubfoldering(self: *CAkFilePackageLowLevelIOBlocking, use_sub_foldering: bool) void {
-        c.WWISEC_CAkFilePackageLowLevelIOBlocking_SetUseSubfoldering(self, use_sub_foldering);
-    }
-
-    pub fn loadFilePackage(self: *CAkFilePackageLowLevelIOBlocking, falllback_allocator: std.mem.Allocator, file_package_name: []const u8) common.WwiseError!u32 {
-        var result: u32 = undefined;
-
-        var stack_oschar_allocator = common.stackCharAllocator(falllback_allocator);
-        var allocator = stack_oschar_allocator.get();
-
-        const raw_file_package_name = common.toOSChar(allocator, file_package_name) catch return common.WwiseError.Fail;
-        defer allocator.free(raw_file_package_name);
-
-        try common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(self, @ptrCast(raw_file_package_name), &result),
-        );
-
-        return result;
-    }
-
-    pub inline fn unloadFilePackage(self: *CAkFilePackageLowLevelIOBlocking, package_id: u32) common.WwiseError!void {
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadFilePackage(self, package_id),
-        );
-    }
-
-    pub inline fn unloadAllFilePackages(self: *CAkFilePackageLowLevelIOBlocking) common.WwiseError!void {
-        return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadAllFilePackages(self),
-        );
-    }
-
-    pub inline fn setPackageFallbackBehavior(self: *CAkFilePackageLowLevelIOBlocking, fallback: bool) void {
-        c.WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetPackageFallbackBehavior(self, fallback);
-    }
-} else void;
-
 pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_package_io_deferred) opaque {
     const Alignment = @alignOf(*CAkFilePackageLowLevelIODeferred);
 
@@ -221,9 +77,9 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
         allocator.free(buffer[0..instance_size_of]);
     }
 
-    pub inline fn init(self: *CAkFilePackageLowLevelIODeferred, in_device_settings: *const StreamMgr.AkDeviceSettings, in_async_open: bool) common.WwiseError!void {
+    pub inline fn init(self: *CAkFilePackageLowLevelIODeferred, in_device_settings: *const StreamMgr.AkDeviceSettings) common.WwiseError!void {
         return common.handleAkResult(
-            c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(self, @ptrCast(in_device_settings), in_async_open),
+            c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(self, @ptrCast(in_device_settings)),
         );
     }
 

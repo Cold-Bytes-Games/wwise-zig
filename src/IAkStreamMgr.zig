@@ -302,7 +302,7 @@ pub const AkStreamData = extern struct {
 };
 
 pub const NativeAkFileOpenData = extern struct {
-    file_name: [*]const common.AkOSChar,
+    file_name: [*:0]const common.AkOSChar,
     file_id: common.AkFileID = 0,
     flags: ?*AkFileSystemFlags = null,
     open_mode: AkOpenMode = .read,
@@ -327,7 +327,7 @@ pub const AkFileOpenData = struct {
     open_mode: AkOpenMode = .read,
 
     pub fn deinit(self: AkFileOpenData, allocator: std.mem.Allocator) void {
-        allocator.free(self.name);
+        allocator.free(self.file_name);
     }
 
     pub fn fromC(value: NativeAkFileOpenData, allocator: std.mem.Allocator) !AkFileOpenData {
@@ -343,7 +343,7 @@ pub const AkFileOpenData = struct {
         return .{
             .file_name = try common.toOSChar(allocator, self.file_name),
             .file_id = self.file_id,
-            .flags = if (self.flags) |*flags| flags else null,
+            .flags = if (self.flags) |*flags| @constCast(@ptrCast(flags)) else null,
             .open_mode = self.open_mode,
         };
     }
@@ -809,13 +809,14 @@ pub const IAkStreamMgr = opaque {
         in_sync_open: bool,
     ) common.WwiseError!void {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_char_allocator.get();
+        const char_allocator = stack_char_allocator.get();
+        var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+        defer area_allocator.deinit();
 
-        const native_file_open = in_file_open.toC(allocator) catch return common.WwiseError.Fail;
-        defer allocator.free(native_file_open.file);
+        const native_file_open = in_file_open.toC(area_allocator.allocator()) catch return common.WwiseError.Fail;
 
         return common.handleAkResult(
-            c.WWISEC_AK_IAkStreamMgr_CreateStd_String(
+            c.WWISEC_AK_IAkStreamMgr_CreateStd(
                 @ptrCast(self),
                 @ptrCast(&native_file_open),
                 @ptrCast(out_stream),
@@ -835,13 +836,14 @@ pub const IAkStreamMgr = opaque {
         in_caching: bool,
     ) common.WwiseError!void {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_char_allocator.get();
+        const char_allocator = stack_char_allocator.get();
+        var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+        defer area_allocator.deinit();
 
-        const native_file_open = in_file_open.toC(allocator) catch return common.WwiseError.Fail;
-        defer allocator.free(native_file_open.file);
+        const native_file_open = in_file_open.toC(area_allocator.allocator()) catch return common.WwiseError.Fail;
 
         return common.handleAkResult(
-            c.WWISEC_AK_IAkStreamMgr_CreateAuto_String(
+            c.WWISEC_AK_IAkStreamMgr_CreateAuto_AkFileOpenData(
                 @ptrCast(self),
                 @ptrCast(&native_file_open),
                 @ptrCast(in_heuristics),

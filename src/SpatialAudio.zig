@@ -231,7 +231,6 @@ pub const AkPortalParams = extern struct {
     enabled: bool = false,
     front_room: AkRoomID = .{},
     back_room: AkRoomID = .{},
-    room_priority: u32 = 100,
 
     pub fn fromC(value: c.WWISEC_AkPortalParams) AkPortalParams {
         return @bitCast(value);
@@ -251,6 +250,7 @@ pub const AkRoomParams = extern struct {
     room_game_obj_aux_send_level_to_self: f32 = 0.0,
     room_game_obj_keep_registered: bool = false,
     geometry_instance_id: AkGeometrySetID = .{},
+    room_priority: u32 = 100,
 
     pub fn fromC(value: c.WWISEC_AkRoomParams) AkRoomParams {
         return @bitCast(value);
@@ -538,7 +538,7 @@ pub fn setReverbZone(in_reverb_zone: AkRoomID, in_parent_room: AkRoomID, in_tran
     );
 }
 
-pub fn removeReverbZone(in_reverb_zone: AkRoomID) !common.WwiseError!void {
+pub fn removeReverbZone(in_reverb_zone: AkRoomID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_RemoveReverbZone(in_reverb_zone.toC()),
     );
@@ -569,9 +569,9 @@ pub fn setDiffractionOrder(in_diffraction_order: u32, in_update_paths: bool) com
 }
 
 pub fn setMaxEmitterRoomAuxSends(in_max_emitter_room_aux_sends: u32) common.WwiseError!void {
-    return common.handleAkResult{
+    return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(in_max_emitter_room_aux_sends),
-    };
+    );
 }
 
 pub fn setNumberOfPrimaryRays(in_nb_primary_rays: u32) common.WwiseError!void {

@@ -323,7 +323,7 @@ pub const MACOSX_AkPlatformInitSettings = extern struct {
 
     audio_api: AkAudioAPIMac = AkAudioAPIMac.Default,
     num_spatial_audio_point_sources: u32 = 0,
-    verbose_system_output = false,
+    verbose_system_output: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_MACOSX_AkPlatformInitSettings) MACOSX_AkPlatformInitSettings {
         return @bitCast(value);

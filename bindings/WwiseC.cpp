@@ -157,7 +157,7 @@ bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* 
 
 // BEGIN AkMonitor
 static_assert(sizeof(WWISEC_AK_Monitor_MsgContext) == sizeof(AK::Monitor::MsgContext));
-static_assert(WWISEC_AK_Monitor_Num_ErrorCodes == AK::Monitor::Num_ErrorCodes);
+static_assert(static_cast<std::size_t>(WWISEC_AK_Monitor_Num_ErrorCodes) == static_cast<std::size_t>(AK::Monitor::Num_ErrorCodes));
 
 WWISEC_AKRESULT WWISEC_AK_Monitor_PostCode(WWISEC_AK_Monitor_ErrorCode in_eError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus)
 {
@@ -240,7 +240,6 @@ WWISEC_AK_IReadBytes* WWISEC_AK_IReadBytes_CreateInstance(void* instance, const 
 void WWISEC_AK_IReadBytes_DestroyInstance(WWISEC_AK_IReadBytes* instance)
 {
     WWISEC_AK_IReadBytes_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IReadBytes_Wrapper*>(instance);
-    wrapper->~WWISEC_AK_IReadBytes_Wrapper();
     AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
 }
 
@@ -278,7 +277,6 @@ WWISEC_AK_IWriteBytes* WWISEC_AK_IWriteBytes_CreateInstance(void* instance, cons
 void WWISEC_AK_IWriteBytes_DestroyInstance(WWISEC_AK_IWriteBytes* instance)
 {
     WWISEC_AK_IWriteBytes_Wrapper* wrapper = reinterpret_cast<WWISEC_AK_IWriteBytes_Wrapper*>(instance);
-    wrapper->~WWISEC_AK_IWriteBytes_Wrapper();
     AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
 }
 
@@ -435,7 +433,7 @@ static_assert(sizeof(WWISEC_AkAcousticTexture) == sizeof(AkAcousticTexture));
 
 // BEGIN AkMemoryMgr
 WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
-static_assert(WWISEC_AK_TempAlloc_Type_NUM == AK::TempAlloc::Type_NUM);
+static_assert(static_cast<std::size_t>(WWISEC_AK_TempAlloc_Type_NUM) == static_cast<std::size_t>(AK::TempAlloc::Type_NUM));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_CategoryStats) == sizeof(AK::MemoryMgr::CategoryStats));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_GlobalStats) == sizeof(AK::MemoryMgr::GlobalStats));
 static_assert(sizeof(WWISEC_AK_TempAlloc_Stats) == sizeof(AK::TempAlloc::Stats));
@@ -508,7 +506,9 @@ void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename)
 
 void WWISEC_AK_TempAlloc_GetStats(WWISEC_AK_TempAlloc_Type in_eType, WWISEC_AK_TempAlloc_Stats* out_stats)
 {
+#if AK_WWISESDK_VERSION_MAJOR >= 2023 && AK_WWISESDK_VERSION_SUBMINOR >= 1 // Try again with Wwise 2023.1.1
     AK::TempAlloc::GetStats(static_cast<AK::TempAlloc::Type>(in_eType), *reinterpret_cast<AK::TempAlloc::Stats*>(out_stats));
+#endif
 }
 
 void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType, const AkOSChar* pszFilename)
@@ -536,7 +536,7 @@ void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettin
 // END AkModule
 
 // BEGIN IAkPlugin
-static_assert(WWISEC_AK_PluginServiceType_MAX == AK::PluginServiceType_MAX);
+static_assert(static_cast<std::size_t>(WWISEC_AK_PluginServiceType_MAX) == static_cast<std::size_t>(AK::PluginServiceType_MAX));
 
 WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkGlobalPluginContext_GetStreamMgr(const WWISEC_AK_IAkGlobalPluginContext* self)
 {
@@ -2416,7 +2416,7 @@ class WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper : public AK::StreamMgr::IAkL
 
     AKRESULT OutputSearchedPaths(AKRESULT in_result, const AkFileOpenData& in_FileOpen, AkOSChar* out_searchedPath, AkInt32 in_pathSize) override
     {
-        _functions.OutputSearchedPaths(_instance, static_cast<WWISEC_AKRESULT>(in_result), reinterpret_cast<const WWISEC_AkFileOpenData*>(&in_FileOpen), out_searchedPath, in_pathSize);
+        return static_cast<AKRESULT>(_functions.OutputSearchedPaths(_instance, static_cast<WWISEC_AKRESULT>(in_result), reinterpret_cast<const WWISEC_AkFileOpenData*>(&in_FileOpen), out_searchedPath, in_pathSize));
     }
 
   private:
@@ -2496,7 +2496,7 @@ class WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper : public AK::StreamMgr
 
     AKRESULT GetNextPreferredDevice(AkAsyncFileOpenData& in_FileOpen, AkDeviceID& io_idDevice) override
     {
-        _functions.GetNextPreferredDevice(_instance, reinterpret_cast<WWISEC_AkAsyncFileOpenData*>(&in_FileOpen), reinterpret_cast<WWISEC_AkDeviceID*>(&io_idDevice));
+        return static_cast<AKRESULT>(_functions.GetNextPreferredDevice(_instance, reinterpret_cast<WWISEC_AkAsyncFileOpenData*>(&in_FileOpen), reinterpret_cast<WWISEC_AkDeviceID*>(&io_idDevice)));
     }
 
   private:
@@ -3007,53 +3007,6 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Float(WWISEC_
 // END AkQueryParameters
 
 // BEGIN IO Hooks
-#if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
-#include <AkDefaultIOHookBlocking.h>
-
-size_t WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof()
-{
-    return sizeof(CAkDefaultIOHookBlocking);
-}
-
-void* WWISEC_AK_CAkDefaultIOHookBlocking_Create(char* in_ioHookBuffer)
-{
-    ::new (in_ioHookBuffer) CAkDefaultIOHookBlocking();
-    return reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHookBuffer);
-}
-
-void WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(void* in_ioHook)
-{
-#if defined(AK_WIN)
-    reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->~CAkDefaultIOHookBlocking();
-#endif
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
-}
-
-void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook)
-{
-    reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->Term();
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->SetBasePath(in_pszBasePath));
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->AddBasePath(in_pszBasePath));
-}
-
-void WWISEC_CAkDefaultIOHookBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
-{
-    reinterpret_cast<CAkDefaultIOHookBlocking*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
-}
-#endif
-
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED)
 #include <AkDefaultIOHookDeferred.h>
 
@@ -3075,9 +3028,9 @@ void WWISEC_AK_CAkDefaultIOHookDeferred_Destroy(void* in_ioHook)
 #endif
 }
 
-WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings)
 {
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings)));
 }
 
 void WWISEC_AK_CAkDefaultIOHookDeferred_Term(void* in_ioHook)
@@ -3098,73 +3051,6 @@ WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_AddBasePath(void* in_ioHook, 
 void WWISEC_CAkDefaultIOHookDeferred_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
 {
     reinterpret_cast<CAkDefaultIOHookDeferred*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
-}
-#endif
-
-#if defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING)
-#include <AkFilePackageLowLevelIOBlocking.h>
-
-size_t WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof()
-{
-    return sizeof(CAkFilePackageLowLevelIOBlocking);
-}
-
-void* WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Create(char* in_ioHookBuffer)
-{
-    new (in_ioHookBuffer) CAkFilePackageLowLevelIOBlocking();
-    return reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHookBuffer);
-}
-
-void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(void* in_ioHook)
-{
-#if defined(AK_WIN)
-    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->~CAkFilePackageLowLevelIOBlocking();
-#endif
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
-}
-
-void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(void* in_ioHook)
-{
-    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->Term();
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->SetBasePath(in_pszBasePath));
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->AddBasePath(in_pszBasePath));
-}
-
-void WWISEC_CAkFilePackageLowLevelIOBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering)
-{
-    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->SetUseSubfoldering(bUseSubFoldering);
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePackageName, AkUInt32* out_uPackageID)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->LoadFilePackage(in_pszFilePackageName, *out_uPackageID));
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->UnloadFilePackage(in_uPackageID));
-}
-
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadAllFilePackages(void* in_ioHook)
-{
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->UnloadAllFilePackages());
-}
-
-void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetPackageFallbackBehavior(void* in_ioHook, bool bFallback)
-{
-    reinterpret_cast<CAkFilePackageLowLevelIOBlocking*>(in_ioHook)->SetPackageFallbackBehavior(bFallback);
 }
 #endif
 
@@ -3189,9 +3075,9 @@ void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Destroy(void* in_ioHook)
 #endif
 }
 
-WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen)
+WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings)
 {
-    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings), in_bAsyncOpen));
+    return static_cast<WWISEC_AKRESULT>(reinterpret_cast<CAkFilePackageLowLevelIODeferred*>(in_ioHook)->Init(*reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings)));
 }
 
 void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Term(void* in_ioHook)
@@ -3401,7 +3287,7 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReverbZone(WWISEC_AkRoomID in_ReverbZo
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveReverbZone(WWISEC_AkRoomID in_ReverbZone)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveReberbZone(in_ReverbZone.id));
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveReverbZone(in_ReverbZone.id));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID)
@@ -3426,7 +3312,7 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffract
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(AkUInt32 in_uMaxEmitterRoomAuxSends)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxEmitterRoomAuxSends(in_uMaxEmmiterRoomAuxSends));
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxEmitterRoomAuxSends(in_uMaxEmitterRoomAuxSends));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPrimaryRays)

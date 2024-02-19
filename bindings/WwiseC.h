@@ -1858,9 +1858,9 @@ extern "C"
 
     typedef enum WWISEC_AkAudioAPIMac
     {
-        WWISEC_AkAudioAPI_AVAudioEngine = 1 << 0,                                                  ///< Use AVFoundation framework (modern, has more capabilities, available only for macOS 10.15 or above)
-        WWISEC_AkAudioAPI_AudioUnit = 1 << 1,                                                      ///< Use AudioUnit framework (basic functionality, compatible with all macOS devices)
-        WWISEC_AkAudioAPI_Default = WWISEC_AkAudioAPI_AVAudioEngine | WWISEC_AkAudioAPI_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
+        WWISEC_AkAudioAPIMac_AVAudioEngine = 1 << 0,                                                        ///< Use AVFoundation framework (modern, has more capabilities, available only for macOS 10.15 or above)
+        WWISEC_AkAudioAPIMac_AudioUnit = 1 << 1,                                                            ///< Use AudioUnit framework (basic functionality, compatible with all macOS devices)
+        WWISEC_AkAudioAPIMac_Default = WWISEC_AkAudioAPIMac_AVAudioEngine | WWISEC_AkAudioAPIMac_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
     } WWISEC_AkAudioAPIMac;
 
     /// \cond !(Web)
@@ -1890,9 +1890,9 @@ extern "C"
     ///< \sa AK::SoundEngine::Init
     typedef enum WWISEC_AkAudioAPIAndroid
     {
-        WWISEC_AkAudioAPI_AAudio = 1 << 0,                                                  ///< Use AAudio (lower latency, available only for Android 8.1 or above)
-        WWISEC_AkAudioAPI_OpenSL_ES = 1 << 1,                                               ///< Use OpenSL ES (older API, compatible with all Android devices)
-        WWISEC_AkAudioAPI_Default = WWISEC_AkAudioAPI_AAudio | WWISEC_AkAudioAPI_OpenSL_ES, ///< Default value, will select the more appropriate API (AAudio for compatible devices, OpenSL for others)
+        WWISEC_AkAudioAPIAndroid_AAudio = 1 << 0,                                                                ///< Use AAudio (lower latency, available only for Android 8.1 or above)
+        WWISEC_AkAudioAPIAndroid_OpenSL_ES = 1 << 1,                                                             ///< Use OpenSL ES (older API, compatible with all Android devices)
+        WWISEC_AkAudioAPIAndroid_Default = WWISEC_AkAudioAPIAndroid_AAudio | WWISEC_AkAudioAPIAndroid_OpenSL_ES, ///< Default value, will select the more appropriate API (AAudio for compatible devices, OpenSL for others)
     } WWISEC_AkAudioAPIAndroid;
 
     typedef const void* WWISEC_SLObjectItf;
@@ -2010,9 +2010,9 @@ extern "C"
 
     typedef enum WWISEC_AkAudioAPIiOS
     {
-        WWISEC_AkAudioAPI_AVAudioEngine = 1 << 0,                                                  ///< Use AVFoundation framework (modern, has more capabilities, available only for iOS/tvOS 13 or above)
-        WWISEC_AkAudioAPI_AudioUnit = 1 << 1,                                                      ///< Use AudioUnit framework (basic functionality, compatible with all iOS devices)
-        WWISEC_AkAudioAPI_Default = WWISEC_AkAudioAPI_AVAudioEngine | WWISEC_AkAudioAPI_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
+        WWISEC_AkAudioAPIiOS_AVAudioEngine = 1 << 0,                                                        ///< Use AVFoundation framework (modern, has more capabilities, available only for iOS/tvOS 13 or above)
+        WWISEC_AkAudioAPIiOS_AudioUnit = 1 << 1,                                                            ///< Use AudioUnit framework (basic functionality, compatible with all iOS devices)
+        WWISEC_AkAudioAPIiOS_Default = WWISEC_AkAudioAPIiOS_AVAudioEngine | WWISEC_AkAudioAPIiOS_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
     } WWISEC_AkAudioAPIiOS;
 
     typedef struct WWISEC_AudioBufferList WWISEC_AudioBufferList;
@@ -3181,17 +3181,17 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AK_CALLBACK(void, WWISEC_AkFileOpenCallback)
     (
         WWISEC_AkAsyncFileOpenData* in_pOpenInfo, ///< Pointer to the AkAsyncFileOpenData structure that was passed to corresponding Open().
-        AKRESULT in_eResult                       ///< Result of transfer: AK_Success or AK_Fail (streams waiting for this transfer become invalid).
+        WWISEC_AKRESULT in_eResult                ///< Result of transfer: AK_Success or AK_Fail (streams waiting for this transfer become invalid).
     );
 
     typedef struct WWISEC_AkAsyncFileOpenData
     {
         WWISEC_AkFileOpenData base;
-        AkFileOpenCallback pCallback; ///< Callback function used to notify the high-level device when Open is done
-        void* pCookie;                ///< Reserved. Pass this unchanged to the callback function. The I/O device uses this cookie to retrieve the owner of the transfer.
-        AkFileDesc* pFileDesc;        ///< File Descriptor to fill once the Open operation is complete.
-        void* pCustomData;            ///< Convienience pointer for the IO hook implementer. Useful for additional data used in asynchronous implementations, for example.
-        AkOSChar* pszStreamName;      ///< Display name. If provided, this will be used to set the stream name, which is used for the profiler. This struct is not responsible for the memory.
+        WWISEC_AkFileOpenCallback pCallback; ///< Callback function used to notify the high-level device when Open is done
+        void* pCookie;                       ///< Reserved. Pass this unchanged to the callback function. The I/O device uses this cookie to retrieve the owner of the transfer.
+        WWISEC_AkFileDesc* pFileDesc;        ///< File Descriptor to fill once the Open operation is complete.
+        void* pCustomData;                   ///< Convienience pointer for the IO hook implementer. Useful for additional data used in asynchronous implementations, for example.
+        AkOSChar* pszStreamName;             ///< Display name. If provided, this will be used to set the stream name, which is used for the profiler. This struct is not responsible for the memory.
     } WWISEC_AkAsyncFileOpenData;
 
     typedef struct WWISEC_AkIoHeuristics
@@ -3509,48 +3509,22 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 // END AkQueryParameters
 
 // BEGIN IO Hooks
-#if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_BLOCKING)
-    size_t WWISEC_AK_CAkDefaultIOHookBlocking_Sizeof();
-    void* WWISEC_AK_CAkDefaultIOHookBlocking_Create(char* in_ioHookBuffer);
-    void WWISEC_AK_CAkDefaultIOHookBlocking_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
-    void WWISEC_AK_CAkDefaultIOHookBlocking_Term(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
-    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
-    void WWISEC_CAkDefaultIOHookBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
-#endif
-
 #if defined(WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED)
     size_t WWISEC_AK_CAkDefaultIOHookDeferred_Sizeof();
     void* WWISEC_AK_CAkDefaultIOHookDeferred_Create(char* in_ioHookBuffer);
     void WWISEC_AK_CAkDefaultIOHookDeferred_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings);
     void WWISEC_AK_CAkDefaultIOHookDeferred_Term(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
     WWISEC_AKRESULT WWISEC_AK_CAkDefaultIOHookDeferred_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
     void WWISEC_CAkDefaultIOHookDeferred_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
 #endif
 
-#if defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_BLOCKING)
-    size_t WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Sizeof();
-    void* WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Create(char* in_ioHookBuffer);
-    void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
-    void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_Term(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
-    void WWISEC_CAkFilePackageLowLevelIOBlocking_SetUseSubfoldering(void* in_ioHook, bool bUseSubFoldering);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_LoadFilePackage(void* in_ioHook, const AkOSChar* in_pszFilePacakgeName, AkUInt32* out_uPackageID);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadFilePackage(void* in_ioHook, AkUInt32 in_uPackageID);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIOBlocking_UnloadAllFilePackages(void* in_ioHook);
-    void WWISEC_AK_CAkFilePackageLowLevelIOBlocking_SetPackageFallbackBehavior(void* in_ioHook, bool bFallback);
-#endif
-
 #if defined(WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED)
     size_t WWISEC_AK_CAkFilePackageLowLevelIODeferred_Sizeof();
     void* WWISEC_AK_CAkFilePackageLowLevelIODeferred_Create(char* in_ioHookBuffer);
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Destroy(void* in_ioHook);
-    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings, bool in_bAsyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_Init(void* in_ioHook, const WWISEC_AkDeviceSettings* in_deviceSettings);
     void WWISEC_AK_CAkFilePackageLowLevelIODeferred_Term(void* in_ioHook);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_SetBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
     WWISEC_AKRESULT WWISEC_AK_CAkFilePackageLowLevelIODeferred_AddBasePath(void* in_ioHook, const AkOSChar* in_pszBasePath);
