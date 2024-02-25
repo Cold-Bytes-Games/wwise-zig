@@ -1774,8 +1774,8 @@ extern "C"
         AkUInt32 uMemoryDebugLevel;                            ///< Default 0 disabled. 1 debug enabled. 2 stomp allocator enabled. 3 stomp allocator and debug enabled. User implementations may use multiple non-zero values to offer different features.
         //@}
 
-        // WWISEC_AkSpanCount uVMSpanCount; // will be there in 2023.1.1
-        // WWISEC_AkSpanCount uDeviceSpanCount; // will be there in 2023.1.1
+        WWISEC_AkSpanCount uVMSpanCount;
+        WWISEC_AkSpanCount uDeviceSpanCount;
     } WWISEC_AkMemSettings;
 
     WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings);
@@ -1813,6 +1813,9 @@ extern "C"
         bool bEnableAvxSupport; ///< Enables run-time detection of AVX and AVX2 SIMD support in the engine and plug-ins. Disabling this may improve CPU performance by allowing for higher CPU clockspeeds.
 
         AkUInt32 uMaxSystemAudioObjects; ///< Dictates how many Microsoft Spatial Sound dynamic objects will be reserved by the System sink. On Windows, other running processes will be prevented from reserving these objects. Set to 0 to disable the use of System Audio Objects. Default is 128.
+
+        // Configuration for AK Motion plug-in
+        bool bEnableDirectInputSupport; ///< Enables run-time enumeration and support of DirectInput devices for AK Motion plug-in. Disabling this can alleviate potential issues with stability around device management, and improve overall responsiveness of device enumeration. Default is false.
     } WWISEC_WIN_AkPlatformInitSettings;
 
     typedef struct WWISEC_POSIX_AkThreadProperties
@@ -3564,7 +3567,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 #define WWISEC_AK_SA_EPSILON (0.001f)
 #define WWISEC_AK_SA_DIFFRACTION_EPSILON (0.002f)       // Radians
 #define WWISEC_AK_SA_DIFFRACTION_DOT_EPSILON (0.000002) // 1.f - cos(AK_SA_DIFFRACTION_EPSILON)
-#define WWISEC_AK_SA_PLANE_THICKNESS_RATIO (0.005f)
+#define WWISEC_AK_SA_PLANE_THICKNESS (0.01f)
 #define WWISEC_AK_SA_MIN_ENVIRONMENT_ABSORPTION (0.1f)
 #define WWISEC_AK_SA_MIN_ENVIRONMENT_SURFACE_AREA (1.0f)
 

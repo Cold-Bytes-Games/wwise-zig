@@ -50,7 +50,6 @@ pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaqu
 pub const AkMemAllocVM = ?*const fn (size: usize, extra: ?*usize) callconv(.C) ?*anyopaque;
 pub const AkMemFreeVM = ?*const fn (address: ?*anyopaque, size: usize, extra: usize, release: usize) callconv(.C) void;
 
-// Will be there in 2023.1.1
 pub const AkSpanCount = enum(common.DefaultEnumType) {
     small,
     medium,
@@ -84,8 +83,8 @@ pub const AkMemSettings = extern struct {
     debug_realloc_aligned: AkMemDebugReallocAligned = null,
     debug_free: AkMemDebugFree = null,
     memory_debug_level: u32 = 0,
-    // vm_span_count: AkSpanCount = .huge, // will be there in 2023.1.1
-    // device_span_count: AkSpanCount = .huge, // will be there in 2023.1.1
+    vm_span_count: AkSpanCount = .huge,
+    device_span_count: AkSpanCount = .huge,
 
     pub inline fn fromC(value: c.WWISEC_AkMemSettings) AkMemSettings {
         return @bitCast(value);

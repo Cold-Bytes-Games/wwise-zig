@@ -243,6 +243,7 @@ pub const WIN_AkPlatformInitSettings = extern struct {
     sample_rate: u32 = 0,
     enable_avx_support: bool = false,
     max_system_audio_objects: u32 = 0,
+    enable_direct_input_support: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_WIN_AkPlatformInitSettings) WIN_AkPlatformInitSettings {
         return @bitCast(value);

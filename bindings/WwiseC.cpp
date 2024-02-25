@@ -506,9 +506,7 @@ void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename)
 
 void WWISEC_AK_TempAlloc_GetStats(WWISEC_AK_TempAlloc_Type in_eType, WWISEC_AK_TempAlloc_Stats* out_stats)
 {
-#if AK_WWISESDK_VERSION_MAJOR >= 2023 && AK_WWISESDK_VERSION_SUBMINOR >= 1 // Try again with Wwise 2023.1.1
-    AK::TempAlloc::GetStats(static_cast<AK::TempAlloc::Type>(in_eType), *reinterpret_cast<AK::TempAlloc::Stats*>(out_stats));
-#endif
+    // AK::TempAlloc::GetStats(static_cast<AK::TempAlloc::Type>(in_eType), *reinterpret_cast<AK::TempAlloc::Stats*>(out_stats));
 }
 
 void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType, const AkOSChar* pszFilename)
@@ -518,9 +516,7 @@ void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType,
 // END AkMemoryMgr
 
 // BEGIN AkModule
-#if AK_WWISESDK_VERSION_MAJOR >= 2023 && AK_WWISESDK_VERSION_SUBMINOR >= 1 // TODO: Remove
 static_assert(WWISEC_AkSpanCount_END == AkSpanCount_END);
-#endif
 static_assert(sizeof(WWISEC_AkMemSettings) == sizeof(AkMemSettings));
 
 WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings)
