@@ -109,23 +109,11 @@ pub const AkFileOpenCallback = ?*const fn (in_open_info: ?*anyopaque, in_result:
 
 pub const NativeAkAsyncFileOpenData = extern struct {
     base: stream_interfaces.NativeAkFileOpenData,
-    callback: AkFileOpenCallback,
-    cookie: ?*anyopaque,
-    file_desc: ?*AkFileDesc,
-    custom_data: ?*anyopaque,
-    stream_name: [*:0]const common.AkOSChar,
-
-    pub inline fn fromC(value: c.WWISEC_AkAsyncFileOpenData) NativeAkAsyncFileOpenData {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: NativeAkAsyncFileOpenData) c.WWISEC_AkAsyncFileOpenData {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(NativeAkAsyncFileOpenData) == @sizeOf(c.WWISEC_AkAsyncFileOpenData));
-    }
+    callback: AkFileOpenCallback = null,
+    cookie: ?*anyopaque = null,
+    file_desc: ?*AkFileDesc = null,
+    custom_data: ?*anyopaque = null,
+    stream_name: ?[*:0]const common.AkOSChar = null,
 };
 
 pub const AkIoHeuristics = extern struct {
@@ -285,7 +273,7 @@ pub const IAkLowLevelIOHook = opaque {
         in_path_size: i32,
     ) common.WwiseError!void {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-         const char_allocator = stack_char_allocator.get();
+        const char_allocator = stack_char_allocator.get();
         var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
         defer area_allocator.deinit();
 
@@ -294,7 +282,7 @@ pub const IAkLowLevelIOHook = opaque {
         return common.handleAkResult(c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_OutputSearchedPaths(
             @ptrCast(self),
             @intFromEnum(in_result),
-            @ptrCast(&native_file_open),
+            @ptrCast(@alignCast(&native_file_open)),
             out_searched_path,
             in_path_size,
         ));
@@ -321,7 +309,7 @@ pub const IAkFileLocationResolver = opaque {
         return common.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(
                 @ptrCast(self),
-                @ptrCast(in_file_open),
+                @ptrCast(@alignCast(in_file_open)),
                 @ptrCast(io_id_device),
             ),
         );
@@ -364,9 +352,9 @@ pub fn createDevice(in_settings: *const AkDeviceSettings, in_low_level_hook: ?*I
     return result;
 }
 
-pub fn destroyDevice(in_deviceID: common.AkDeviceID) common.WwiseError!void {
+pub fn destroyDevice(in_device_id: common.AkDeviceID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_StreamMgr_DestroyDevice(in_deviceID),
+        c.WWISEC_AK_StreamMgr_DestroyDevice(in_device_id),
     );
 }
 

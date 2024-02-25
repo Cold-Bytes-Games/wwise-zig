@@ -302,22 +302,10 @@ pub const AkStreamData = extern struct {
 };
 
 pub const NativeAkFileOpenData = extern struct {
-    file_name: [*:0]const common.AkOSChar,
-    file_id: common.AkFileID = 0,
-    flags: ?*AkFileSystemFlags = null,
-    open_mode: AkOpenMode = .read,
-
-    pub inline fn fromC(value: c.WWISEC_AkFileOpenData) NativeAkFileOpenData {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: NativeAkFileOpenData) c.WWISEC_AkFileOpenData {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(NativeAkFileOpenData) == @sizeOf(c.WWISEC_AkFileOpenData));
-    }
+    file_name: ?[*:0]const common.AkOSChar align(4) = null,
+    file_id: common.AkFileID align(4) = 0,
+    flags: ?*AkFileSystemFlags align(4) = null,
+    open_mode: AkOpenMode align(4) = .read,
 };
 
 pub const AkFileOpenData = struct {
@@ -818,7 +806,7 @@ pub const IAkStreamMgr = opaque {
         return common.handleAkResult(
             c.WWISEC_AK_IAkStreamMgr_CreateStd(
                 @ptrCast(self),
-                @ptrCast(&native_file_open),
+                @ptrCast(@alignCast(&native_file_open)),
                 @ptrCast(out_stream),
                 in_sync_open,
             ),
@@ -845,7 +833,7 @@ pub const IAkStreamMgr = opaque {
         return common.handleAkResult(
             c.WWISEC_AK_IAkStreamMgr_CreateAuto_AkFileOpenData(
                 @ptrCast(self),
-                @ptrCast(&native_file_open),
+                @ptrCast(@alignCast(&native_file_open)),
                 @ptrCast(in_heuristics),
                 @ptrCast(in_buffer_settings),
                 @ptrCast(out_stream),

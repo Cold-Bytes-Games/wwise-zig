@@ -21,7 +21,7 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
         allocator.free(buffer[0..instance_size_of]);
     }
 
-    pub inline  fn init(self: *CAkDefaultIOHookDeferred, in_device_settings: *const StreamMgr.AkDeviceSettings) common.WwiseError!void {
+    pub inline fn init(self: *CAkDefaultIOHookDeferred, in_device_settings: *const StreamMgr.AkDeviceSettings) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_CAkDefaultIOHookDeferred_Init(self, @ptrCast(in_device_settings)),
         );
