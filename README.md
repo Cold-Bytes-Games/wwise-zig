@@ -117,9 +117,7 @@ Available options:
 | `use_default_job_worker` | `bool` | Enable usage of the default job worker given by Audiokinetic. (Default: false) |
 | `use_spatial_audio` | `bool` | Enable usagee of the Spatial Audio module (Default: false) |
 | `string_stack_size` | `usize` | Stack size to use for functions that accepts AkOsChar and null-terminated strings (Default: 256) |
-| `include_default_io_hook_blocking` | `bool` | Include the Default IO Hook Blocking (Default: false) |
 | `include_default_io_hook_deferred` | `bool` | Include the Default IO Hook Deferred (Default: false) |
-| `include_file_package_io_blocking` | `bool` | Include the File Package IO Hook Blocking (Default: false) |
 | `include_file_package_io_deferred` | `bool` | Include the File Package IO Hook Deferred (Default: false) |
 | `static_plugins` | []const []const u8 | List of static plugins to link to (Default: empty) |
 
