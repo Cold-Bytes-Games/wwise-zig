@@ -13,8 +13,8 @@ pub const WwisePlatform = enum {
     ps4,
     ps5,
 
-    pub fn getAuthoringPlatformName(self: WwisePlatform) [] const u8 {
-         return switch (self) {
+    pub fn getAuthoringPlatformName(self: WwisePlatform) []const u8 {
+        return switch (self) {
             .android => "Android",
             .ios => "iOS",
             .tvos => "iOS",

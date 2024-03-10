@@ -318,7 +318,9 @@ pub fn generateWwiseIDModule(b: *std.Build, wwise_id_file_path: []const u8, wwis
 
 fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []const u8 {
     if (override_wwise_sdk_path_opt) |wwise_sdk_path| {
-        return wwise_sdk_path;
+        if (wwise_sdk_path.len > 0) {
+            return wwise_sdk_path;
+        }
     }
 
     if (b.graph.env_map.get("WWISESDK")) |wwise_sdk_path| {
