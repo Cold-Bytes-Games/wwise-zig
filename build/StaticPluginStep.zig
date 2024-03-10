@@ -38,7 +38,7 @@ fn make(step: *Step, prog_node: *std.Progress.Node) !void {
     const gpa = b.allocator;
     const arena = b.allocator;
 
-    var man = b.cache.obtain();
+    var man = b.graph.cache.obtain();
     defer man.deinit();
 
     // Random bytes to make StaticPluginStep unique. Refresh this with new

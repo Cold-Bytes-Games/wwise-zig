@@ -14,10 +14,10 @@ This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
 ## Zig version
 
-This library uses zig nominated [2024.1.0-mach](https://machengine.org/about/nominated-zig/). To install using [`zigup`](https://github.com/marler8997/zigup):
+This library uses zig nominated [2024.3.0-mach](https://machengine.org/about/nominated-zig/). To install using [`zigup`](https://github.com/marler8997/zigup):
 
 ```sh
-zigup 0.12.0-dev.2063+804cee3b9
+zigup 0.12.0-dev.3180+83e578a18
 ```
 
 ## Versioning info
@@ -26,12 +26,12 @@ This binding mimic the versioning of Wwise but add the Zig binding version at th
 
 Example:
 
-2023.1.1-zig0
+2023.1.1-zig1
 
 * 2023 = year
 * 1 = major Wwise version
 * 1 = minor Wwise version
-* -zig0 = Zig binding version
+* -zig1 = Zig binding version
 
 ## Supported platforms
 
