@@ -329,7 +329,7 @@ fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []co
         return wwise_sdk_path;
     }
 
-    if (b.env_map.get("WWISESDK")) |wwise_sdk_path| {
+    if (b.graph.env_map.get("WWISESDK")) |wwise_sdk_path| {
         return wwise_sdk_path;
     }
 
