@@ -47,7 +47,7 @@ fn make(step: *Step, prog_node: *std.Progress.Node) !void {
     const gpa = b.allocator;
     const arena = b.allocator;
 
-    var manifest = b.cache.obtain();
+    var manifest = b.graph.cache.obtain();
     defer manifest.deinit();
 
     // Random bytes to make GenerateWwiseIDStep unique. Refresh this with new
