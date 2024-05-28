@@ -1008,9 +1008,7 @@ pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_
     out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
-pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *common.AkBankID, out_bank_type: *common.AkBankType) common.WwiseError!void {
-    var raw_bank_type: u32 = 0;
-
+pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callbacks.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *common.AkBankID) common.WwiseError!void {
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryCopy_Async(
             in_memory_bank,
@@ -1018,10 +1016,8 @@ pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank
             @ptrCast(in_bank_callback),
             in_cookie,
             out_bank_id,
-            &raw_bank_type,
         ),
     );
-    out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
 pub const UnloadBankOptionalArgs = struct {
