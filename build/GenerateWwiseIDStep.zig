@@ -40,10 +40,10 @@ pub fn writeIndent(writer: anytype, indent_factor: usize) !void {
     try writer.writeByteNTimes(' ', spaces_to_insert);
 }
 
-fn make(step: *Step, prog_node: *std.Progress.Node) !void {
+fn make(step: *Step, prog_node: std.Progress.Node) !void {
     _ = prog_node;
     const b = step.owner;
-    const self = @fieldParentPtr(GenerateWwiseIDStep, "step", step);
+    const self: *GenerateWwiseIDStep = @fieldParentPtr("step", step);
     const gpa = b.allocator;
     const arena = b.allocator;
 
@@ -185,7 +185,7 @@ fn make(step: *Step, prog_node: *std.Progress.Node) !void {
         });
     };
 
-    b.cache_root.handle.writeFile(sub_path, output.items) catch |err| {
+    b.cache_root.handle.writeFile(.{ .sub_path = sub_path, .data = output.items }) catch |err| {
         return step.fail("unable to write file '{}{s}': {s}", .{
             b.cache_root, sub_path, @errorName(err),
         });

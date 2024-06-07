@@ -85,19 +85,17 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     wwise_c.addCSourceFile(.{
-        .file = .{
-            .path = thisDir() ++ "/bindings/WwiseC.cpp",
-        },
+        .file = b.path("bindings/WwiseC.cpp"),
         .flags = CppFlags,
     });
-    wwise_c.addIncludePath(.{
-        .path = thisDir() ++ "/bindings",
-    });
+    wwise_c.addIncludePath(b.path("bindings"));
 
     const static_plugin_step = StaticPluginStep.create(b, .{ .static_plugins = wwise_build_options.static_plugins });
     wwise_c.addCSourceFile(.{
         .file = .{
-            .generated = &static_plugin_step.output_file,
+            .generated = .{
+                .file = &static_plugin_step.output_file,
+            },
         },
         .flags = CppFlags,
     });
@@ -142,9 +140,7 @@ pub fn build(b: *std.Build) !void {
     const wwise_compile_options = option_step.createModule();
 
     const wwise_zig_module = b.addModule("wwise-zig", .{
-        .root_source_file = .{
-            .path = thisDir() ++ "/src/wwise-zig.zig",
-        },
+        .root_source_file = b.path("src/wwise-zig.zig"),
         .imports = &.{
             .{ .name = "wwise_options", .module = wwise_compile_options },
         },
@@ -157,9 +153,7 @@ pub fn build(b: *std.Build) !void {
 
     const wwise_test = b.addTest(.{
         .name = "wwise_zig_test",
-        .root_source_file = .{
-            .path = thisDir() ++ "/tests/tests.zig",
-        },
+        .root_source_file = b.path("tests/tests.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -180,15 +174,9 @@ pub fn build(b: *std.Build) !void {
 fn wwiseLinkModule(module: *std.Build.Module, wwise_build_options: WwiseBuildOptions) !void {
     const wwise_library_relative_path = try getWwiseLibraryPath(module.owner, module.resolved_target.?, wwise_build_options);
 
-    module.addSystemIncludePath(.{
-        .path = module.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" }),
-    });
-    module.addIncludePath(.{
-        .path = thisDir() ++ "/bindings",
-    });
-    module.addLibraryPath(.{
-        .path = module.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path }),
-    });
+    module.addSystemIncludePath(lazyPathAbsolute(module.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" })));
+    module.addIncludePath(module.owner.path("bindings"));
+    module.addLibraryPath(lazyPathAbsolute(module.owner.pathJoin(&.{ wwise_build_options.wwise_sdk_path, wwise_library_relative_path })));
 
     if (wwise_build_options.use_communication) {
         module.linkSystemLibrary("CommunicationCentral", .{ .needed = true });
@@ -286,7 +274,6 @@ pub fn addGenerateSoundBanksStep(b: *std.Build, wwise_project_path: []const u8, 
 
     const run_step = b.addSystemCommand(arg_list.items);
     run_step.step.name = "Generate Wwise Sound Banks";
-    run_step.extra_file_dependencies = &.{absolute_wwise_project_path};
     return run_step;
 }
 
@@ -306,7 +293,9 @@ pub fn generateWwiseIDModule(b: *std.Build, wwise_id_file_path: []const u8, wwis
 
     const id_module = b.createModule(.{
         .root_source_file = .{
-            .generated = &generate_id_module_step.output_file,
+            .generated = .{
+                .file = &generate_id_module_step.output_file,
+            },
         },
         .imports = &.{
             .{ .name = "wwise-zig", .module = wwise_zig_module },
@@ -419,24 +408,19 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_
         else => return error.OsNotSupported,
     };
 
-    compile_step.addIncludePath(.{
-        .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path}),
-    });
-    compile_step.addIncludePath(.{
-        .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}", .{ wwise_build_options.wwise_sdk_path, platform_name }),
-    });
+    const b = compile_step.step.owner;
+
+    compile_step.addIncludePath(lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path})));
+
+    compile_step.addIncludePath(lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/{s}", .{ wwise_build_options.wwise_sdk_path, platform_name })));
 
     if (wwise_build_options.useDefaultIoHooks()) {
         compile_step.addCSourceFile(.{
-            .file = .{
-                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkMultipleFileLocation.cpp", .{wwise_build_options.wwise_sdk_path}),
-            },
+            .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkMultipleFileLocation.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
         compile_step.addCSourceFile(.{
-            .file = .{
-                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkGeneratedSoundBanksResolver.cpp", .{wwise_build_options.wwise_sdk_path}),
-            },
+            .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkGeneratedSoundBanksResolver.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
     }
@@ -444,7 +428,7 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_
     if (wwise_build_options.include_default_io_hook_deferred) {
         compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", null);
         compile_step.addCSourceFile(.{
-            .file = .{ .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name }) },
+            .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name })),
             .flags = CppFlags,
         });
     }
@@ -456,29 +440,25 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_
     if (wwise_build_options.use_default_job_worker) {
         compile_step.defineCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", null);
         compile_step.addCSourceFile(.{
-            .file = .{
-                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkJobWorkerMgr.cpp", .{wwise_build_options.wwise_sdk_path}),
-            },
+            .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkJobWorkerMgr.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
     }
 
     if (wwise_build_options.useFilePackageIO()) {
         compile_step.addCSourceFile(.{
-            .file = .{
-                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackage.cpp", .{wwise_build_options.wwise_sdk_path}),
-            },
+            .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkFilePackage.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
         compile_step.addCSourceFile(.{
-            .file = .{
-                .path = compile_step.step.owner.fmt("{s}/samples/SoundEngine/Common/AkFilePackageLUT.cpp", .{wwise_build_options.wwise_sdk_path}),
-            },
+            .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkFilePackageLUT.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
     }
 }
 
-inline fn thisDir() []const u8 {
-    return comptime std.fs.path.dirname(@src().file) orelse ".";
+fn lazyPathAbsolute(path: []const u8) std.Build.LazyPath {
+    return .{
+        .cwd_relative = path,
+    };
 }

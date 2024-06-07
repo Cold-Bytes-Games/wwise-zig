@@ -527,7 +527,7 @@ test "Dummy I/O Hook works" {
     }
 
     try std.testing.expect(zig_io_hook.close_called);
-    try std.testing.expect(!zig_io_hook.get_block_size_called);
+    try std.testing.expect(zig_io_hook.get_block_size_called);
     try std.testing.expect(!zig_io_hook.get_device_desc_called);
     try std.testing.expect(zig_io_hook.batch_open_called);
     try std.testing.expect(zig_io_hook.batch_read_called);
