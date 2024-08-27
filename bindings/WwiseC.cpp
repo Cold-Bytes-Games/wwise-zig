@@ -3436,9 +3436,15 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetFastPathSettings(WWISEC_AkInitSettings*
 #endif
 
 #if defined(AK_IOS)
+static_assert(WWISEC_AKMOTION_RESIDENT_MODE == AKMOTION_RESIDENT_MODE);
+
 void WWISEC_AK_SoundEngine_iOS_ChangeAudioSessionProperties(const WWISEC_AkAudioSessionProperties* in_properties)
 {
     AK::SoundEngine::iOS::ChangeAudioSeessionProperties(*reinterpret_cast<const AkAudioSessionProperties*>(in_properties));
 }
+#endif
+
+#if defined(AK_MAC)
+static_assert(WWISEC_AKMOTION_RESIDENT_MODE == AKMOTION_RESIDENT_MODE);
 #endif
 // END Platform-specific AkSoundEngine functions

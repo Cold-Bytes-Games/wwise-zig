@@ -408,6 +408,8 @@ pub const AkAudioAPIiOs = packed struct(common.DefaultEnumType) {
     }
 };
 
+pub const AKMOTION_RESIDENT_MODE = c.WWISEC_AKMOTION_RESIDENT_MODE;
+
 pub const IOS_AudioInputCallbackFunc = c.WWISEC_IOS_AudioInputCallbackFunc;
 pub const IOS_AudioInterruptionCallbackFunc = c.WWISEC_IOS_AudioInterruptionCallbackFunc;
 

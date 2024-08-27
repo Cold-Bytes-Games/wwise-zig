@@ -2018,6 +2018,8 @@ extern "C"
         WWISEC_AkAudioAPIiOS_Default = WWISEC_AkAudioAPIiOS_AVAudioEngine | WWISEC_AkAudioAPIiOS_AudioUnit, ///< Default value, will select the more appropriate API (AVAudioEngine for compatible devices, AudioUnit for others)
     } WWISEC_AkAudioAPIiOS;
 
+#define WWISEC_AKMOTION_RESIDENT_MODE (0x80000000)
+
     typedef struct WWISEC_AudioBufferList WWISEC_AudioBufferList;
 
     /// iOS-only callback function prototype used for audio input source plugin. Implement this function to transfer the
