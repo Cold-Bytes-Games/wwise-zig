@@ -848,14 +848,14 @@ pub const toOSChar = blk: {
 
 pub fn fromOSCharUtf16(allocator: std.mem.Allocator, value_opt: ?[*:0]const u16) ![]u8 {
     if (value_opt) |value| {
-        return std.unicode.utf16leToUtf8Alloc(allocator, value[0..std.mem.len(value)]);
+        return std.unicode.utf16LeToUtf8Alloc(allocator, value[0..std.mem.len(value)]);
     }
 
     return "";
 }
 
 pub fn toOSCharUtf16(allocator: std.mem.Allocator, value: []const u8) ![:0]u16 {
-    return std.unicode.utf8ToUtf16LeWithNull(allocator, value);
+    return std.unicode.utf8ToUtf16LeAllocZ(allocator, value);
 }
 
 pub fn fromCString(allocator: std.mem.Allocator, value_opt: ?[*:0]const u8) ![]u8 {

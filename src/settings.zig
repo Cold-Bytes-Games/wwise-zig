@@ -263,7 +263,7 @@ pub const AkAudioAPILinux = packed struct(common.DefaultEnumType) {
     alsa: bool = false,
     padding: u30 = 0,
 
-    pub const Default = .{ .pulse_audio = true, .alsa = true };
+    pub const Default: AkAudioAPILinux  = .{ .pulse_audio = true, .alsa = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPILinux) AkAudioAPILinux {
         return @bitCast(value);
@@ -302,7 +302,7 @@ pub const AkAudioAPIMac = packed struct(common.DefaultEnumType) {
     audio_unit: bool = false,
     padding: u30 = 0,
 
-    pub const Default = .{ .av_audio_engine = true, .audio_unit = true };
+    pub const Default:AkAudioAPIMac = .{ .av_audio_engine = true, .audio_unit = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPIMac) AkAudioAPIMac {
         return @bitCast(value);
@@ -397,7 +397,7 @@ pub const AkAudioAPIiOs = packed struct(common.DefaultEnumType) {
     audio_unit: bool = false,
     padding: u30 = 0,
 
-    pub const Default = .{ .av_audio_engine = true, .audio_unit = true };
+    pub const Default: AkAudioAPIiOs  = .{ .av_audio_engine = true, .audio_unit = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPIiOS) AkAudioAPIiOs {
         return @bitCast(value);
@@ -463,7 +463,7 @@ pub const AkAudioAPIAndroid = packed struct(common.DefaultEnumType) {
     opensl_es: bool = false,
     pad: u30 = 0,
 
-    pub const Default = .{ .aaudio = true, .opensl_es = true };
+    pub const Default: AkAudioAPIAndroid = .{ .aaudio = true, .opensl_es = true };
 
     pub inline fn fromC(value: c.WWISEC_AkAudioAPIAndroid) AkAudioAPIAndroid {
         return @bitCast(value);

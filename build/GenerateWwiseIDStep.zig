@@ -40,8 +40,9 @@ pub fn writeIndent(writer: anytype, indent_factor: usize) !void {
     try writer.writeByteNTimes(' ', spaces_to_insert);
 }
 
-fn make(step: *Step, prog_node: std.Progress.Node) !void {
-    _ = prog_node;
+fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
+    _ = make_options;
+
     const b = step.owner;
     const self: *GenerateWwiseIDStep = @fieldParentPtr("step", step);
     const gpa = b.allocator;

@@ -31,8 +31,9 @@ pub fn create(owner: *std.Build, options: Options) *StaticPluginStep {
     return self;
 }
 
-fn make(step: *Step, prog_node: std.Progress.Node) !void {
-    _ = prog_node;
+fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
+    _ = make_options;
+
     const b = step.owner;
     const self: *StaticPluginStep = @fieldParentPtr("step", step);
     const gpa = b.allocator;

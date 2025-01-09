@@ -104,26 +104,26 @@ pub fn build(b: *std.Build) !void {
         wwise_c.linkSystemLibrary(static_plugin);
     }
 
-    try wwiseLinkModule(&wwise_c.root_module, wwise_build_options);
+    try wwiseLinkModule(wwise_c.root_module, wwise_build_options);
     wwise_c.linkLibC();
     if (target.result.os.tag != .windows) {
         wwise_c.linkLibCpp();
     }
 
     if (target.result.os.tag == .windows) {
-        wwise_c.defineCMacro("UNICODE", null);
+        wwise_c.root_module.addCMacro("UNICODE", &.{});
     }
 
     if (wwise_build_options.use_communication) {
-        wwise_c.defineCMacro("WWISEC_USE_COMMUNICATION", null);
+        wwise_c.root_module.addCMacro("WWISEC_USE_COMMUNICATION", &.{});
     }
 
     if (wwise_build_options.use_spatial_audio) {
-        wwise_c.defineCMacro("WWISEC_USE_SPATIAL_AUDIO", null);
+        wwise_c.root_module.addCMacro("WWISEC_USE_SPATIAL_AUDIO", &.{});
     }
 
     if (wwise_build_options.configuration == .release) {
-        wwise_c.defineCMacro("AK_OPTIMIZED", null);
+        wwise_c.root_module.addCMacro("AK_OPTIMIZED", &.{});
     }
 
     try handleDefaultWwiseSystems(wwise_c, wwise_build_options);
@@ -426,7 +426,7 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_
     }
 
     if (wwise_build_options.include_default_io_hook_deferred) {
-        compile_step.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", null);
+        compile_step.root_module.addCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", &.{});
         compile_step.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name })),
             .flags = CppFlags,
@@ -434,11 +434,11 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_
     }
 
     if (wwise_build_options.include_file_package_io_deferred) {
-        compile_step.defineCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED", null);
+        compile_step.root_module.addCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED", &.{});
     }
 
     if (wwise_build_options.use_default_job_worker) {
-        compile_step.defineCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", null);
+        compile_step.root_module.addCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", &.{});
         compile_step.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkJobWorkerMgr.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,

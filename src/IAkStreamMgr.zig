@@ -164,7 +164,7 @@ pub const AkDeviceDesc = struct {
             .device_id = value.device_id,
             .can_write = value.can_write,
             .can_read = value.can_read,
-            .device_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.device_name[0..value.string_size]),
+            .device_name = try std.unicode.utf16LeToUtf8Alloc(allocator, value.device_name[0..value.string_size]),
         };
     }
 
@@ -252,7 +252,7 @@ pub const AkStreamRecord = struct {
         return .{
             .stream_id = value.stream_id,
             .device_id = value.device_id,
-            .stream_name = try std.unicode.utf16leToUtf8Alloc(allocator, value.stream_name[0..]),
+            .stream_name = try std.unicode.utf16LeToUtf8Alloc(allocator, value.stream_name[0..]),
             .file_size = value.file_size,
             .is_auto_stream = value.is_auto_stream,
             .is_caching_stream = value.is_caching_stream,
