@@ -170,6 +170,7 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
     base_volume: [*]f32,
     emitter_listener_volume: [*]f32,
     mixer_context: ?*IAkPlugin.IAkMixerPluginContext = null,
+    context: ?*IAkPlugin.IAkMixerInputContext = null,
 
     pub inline fn fromC(value: c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
         return @bitCast(value);

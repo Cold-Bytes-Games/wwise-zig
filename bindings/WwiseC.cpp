@@ -1346,6 +1346,16 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_String(const char* in_pszRt
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetRTPCValue(in_pszRtpcName, in_gameObjectID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetRTPCValueByPlayingID(in_rtpcID, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_String(const char* in_pszRtpcName, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetRTPCValueByPlayingID(in_pszRtpcName, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkSwitchStateID in_switchState, WWISEC_AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetSwitch(in_switchGroup, in_switchState, in_gameObjectID));

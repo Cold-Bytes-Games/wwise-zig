@@ -1274,6 +1274,7 @@ extern "C"
 
     typedef struct WWISEC_AK_IAkStreamMgr WWISEC_AK_IAkStreamMgr;
     typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
+    typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
     typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
     typedef struct WWISEC_AK_IAkPlugin WWISEC_AK_IAkPlugin;
     typedef struct WWISEC_AK_IAkPluginParam WWISEC_AK_IAkPluginParam;
@@ -1360,6 +1361,7 @@ extern "C"
         AkReal32* pfBaseVolume;                         ///< Base volume, common to all channels.
         AkReal32* pfEmitterListenerVolume;              ///< Emitter-listener pair-specific gain. When there are multiple emitter-listener pairs, this volume is set to that of the loudest pair, and the relative gain of other pairs is applied directly on the channel volume matrix pVolumes.
         WWISEC_AK_IAkMixerPluginContext* pMixerContext; ///< Output mixing bus context. Use it to access a few useful panning and mixing services, as well as the ID of the output bus. NULL if pContext is the master audio bus.
+        WWISEC_AK_IAkMixerInputContext* pContext;       ///< Context of the current voice/bus about to be mixed into the output bus with specified base volume and volume matrix.
     } WWISEC_AkSpeakerVolumeMatrixCallbackInfo;
 
     typedef struct WWISEC_AkBusMeteringCallbackInfo
@@ -2581,6 +2583,10 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_String(const char* in_pszRtpcName, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkSwitchStateID in_switchState, WWISEC_AkGameObjectID in_gameObjectID);
 

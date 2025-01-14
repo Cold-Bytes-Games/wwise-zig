@@ -29,6 +29,8 @@ pub const IAkPluginService = opaque {};
 
 pub const IAkMixerPluginContext = opaque {};
 
+pub const IAkMixerInputContext = opaque {};
+
 pub const IAkGlobalPluginContext = opaque {
     pub fn getStreamMgr(self: *const IAkGlobalPluginContext) *IAkStreamMgr.IAkStreamMgr {
         return @ptrCast(
