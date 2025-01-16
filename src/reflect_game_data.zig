@@ -35,6 +35,7 @@ pub const AkImageSourceParams = extern struct {
     distance_scaling_factor: f32 = 1.0,
     level: f32 = 1.0,
     diffraction: f32 = 0.0,
+    occlusion: f32 = 0.0,
     diffraction_emitter_side: u8 = 0.0,
     diffraction_listener_side: u8 = 0.0,
 
