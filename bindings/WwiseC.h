@@ -1565,6 +1565,7 @@ extern "C"
         WWISEC_AkMemID_Integration,          ///< Game engine integration allocations.
         WWISEC_AkMemID_JobMgr,               ///< Allocations for Sound Engine jobs and job dependencies.
         WWISEC_AkMemID_TempAudioRender,      ///< Temporary allocations for audio render.
+        WWISEC_AkMemID_BookmarkAlloc,        ///< Allocations serviced by the bookmark allocator
 
         WWISEC_AkMemID_NUM,               ///< Category count.
         WWISEC_AkMemID_MASK = 0x1FFFFFFF, ///< Mask for category IDs.
@@ -1587,10 +1588,8 @@ extern "C"
 
     typedef struct WWISEC_AK_MemoryMgr_GlobalStats
     {
-        AkUInt64 uUsed;       ///< Total memory used including all categories (in bytes)
-        AkUInt64 uDeviceUsed; ///< Total device memory used including all categories (in bytes)
-        AkUInt64 uReserved;   ///< Total reserved memory. (Used and unused). Will return 0 if the reserved memory is not traceable.
-        AkUInt64 uMax;        ///< Maximum total allocation size, specified in the initialization settings through uMemAllocationSizeLimit. Will be 0 if no limit was set.
+        AkUInt64 uUsed;     ///< Total memory used including all categories (in bytes)
+        AkUInt64 uReserved; ///< Total reserved memory. (Used and unused). Will return 0 if the reserved memory is not traceable.
     } WWISEC_AK_MemoryMgr_GlobalStats;
 
     bool WWISEC_AK_MemoryMgr_IsInitialized();
@@ -1606,11 +1605,9 @@ extern "C"
     void WWISEC_AK_MemoryMgr_StartProfileThreadUsage();
     AkUInt64 WWISEC_AK_MemoryMgr_StopProfileThreadUsage();
     void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename);
+    // END AkMemoryMgr
 
-    ////////////////////////////////////////////////////////////////////////
-    /// @name TempAlloc systems
-    //@{
-
+    // BEGIN AkTempAllocDefs
     /// Temp-alloc memory statistics. Whenever these are fetched, they represent the last completed temp-alloc "tick".
     /// \remarks These statistics are not collected in the Release configuration of the memory mgr.
     typedef struct WWISEC_AK_TempAlloc_Stats
@@ -1653,7 +1650,38 @@ extern "C"
     /// Get a detailed listing of the allocations into the temp-alloc pool, and output them to a file.
     /// \note TempAllocInitSettings::bTrackDetailedStats must be enabled for the specified type to get detailed information about the underlying allocs. Otherwise, only the simple stats are listed.
     void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType, const AkOSChar* pszFilename);
-    // END AkMemoryMgr
+
+    struct WWISEC_AK_BookmarkAlloc_Stats
+    {
+        AkUInt32 uRecentPeakMemUsed;   ///< Peak used memory in a single BookmarkAlloc region since the last tick (in bytes).
+        AkUInt32 uRecentBlocksFetched; ///< Number of times a block was fetched from the cache, not including the base block. High values here may indicate that block sizes need to be larger.
+        AkUInt32 uMemAllocated;        ///< Currently allocated memory (in bytes).
+        AkUInt32 uBlocksAllocated;     ///< Number of individual blocks currently allocated.
+
+        AkUInt32 uPeakMemUsed;         ///< The peak value for uRecentPeakMemUsed since initialization.
+        AkUInt32 uPeakMemAllocated;    ///< The peak value for uMemAllocated since initialization.
+        AkUInt32 uPeakBlocksFetched;   ///< The peak value for uRecentBlocksFetched since initialization.
+        AkUInt32 uPeakBlocksAllocated; ///< The peak value for uBlocksAllocated since initialization.
+        AkUInt32 uPeakBlockSize;       ///< The peak size of any single block since initialization.
+    };
+
+    /// Initialization settings for Bookmark-allocator memory.
+    /// \remarks The debug options are intended for monitoring and analyzing potential issues in usage of the BookmarkAlloc system during development. Their functionality is specifically removed in Release configurations of the AkMemoryMgr.
+    struct WWISEC_AK_BookmarkAlloc_InitSettings
+    {
+        AkUInt32 uMinimumBlockCount;   ///< The number of blocks of memory the system is initialized with and is the minimum kept around forever. Defaults to 1. Higher values increase upfront memory use, but can reduce, or eliminate, the creation and destruction of memory blocks over time.
+        AkUInt32 uMinimumBlockSize;    ///< The minimum size of each block. If a new allocation requests a new block of memory, then the new block is the size of the requested allocation times four, and then rounded up to the next multiple of this value. Defaults to 64 KiB.
+        AkUInt32 uMaximumUnusedBlocks; ///< The maximum number of blocks that the system keeps in an unused state, and avoids freeing. Defaults to 1. Higher values do not increase the peak memory use, but do prevent unused memory from being freed, in order to reduce creation and destruction of memory blocks.
+
+        bool bDebugDetailedStats;    ///< Enable to track detailed stats, specifically collection of Stats::uRecentPeakMemUsed. Enabled by default.
+        bool bDebugClearMemory;      ///< Enable to clear any allocation to a deterministic garbage value during allocs, and after the stack is rewound to a bookmark. Useful to make sure memory is initialized properly. Disabled by default.
+        bool bDebugEnableSentinels;  ///< Enable to write out sentinels between most allocations to help detect memory overwrites, which are verified at the termination of a bookmark alloc region. Enabled by default. Increases memory usage of blocks slightly.
+        bool bDebugStandaloneAllocs; ///< Enable to force the block size to be as small as possible for each allocation (smaller than can be achieved by just setting uMinimumBlockSize to very low values). Useful to investigate memory overruns in-depth, especially in conjunction with the MemoryMgr's stomp allocator. If enabled, bDebugEnableSentinels will be disabled. Greatly increases CPU and memory usage.
+    };
+
+    /// Get simple statistics for the Bookmark allocator
+    void WWISEC_AK_BookmarkAlloc_GetStats(WWISEC_AK_BookmarkAlloc_Stats* out_stats);
+    // END AkTempAllocDefs
 
     // BEGIN AkModule
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemInitForThread)();

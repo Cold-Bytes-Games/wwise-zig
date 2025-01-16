@@ -437,8 +437,6 @@ WWISEC_ASSERT_ENUM_VALUE_SAME(AkMemID_NUM);
 static_assert(static_cast<std::size_t>(WWISEC_AK_TempAlloc_Type_NUM) == static_cast<std::size_t>(AK::TempAlloc::Type_NUM));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_CategoryStats) == sizeof(AK::MemoryMgr::CategoryStats));
 static_assert(sizeof(WWISEC_AK_MemoryMgr_GlobalStats) == sizeof(AK::MemoryMgr::GlobalStats));
-static_assert(sizeof(WWISEC_AK_TempAlloc_Stats) == sizeof(AK::TempAlloc::Stats));
-static_assert(sizeof(WWISEC_AK_TempAlloc_InitSettings) == sizeof(AK::TempAlloc::InitSettings));
 
 bool WWISEC_AK_MemoryMgr_IsInitialized()
 {
@@ -505,16 +503,29 @@ void WWISEC_AK_MemoryMgr_DumpToFile(const AkOSChar* pszFilename)
     AK::MemoryMgr::DumpToFile(pszFilename);
 }
 
+// END AkMemoryMgr
+
+// BEGIN AkTempAllocDefs
+static_assert(sizeof(WWISEC_AK_TempAlloc_Stats) == sizeof(AK::TempAlloc::Stats));
+static_assert(sizeof(WWISEC_AK_TempAlloc_InitSettings) == sizeof(AK::TempAlloc::InitSettings));
+static_assert(sizeof(WWISEC_AK_BookmarkAlloc_Stats) == sizeof(AK::BookmarkAlloc::Stats));
+static_assert(sizeof(WWISEC_AK_BookmarkAlloc_InitSettings) == sizeof(AK::BookmarkAlloc::InitSettings));
+
 void WWISEC_AK_TempAlloc_GetStats(WWISEC_AK_TempAlloc_Type in_eType, WWISEC_AK_TempAlloc_Stats* out_stats)
 {
-    // AK::TempAlloc::GetStats(static_cast<AK::TempAlloc::Type>(in_eType), *reinterpret_cast<AK::TempAlloc::Stats*>(out_stats));
+    AK::TempAlloc::GetStats(static_cast<AK::TempAlloc::Type>(in_eType), *reinterpret_cast<AK::TempAlloc::Stats*>(out_stats));
 }
 
 void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType, const AkOSChar* pszFilename)
 {
     AK::TempAlloc::DumpTempAllocsToFile(static_cast<AK::TempAlloc::Type>(in_eType), pszFilename);
 }
-// END AkMemoryMgr
+
+void WWISEC_AK_BookmarkAlloc_GetStats(WWISEC_AK_BookmarkAlloc_Stats* out_stats)
+{
+    AK::BookmarkAlloc::GetStats(*reinterpret_cast<AK::BookmarkAlloc::Stats*>(out_stats));
+}
+// END AkTempAllocDefs
 
 // BEGIN AkModule
 static_assert(WWISEC_AkSpanCount_END == AkSpanCount_END);

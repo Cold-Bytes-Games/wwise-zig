@@ -1,6 +1,7 @@
 const wwise_options = @import("wwise_options");
 
 pub const AkMemSettings = MemoryMgr.AkMemSettings;
+pub const BookmarkAlloc = @import("BookmarkAlloc.zig");
 pub const Comm = if (wwise_options.use_communication) @import("Comm.zig") else void;
 pub const IOHooks = @import("IOHooks.zig");
 pub const JobWorkerMgr = if (wwise_options.use_default_job_worker) @import("JobWorkerMgr.zig") else void;

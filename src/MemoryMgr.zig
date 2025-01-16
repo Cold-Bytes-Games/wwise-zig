@@ -26,6 +26,7 @@ pub const AkMemID = enum(common.DefaultEnumType) {
     integration = c.WWISEC_AkMemID_Integration,
     job_mgr = c.WWISEC_AkMemID_JobMgr,
     temp_audio_render = c.WWISEC_AkMemID_TempAudioRender,
+    bookmark_alloc = c.WWISEC_AkMemID_BookmarkAlloc,
 };
 
 pub const AkMemType_Media = c.WWISEC_AkMemType_Media;
@@ -120,9 +121,7 @@ pub const CategoryStats = extern struct {
 
 pub const GlobalStats = extern struct {
     used: u64 = 0,
-    device_used: u64 = 0,
     reserved: u64 = 0,
-    max: u64 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AK_MemoryMgr_GlobalStats) GlobalStats {
         return @bitCast(value);
