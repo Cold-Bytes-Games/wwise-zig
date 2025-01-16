@@ -23,16 +23,16 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     music_sync_grid: bool = false,
     music_sync_user_ue: bool = false,
     music_sync_point: bool = false,
-    pad0: bool = false,
     midi_event: bool = false,
+    pad0: bool = false,
     pad1: u3 = 0,
     enable_get_source_play_position: bool = false,
     enable_get_music_play_position: bool = false,
     enable_get_source_stream_buffering: bool = false,
     pad2: u9 = 0,
 
-    pub const MusicSyncAll: AkCallbackType = @bitCast(c.WWISEC_AK_MusicSyncAll);
-    pub const CallbackBits: AkCallbackType = @bitCast(c.WWISEC_AK_CallbackBits);
+    pub const music_sync_all: AkCallbackType = @bitCast(c.WWISEC_AK_MusicSyncAll);
+    pub const callback_bits: AkCallbackType = @bitCast(c.WWISEC_AK_CallbackBits);
 
     pub inline fn fromC(value: u32) AkCallbackType {
         return @bitCast(value);
@@ -162,6 +162,27 @@ pub const AkDynamicSequenceItemCallbackInfo = extern struct {
     }
 };
 
+pub const AkMixerInputInfo = extern struct {
+    connection_type: common.AkConnectionType = .direct,
+    center_perc: f32 = 0.0,
+    speaker_panning_type: common.AkSpeakerPanningType = .direct_speaker_assignment,
+    spatialization_mode: common.Ak3DSpatializationMode = .none,
+    @"3d_position_type": common.Ak3DPositionType = .emitter,
+    has_listener_relative_routing: bool = false,
+
+    pub inline fn fromC(value: c.WWISEC_AkMixerInputInfo) AkMixerInputInfo {
+        return @bitCast(value);
+    }
+
+    pub inline fn toC(self: AkMixerInputInfo) c.WWISEC_AkMixerInputInfo {
+        return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkMixerInputInfo) == @sizeOf(c.WWISEC_AkMixerInputInfo));
+    }
+};
+
 pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
     base: AkEventCallbackInfo = .{},
     volumes: SpeakerVolumes.MatrixPtr,
@@ -170,7 +191,7 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
     base_volume: [*]f32,
     emitter_listener_volume: [*]f32,
     mixer_context: ?*IAkPlugin.IAkMixerPluginContext = null,
-    context: ?*IAkPlugin.IAkMixerInputContext = null,
+    input_info: AkMixerInputInfo = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
         return @bitCast(value);
@@ -332,7 +353,9 @@ pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
     init: bool = false,
     @"suspend": bool = false,
     wakeup_from_suspend: bool = false,
-    pad: u19 = 0,
+    profiler_connect: bool = false,
+    profiler_disocnnect: boll = false,
+    pad: u17 = 0,
 
     pub inline fn fromC(value: u32) AkGlobalCallbackLocation {
         return @bitCast(value);

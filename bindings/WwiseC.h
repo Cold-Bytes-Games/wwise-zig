@@ -1283,27 +1283,35 @@ extern "C"
     // BEGIN AkCallback
     typedef enum WWISEC_AkCallbackType
     {
-        WWISEC_AK_EndOfEvent = 0x0001,                      ///< Callback triggered when reaching the end of an event. AkCallbackInfo can be cast to AkEventCallbackInfo.
-        WWISEC_AK_EndOfDynamicSequenceItem = 0x0002,        ///< Callback triggered when reaching the end of a dynamic sequence item. AkCallbackInfo can be cast to AkDynamicSequenceItemCallbackInfo.
-        WWISEC_AK_Marker = 0x0004,                          ///< Callback triggered when encountering a marker during playback. AkCallbackInfo can be cast to AkMarkerCallbackInfo.
-        WWISEC_AK_Duration = 0x0008,                        ///< Callback triggered when the duration of the sound is known by the sound engine. AkCallbackInfo can be cast to AkDurationCallbackInfo.
-        WWISEC_AK_SpeakerVolumeMatrix = 0x0010,             ///< Callback triggered at each frame, letting the client modify the speaker volume matrix. AkCallbackInfo can be cast to AkSpeakerVolumeMatrixCallbackInfo.
-        WWISEC_AK_Starvation = 0x0020,                      ///< Callback triggered when playback skips a frame due to stream starvation. AkCallbackInfo can be cast to AkEventCallbackInfo.
-        WWISEC_AK_MusicPlaylistSelect = 0x0040,             ///< Callback triggered when music playlist container must select the next item to play. AkCallbackInfo can be cast to AkMusicPlaylistCallbackInfo.
-        WWISEC_AK_MusicPlayStarted = 0x0080,                ///< Callback triggered when a "Play" or "Seek" command has been executed ("Seek" commands are issued from AK::SoundEngine::SeekOnEvent()). Applies to objects of the Interactive-Music Hierarchy only. AkCallbackInfo can be cast to AkEventCallbackInfo.
-        WWISEC_AK_MusicSyncBeat = 0x0100,                   ///< Enable notifications on Music Beat. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
-        WWISEC_AK_MusicSyncBar = 0x0200,                    ///< Enable notifications on Music Bar. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
-        WWISEC_AK_MusicSyncEntry = 0x0400,                  ///< Enable notifications on Music Entry Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
-        WWISEC_AK_MusicSyncExit = 0x0800,                   ///< Enable notifications on Music Exit Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
-        WWISEC_AK_MusicSyncGrid = 0x1000,                   ///< Enable notifications on Music Grid. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
-        WWISEC_AK_MusicSyncUserCue = 0x2000,                ///< Enable notifications on Music Custom Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
-        WWISEC_AK_MusicSyncPoint = 0x4000,                  ///< Enable notifications on Music switch transition synchronization point. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
-        WWISEC_AK_MusicSyncAll = 0x7f00,                    ///< Use this flag if you want to receive all notifications concerning AK_MusicSync registration.
-        WWISEC_AK_MIDIEvent = 0x10000,                      ///< Enable notifications for MIDI events. AkCallbackInfo can be cast to AkMIDIEventCallbackInfo.
-        WWISEC_AK_CallbackBits = 0xfffff,                   ///< Bitmask for all callback types.
-        WWISEC_AK_EnableGetSourcePlayPosition = 0x100000,   ///< Enable play position information for use by AK::SoundEngine::GetSourcePlayPosition().
-        WWISEC_AK_EnableGetMusicPlayPosition = 0x200000,    ///< Enable play position information of music objects, queried via AK::MusicEngine::GetPlayingSegmentInfo().
-        WWISEC_AK_EnableGetSourceStreamBuffering = 0x400000 ///< Enable stream buffering information for use by AK::SoundEngine::GetSourceStreamBuffering().
+        WWISEC_AK_EndOfEvent = 0x0001,               ///< Callback triggered when reaching the end of an event. AkCallbackInfo can be cast to AkEventCallbackInfo.
+        WWISEC_AK_EndOfDynamicSequenceItem = 0x0002, ///< Callback triggered when reaching the end of a dynamic sequence item. AkCallbackInfo can be cast to AkDynamicSequenceItemCallbackInfo.
+        WWISEC_AK_Marker = 0x0004,                   ///< Callback triggered when encountering a marker during playback. AkCallbackInfo can be cast to AkMarkerCallbackInfo.
+        WWISEC_AK_Duration = 0x0008,                 ///< Callback triggered when the duration of the sound is known by the sound engine. AkCallbackInfo can be cast to AkDurationCallbackInfo.
+        WWISEC_AK_SpeakerVolumeMatrix = 0x0010,      ///< Callback triggered at each frame, letting the client modify the speaker volume matrix. AkCallbackInfo can be cast to AkSpeakerVolumeMatrixCallbackInfo.
+        WWISEC_AK_Starvation = 0x0020,               ///< Callback triggered when playback skips a frame due to stream starvation. AkCallbackInfo can be cast to AkEventCallbackInfo.
+        WWISEC_AK_MusicPlaylistSelect = 0x0040,      ///< Callback triggered when music playlist container must select the next item to play. AkCallbackInfo can be cast to AkMusicPlaylistCallbackInfo.
+        WWISEC_AK_MusicPlayStarted = 0x0080,         ///< Callback triggered when a "Play" or "Seek" command has been executed ("Seek" commands are issued from AK::SoundEngine::SeekOnEvent()). Applies to objects of the Interactive-Music Hierarchy only. AkCallbackInfo can be cast to AkEventCallbackInfo.
+        WWISEC_AK_MusicSyncBeat = 0x0100,            ///< Enable notifications on Music Beat. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncBar = 0x0200,             ///< Enable notifications on Music Bar. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncEntry = 0x0400,           ///< Enable notifications on Music Entry Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncExit = 0x0800,            ///< Enable notifications on Music Exit Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncGrid = 0x1000,            ///< Enable notifications on Music Grid. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncUserCue = 0x2000,         ///< Enable notifications on Music Custom Cue. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MusicSyncPoint = 0x4000,           ///< Enable notifications on Music switch transition synchronization point. AkCallbackInfo can be cast to AkMusicSyncCallbackInfo.
+        WWISEC_AK_MIDIEvent = 0x8000,                ///< Enable notifications for MIDI events. AkCallbackInfo can be cast to AkMIDIEventCallbackInfo.
+
+        WWISEC_AK_Callback_Last = 0x10000, ///< Last calblack unused bit, invalid value.
+
+        // A few useful bitmasks.
+        WWISEC_AK_MusicSyncAll = 0x7f00, ///< Use this flag if you want to receive all notifications concerning AK_MusicSync registration.
+        WWISEC_AK_CallbackBits = 0xffff, ///< Bitmask for all callback types.
+
+        // Not callback types, but need to be part of same bitfield for AK::SoundEngine::PostEvent().
+        WWISEC_AK_EnableGetSourcePlayPosition = 0x100000,    ///< Enable play position information for use by AK::SoundEngine::GetSourcePlayPosition().
+        WWISEC_AK_EnableGetMusicPlayPosition = 0x200000,     ///< Enable play position information of music objects, queried via AK::MusicEngine::GetPlayingSegmentInfo().
+        WWISEC_AK_EnableGetSourceStreamBuffering = 0x400000, ///< Enable stream buffering information for use by AK::SoundEngine::GetSourceStreamBuffering().
+
+        WWISEC_AK_SourceInfo_Last = 0x800000, ///< Last source info enable bit, invalid value.
     } WWISEC_AkCallbackType;
 
     typedef struct WWISEC_AkCallbackInfo
@@ -1352,6 +1360,16 @@ extern "C"
         void* pCustomInfo;             ///< Custom info passed to the DynamicSequence::Open function
     } WWISEC_AkDynamicSequenceItemCallbackInfo;
 
+    typedef struct WWISEC_AkMixerInputInfo
+    {
+        WWISEC_AkConnectionType eConnectionType;           ///< Nature of the connection between this input and the mixer.
+        AkReal32 fCenterPerc;                              ///< Center percentage of this input, between 0 and 1.
+        WWISEC_AkSpeakerPanningType eSpeakerPanningType;   ///< Specifies type of panning logic when object is not 3D spatialized. Applicable only when eSpatializationMode is AK_SpatializationMode_None.
+        WWISEC_Ak3DSpatializationMode eSpatializationMode; ///< The 3D spatialization mode used by this input. Applicable only when the input has listener relative routing (see bHasListenerRelativeRouting).
+        WWISEC_Ak3DPositionType e3DPositionType;           ///< Get whether the emitter position is defined by the game alone (AK_3DPositionType_Emitter), or if it is further automated. Applicable only when the input has listener relative routing (see bHasListenerRelativeRouting).
+        bool bHasListenerRelativeRouting;                  ///< Get the value of this input's Listener Relative Routing option, that is, if the emitter-listener relative association is calculated at this node.
+    } WWISEC_AkMixerInputInfo;
+
     typedef struct WWISEC_AkSpeakerVolumeMatrixCallbackInfo
     {
         WWISEC_AkEventCallbackInfo base;
@@ -1361,7 +1379,7 @@ extern "C"
         AkReal32* pfBaseVolume;                         ///< Base volume, common to all channels.
         AkReal32* pfEmitterListenerVolume;              ///< Emitter-listener pair-specific gain. When there are multiple emitter-listener pairs, this volume is set to that of the loudest pair, and the relative gain of other pairs is applied directly on the channel volume matrix pVolumes.
         WWISEC_AK_IAkMixerPluginContext* pMixerContext; ///< Output mixing bus context. Use it to access a few useful panning and mixing services, as well as the ID of the output bus. NULL if pContext is the master audio bus.
-        WWISEC_AK_IAkMixerInputContext* pContext;       ///< Context of the current voice/bus about to be mixed into the output bus with specified base volume and volume matrix.
+        WWISEC_AkMixerInputInfo inputInfo;              ///< Information about the current voice/bus about to be mixed into the output bus with specified base volume and volume matrix.
     } WWISEC_AkSpeakerVolumeMatrixCallbackInfo;
 
     typedef struct WWISEC_AkBusMeteringCallbackInfo
@@ -1468,7 +1486,9 @@ extern "C"
         WWISEC_AkGlobalCallbackLocation_Init = (1 << 10),                           ///< Sound engine initialization.
         WWISEC_AkGlobalCallbackLocation_Suspend = (1 << 11),                        ///< Sound engine suspension through \ref AK::SoundEngine::Suspend
         WWISEC_AkGlobalCallbackLocation_WakeupFromSuspend = (1 << 12),              ///< Sound engine awakening through \ref AK::SoundEngine::WakeupFromSuspend
-        WWISEC_AkGlobalCallbackLocation_Num = 13                                    ///< Total number of global callback locations.
+        WWISEC_AkGlobalCallbackLocation_ProfilerConnect = (1 << 13),                ///< Wwise Profiler has connected to the game.
+        WWISEC_AkGlobalCallbackLocation_ProfilerDisconnect = (1 << 14),             ///< Wwise Profiler has disconnected from the game.
+        WWISEC_AkGlobalCallbackLocation_Num = 15                                    ///< Total number of global callback locations.
     } WWISEC_AkGlobalCallbackLocation;
 
     AK_CALLBACK(void, WWISEC_AkGlobalCallbackFunc)
@@ -3657,6 +3677,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkReal32 fDistanceScalingFactor;  ///< Image source distance scaling. This number effectively scales the sourcePosition vector with respect to the listener and, consequently, scales distance and preserves orientation.
         AkReal32 fLevel;                  ///< Game-controlled level for this source, linear.
         AkReal32 fDiffraction;            ///< Diffraction amount, normalized to the range [0,1].
+        AkReal32 fOcclusion;              ///< Portal occlusion amount, in the range [0,1].
         AkUInt8 uDiffractionEmitterSide;  ///< If there is a shadow zone diffraction just after the emitter in the reflection path, indicates the number of diffraction edges, otherwise 0 if no diffraction.
         AkUInt8 uDiffractionListenerSide; ///< If there is a shadow zone diffraction before reaching the listener in the reflection path, indicates the number of diffraction edges, otherwise 0 if no diffraction.
     } WWISEC_AkImageSourceParams;
