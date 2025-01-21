@@ -78,6 +78,7 @@ extern "C"
     typedef AkUInt32 WWISEC_AkRayID;             ///< Unique (per emitter) identifier for an emitter-listener ray.
     typedef AkUInt64 WWISEC_AkAudioObjectID;     ///< Audio Object ID
     typedef AkUInt32 WWISEC_AkJobType;           ///< Job type identifier
+    typedef AkUInt64 WWISEC_AkCacheID;           ///< Stream cache block ID.
 
     // Constants.
     static const WWISEC_AkPluginID WWISEC_AK_INVALID_PLUGINID = (WWISEC_AkPluginID)-1;                  ///< Invalid FX ID
@@ -91,6 +92,7 @@ extern "C"
     static const WWISEC_AkMemPoolId WWISEC_AK_DEFAULT_POOL_ID = -1;                                     ///< Default pool ID, same as AK_INVALID_POOL_ID
     static const WWISEC_AkAuxBusID WWISEC_AK_INVALID_AUX_ID = WWISEC_AK_INVALID_UNIQUE_ID;              ///< Invalid auxiliary bus ID (or no Aux bus ID)
     static const WWISEC_AkFileID WWISEC_AK_INVALID_FILE_ID = (WWISEC_AkFileID)-1;                       ///< Invalid file ID
+    static const WWISEC_AkCacheID AK_INVALID_CACHE_ID = (AkCacheID)-1;                                  ///< Invalid cache ID
     static const WWISEC_AkDeviceID WWISEC_AK_INVALID_DEVICE_ID = (WWISEC_AkDeviceID)-1;                 ///< Invalid streaming device ID
     static const WWISEC_AkBankID WWISEC_AK_INVALID_BANK_ID = WWISEC_AK_INVALID_UNIQUE_ID;               ///< Invalid bank ID
     static const WWISEC_AkArgumentValueID WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID = 0;                      ///< Fallback argument value ID
@@ -109,7 +111,7 @@ extern "C"
     static const AkReal32 WWISEC_AK_DEFAULT_BANK_THROUGHPUT = 1 * 1024 * 1024 / 1000.f;             ///<  Default bank load throughput (1 Mb/ms)
 
     // Bank version
-    static const AkUInt32 WWISEC_AK_SOUNDBANK_VERSION = 145; ///<  Version of the soundbank reader
+    static const AkUInt32 WWISEC_AK_SOUNDBANK_VERSION = 154; ///<  Version of the soundbank reader
 
     // Job types
     static const WWISEC_AkJobType WWISEC_AkJobType_Generic = 0;         ///< Job type for general-purpose work
@@ -189,7 +191,6 @@ extern "C"
         WWISEC_AK_InvalidFloatValue = 95,            ///< One parameter has a invalid float value such as NaN, INF or FLT_MAX.
         WWISEC_AK_FileFormatMismatch = 96,           ///< Media file format unexpected
         WWISEC_AK_NoDistinctListener = 97,           ///< No distinct listener provided for AddOutput
-        WWISEC_AK_ACP_Error = 98,                    ///< Generic XMA decoder error.
         WWISEC_AK_ResourceInUse = 99,                ///< Resource is in use and cannot be released.
         WWISEC_AK_InvalidBankType = 100,             ///< Invalid bank type. The bank type was either supplied through a function call (e.g. LoadBank) or obtained from a bank loaded from memory.
         WWISEC_AK_AlreadyInitialized = 101,          ///< Init() was called but that element was already initialized.
@@ -201,6 +202,7 @@ extern "C"
         WWISEC_AK_Deferred = 107,                    ///< Returned by functions to indicate to the caller the that the operation is done asynchronously. Used by Low Level IO Hook implementations when async operation are suppored by the hardware.
         WWISEC_AK_FilePathTooLong = 108,             ///< The combination of base path and file name exceeds maximum buffer lengths.
         WWISEC_AK_InvalidState = 109,                ///< This method should not be called when the object is in its current state.
+        WWISEC_AKRESULT_Last,
     } WWISEC_AKRESULT;
 
     typedef enum WWISEC_AkGroupType
@@ -247,9 +249,10 @@ extern "C"
 
     typedef enum WWISEC_AK_SoundEngine_MultiPositionType
     {
-        WWISEC_AK_SoundEngine_MultiPositionType_SingleSource,   ///< Used for normal sounds, not expected to pass to AK::SoundEngine::SetMultiplePosition() (if done, only the first position will be used).
-        WWISEC_AK_SoundEngine_MultiPositionType_MultiSources,   ///< Simulate multiple sources in one sound playing, adding volumes. For instance, all the torches on your level emitting using only one sound.
-        WWISEC_AK_SoundEngine_MultiPositionType_MultiDirections ///< Simulate one sound coming from multiple directions. Useful for repositionning sounds based on wall openings or to simulate areas like forest or rivers ( in combination with spreading in the attenuation of the sounds ).
+        WWISEC_AK_SoundEngine_MultiPositionType_SingleSource,    ///< Used for normal sounds, not expected to pass to AK::SoundEngine::SetMultiplePosition() (if done, only the first position will be used).
+        WWISEC_AK_SoundEngine_MultiPositionType_MultiSources,    ///< Simulate multiple sources in one sound playing, adding volumes. For instance, all the torches on your level emitting using only one sound.
+        WWISEC_AK_SoundEngine_MultiPositionType_MultiDirections, ///< Simulate one sound coming from multiple directions. Useful for repositionning sounds based on wall openings or to simulate areas like forest or rivers ( in combination with spreading in the attenuation of the sounds ).
+        WWISEC_AK_SoundEngine_MultiPositionType_Last,
     } WWISEC_AK_SoundEngine_MultiPositionType;
 
     typedef enum WWISEC_AkSetPositionFlags
@@ -271,24 +274,27 @@ extern "C"
     /// 3D position type: defines what acts as the emitter position for computing spatialization against the listener. Used when Ak3DSpatializationMode is AK_SpatializationMode_PositionOnly or AK_SpatializationMode_PositionAndOrientation.
     enum
     {
-        WWISEC_Ak3DPositionType_AK_3DPositionType_Emitter = 0,               ///< 3D spatialization is computed directly from the emitter game object position.
-        WWISEC_Ak3DPositionType_AK_3DPositionType_EmitterWithAutomation = 1, ///< 3D spatialization is computed from the emitter game object position, translated by user-defined automation.
-        WWISEC_Ak3DPositionType_AK_3DPositionType_ListenerWithAutomation = 2 ///< 3D spatialization is computed from the listener game object position, translated by user-defined automation.
+        WWISEC_Ak3DPositionType_AK_3DPositionType_Emitter = 0,                ///< 3D spatialization is computed directly from the emitter game object position.
+        WWISEC_Ak3DPositionType_AK_3DPositionType_EmitterWithAutomation = 1,  ///< 3D spatialization is computed from the emitter game object position, translated by user-defined automation.
+        WWISEC_Ak3DPositionType_AK_3DPositionType_ListenerWithAutomation = 2, ///< 3D spatialization is computed from the listener game object position, translated by user-defined automation.
+        WWISEC_Ak3DPositionType_AK_3DPositionType_Last,
     };
     typedef AkUInt8 WWISEC_Ak3DPositionType;
 
     typedef enum WWISEC_AkPanningRule
     {
-        WWISEC_AkPanningRule_Speakers = 0,  ///< Left and right positioned 60 degrees apart (by default - see AK::SoundEngine::GetSpeakerAngles()).
-        WWISEC_AkPanningRule_Headphones = 1 ///< Left and right positioned 180 degrees apart.
+        WWISEC_AkPanningRule_Speakers = 0,   ///< Left and right positioned 60 degrees apart (by default - see AK::SoundEngine::GetSpeakerAngles()).
+        WWISEC_AkPanningRule_Headphones = 1, ///< Left and right positioned 180 degrees apart.
+        WWISEC_AkPanningRule_Last
     } WWISEC_AkPanningRule;
 
     /// 3D spatialization mode.
     enum
     {
-        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_None = 0,                  ///< No spatialization
-        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionOnly = 1,          ///< Spatialization based on emitter position only.
-        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionAndOrientation = 2 ///< Spatialization based on both emitter position and emitter orientation.
+        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_None = 0,                   ///< No spatialization
+        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionOnly = 1,           ///< Spatialization based on emitter position only.
+        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionAndOrientation = 2, ///< Spatialization based on both emitter position and emitter orientation.
+        WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_Last
     };
     typedef AkUInt8 WWISEC_Ak3DSpatializationMode;
 
@@ -306,7 +312,8 @@ extern "C"
         WWISEC_AkPluginTypeSink = 7,            ///< Sink plug-in: implement custom sound engine end point.
         WWISEC_AkPluginTypeGlobalExtension = 8, ///< Global Extension plug-in: (e.g. Spatial Audio, Interactive Music)
         WWISEC_AkPluginTypeMetadata = 9,        ///< Metadata plug-in: applies object-based processing to audio data
-        WWISEC_AkPluginTypeMask = 0xf           ///< Plug-in type mask is 4 bits.
+        WWISEC_AkPluginTypeLast,
+        WWISEC_AkPluginTypeMask = 0xf ///< Plug-in type mask is 4 bits.
     } WWISEC_AkPluginType;
 
     typedef enum WWISEC_AkCurveInterpolation
@@ -321,7 +328,8 @@ extern "C"
         WWISEC_AkCurveInterpolation_SineRecip = 7,     ///< Reciprocal of sine curve
         WWISEC_AkCurveInterpolation_Exp3 = 8,          ///< Exp3
         WWISEC_AkCurveInterpolation_LastFadeCurve = 8, ///< Update this value to reflect last curve available for fades
-        WWISEC_AkCurveInterpolation_Constant = 9       ///< Constant ( not valid for fading values )
+        WWISEC_AkCurveInterpolation_Constant = 9,      ///< Constant ( not valid for fading values )
+        WWISEC_AkCurveInterpolation_Last,
     } WWISEC_AkCurveInterpolation;
 
     typedef struct WWISEC_AkAuxSendValue
@@ -339,6 +347,7 @@ extern "C"
         WWISEC_ConnectionType_GameDefSend = 0x1,     ///< Connection by a game-defined send.
         WWISEC_ConnectionType_UserDefSend = 0x2,     ///< Connection by a user-defined send.
         WWISEC_ConnectionType_ReflectionsSend = 0x3, ///< Connection by a early reflections send.
+        WWISEC_ConnectionType_Last,
     } WWISEC_AkConnectionType;
 
     typedef struct WWISEC_AkVector64
@@ -520,11 +529,13 @@ extern "C"
         WWISEC_AkBankType_User = WWISEC_AKCODECID_BANK,        ///< User-defined bank.
         WWISEC_AkBankType_Event = WWISEC_AKCODECID_BANK_EVENT, ///< Bank generated for one event.
         WWISEC_AkBankType_Bus = WWISEC_AKCODECID_BANK_BUS,     ///< Bank generated for one bus or aux bus.
+        WWISEC_AkBankType_Last
     } WWISEC_AkBankTypeEnum;
     // END AkTypes
 
     // BEGIN AkSpeakerConfig
     typedef AkUInt32 WWISEC_AkChannelConfig;
+#define WWISEC_AK_DEFAULT_HEIGHT_ANGLE 30.f
     // END AkSpeakerConfig
 
     // BEGIN AkMidiTypes
@@ -2370,6 +2381,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
         bool bDebugOutOfRangeCheckEnabled; ///< Debug setting: Enable checks for out-of-range (and NAN) floats in the processing code.  This incurs a small performance hit, but can be enabled in most scenarios.  Will print error messages in the log if invalid values are found at various point in the pipeline. Contact AK Support with the new error messages for more information.
 
+        bool bOfflineRendering; ///< Enables/disables offline rendering. \ref goingfurther_offlinerendering
+
         WWISEC_AkProfilerPushTimerFunc fnProfilerPushTimer;   ///< External (optional) function for tracking performance of the sound engine that is called when a timer starts. (only called in Debug and Profile binaries; this is not called in Release)
         WWISEC_AkProfilerPopTimerFunc fnProfilerPopTimer;     ///< External (optional) function for tracking performance of the sound engine that is called when a timer stops. (only called in Debug and Profile binaries; this is not called in Release)
         WWISEC_AkProfilerPostMarkerFunc fnProfilerPostMarker; ///< External (optional) function for tracking significant events in the sound engine, to act as a marker or bookmark. (only called in Debug and Profile binaries; this is not called in Release)
@@ -2377,11 +2390,12 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef enum WWISEC_AkActionOnEventType
     {
-        WWISEC_AkActionOnEventType_Stop = 0,           ///< Stop
-        WWISEC_AkActionOnEventType_Pause = 1,          ///< Pause
-        WWISEC_AkActionOnEventType_Resume = 2,         ///< Resume
-        WWISEC_AkActionOnEventType_Break = 3,          ///< Break
-        WWISEC_AkActionOnEventType_ReleaseEnvelope = 4 ///< Release envelope
+        WWISEC_AkActionOnEventType_Stop = 0,            ///< Stop
+        WWISEC_AkActionOnEventType_Pause = 1,           ///< Pause
+        WWISEC_AkActionOnEventType_Resume = 2,          ///< Resume
+        WWISEC_AkActionOnEventType_Break = 3,           ///< Break
+        WWISEC_AkActionOnEventType_ReleaseEnvelope = 4, ///< Release envelope
+        WWISEC_AkActionOnEventType_Last,
     } WWISEC_AkActionOnEventType;
 
     typedef struct WWISEC_AkSourceSettings
@@ -2402,15 +2416,17 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef enum WWISEC_AK_SoundEngine_PreparationType
     {
-        WWISEC_AK_SoundEngine_Preparation_Load,         ///< \c PrepareEvent() will load required information to play the specified event.
-        WWISEC_AK_SoundEngine_Preparation_Unload,       ///< \c PrepareEvent() will unload required information to play the specified event.
-        WWISEC_AK_SoundEngine_Preparation_LoadAndDecode ///< Vorbis media is decoded when loading, and an uncompressed PCM version is used for playback.
+        WWISEC_AK_SoundEngine_Preparation_Load,          ///< \c PrepareEvent() will load required information to play the specified event.
+        WWISEC_AK_SoundEngine_Preparation_Unload,        ///< \c PrepareEvent() will unload required information to play the specified event.
+        WWISEC_AK_SoundEngine_Preparation_LoadAndDecode, ///< Vorbis media is decoded when loading, and an uncompressed PCM version is used for playback.
+        WWISEC_AK_SoundEngine_Preparation_Last
     } WWISEC_AK_SoundEngine_PreparationType;
 
     typedef enum WWISEC_AK_SoundEngine_AkBankContent
     {
         WWISEC_AK_SoundEngine_AkBankContent_StructureOnly, ///< Use AkBankContent_StructureOnly to load only the structural content, including Events, and then later use the PrepareEvent() functions to load media on demand from loose files on the disk.
-        WWISEC_AK_SoundEngine_AkBankContent_All            ///< Use AkBankContent_All to load both the media and structural content.
+        WWISEC_AK_SoundEngine_AkBankContent_All,           ///< Use AkBankContent_All to load both the media and structural content.
+        WWISEC_AK_SoundEngine_AkBankContent_Last
     } WWISEC_AK_SoundEngine_AkBankContent;
 
     bool WWISEC_AK_SoundEngine_IsInitialized();
@@ -2599,9 +2615,15 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uBusses);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnsetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
+
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_TryUnsetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings, WWISEC_AKRESULT* out_pUnsetResults);
 
@@ -2674,10 +2696,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(WWISEC_AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_FXShareSetID);
-
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkUniqueID in_shareSetID);
-
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_String(const char* in_pszBusName, WWISEC_AkUniqueID in_shareSetID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig);
 

@@ -1,4 +1,5 @@
 const std = @import("std");
+const c = @import("c.zig");
 
 // NOTE: Please sync this with the defines in AkSpeakerConfig.h
 pub const AkSpeakerSetup = packed struct(u20) {
@@ -355,6 +356,31 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_right = true,
     };
 
+    pub const @"Dolby 5.0.4" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .side_left = true,
+        .side_right = true,
+        .front_center = true,
+        .height_front_left = true,
+        .height_front_right = true,
+        .height_back_left = true,
+        .height_back_right = true,
+    };
+
+    pub const @"Dolby 5.1.4" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .side_left = true,
+        .side_right = true,
+        .front_center = true,
+        .height_front_left = true,
+        .height_front_right = true,
+        .height_back_left = true,
+        .height_back_right = true,
+        .low_frequency = true,
+    };
+
     pub const @"Dolby 5.1.2" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
@@ -574,6 +600,7 @@ comptime {
 
 pub const AK_STANDARD_MAX_NUM_CHANNELS = 8;
 pub const AK_MAX_AMBISONICS_ORDER = 5;
+pub const AK_DEFAULT_HEIGHT_ANGLE = c.WWISEC_AK_DEFAULT_HEIGHT_ANGLE;
 
 pub const AkChannelConfigType = enum(u4) {
     anonymous = 0,

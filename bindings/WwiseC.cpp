@@ -69,7 +69,21 @@ static_assert(sizeof(WWISEC_AkTransform) == sizeof(AkTransform));
 static_assert(sizeof(WWISEC_AkChannelEmitter) == sizeof(AkChannelEmitter));
 static_assert(sizeof(WWISEC_AkEmitterListenerPair) == sizeof(AkEmitterListenerPair));
 static_assert(sizeof(WWISEC_AkCodecDescriptor) == sizeof(AkCodecDescriptor));
+static_assert(WWISEC_AK_SOUNDBANK_VERSION == AK_SOUNDBANK_VERSION);
+static_assert(WWISEC_AKRESULT_Last == AKRESULT_Last);
+static_assert(WWISEC_ConnectionType_Last == ConnectionType_Last);
+static_assert(WWISEC_AkCurveInterpolation_Last == AkCurveInterpolation_Last);
+static_assert(WWISEC_AkBankType_Last == AkBankType_Last);
+static_assert(WWISEC_AK_SoundEngine_MultiPositionType_Last == AK::SoundEngine::MultiPositionType_Last);
+static_assert(WWISEC_Ak3DPositionType_AK_3DPositionType_Last == AK_3DPositionType_Last);
+static_assert(WWISEC_AkPanningRule_Last == AkPanningRule_Last);
+static_assert(WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_Last == AK_SpatializationMode_Last);
+static_assert(WWISEC_AkPluginTypeLast == AkPluginType_Last);
 // END AkTypes
+
+// BEGIN AkSpeakerConfig
+static_assert(WWISEC_AK_DEFAULT_HEIGHT_ANGLE == AK_DEFAULT_HEIGHT_ANGLE);
+// END AkSpeakerConfig
 
 // BEGIN AkMidiTypes
 static_assert(sizeof(WWISEC_AkMIDIEvent_tGen) == sizeof(AkMIDIEvent::tGen));
@@ -707,6 +721,9 @@ static_assert(sizeof(WWISEC_AkInitSettings) == sizeof(AkInitSettings));
 static_assert(sizeof(WWISEC_AkPlatformInitSettings) == sizeof(AkPlatformInitSettings));
 static_assert(sizeof(WWISEC_AkSourceSettings) == sizeof(AkSourceSettings));
 static_assert(sizeof(WWISEC_AkSourcePosition) == sizeof(AkSourcePosition));
+static_assert(WWISEC_AkActionOnEventType_Last == AK::SoundEngine::AkActionOnEventType_Last);
+static_assert(WWISEC_AK_SoundEngine_Preparation_Last == AK::SoundEngine::Preparation_Last);
+static_assert(WWISEC_AK_SoundEngine_AkBankContent_Last == AK::SoundEngine::AkBankContent_Last);
 
 void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
 {
@@ -1239,14 +1256,49 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngin
         in_pCookie));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uBusses)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        AK::SoundEngine::PrepareBus(
+            static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+            in_ppszString,
+            in_uBusses));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        AK::SoundEngine::PrepareBus(
+            static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+            reinterpret_cast<AkUniqueID*>(in_pBusID),
+            in_uBusses));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        AK::SoundEngine::PrepareBus(
+            static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+            in_ppszString,
+            in_uBusses,
+            reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback),
+            in_pCookie));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+{
+    return static_cast<WWISEC_AKRESULT>(
+        AK::SoundEngine::PrepareBus(
+            static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
+            reinterpret_cast<AkUniqueID*>(in_pBusID),
+            in_uBusses,
+            reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback),
+            in_pCookie));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMedia(reinterpret_cast<AkSourceSettings*>(in_pSourceSettings), in_uNumSourceSettings));
-}
-
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnsetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings)
-{
-    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnsetMedia(reinterpret_cast<AkSourceSettings*>(in_pSourceSettings), in_uNumSourceSettings));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_TryUnsetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings, WWISEC_AKRESULT* out_pUnsetResults)
@@ -1454,16 +1506,6 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusN
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(WWISEC_AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_FXShareSetID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOutputDeviceEffect(in_outputDeviceID, in_uFXIndex, in_FXShareSetID));
-}
-
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkUniqueID in_shareSetID)
-{
-    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMixer(in_audioNodeID, in_shareSetID));
-}
-
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMixer_String(const char* in_pszBusName, WWISEC_AkUniqueID in_shareSetID)
-{
-    return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMixer(in_pszBusName, in_shareSetID));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig)

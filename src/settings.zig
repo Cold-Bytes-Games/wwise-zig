@@ -104,6 +104,7 @@ pub const AkInitSettings = struct {
     bank_read_buffer_size: u32 = 0,
     debug_out_of_range_limit: f32 = 0.0,
     debug_out_of_range_check_enabled: bool = false,
+    offline_rendering: bool = false,
     fn_profiler_push_timer: AkProfilerPushTimerFunc = null,
     fn_profiler_pop_timer: AkProfilerPopTimerFunc = null,
     fn_profiler_post_marker: AkProfilerPostMarkerFunc = null,
@@ -137,6 +138,7 @@ pub const AkInitSettings = struct {
             .bank_read_buffer_size = value.uBankReadBufferSize,
             .debug_out_of_range_limit = value.fDebugOutOfRangeLimit,
             .debug_out_of_range_check_enabled = value.bDebugOutOfRangeCheckEnabled,
+            .offline_rendering = value.bOfflineRendering,
             .fn_profiler_push_timer = value.fnProfilerPushTimer,
             .fn_profiler_pop_timer = @ptrCast(value.fnProfilerPopTimer),
             .fn_profiler_post_marker = value.fnProfilerPostMarker,
@@ -166,6 +168,7 @@ pub const AkInitSettings = struct {
             .uBankReadBufferSize = self.bank_read_buffer_size,
             .fDebugOutOfRangeLimit = self.debug_out_of_range_limit,
             .bDebugOutOfRangeCheckEnabled = self.debug_out_of_range_check_enabled,
+            .bOfflineRendering = self.offline_rendering,
             .fnProfilerPushTimer = self.fn_profiler_push_timer,
             .fnProfilerPopTimer = @ptrCast(self.fn_profiler_pop_timer),
             .fnProfilerPostMarker = self.fn_profiler_post_marker,
@@ -263,7 +266,7 @@ pub const AkAudioAPILinux = packed struct(common.DefaultEnumType) {
     alsa: bool = false,
     padding: u30 = 0,
 
-    pub const Default: AkAudioAPILinux  = .{ .pulse_audio = true, .alsa = true };
+    pub const Default: AkAudioAPILinux = .{ .pulse_audio = true, .alsa = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPILinux) AkAudioAPILinux {
         return @bitCast(value);
@@ -302,7 +305,7 @@ pub const AkAudioAPIMac = packed struct(common.DefaultEnumType) {
     audio_unit: bool = false,
     padding: u30 = 0,
 
-    pub const Default:AkAudioAPIMac = .{ .av_audio_engine = true, .audio_unit = true };
+    pub const Default: AkAudioAPIMac = .{ .av_audio_engine = true, .audio_unit = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPIMac) AkAudioAPIMac {
         return @bitCast(value);
@@ -397,7 +400,7 @@ pub const AkAudioAPIiOs = packed struct(common.DefaultEnumType) {
     audio_unit: bool = false,
     padding: u30 = 0,
 
-    pub const Default: AkAudioAPIiOs  = .{ .av_audio_engine = true, .audio_unit = true };
+    pub const Default: AkAudioAPIiOs = .{ .av_audio_engine = true, .audio_unit = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPIiOS) AkAudioAPIiOs {
         return @bitCast(value);

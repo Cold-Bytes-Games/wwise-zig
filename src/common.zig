@@ -43,6 +43,7 @@ pub const AkPipelineID = c.WWISEC_AkPipelineID;
 pub const AkRayID = c.WWISEC_AkRayID;
 pub const AkAudioObjectID = c.WWISEC_AkAudioObjectID;
 pub const AkJobType = c.WWISEC_AkJobType;
+pub const AkCacheID = c.WWISEC_AkCacheID;
 
 pub const AkJobType_Generic = c.WWISEC_AkJobType_Generic;
 pub const AkJobType_AudioProcessing = c.WWISEC_AkJobType_AudioProcessing;
@@ -59,6 +60,7 @@ pub const AK_INVALID_POOL_ID = c.WWISEC_AK_INVALID_POOL_ID;
 pub const AK_DEFAULT_POOL_ID = c.WWISEC_AK_DEFAULT_POOL_ID;
 pub const AK_INVALID_AUX_ID = c.WWISEC_AK_INVALID_AUX_ID;
 pub const AK_INVALID_FILE_ID = c.WWISEC_AK_INVALID_FILE_ID;
+pub const AK_INVALID_CACHE_ID = c.AK_INVALID_CACHE_ID;
 pub const AK_INVALID_DEVICE_ID = c.WWISEC_AK_INVALID_DEVICE_ID;
 pub const AK_INVALID_BANK_ID = c.WWISEC_AK_INVALID_BANK_ID;
 pub const AK_FALLBACK_ARGUMENTVALUE_ID = c.WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID;
@@ -604,7 +606,6 @@ pub const AKRESULT = enum(DefaultEnumType) {
     invalid_float_value = 95,
     file_format_mismatch = 96,
     no_distinct_listener = 97,
-    acp_error = 98,
     resource_in_use = 99,
     invalid_bank_type = 100,
     already_initialized = 101,
@@ -737,7 +738,6 @@ pub const WwiseError = error{
     InvalidFloatValue,
     FileFormatMismatch,
     NoDistinctListener,
-    ACP_Error,
     ResourceInUse,
     InvalidBankType,
     AlreadyInitialized,
@@ -819,7 +819,6 @@ pub inline fn handleAkResult(result: c.WWISEC_AKRESULT) WwiseError!void {
         c.WWISEC_AK_InvalidFloatValue => return WwiseError.InvalidFloatValue,
         c.WWISEC_AK_FileFormatMismatch => return WwiseError.FileFormatMismatch,
         c.WWISEC_AK_NoDistinctListener => return WwiseError.NoDistinctListener,
-        c.WWISEC_AK_ACP_Error => return WwiseError.ACP_Error,
         c.WWISEC_AK_ResourceInUse => return WwiseError.ResourceInUse,
         c.WWISEC_AK_InvalidBankType => return WwiseError.InvalidBankType,
         c.WWISEC_AK_AlreadyInitialized => return WwiseError.AlreadyInitialized,

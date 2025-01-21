@@ -168,9 +168,19 @@ pub fn getSpeakerAngles(io_speaker_angles: ?*[]f32, io_num_angles: *u32, out_hei
     );
 }
 
-pub fn setSpeakerAngles(in_speaker_angles: []const f32, in_height_angle: f32, in_id_output: common.AkOutputDeviceID) common.WwiseError!void {
+pub const SetSpeakerAnglesOptionalArgs = struct {
+    height_angle: f32 = speaker_config.AK_DEFAULT_HEIGHT_ANGLE,
+    id_output: common.AkOutputDeviceID = 0,
+};
+
+pub fn setSpeakerAngles(in_speaker_angles: []const f32, optional_args: SetSpeakerAnglesOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_SetSpeakerAngles(@ptrCast(in_speaker_angles), @truncate(in_speaker_angles.len), in_height_angle, in_id_output),
+        c.WWISEC_AK_SoundEngine_SetSpeakerAngles(
+            @ptrCast(in_speaker_angles),
+            @truncate(in_speaker_angles.len),
+            optional_args.height_angle,
+            optional_args.id_output,
+        ),
     );
 }
 
@@ -1256,18 +1266,100 @@ pub fn prepareEventAsyncID(
     );
 }
 
-pub fn setMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
+pub fn prepareBusString(
+    fallback_allocator: std.mem.Allocator,
+    in_preparation_type: PreparationType,
+    in_bus_names: [][]const u8,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    const char_allocator = stack_char_allocator.get();
+
+    var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+    defer area_allocator.deinit();
+
+    const allocator = area_allocator.allocator();
+
+    var raw_bus_names_list = std.ArrayList([*:0]const u8).init(allocator);
+    defer raw_bus_names_list.deinit();
+
+    for (in_bus_names) |bus_name| {
+        const raw_bus_name = common.toCString(allocator, bus_name) catch return common.WwiseError.Fail;
+        raw_bus_names_list.append(raw_bus_name) catch return common.WwiseError.Fail;
+    }
+
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_SetMedia(
-            @ptrCast(@constCast(in_source_settings)),
-            @truncate(in_source_settings.len),
+        c.WWISEC_AK_SoundEngine_PrepareBus_String(
+            @intFromEnum(in_preparation_type),
+            @ptrCast(raw_bus_names_list.items),
+            @truncate(raw_bus_names_list.items.len),
         ),
     );
 }
 
-pub fn unsetMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
+pub fn prepareBusID(in_preparation_type: PreparationType, in_bus_ids: []const common.AkUniqueID) common.WwiseError!void {
     return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_UnsetMedia(
+        c.WWISEC_AK_SoundEngine_PrepareBus_ID(
+            @intFromEnum(in_preparation_type),
+            @ptrCast(@constCast(in_bus_ids)),
+            @truncate(in_bus_ids.len),
+        ),
+    );
+}
+
+pub fn prepareBusAsyncString(
+    fallback_allocator: std.mem.Allocator,
+    in_preparation_type: PreparationType,
+    in_bus_names[]const u8,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+) common.WwiseError!void {
+    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    const char_allocator = stack_char_allocator.get();
+
+    var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
+    defer area_allocator.deinit();
+
+    const allocator = area_allocator.allocator();
+
+    var raw_bus_names_list = std.ArrayList([*:0]const u8).init(allocator);
+    defer raw_bus_names_list.deinit();
+
+    for (in_bus_names) |bus_name| {
+        const raw_bus_name = common.toCString(allocator, bus_name) catch return common.WwiseError.Fail;
+        raw_bus_names_list.append(raw_bus_name) catch return common.WwiseError.Fail;
+    }
+
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareBus_Async_String(
+            @intFromEnum(in_preparation_type),
+            @ptrCast(raw_bus_names_list.items),
+            @truncate(raw_bus_names_list.items.len),
+            @ptrCast(in_bank_callback),
+            in_cookie,
+        ),
+    );
+}
+
+pub fn prepareBusAsyncID(
+    in_preparation_type: PreparationType,
+    in_bus_ids: []const common.AkUniqueID,
+    in_bank_callback: callbacks.AkBankCallbackFunc,
+    in_cookie: ?*anyopaque,
+) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_PrepareBus_Async_ID(
+            @intFromEnum(in_preparation_type),
+            @ptrCast(@constCast(in_bus_ids)),
+            @truncate(in_bus_ids.len),
+            @ptrCast(in_bank_callback),
+            in_cookie,
+        ),
+    );
+}
+
+pub fn setMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetMedia(
             @ptrCast(@constCast(in_source_settings)),
             @truncate(in_source_settings.len),
         ),
@@ -1766,24 +1858,6 @@ pub fn setBusEffectString(fallback_allocatr: std.mem.Allocator, in_bus_name: []c
 pub fn setOutputDeviceEffect(in_output_device_id: common.AkOutputDeviceID, in_fx_index: u32, in_fx_share_set_id: common.AkUniqueID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetOutputDeviceEffect(in_output_device_id, in_fx_index, in_fx_share_set_id),
-    );
-}
-
-pub fn setMixerID(in_audio_node_id: common.AkUniqueID, in_share_set_id: common.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_SetMixer_ID(in_audio_node_id, in_share_set_id),
-    );
-}
-
-pub fn setMixerString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_share_set_id: common.AkUniqueID) common.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-    var allocator = stack_char_allocator.get();
-
-    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
-    defer allocator.free(raw_bus_name);
-
-    return common.handleAkResult(
-        c.WWISEC_AK_SoundEngine_SetMixer_String(raw_bus_name, in_share_set_id),
     );
 }
 
