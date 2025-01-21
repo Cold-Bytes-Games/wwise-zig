@@ -32,7 +32,7 @@ SOFTWARE.
 #include <AK/SoundEngine/Common/AkDynamicSequence.h>
 #include <AK/SoundEngine/Common/AkErrorMessageTranslator.h>
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>
-#include <AK/SoundEngine/Common/AkModule.h>
+#include <AK/SoundEngine/Common/AkMemoryMgrModule.h>
 #include <AK/SoundEngine/Common/AkQueryParameters.h>
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
 #include <AK/SoundEngine/Common/AkStreamMgrModule.h>
@@ -527,8 +527,12 @@ void WWISEC_AK_BookmarkAlloc_GetStats(WWISEC_AK_BookmarkAlloc_Stats* out_stats)
 }
 // END AkTempAllocDefs
 
-// BEGIN AkModule
-static_assert(WWISEC_AkSpanCount_END == AkSpanCount_END);
+// BEGIN AkMemoryArenaTypes
+static_assert(sizeof(WWISEC_AK_MemoryArea_AkMemoryArenaSettings) == sizeof(AK::MemoryArena::AkMemoryArenaSettings));
+// END AkMemoryArenaTypes
+
+// BEGIN AkMemoryMgrModule
+static_assert(WWISEC_AkMemoryMgrArena_NUM == AkMemoryMgrArena_NUM);
 static_assert(sizeof(WWISEC_AkMemSettings) == sizeof(AkMemSettings));
 
 WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings)
@@ -541,7 +545,16 @@ void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettin
     AK::MemoryMgr::GetDefaultSettings(*reinterpret_cast<AkMemSettings*>(out_pMemSettings));
 }
 
-// END AkModule
+void WWISEC_AK_MemoryMgr_VerifyMemoryArenaIntegrity(WWISEC_AkMemoryMgrArena in_eArena)
+{
+    AK::MemoryMgr::VerifyMemoryArenaIntegrity(static_cast<AkMemoryMgrArena>(in_eArena));
+}
+
+WWISEC_AK_MemoryArea_AkMemoryArea* WWISEC_AK_MemoryMgr_GetMemoryArena(WWISEC_AkMemoryMgrArena in_eArena)
+{
+    return reinterpret_cast<WWISEC_AK_MemoryArea_AkMemoryArea*>(AK::MemoryMgr::GetMemoryArena(static_cast<AkMemoryMgrArena>(in_eArena)));
+}
+// END AkMemoryMgrModule
 
 // BEGIN IAkPlugin
 static_assert(static_cast<std::size_t>(WWISEC_AK_PluginServiceType_MAX) == static_cast<std::size_t>(AK::PluginServiceType_MAX));

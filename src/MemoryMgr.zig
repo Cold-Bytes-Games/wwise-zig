@@ -1,6 +1,8 @@
 const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
+const BookmarkAlloc = @import("BookmarkAlloc.zig");
+const MemoryArena = @import("MemoryArea.zig");
 const TempAlloc = @import("TempAlloc.zig");
 
 pub const AkMemPoolId = c.WWISEC_AkMemPoolId;
@@ -32,73 +34,6 @@ pub const AkMemID = enum(common.DefaultEnumType) {
 pub const AkMemType_Media = c.WWISEC_AkMemType_Media;
 pub const AkMemType_Device = c.WWISEC_AkMemType_Device;
 pub const AkMemType_NoTrack = c.WWISEC_AkMemType_NoTrack;
-
-pub const AkMemInitForThread = ?*const fn () callconv(.C) void;
-pub const AkMemTermForThread = ?*const fn () callconv(.C) void;
-pub const AkMemTrimForThread = ?*const fn () callconv(.C) void;
-pub const AkMemMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize) callconv(.C) ?*anyopaque;
-pub const AkMemMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32) callconv(.C) ?*anyopaque;
-pub const AkMemRealloc = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize) callconv(.C) ?*anyopaque;
-pub const AkMemReallocAligned = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize, alignment: u32) callconv(.C) ?*anyopaque;
-pub const AkMemFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) void;
-pub const AkMemTotalReservedMemorySize = ?*const fn () callconv(.C) usize;
-pub const AkMemSizeOfMemory = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) usize;
-pub const AkMemDebugMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugRealloc = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, new_addresss: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugReallocAligned = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, alignment: u32, new_address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) void;
-pub const AkMemAllocVM = ?*const fn (size: usize, extra: ?*usize) callconv(.C) ?*anyopaque;
-pub const AkMemFreeVM = ?*const fn (address: ?*anyopaque, size: usize, extra: usize, release: usize) callconv(.C) void;
-
-pub const AkSpanCount = enum(common.DefaultEnumType) {
-    small,
-    medium,
-    huge,
-};
-
-pub const AkMemSettings = extern struct {
-    init_for_thread: AkMemInitForThread = null,
-    term_for_thread: AkMemTermForThread = null,
-    trim_for_thread: AkMemTrimForThread = null,
-    malloc: AkMemMalloc = null,
-    malign: AkMemMalign = null,
-    realloc: AkMemRealloc = null,
-    realloc_aligned: AkMemReallocAligned = null,
-    free: AkMemFree = null,
-    total_reserved_memory_size: AkMemTotalReservedMemorySize = null,
-    size_of_memory: AkMemSizeOfMemory = null,
-    mem_allocation_size_limit: u64 = 0,
-    enable_separate_device_heap: bool = false,
-    temp_alloc_settings: [std.meta.fields(TempAlloc.Type).len]TempAlloc.InitSettings = [_]TempAlloc.InitSettings{.{}} ** std.meta.fields(TempAlloc.Type).len,
-    alloc_vm: AkMemAllocVM = null,
-    free_vm: AkMemFreeVM = null,
-    alloc_device: AkMemAllocVM = null,
-    free_device: AkMemFreeVM = null,
-    vm_page_size: u32 = 0,
-    device_page_size: u32 = 0,
-    max_thread_local_heap_alloc_size: u32 = 0,
-    debug_malloc: AkMemDebugMalloc = null,
-    debug_malign: AkMemDebugMalign = null,
-    debug_realloc: AkMemDebugRealloc = null,
-    debug_realloc_aligned: AkMemDebugReallocAligned = null,
-    debug_free: AkMemDebugFree = null,
-    memory_debug_level: u32 = 0,
-    vm_span_count: AkSpanCount = .huge,
-    device_span_count: AkSpanCount = .huge,
-
-    pub inline fn fromC(value: c.WWISEC_AkMemSettings) AkMemSettings {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: AkMemSettings) c.WWISEC_AkMemSettings {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(AkMemSettings) == @sizeOf(c.WWISEC_AkMemSettings));
-    }
-};
 
 pub const CategoryStats = extern struct {
     used: u64 = 0,
@@ -136,6 +71,66 @@ pub const GlobalStats = extern struct {
     }
 };
 
+// BEGIN MemoryMgrModule
+pub const AkMemInitForThread = ?*const fn () callconv(.C) void;
+pub const AkMemTermForThread = ?*const fn () callconv(.C) void;
+pub const AkMemTrimForThread = ?*const fn () callconv(.C) void;
+pub const AkMemMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize) callconv(.C) ?*anyopaque;
+pub const AkMemMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32) callconv(.C) ?*anyopaque;
+pub const AkMemRealloc = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize) callconv(.C) ?*anyopaque;
+pub const AkMemReallocAligned = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize, alignment: u32) callconv(.C) ?*anyopaque;
+pub const AkMemFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) void;
+pub const AkMemTotalReservedMemorySize = ?*const fn () callconv(.C) usize;
+pub const AkMemSizeOfMemory = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) usize;
+pub const AkMemDebugMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
+pub const AkMemDebugMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
+pub const AkMemDebugRealloc = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, new_addresss: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
+pub const AkMemDebugReallocAligned = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, alignment: u32, new_address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
+pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) void;
+
+pub const AkMemoryMgrArena = enum(common.DefaulEnumType) {
+    primary = 0,
+    media,
+    profiler,
+    device,
+};
+
+pub const AkMemSettings = extern struct {
+    init_for_thread: AkMemInitForThread = null,
+    term_for_thread: AkMemTermForThread = null,
+    trim_for_thread: AkMemTrimForThread = null,
+    malloc: AkMemMalloc = null,
+    malign: AkMemMalign = null,
+    realloc: AkMemRealloc = null,
+    realloc_aligned: AkMemReallocAligned = null,
+    free: AkMemFree = null,
+    total_reserved_memory_size: AkMemTotalReservedMemorySize = null,
+    size_of_memory: AkMemSizeOfMemory = null,
+
+    memory_arena_settiongs: [std.meta.fileds(AkMemoryMgrArena).len]MemoryArena.AkMemoryAreaSettings = @splat(.{}),
+    temp_alloc_settings: [std.meta.fields(TempAlloc.Type).len]TempAlloc.InitSettings = @splat(.{}),
+    bookmark_alloc_settings: BookmarkAlloc.InitSettings = .{},
+
+    debug_malloc: AkMemDebugMalloc = null,
+    debug_malign: AkMemDebugMalign = null,
+    debug_realloc: AkMemDebugRealloc = null,
+    debug_realloc_aligned: AkMemDebugReallocAligned = null,
+    debug_free: AkMemDebugFree = null,
+    memory_debug_level: u32 = 0,
+
+    pub inline fn fromC(value: c.WWISEC_AkMemSettings) AkMemSettings {
+        return @bitCast(value);
+    }
+
+    pub inline fn toC(self: AkMemSettings) c.WWISEC_AkMemSettings {
+        return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkMemSettings) == @sizeOf(c.WWISEC_AkMemSettings));
+    }
+};
+
 pub fn init(in_pSettings: *AkMemSettings) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_MemoryMgr_Init(@ptrCast(in_pSettings)),
@@ -149,6 +144,7 @@ pub fn term() void {
 pub fn getDefaultSettings(out_pMemSettings: *AkMemSettings) void {
     c.WWISEC_AK_MemoryMgr_GetDefaultSettings(@ptrCast(out_pMemSettings));
 }
+// END MemoryMgrModule
 
 pub fn isInitialized() bool {
     return c.WWISEC_AK_MemoryMgr_IsInitialized();

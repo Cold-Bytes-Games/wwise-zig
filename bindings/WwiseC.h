@@ -1683,7 +1683,40 @@ extern "C"
     void WWISEC_AK_BookmarkAlloc_GetStats(WWISEC_AK_BookmarkAlloc_Stats* out_stats);
     // END AkTempAllocDefs
 
-    // BEGIN AkModule
+    // BEGIN AkMemoryArenaTypes
+    typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkAllocSpan)(
+        size_t in_uSize,
+        size_t* out_userData);
+    typedef void(AKSOUNDENGINE_CALL* WWISEC_AkFreeSpan)(
+        void* in_pAddress,
+        size_t in_uSize,
+        size_t in_userData);
+
+    typedef struct WWISEC_AK_MemoryArea_AkMemoryArenaSettings
+    {
+        bool bEnableSba;                 // Used to determine if the SbaHeap should be initialized and utilized at all. If disabled, all small allocs (size < kAllocSizeMedium) will go into the TlsfHeap and be treated as "Medium" allocs.
+        AkUInt32 uSbaInitSize;           // the size of the initial allocation of memory for the small block allocator (SBA). This allocation will be made inside the main "tlsf" heap, and will always persist. Sub-allocations that fit in this range will have better fragmentation characteristics, and an overall reduction in memory overhead. This does not have to be a power-of-two.
+        AkUInt32 uSbaSpanSize;           // the size of each span of memory for the SBA. Each span has a unique size class. Lower values can slightly increase the overhead of initializing SBA allocations, but can reduce overall memory reservation. This must be a power-of-two.
+        AkUInt32 uSbaMaximumUnusedSpans; // The maximum number of SBA spans that the system keeps in an unused state, and avoids freeing. Defaults to 1. Higher values do not increase the peak memory use, but do prevent unused memory from being freed, in order to reduce creation and destruction of SBA spans.
+
+        AkUInt32 uTlsfInitSize;                 // the size of the initial span of memory requested for the main tlsf heap. This span will always persist. (does not have to be a power-of-two)
+        AkUInt32 uTlsfSpanSize;                 // when a memory allocation cannot fit in the main tlsf heap, and is a medium-sized allocation, new spans requested will be a multiple of this size (does not have to be a power-of-two)
+        AkUInt32 uTlsfLargeSpanSize;            // when a memory allocation cannot fit in the main tlsf heap, and is a large-sized allocation, new spans requested will be a multiple of this size (does not have to be a power-of-two)
+        AkUInt32 uTlsfSpanOverhead;             // the amount of allocation 'overhead' assumed for each span. When new spans for Tlsf are requested, this is subtracted from the size of the requested span, after multiplying the requested size up by uPageSize. Defaults to 128.
+        AkUInt32 uTlsfMaximumUnusedMediumSpans; // The maximum number of "medium spans" that the system keeps in an unused state, and avoids freeing. Defaults to 1. Higher values do not increase the peak memory use, but do prevent unused memory from being freed, in order to reduce creation and destruction of medium spans.
+        AkUInt32 uTlsfMaximumUnusedLargeSpans;  // The maximum number of "large spans" that the system keeps in an unused state, and avoids freeing. Defaults to 1. Higher values do not increase the peak memory use, but do prevent unused memory from being freed, in order to reduce creation and destruction of large spans.
+
+        AkUInt32 uAllocSizeLarge; // defines the minimum size for an allocation to qualify as "Large". Default to UINT_MAX, so that all large allocs are treated as Medium allocs. Large allocs go into best-fit searches, same as medium allocations, but will go to a separate list of secondary spans, distinct from "Medium" allocations
+        AkUInt32 uAllocSizeHuge;  // defines the minimum size for an allocation to qualify as "Huge". Huge allocs always go into standalone spans even if there is space available in an existing span
+
+        AkUInt32 uMemReservedLimit; // the limit on how much memory will be reserved by this arena. If a request for to reserve more memory is made that would go over this limit, a nullptr is returned. If set to zero, no limit is in place.
+
+        WWISEC_AkAllocSpan fnMemAllocSpan; // called when the arena needs a new span of memory, including the initial one requested. Set to nullptr to disable initialization of the arena.
+        WWISEC_AkFreeSpan fnMemFreeSpan;   // called when the arena is releasing a span of memory
+    } WWISEC_AK_MemoryArea_AkMemoryArenaSettings;
+    // END AkMemoryArenaTypes
+
+    // BEGIN AkMemoryMgrModule
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemInitForThread)();
 
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemTermForThread)();
@@ -1756,30 +1789,17 @@ extern "C"
         WWISEC_AkMemPoolId poolId,
         void* pAddress);
 
-    typedef void* (*WWISEC_AkMemAllocVM)(
-        size_t size,
-        size_t* extra);
-
-    typedef void (*WWISEC_AkMemFreeVM)(
-        void* address,
-        size_t size,
-        size_t extra,
-        size_t release);
-
-    typedef enum WWISEC_AkSpanCount
+    // Listing of every memory arena used by the AkMemoryMgr, when using default AkMemoryMgr systems in Wwise
+    typedef enum WWISEC_AkMemoryMgrArena
     {
-        // Span count attempts to be as low as possible. Offers lowest memory usage, but reduces CPU performance due to increased calls to pfAllocVM and other memory allocation hooks.
-        WWISEC_AkSpanCount_Small = 0,
+        WWISEC_AkMemoryMgrArena_Primary = 0,
+        WWISEC_AkMemoryMgrArena_Media,
+        WWISEC_AkMemoryMgrArena_Profiler, // "Profiler" arena will not be available in AK_OPTIMIZED (e.g. "Release") builds
+        WWISEC_AkMemoryMgrArena_Device,   // "Device" arena will only be available on platforms that use device memory for voice decoding
+        WWISEC_AkMemoryMgrArena_NUM,
+    } WWISEC_AkMemoryMgrArena;
 
-        // Span count attempts to match 512KiB mappings. Offers moderate balance between memory and CPU usage.
-        WWISEC_AkSpanCount_Medium,
-
-        // Span count attempts to match 2MiB, or AK_VM_HUGE_PAGE_SIZE, mappings. Offers best overall CPU performance due to use of 2MiB page mappings, but increased memory usage.
-        WWISEC_AkSpanCount_Huge,
-
-        WWISEC_AkSpanCount_END,
-    } WWISEC_AkSpanCount;
-
+    typedef struct WWISEC_AK_MemoryArea_AkMemoryArea WWISEC_AK_MemoryArea_AkMemoryArea;
     typedef struct WWISEC_AkMemSettings
     {
         /// @name High-level memory allocation hooks. When not NULL, redirect allocations normally forwarded to rpmalloc.
@@ -1798,20 +1818,9 @@ extern "C"
 
         /// @name Configuration.
         //@{
-        AkUInt64 uMemAllocationSizeLimit; ///< When non-zero, limits the total amount of virtual and device memory allocated by AK::MemoryMgr.
-        bool bEnableSeparateDeviceHeap;   ///< Enable use of device memory heap for all allocations (on applicable platforms).
+        WWISEC_AK_MemoryArea_AkMemoryArenaSettings memoryAreaSettings[WWISEC_AkMemoryMgrArena_NUM];
         WWISEC_AK_TempAlloc_InitSettings tempAllocSettings[WWISEC_AK_TempAlloc_Type_NUM];
-        //@}
-
-        /// @name Page allocation hooks, used by rpmalloc. Default to AKPLATFORM::AllocVM et al.
-        //@{
-        WWISEC_AkMemAllocVM pfAllocVM;         ///< Virtual page allocation hook.
-        WWISEC_AkMemFreeVM pfFreeVM;           ///< Virtual page allocation hook.
-        WWISEC_AkMemAllocVM pfAllocDevice;     ///< Device page allocation hook.
-        WWISEC_AkMemFreeVM pfFreeDevice;       ///< Device page allocation hook.
-        AkUInt32 uVMPageSize;                  ///< Virtual memory page size. Defaults to 0 which means auto-detect.
-        AkUInt32 uDevicePageSize;              ///< Device memory page size. Defaults to 0 which means auto-detect.
-        AkUInt32 uMaxThreadLocalHeapAllocSize; ///< All memory allocations of sizes larger than this value will go to a global heap shared across all threads. Defaults to 0 which means all allocations go to a global heap.
+        WWISEC_AK_BookmarkAlloc_InitSettings bookmarkAllocSettings;
         //@}
 
         /// @name Memory allocation debugging.
@@ -1823,14 +1832,14 @@ extern "C"
         WWISEC_AkMemDebugFree pfDebugFree;                     ///< (Optional) Memory allocation debugging hook. Used for tracking calls to pfFree.
         AkUInt32 uMemoryDebugLevel;                            ///< Default 0 disabled. 1 debug enabled. 2 stomp allocator enabled. 3 stomp allocator and debug enabled. User implementations may use multiple non-zero values to offer different features.
         //@}
-
-        WWISEC_AkSpanCount uVMSpanCount;
-        WWISEC_AkSpanCount uDeviceSpanCount;
     } WWISEC_AkMemSettings;
 
     WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings);
     void WWISEC_AK_MemoryMgr_GetDefaultSettings(WWISEC_AkMemSettings* out_pMemSettings);
-    // END AkModule
+
+    void WWISEC_AK_MemoryMgr_VerifyMemoryArenaIntegrity(WWISEC_AkMemoryMgrArena in_eArena);
+    WWISEC_AK_MemoryArea_AkMemoryArea* WWISEC_AK_MemoryMgr_GetMemoryArena(WWISEC_AkMemoryMgrArena in_eArena);
+    // END AkMemoryMgrModule
 
     // BEGIN Platform-specific (Ak*SoundEngine and AkPlatformFunc)
     typedef struct WWISEC_WIN_AkThreadProperties
