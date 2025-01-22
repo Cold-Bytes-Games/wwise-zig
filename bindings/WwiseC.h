@@ -872,7 +872,7 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_FileNotFound,
         WWISEC_AK_Monitor_ErrorCode_CannotOpenFile,
         WWISEC_AK_Monitor_ErrorCode_CannotStartStreamNoMemory,
-        WWISEC_AK_Monitor_ErrorCode_IODevice,
+        WWISEC_AK_Monitor_ErrorCode_IODeviceStr,
         WWISEC_AK_Monitor_ErrorCode_IncompatibleIOSettings,
 
         WWISEC_AK_Monitor_ErrorCode_PluginUnsupportedChannelConfiguration,
@@ -915,9 +915,6 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_MediaNotLoaded,
         WWISEC_AK_Monitor_ErrorCode_VoiceStarving,
         WWISEC_AK_Monitor_ErrorCode_StreamingSourceStarving,
-        WWISEC_AK_Monitor_ErrorCode_XMADecoderSourceStarving,
-        WWISEC_AK_Monitor_ErrorCode_XMADecodingError,
-        WWISEC_AK_Monitor_ErrorCode_InvalidXMAData,
 
         WWISEC_AK_Monitor_ErrorCode_PluginNotRegistered,
         WWISEC_AK_Monitor_ErrorCode_CodecNotRegistered,
@@ -950,9 +947,6 @@ extern "C"
 
         WWISEC_AK_Monitor_ErrorCode_CommandQueueFull,
         WWISEC_AK_Monitor_ErrorCode_CommandTooLarge,
-
-        WWISEC_AK_Monitor_ErrorCode_XMACreateDecoderLimitReached,
-        WWISEC_AK_Monitor_ErrorCode_XMAStreamBufferTooSmall,
 
         WWISEC_AK_Monitor_ErrorCode_ModulatorScopeError_Inst,
         WWISEC_AK_Monitor_ErrorCode_ModulatorScopeError_Obj,
@@ -1053,9 +1047,7 @@ extern "C"
 
         WWISEC_AK_Monitor_ErrorCode_NotEnoughMemInFunction,
         WWISEC_AK_Monitor_ErrorCode_FXNotFound,
-        WWISEC_AK_Monitor_ErrorCode_SetMixerNotABus,
         WWISEC_AK_Monitor_ErrorCode_AudioNodeNotFound,
-        WWISEC_AK_Monitor_ErrorCode_SetMixerFailed,
         WWISEC_AK_Monitor_ErrorCode_SetBusConfigUnsupported,
         WWISEC_AK_Monitor_ErrorCode_BusNotFound,
 
@@ -1064,6 +1056,9 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_UnexpectedPrepareGameSyncsCall,
         WWISEC_AK_Monitor_ErrorCode_MusicEngineNotInitialized,
         WWISEC_AK_Monitor_ErrorCode_LoadingBankMismatch,
+
+        WWISEC_AK_Monitor_ErrorCode_ProxyObjectMismatch,
+        WWISEC_AK_Monitor_ErrorCode_ProxyObjectMemory,
 
         WWISEC_AK_Monitor_ErrorCode_MasterBusStructureNotLoaded,
         WWISEC_AK_Monitor_ErrorCode_TooManyChildren,
@@ -1074,11 +1069,6 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_NXDeviceRegistrationFailed,
         WWISEC_AK_Monitor_ErrorCode_MixPluginOnObjectBus,
 
-        WWISEC_AK_Monitor_ErrorCode_XboxXMAVoiceResetFailed,
-        WWISEC_AK_Monitor_ErrorCode_XboxACPMessage,
-        WWISEC_AK_Monitor_ErrorCode_XboxFrameDropped,
-        WWISEC_AK_Monitor_ErrorCode_XboxACPError,
-        WWISEC_AK_Monitor_ErrorCode_XboxXMAFatalError,
         WWISEC_AK_Monitor_ErrorCode_MissingMusicNodeParent,
         WWISEC_AK_Monitor_ErrorCode_HardwareOpusDecoderError,
         WWISEC_AK_Monitor_ErrorCode_SetGeometryTooManyTriangleConnected,
@@ -1161,9 +1151,15 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_AudioOut2UserCreateError,
 
         WWISEC_AK_Monitor_ErrorCode_FeedbackOnAudioObjectsBus,
-        WWISEC_AK_Monitor_ErrorCode_AssetSwapEnabled,
 
         WWISEC_AK_Monitor_ErrorCode_SpatialAudio_SiblingPortal,
+        WWISEC_AK_Monitor_ErrorCode_ActivityPlayback_Warning,
+
+        WWISEC_AK_Monitor_ErrorCode_CannotPlaySource_FileAccess,
+        WWISEC_AK_Monitor_ErrorCode_MediaDiscrepancy,
+        WWISEC_AK_Monitor_ErrorCode_WwiseIODisconnected,
+        WWISEC_AK_Monitor_ErrorCode_WwiseIODisconnectedStr,
+        WWISEC_AK_Monitor_ErrorCode_IODevice,
         // ALWAYS ADD NEW CODES AT THE END !!!!!!!
         // Otherwise it may break comm compatibility in a patch
 
