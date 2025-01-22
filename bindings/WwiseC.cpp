@@ -3376,6 +3376,16 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffract
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetDiffractionOrder(in_uDiffractionOrder, in_bUpdatePaths));
 }
 
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxGlobalReflectionPaths(AkUInt32 in_uMaxGlobalReflectionPaths)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxGlobalReflectionPaths(in_uMaxGlobalReflectionPaths));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(AkUInt32 in_uMaxDiffractionPaths, WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxDiffractionPaths(in_uMaxDiffractionPaths, in_gameObjectID));
+}
+
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(AkUInt32 in_uMaxEmitterRoomAuxSends)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxEmitterRoomAuxSends(in_uMaxEmitterRoomAuxSends));
@@ -3389,6 +3399,11 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPri
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(AkUInt32 in_uNbFrames)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetLoadBalancingSpread(in_uNbFrames));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetSmoothingConstant(AkReal32 in_fSmoothingConstantMs, WWISEC_AkGameObjectID in_gameObjectID)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetSmoothingConstant(in_fSmoothingConstantMs, in_gameObjectID));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID)
@@ -3424,6 +3439,11 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::QueryDiffractionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkDiffractionPathInfo*>(out_aPaths), *io_uArraySize));
+}
+
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetTransmissionOperation(WWISEC_AkTransmissionOperation in_eOperation)
+{
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetTransmissionOperation(in_eOperation));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine()

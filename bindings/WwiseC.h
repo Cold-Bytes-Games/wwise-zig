@@ -3757,38 +3757,64 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     // BEGIN AkSpatialAudio
     /// Initialization settings of the spatial audio module.
+    enum
+    {
+        WWISEC_AkTransmissionOperation_Add,      ///< Transmission loss of each hit surface is summed until it reaches 100%.
+        WWISEC_AkTransmissionOperation_Multiply, ///< The inverse of transmission loss (1 - TL) is multiplied in succession, and the result inverted. With each hit surface, the effect of additional transmission loss is reduced. The total loss will approach but never reach 100% unless a surface with 100% loss is found.
+        WWISEC_AkTransmissionOperation_Max,      ///< The highest transmission loss of all hit surfaces is used.
+        WWISEC_AkTransmissionOperation_Default = WWISEC_AkTransmissionOperation_Max,
+    };
+    typedef AkUInt8 WWISEC_AkTransmissionOperation;
+
     typedef struct WWISEC_AkSpatialAudioInitSettings
     {
-        AkUInt32 uMaxSoundPropagationDepth;              ///< Maximum number of portals that sound can propagate through; must be less than or equal to AK_MAX_SOUND_PROPAGATION_DEPTH.
-        AkReal32 fMovementThreshold;                     ///< Amount that an emitter or listener has to move to trigger a validation of reflections/diffraction. Larger values can reduce the CPU load at the cost of reduced accuracy. Note that the ray tracing itself is not affected by this value. Rays are cast each time a Spatial Audio update is executed.
-        AkUInt32 uNumberOfPrimaryRays;                   ///< The number of primary rays used in the ray tracing engine. A larger number of rays will increase the chances of finding reflection and diffraction paths, but will result in higher CPU usage. When CPU limit is active (see \ref AkSpatialAudioInitSettings::fCPULimitPercentage), this setting represents the maximum allowed number of primary rays.
-        AkUInt32 uMaxReflectionOrder;                    ///< Maximum reflection order [1, 4] - the number of 'bounces' in a reflection path. A high reflection order renders more details at the expense of higher CPU usage.
-        AkUInt32 uMaxDiffractionOrder;                   ///< Maximum diffraction order [1, 8] - the number of 'bends' in a diffraction path. A high diffraction order accommodates more complex geometry at the expense of higher CPU usage.
-                                                         ///< Diffraction must be enabled on the geometry to find diffraction paths (refer to \c AkGeometryParams). Set to 0 to disable diffraction on all geometry.
-                                                         ///< This parameter limits the recursion depth of diffraction rays cast from the listener to scan the environment, and also the depth of the diffraction search to find paths between emitter and listener.
-                                                         ///< To optimize CPU usage, set it to the maximum number of edges you expect the obstructing geometry to traverse.
-                                                         ///< For example, if box-shaped geometry is used exclusively, and only a single box is expected between an emitter and then listener, limiting \c uMaxDiffractionOrder to 2 may be sufficient.
-                                                         ///< A diffraction path search starts from the listener, so when the maximum diffraction order is exceeded, the remaining geometry between the end of the path and the emitter is ignored.
-                                                         ///< In such case, where the search is terminated before reaching the emitter, the diffraction coefficient will be underestimated. It is calculated from a partial path, ignoring any remaining geometry.
-        AkUInt32 uMaxEmitterRoomAuxSends;                ///< The maximum number of game-defined auxiliary sends that can originate from a single emitter. An emitter can send to its own room, and to all adjacent rooms if the emitter and listener are in the same room. If a limit is set, the most prominent sends are kept, based on spread to the adjacent portal from the emitters perspective.
-                                                         ///< Set to 1 to only allow emitters to send directly to their current room, and to the room a listener is transitioning to if inside a portal. Set to 0 to disable the limit.
-        AkUInt32 uDiffractionOnReflectionsOrder;         ///< The maximum possible number of diffraction points at each end of a reflection path. Diffraction on reflection allows reflections to fade in and out smoothly as the listener or emitter moves in and out of the reflection's shadow zone.
-                                                         ///< When greater than zero, diffraction rays are sent from the listener to search for reflections around one or more corners from the listener.
-                                                         ///< Diffraction must be enabled on the geometry to find diffracted reflections (refer to \c AkGeometryParams). Set to 0 to disable diffraction on reflections.
-                                                         ///< To allow reflections to propagate through portals without being cut off, set \c uDiffractionOnReflectionsOrder to 2 or greater.
-        AkReal32 fMaxPathLength;                         ///< The total length of a path composed of a sequence of segments (or rays) cannot exceed the defined maximum path length. High values compute longer paths but increase the CPU cost.
-                                                         ///< Each individual sound is also affected by its maximum attenuation distance, specified in the Authoring tool. Reflection or diffraction paths, calculated inside Spatial Audio, will never exceed a sound's maximum attenuation distance.
-                                                         ///< Note, however, that attenuation is considered infinite if the furthest point is above the audibility threshold.
-        AkReal32 fCPULimitPercentage;                    ///< Defines the targeted computation time allocated for the ray tracing engine. Defined as a percentage [0, 100] of the current audio frame. The ray tracing engine dynamically adapts the number of primary rays to target the specified computation time value. In all circumstances, the computed number of primary rays cannot exceed the number of primary rays specified by AkSpatialAudioInitSettings::uNumberOfPrimaryRays.
-                                                         ///< A value of 0 indicates no target has been set. In this case, the number of primary rays is fixed and is set by AkSpatialAudioInitSettings::uNumberOfPrimaryRays.
-        AkUInt32 uLoadBalancingSpread;                   ///< Spread the computation of paths on uLoadBalancingSpread frames [1..[. When uLoadBalancingSpread is set to 1, no load balancing is done. Values greater than 1 indicate the computation of paths will be spread on this number of frames.
-        bool bEnableGeometricDiffractionAndTransmission; ///< Enable computation of geometric diffraction and transmission paths for all sources that have the <b>Enable Diffraction and Transmission</b> box checked in the Positioning tab of the Wwise Property Editor.
-                                                         ///< This flag enables sound paths around (diffraction) and through (transmission) geometry (see \c AK::SpatialAudio::SetGeometry).
-                                                         ///< Setting \c bEnableGeometricDiffractionAndTransmission to false implies that geometry is only to be used for reflection calculation.
-                                                         ///< Diffraction edges must be enabled on geometry for diffraction calculation (see \c AkGeometryParams).
-                                                         ///< If \c bEnableGeometricDiffractionAndTransmission is false but a sound has <b>Enable Diffraction and Transmission</b> selected in the Positioning tab of the authoring tool, the sound will diffract through portals but will pass through geometry as if it is not there.
-                                                         ///< One would typically disable this setting in the case that the game intends to perform its own obstruction calculation, but geometry is still passed to spatial audio for reflection calculation.
-        bool bCalcEmitterVirtualPosition;                ///< An emitter that is diffracted through a portal or around geometry will have its apparent or virtual position calculated by Wwise Spatial Audio and passed on to the sound engine.
+        AkUInt32 uMaxSoundPropagationDepth;                    ///< Maximum number of portals that sound can propagate through; must be less than or equal to AK_MAX_SOUND_PROPAGATION_DEPTH.
+        AkReal32 fMovementThreshold;                           ///< Amount that an emitter or listener has to move to trigger a validation of reflections/diffraction. Larger values can reduce the CPU load at the cost of reduced accuracy. Note that the ray tracing itself is not affected by this value. Rays are cast each time a Spatial Audio update is executed.
+        AkUInt32 uNumberOfPrimaryRays;                         ///< The number of primary rays used in the ray tracing engine. A larger number of rays will increase the chances of finding reflection and diffraction paths, but will result in higher CPU usage. When CPU limit is active (see \ref AkSpatialAudioInitSettings::fCPULimitPercentage), this setting represents the maximum allowed number of primary rays.
+        AkUInt32 uMaxReflectionOrder;                          ///< Maximum reflection order [1, 4] - the number of 'bounces' in a reflection path. A high reflection order renders more details at the expense of higher CPU usage.
+        AkUInt32 uMaxDiffractionOrder;                         ///< Maximum diffraction order [1, 8] - the number of 'bends' in a diffraction path. A high diffraction order accommodates more complex geometry at the expense of higher CPU usage.
+                                                               ///< Diffraction must be enabled on the geometry to find diffraction paths (refer to \c AkGeometryParams). Set to 0 to disable diffraction on all geometry.
+                                                               ///< This parameter limits the recursion depth of diffraction rays cast from the listener to scan the environment, and also the depth of the diffraction search to find paths between emitter and listener.
+                                                               ///< To optimize CPU usage, set it to the maximum number of edges you expect the obstructing geometry to traverse.
+                                                               ///< For example, if box-shaped geometry is used exclusively, and only a single box is expected between an emitter and then listener, limiting \c uMaxDiffractionOrder to 2 may be sufficient.
+                                                               ///< A diffraction path search starts from the listener, so when the maximum diffraction order is exceeded, the remaining geometry between the end of the path and the emitter is ignored.
+                                                               ///< In such case, where the search is terminated before reaching the emitter, the diffraction coefficient will be underestimated. It is calculated from a partial path, ignoring any remaining geometry.
+        AkUInt32 uMaxDiffractionPaths;                         ///< Limit the maximum number of diffraction paths computed per emitter, excluding the direct/transmission path. The acoustics engine searches for up to uMaxDiffractionPaths paths and stops searching when this limit is reached.
+                                                               ///< Setting a low number for uMaxDiffractionPaths (1-4) uses fewer CPU resources, but is more likely to cause discontinuities in the resulting audio. This can occur, for example, when a more prominent path is discovered, displacing a less prominent one.
+                                                               ///< Conversely, a larger number (8 or more) produces higher quality output but requires more CPU resources. The recommended range is 2-8.
+        AkUInt32 uMaxGlobalReflectionPaths;                    ///< [\ref spatial_audio_experimental "Experimental"] Set a global reflection path limit among all sound emitters with early reflections enabled. Potential reflection paths, discovered by raycasting, are first sorted according to a heuristic to determine which paths are the most prominent.
+                                                               ///< Afterwards, the full reflection path calculation is performed on only the uMaxGlobalReflectionPaths, most prominent paths. Limiting the total number of reflection path calculations can significantly reduce CPU usage. Recommended range: 10-50.
+                                                               ///< Set to 0 to disable the limit. In this case, the number of paths computed is unbounded and depends on how many are discovered by raycasting.
+        AkUInt32 uMaxEmitterRoomAuxSends;                      ///< The maximum number of game-defined auxiliary sends that can originate from a single emitter. An emitter can send to its own room, and to all adjacent rooms if the emitter and listener are in the same room. If a limit is set, the most prominent sends are kept, based on spread to the adjacent portal from the emitters perspective.
+                                                               ///< Set to 1 to only allow emitters to send directly to their current room, and to the room a listener is transitioning to if inside a portal. Set to 0 to disable the limit.
+        AkUInt32 uDiffractionOnReflectionsOrder;               ///< The maximum possible number of diffraction points at each end of a reflection path. Diffraction on reflection allows reflections to fade in and out smoothly as the listener or emitter moves in and out of the reflection's shadow zone.
+                                                               ///< When greater than zero, diffraction rays are sent from the listener to search for reflections around one or more corners from the listener.
+                                                               ///< Diffraction must be enabled on the geometry to find diffracted reflections (refer to \c AkGeometryParams). Set to 0 to disable diffraction on reflections.
+                                                               ///< To allow reflections to propagate through portals without being cut off, set \c uDiffractionOnReflectionsOrder to 2 or greater.
+        AkReal32 fMaxDiffractionAngleDegrees;                  ///< The largest possible diffraction value, in degrees, beyond which paths are not computed and are inaudible. Must be greater than zero. Default value: 180 degrees.
+                                                               ///< A large value (for example, 360 degrees) allows paths to propagate further around corners and obstacles, but takes more CPU time to compute.
+                                                               ///< A gain is applied to each diffraction path to taper the volume of the path to zero as the diffraction angle approaches fMaxDiffractionAngleDegrees,
+                                                               ///< and appears in the Voice Inspector as "Propagation Path Gain". This tapering gain is applied in addition to the diffraction curves, and prevents paths from popping in or out suddenly when the maximum diffraction angle is exceeded.
+                                                               ///< In Wwise Authoring, the horizontal axis of a diffraction curve in the attenuation editor is defined over the range 0-100%, corresponding to angles 0-180 degrees.
+                                                               ///< If fMaxDiffractionAngleDegrees is greater than 180 degrees, diffraction coefficients over 100% are clamped and the curve is evaluated at the rightmost point.
+        AkReal32 fMaxPathLength;                               ///< The total length of a path composed of a sequence of segments (or rays) cannot exceed the defined maximum path length. High values compute longer paths but increase the CPU cost.
+                                                               ///< Each individual sound is also affected by its maximum attenuation distance, specified in the Authoring tool. Reflection or diffraction paths, calculated inside Spatial Audio, will never exceed a sound's maximum attenuation distance.
+                                                               ///< Note, however, that attenuation is considered infinite if the furthest point is above the audibility threshold.
+        AkReal32 fCPULimitPercentage;                          ///< Defines the targeted computation time allocated for the ray tracing engine. Defined as a percentage [0, 100] of the current audio frame. The ray tracing engine dynamically adapts the number of primary rays to target the specified computation time value. In all circumstances, the computed number of primary rays cannot exceed the number of primary rays specified by AkSpatialAudioInitSettings::uNumberOfPrimaryRays.
+                                                               ///< A value of 0 indicates no target has been set. In this case, the number of primary rays is fixed and is set by AkSpatialAudioInitSettings::uNumberOfPrimaryRays.
+        AkReal32 fSmoothingConstantMs;                         ///< [\ref spatial_audio_experimental "Experimental"]  Enable parameter smoothing on the diffraction paths output from the Acoustics Engine. Set fSmoothingConstantMs to a value greater than 0 to define the time constant (in milliseconds) for parameter smoothing.
+                                                               ///< The time constant of an exponential moving average is the amount of time for the smoothed response of a unit step function to reach 1 - 1/e ~= 63.2% of the original signal.
+                                                               ///< A large value (eg. 500-1000 ms) results in less variance but introduces lag, which is a good choice when using conservative values for uNumberOfPrimaryRays (eg. 5-10), uMaxDiffractionPaths (eg. 1-3) or fMovementThreshold ( > 1m ), in order to reduce overall CPU cost.
+                                                               ///< A small value (eg. 10-100 ms) results in greater accuracy and faster convergence of rendering parameters. Set to 0 to disable path smoothing.
+        AkUInt32 uLoadBalancingSpread;                         ///< Spread the computation of paths on uLoadBalancingSpread frames [1..[. When uLoadBalancingSpread is set to 1, no load balancing is done. Values greater than 1 indicate the computation of paths will be spread on this number of frames.
+        bool bEnableGeometricDiffractionAndTransmission;       ///< Enable computation of geometric diffraction and transmission paths for all sources that have the <b>Enable Diffraction and Transmission</b> box checked in the Positioning tab of the Wwise Property Editor.
+                                                               ///< This flag enables sound paths around (diffraction) and through (transmission) geometry (see \c AK::SpatialAudio::SetGeometry).
+                                                               ///< Setting \c bEnableGeometricDiffractionAndTransmission to false implies that geometry is only to be used for reflection calculation.
+                                                               ///< Diffraction edges must be enabled on geometry for diffraction calculation (see \c AkGeometryParams).
+                                                               ///< If \c bEnableGeometricDiffractionAndTransmission is false but a sound has <b>Enable Diffraction and Transmission</b> selected in the Positioning tab of the authoring tool, the sound will diffract through portals but will pass through geometry as if it is not there.
+                                                               ///< One would typically disable this setting in the case that the game intends to perform its own obstruction calculation, but geometry is still passed to spatial audio for reflection calculation.
+        bool bCalcEmitterVirtualPosition;                      ///< An emitter that is diffracted through a portal or around geometry will have its apparent or virtual position calculated by Wwise Spatial Audio and passed on to the sound engine.
+        WWISEC_AkTransmissionOperation eTransmissionOperation; ///< The operation used to determine transmission loss on direct paths.
     } WWISEC_AkSpatialAudioInitSettings;
 
     // Settings for individual image sources.
@@ -3865,9 +3891,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// pathPoint[0] is closest to the emitter, pathPoint[numPathPoints-1] is closest to the listener.
         WWISEC_AkVector64 pathPoint[WWISEC_AK_MAX_REFLECTION_PATH_LENGTH];
 
-        /// The surfaces that were hit in the path.
-        /// surfaces[0] is closest to the emitter, surfaces[numPathPoints-1] is closest to the listener.
-        WWISEC_AkAcousticSurface surfaces[WWISEC_AK_MAX_REFLECTION_PATH_LENGTH];
+        /// The texture that were hit in the path.
+        /// textureIDs[0] is closest to the emitter, textureIDs[numPathPoints-1] is closest to the listener.
+        AkUInt32 textureIDs[AK_MAX_REFLECTION_PATH_LENGTH];
 
         /// Number of valid elements in the \c pathPoint[], \c surfaces[], and \c diffraction[] arrays.
         AkUInt32 numPathPoints;
@@ -3955,6 +3981,10 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// Occlusion value for this path
         /// This value includes the accumulated portal occlusion for all portals along the path.
         AkReal32 occlusionValue;
+
+        /// Propagation path gain.
+        /// Includes volume tapering gain to ensure that diffraction paths do not cut in or out when the maximum diffraction angle is exceeded.
+        AkReal32 gain;
     } WWISEC_AkDiffractionPathInfo;
 
     /// Parameters passed to \c SetPortal
@@ -4055,7 +4085,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// - \ref AkGeometryParams
         WWISEC_AkGeometrySetID GeometryInstanceID;
 
-        AkUInt32 RoomPriority;
+        AkReal32 RoomPriority;
     } WWISEC_AkRoomParams;
 
     /// Parameters passed to \c SetGeometry
@@ -4133,20 +4163,22 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         ///	- \ref AK::SpatialAudio::RemoveGeometryInstance
         WWISEC_AkGeometrySetID GeometrySetID;
 
-        /// Associate this geometry instance with the room \c RoomID. Associating a geometry instance with a particular room will limit the scope in which the geometry is visible/accessible. \c RoomID can be left as default (-1), in which case
-        /// this geometry instance will have a global scope. It is recommended to associate geometry with a room when the geometry is (1) fully contained within the room (ie. not visible to other rooms accept by portals),
-        /// and (2) the room does not share geometry with other rooms. Doing so reduces the search space for ray casting performed by reflection and diffraction calculations. Take note that once one or more geometry instances
-        /// are associated with a room, that room will no longer be able to access geometry that is in the global scope.
-        ///	- \ref AK::SpatialAudio::SetRoom
-        ///	- \ref AkRoomParams
-        WWISEC_AkRoomID RoomID;
-
         /// When enabled, the geometry instance is indexed for ray computation and used to compute reflection, diffraction, and transmission.
         /// If the geometry instance is used only for room containment, this flag must be set to false.
         ///	- \ref AK::SpatialAudio::SetRoom
         ///	- \ref AkRoomParams
         ///
         bool UseForReflectionAndDiffraction;
+
+        /// [\ref spatial_audio_experimental "Experimental"]  When set to false (default), the intersection of the geometry instance with any portal bounding box is subtracted from the geometry. In effect, an opening is created at the portal location through which sound can pass.
+        /// When set to true, portals cannot create openings in the geometry instance. Enable this to allow the geometry instance to be an obstacle to paths going into or through portal bounds.
+        ///	- \ref AK::SpatialAudio::SetPortal
+        ///
+        bool BypassPortalSubtraction;
+
+        /// A solid geometry instance applies transmission loss once for each time a transmission path enters and exits its volume, using the max transmission loss between each hit surface. A non-solid geometry instance is one where each surface is infinitely thin, applying transmission loss at each surface. This option has no effect if the Transmission Operation is set to Max.
+        ///
+        bool IsSolid;
     } WWISEC_AkGeometryInstanceParams;
 
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_Init(const WWISEC_AkSpatialAudioInitSettings* in_initSettings);
@@ -4171,9 +4203,12 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflectionsOrder, bool in_bUpdatePaths);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffractionOrder, bool in_bUpdatePaths);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxGlobalReflectionPaths(AkUInt32 in_uMaxGlobalReflectionPaths);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(AkUInt32 in_uMaxDiffractionPaths, WWISEC_AkGameObjectID in_gameObjectID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(AkUInt32 in_uMaxEmitterRoomAuxSends);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPrimaryRays);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(AkUInt32 in_uNbFrames);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetSmoothingConstant(AkReal32 in_fSmoothingConstantMs, WWISEC_AkGameObjectID in_gameObjectID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fSendVolume);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction, AkReal32 in_fOcclusion);
@@ -4181,6 +4216,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalToPortalObstruction(WWISEC_AkPortalID in_PortalID0, WWISEC_AkPortalID in_PortalID1, AkReal32 in_fObstruction);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_portal, AkReal32* out_wetDiffraction);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetTransmissionOperation(WWISEC_AkTransmissionOperation in_eOperation);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine();
     // END AkSpatialAudio
 

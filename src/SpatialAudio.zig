@@ -90,19 +90,32 @@ pub fn getOutdoorRoomID() AkRoomID {
     return AkRoomID.fromC(c.WWISEC_AK_SpatialAudio_kOutdoorRoomID);
 }
 
+pub const AkTransmissionOperation = enum(u8) {
+    add = c.WWISEC_AkTransmissionOperation_Add,
+    multiply = c.WWISEC_AkTransmissionOperation_Multiply,
+    max = c.WWISEC_AkTransmissionOperation_Max,
+
+    pub const default: AkTransmissionOperation = .max;
+};
+
 pub const AkSpatialAudioInitSettings = extern struct {
     max_sound_propagation_depth: u32 = AK_MAX_SOUND_PROPAGATION_DEPTH,
     movement_threshold: f32 = AK_DEFAULT_MOVEMENT_THRESHOLD,
     number_of_primary_rays: u32 = 100,
     max_reflection_order: u32 = 1,
     max_diffraction_order: u32 = 8,
+    max_diffraction_paths: u32 = 0,
+    max_global_reflection_paths: u32 = 0,
     max_emitter_room_aux_sends: u32 = 3,
     diffraction_on_reflections_order: u32 = 2,
+    max_diffraction_angle_degrees: f32 = 0.0,
     max_path_length: f32 = 10000.0,
     cpu_limit_percentage: f32 = 0.0,
+    smoothing_constant_ms: f32 = 0.0,
     load_balancing_spread: u32 = 1,
     enable_geometric_diffraction_and_transmission: bool = true,
     calc_emitter_virtual_position: bool = true,
+    transmission_operation: AkTransmissionOperation = .default,
 
     pub fn fromC(value: c.WWISEC_AkSpatialAudioInitSettings) AkSpatialAudioInitSettings {
         return @bitCast(value);
@@ -185,11 +198,11 @@ pub const AkAcousticSurface = extern struct {
 
 pub const AkReflectionPathInfo = extern struct {
     image_source: common.AkVector64 = .{},
-    path_point: [AK_MAX_REFLECTION_PATH_LENGTH]common.AkVector64 = [_]common.AkVector64{.{}} ** AK_MAX_REFLECTION_PATH_LENGTH,
-    surfaces: [AK_MAX_REFLECTION_PATH_LENGTH]AkAcousticSurface = [_]AkAcousticSurface{.{}} ** AK_MAX_REFLECTION_PATH_LENGTH,
+    path_point: [AK_MAX_REFLECTION_PATH_LENGTH]common.AkVector64 = @splat(.{}),
+    textureIDs: [AK_MAX_REFLECTION_PATH_LENGTH]u32 = @splat(0),
     num_path_points: u32 = 0,
     num_reflections: u32 = 0,
-    diffraction: [AK_MAX_REFLECTION_PATH_LENGTH]f32 = [_]f32{0.0} ** AK_MAX_REFLECTION_PATH_LENGTH,
+    diffraction: [AK_MAX_REFLECTION_PATH_LENGTH]f32 = @splat(0.0),
     level: f32 = 0.0,
     is_occluded: bool = false,
 
@@ -203,11 +216,11 @@ pub const AkReflectionPathInfo = extern struct {
 };
 
 pub const AkDiffractionPathInfo = extern struct {
-    nodes: [AK_MAX_SOUND_PROPAGATION_DEPTH]common.AkVector64 = [_]common.AkVector64{.{}} ** AK_MAX_SOUND_PROPAGATION_DEPTH,
+    nodes: [AK_MAX_SOUND_PROPAGATION_DEPTH]common.AkVector64 = @splat(.{}),
     emitter_pos: common.AkVector64 = .{},
-    angles: [AK_MAX_SOUND_PROPAGATION_DEPTH]f32 = [_]f32{0.0} ** AK_MAX_SOUND_PROPAGATION_DEPTH,
-    portals: [AK_MAX_SOUND_PROPAGATION_DEPTH]AkPortalID = [_]AkPortalID{.{}} ** AK_MAX_SOUND_PROPAGATION_DEPTH,
-    rooms: [AK_MAX_SOUND_PROPAGATION_DEPTH + 1]AkRoomID = [_]AkRoomID{.{}} ** (AK_MAX_SOUND_PROPAGATION_DEPTH + 1),
+    angles: [AK_MAX_SOUND_PROPAGATION_DEPTH]f32 = @splat(0.0),
+    portals: [AK_MAX_SOUND_PROPAGATION_DEPTH]AkPortalID = @splat(.{}),
+    rooms: [AK_MAX_SOUND_PROPAGATION_DEPTH + 1]AkRoomID = @splat(.{}),
     virtual_pos: common.AkWorldTransform = .{},
     node_count: u32 = 0,
     diffraction: f32 = 0.0,
@@ -215,6 +228,7 @@ pub const AkDiffractionPathInfo = extern struct {
     tot_length: f32 = 0.0,
     obstruction_value: f32 = 0.0,
     occlusion_value: f32 = 0.0,
+    gain: f32 = 0.0,
 
     pub fn fromC(value: c.WWISEC_AkDiffractionPathInfo) AkDiffractionPathInfo {
         return @bitCast(value);
@@ -250,7 +264,7 @@ pub const AkRoomParams = extern struct {
     room_game_obj_aux_send_level_to_self: f32 = 0.0,
     room_game_obj_keep_registered: bool = false,
     geometry_instance_id: AkGeometrySetID = .{},
-    room_priority: u32 = 100,
+    room_priority: f32 = 100.0,
 
     pub fn fromC(value: c.WWISEC_AkRoomParams) AkRoomParams {
         return @bitCast(value);
@@ -314,8 +328,9 @@ pub const AkGeometryInstanceParams = extern struct {
         .z = 1,
     },
     geometry_set_id: AkGeometrySetID = .{},
-    room_id: AkRoomID = .{},
     use_for_reflection_and_diffraction: bool = true,
+    bypass_portal_subtraction: bool = false,
+    is_solid: bool = false,
 
     pub fn fromC(value: c.WWISEC_AkGeometryInstanceParams) AkGeometryInstanceParams {
         return @bitCast(value);
@@ -568,6 +583,24 @@ pub fn setDiffractionOrder(in_diffraction_order: u32, in_update_paths: bool) com
     );
 }
 
+pub fn setMaxGlobalReflectionPaths(in_max_global_reflection_paths: u32) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_SetMaxGlobalReflectionPaths(in_max_global_reflection_paths),
+    );
+}
+
+pub const SetMaxDiffractionPathsOptionalArgs = struct {
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT_ID,
+};
+pub fn setMaxDiffractionPaths(in_max_diffraction_paths, optional_args: SetMaxDiffractionPathsOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(
+            in_max_diffraction_paths,
+            optional_args.game_object_id,
+        ),
+    );
+}
+
 pub fn setMaxEmitterRoomAuxSends(in_max_emitter_room_aux_sends: u32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(in_max_emitter_room_aux_sends),
@@ -583,6 +616,18 @@ pub fn setNumberOfPrimaryRays(in_nb_primary_rays: u32) common.WwiseError!void {
 pub fn setLoadBalancingSpread(in_nb_frames: u32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(in_nb_frames),
+    );
+}
+
+pub const SetSmoothingConstantOptionalArgs = struct {
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT_ID,
+};
+pub fn setSmoothingConstant(in_smoothing_constant_ms: f32, optional_args: SetSmoothingConstantOptionalArgs) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_SetSmoothingConstant(
+            in_smoothing_constant_ms,
+            optional_args.game_object_id,
+        ),
     );
 }
 
@@ -643,6 +688,12 @@ pub fn queryDiffractionPaths(
             @ptrCast(out_paths),
             io_array_size,
         ),
+    );
+}
+
+pub fn setTransmissionOperation(in_operation: AkTransmissionOperation) common.WwiseError!void {
+    return common.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_SetTransmissionOperation(@intFromEnum(in_operation)),
     );
 }
 
