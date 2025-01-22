@@ -23,13 +23,12 @@ pub const AkPluginServiceType = enum(common.DefaultEnumType) {
     audio_object_priority = c.WWISEC_AK_PluginServiceType_AudioObjectPriority,
     hash_table = c.WWISEC_AK_PluginServiceType_HashTable,
     markers = c.WWISEC_AK_PluginServiceType_Markers,
+    temp_alloc = c.WWISEC_AK_PluginServiceType_TempAlloc,
 };
 
 pub const IAkPluginService = opaque {};
 
 pub const IAkMixerPluginContext = opaque {};
-
-pub const IAkMixerInputContext = opaque {};
 
 pub const IAkGlobalPluginContext = opaque {
     pub fn getStreamMgr(self: *const IAkGlobalPluginContext) *IAkStreamMgr.IAkStreamMgr {

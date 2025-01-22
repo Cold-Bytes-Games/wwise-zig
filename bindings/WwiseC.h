@@ -1285,7 +1285,6 @@ extern "C"
 
     typedef struct WWISEC_AK_IAkStreamMgr WWISEC_AK_IAkStreamMgr;
     typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
-    typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
     typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
     typedef struct WWISEC_AK_IAkPlugin WWISEC_AK_IAkPlugin;
     typedef struct WWISEC_AK_IAkPluginParam WWISEC_AK_IAkPluginParam;
@@ -1862,13 +1861,6 @@ extern "C"
 
     typedef struct WWISEC_WIN_AkPlatformInitSettings
     {
-        // Direct sound.
-        void* hWnd; ///< Handle of the window associated with the audio.
-                    ///< Each game must specify the HWND of the application for device detection purposes.
-                    ///< The value returned by GetDefaultPlatformInitSettings is the foreground HWND at
-                    ///< the moment of the initialization of the sound engine and might not be the correct one for your game.
-                    ///< Each game must provide the correct HWND to use.
-
         // Threading model.
         WWISEC_WIN_AkThreadProperties threadLEngine;     ///< Lower engine threading properties
         WWISEC_WIN_AkThreadProperties threadOutputMgr;   ///< Ouput thread threading properties
@@ -1883,9 +1875,6 @@ extern "C"
         bool bEnableAvxSupport; ///< Enables run-time detection of AVX and AVX2 SIMD support in the engine and plug-ins. Disabling this may improve CPU performance by allowing for higher CPU clockspeeds.
 
         AkUInt32 uMaxSystemAudioObjects; ///< Dictates how many Microsoft Spatial Sound dynamic objects will be reserved by the System sink. On Windows, other running processes will be prevented from reserving these objects. Set to 0 to disable the use of System Audio Objects. Default is 128.
-
-        // Configuration for AK Motion plug-in
-        bool bEnableDirectInputSupport; ///< Enables run-time enumeration and support of DirectInput devices for AK Motion plug-in. Disabling this can alleviate potential issues with stability around device management, and improve overall responsiveness of device enumeration. Default is false.
     } WWISEC_WIN_AkPlatformInitSettings;
 
     typedef struct WWISEC_POSIX_AkThreadProperties
@@ -2048,6 +2037,15 @@ extern "C"
         WWISEC_IOS_AkAudioSessionModeVideoChat       ///< Audio session mode corresponding to the AVAudiosession's AVAudioSessionModeMoviePlayback constant
     } WWISEC_IOS_AkAudioSessionMode;
 
+    /// The IDs of the iOS audio session route sharing policies, which determine which audio routes are permitted for the audio session controlled by Wwise. These policies only apply for the "Playback" audio session category. These IDs are funtionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session route-sharing policies. The original prefix "AV" is replaced with "Ak" for the ID names.
+    typedef enum WWISEC_IOS_AkAudioSessionRouteSharingPolicy
+    {
+        WWISEC_IOS_AkAudioSessionRouteSharingPolicyDefault = 0,       ///< Corresponds to AVAudioSessionRouteSharingPolicyDefault
+        WWISEC_IOS_AkAudioSessionRouteSharingPolicyLongFormAudio = 1, ///< Corresponds to AVAudioSessionRouteSharingPolicyLongFormAudio
+        WWISEC_IOS_AkAudioSessionRouteSharingPolicyLongFormVideo = 3, ///< Corresponds to AVAudioSessionRouteSharingPolicyLongFormVideo
+        WWISEC_IOS_AkAudioSessionRouteSharingPolicy_Last,             ///< End of enum, invalid value.
+    } WWISEC_IOS_AkAudioSessionRouteSharingPolicy;
+
     /// The behavior flags for when iOS audio session is activated. These IDs are functionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session options. The original prefix "AV" is replaced with "Ak" for the ID names.
     ///
     /// \sa
@@ -2074,9 +2072,10 @@ extern "C"
     /// - \ref AkAudioSessionSetActiveOptions
     typedef struct WWISEC_IOS_AkAudioSessionProperties
     {
-        WWISEC_IOS_AkAudioSessionCategory eCategory;                    ///< \sa AkAudioSessionCategory
-        WWISEC_IOS_AkAudioSessionCategoryOptions eCategoryOptions;      ///< \sa AkAudioSessionCategoryOptions
-        WWISEC_IOS_AkAudioSessionMode eMode;                            ///< \sa AkAudioSessionMode
+        WWISEC_IOS_AkAudioSessionCategory eCategory;               ///< \sa AkAudioSessionCategory
+        WWISEC_IOS_AkAudioSessionCategoryOptions eCategoryOptions; ///< \sa AkAudioSessionCategoryOptions
+        WWISEC_IOS_AkAudioSessionMode eMode;                       ///< \sa AkAudioSessionMode
+        WWISEC_IOS_AkAudioSessionRouteSharingPolicy eRouteSharingPolicy;
         WWISEC_IOS_AkAudioSessionSetActiveOptions eSetActivateOptions;  ///< \sa AkAudioSessionSetActiveOptions
         WWISEC_IOS_AkAudioSessionBehaviorOptions eAudioSessionBehavior; ///< Flags to change the default Sound Engine behavior related to the management of the iOS Audio Session with regards to application lifecycle events. \sa AkAudioSessionBehaviorFlags
     } WWISEC_IOS_AkAudioSessionProperties;
@@ -2206,6 +2205,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AK_PluginServiceType_AudioObjectPriority = 3,
         WWISEC_AK_PluginServiceType_HashTable = 4,
         WWISEC_AK_PluginServiceType_Markers = 5,
+        WWISEC_AK_PluginServiceType_TempAlloc = 6,
         WWISEC_AK_PluginServiceType_MAX,
     } WWISEC_AK_AkPluginServiceType;
 
@@ -2760,7 +2760,26 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AkUInt32 WWISEC_AK_SoundEngine_GetBufferTick();
 
     AkUInt64 WWISEC_AK_SoundEngine_GetSampleTick();
-// END AkSoundEngine
+    // END AkSoundEngine
+
+    // BEGIN AkFileSystemFlags
+    typedef struct WWISEC_AkFileSystemFlags
+    {
+        AkUInt32 uCompanyID;        ///< Company ID (Wwise uses AKCOMPANYID_AUDIOKINETIC, defined in AkTypes.h, for soundbanks and standard streaming files, and AKCOMPANYID_AUDIOKINETIC_EXTERNAL for streaming external sources).
+        AkUInt32 uCodecID;          ///< File/codec type ID (defined in AkTypes.h)
+        AkUInt32 uCustomParamSize;  ///< Size of the custom parameter
+        void* pCustomParam;         ///< Custom parameter
+        bool bIsLanguageSpecific;   ///< True when the file location depends on language
+        bool bIsAutomaticStream;    ///< True when the file is opened to be used as an automatic stream. Note that you don't need to set it.
+                                    ///< If you pass an AkFileSystemFlags to IAkStreamMgr CreateStd|Auto(), it will be set internally to the correct value.
+        WWISEC_AkCacheID uCacheID;  ///< Cache ID for caching system used by automatic streams. The user is responsible for guaranteeing unicity of IDs.
+                                    ///< When set, it supersedes the file ID passed to AK::IAkStreamMgr::CreateAuto() (ID version). Caching is optional and depends on the implementation.
+        AkUInt32 uNumBytesPrefetch; ///< Indicates the number of bytes from the beginning of the file that should be streamed into cache via a caching stream. This field is only relevant when opening caching streams via
+                                    ///< AK::IAkStreamMgr::PinFileInCache() and AK::SoundEngine::PinEventInStreamCache().  When using AK::SoundEngine::PinEventInStreamCache(),
+                                    ///< it is initialized to the prefetch size stored in the sound bank, but may be changed by the file location resolver, or set to 0 to cancel caching.
+        AkUInt32 uDirectoryHash;    ///< If the implementation uses a hashed directory structure, this is the hash value that should be employed for determining the directory structure
+    } WWISEC_AkFileSystemFlags;
+    // END AkFileSystemFlags
 
 // BEGIN IAkStreamMgr
 #define WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH (64)
@@ -2796,23 +2815,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AK_OpenModeReadWrite = 3   ///< Read and write access
     } WWISEC_AkOpenMode;
 
-    typedef struct WWISEC_AkFileSystemFlags
-    {
-        AkUInt32 uCompanyID;        ///< Company ID (Wwise uses AKCOMPANYID_AUDIOKINETIC, defined in AkTypes.h, for soundbanks and standard streaming files, and AKCOMPANYID_AUDIOKINETIC_EXTERNAL for streaming external sources).
-        AkUInt32 uCodecID;          ///< File/codec type ID (defined in AkTypes.h)
-        AkUInt32 uCustomParamSize;  ///< Size of the custom parameter
-        void* pCustomParam;         ///< Custom parameter
-        bool bIsLanguageSpecific;   ///< True when the file location depends on language
-        bool bIsAutomaticStream;    ///< True when the file is opened to be used as an automatic stream. Note that you don't need to set it.
-                                    ///< If you pass an AkFileSystemFlags to IAkStreamMgr CreateStd|Auto(), it will be set internally to the correct value.
-        WWISEC_AkFileID uCacheID;   ///< Cache ID for caching system used by automatic streams. The user is responsible for guaranteeing unicity of IDs.
-                                    ///< When set, it supersedes the file ID passed to AK::IAkStreamMgr::CreateAuto() (ID version). Caching is optional and depends on the implementation.
-        AkUInt32 uNumBytesPrefetch; ///< Indicates the number of bytes from the beginning of the file that should be streamed into cache via a caching stream. This field is only relevant when opening caching streams via
-                                    ///< AK::IAkStreamMgr::PinFileInCache() and AK::SoundEngine::PinEventInStreamCache().  When using AK::SoundEngine::PinEventInStreamCache(),
-                                    ///< it is initialized to the prefetch size stored in the sound bank, but may be changed by the file location resolver, or set to 0 to cancel caching.
-        AkUInt32 uDirectoryHash;    ///< If the implementation uses a hashed directory structure, this is the hash value that should be employed for determining the directory structure
-    } WWISEC_AkFileSystemFlags;
-
     typedef struct WWISEC_AkStreamInfo
     {
         WWISEC_AkDeviceID deviceID; ///< Device ID
@@ -2826,8 +2828,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     typedef struct WWISEC_AkAutoStmHeuristics
     {
         AkReal32 fThroughput;       ///< Average throughput in bytes/ms
-        AkUInt32 uLoopStart;        ///< Set to the start of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
-        AkUInt32 uLoopEnd;          ///< Set to the end of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
+        AkUInt64 uLoopStart;        ///< Set to the start of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
+        AkUInt64 uLoopEnd;          ///< Set to the end of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
         AkUInt8 uMinNumBuffers;     ///< Minimum number of buffers if you plan to own more than one buffer at a time, 0 or 1 otherwise
                                     ///< \remarks You should always release buffers as fast as possible, therefore this heuristic should be used only when
                                     ///< dealing with special contraints, like drivers or hardware that require more than one buffer at a time.\n
@@ -2886,10 +2888,11 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUInt32 uStreamID;                                           ///< Unique stream identifier
         WWISEC_AkDeviceID deviceID;                                   ///< Device ID
         AkUtf16 szStreamName[WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH]; ///< Stream name
-        AkUInt32 uStringSize;                                         ///< Stream name string's size (number of characters)
-        AkUInt64 uFileSize;                                           ///< File size
-        bool bIsAutoStream;                                           ///< True for auto streams
-        bool bIsCachingStream;                                        ///< True for caching streams
+        WWISEC_AkFileID idFile;
+        AkUInt32 uStringSize;  ///< Stream name string's size (number of characters)
+        AkUInt64 uFileSize;    ///< File size
+        bool bIsAutoStream;    ///< True for auto streams
+        bool bIsCachingStream; ///< True for caching streams
     } WWISEC_AkStreamRecord;
 
     /// Stream statistics.
@@ -3315,7 +3318,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         void (*BatchOpen)(void* instance, AkUInt32 in_uNumFiles, WWISEC_AkAsyncFileOpenData** in_ppItems);
         void (*BatchRead)(void* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems);
         void (*BatchWrite)(void* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems);
-        void (*BatchCancel)(void* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile);
 
         WWISEC_AKRESULT(*OutputSearchedPaths)
         (void* instance, WWISEC_AKRESULT in_result, const WWISEC_AkFileOpenData* in_FileOpen, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
@@ -3331,7 +3333,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchOpen(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, AkUInt32 in_uNumFiles, WWISEC_AkAsyncFileOpenData** in_ppItems);
     void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchRead(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems);
     void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchWrite(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems);
-    void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchCancel(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile);
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkLowLevelIOHook_OutputSearchedPaths(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, WWISEC_AKRESULT in_result, const WWISEC_AkFileOpenData* in_FileOpen, AkOSChar* out_searchedPath, AkInt32 in_pathSize);
 
     typedef struct WWISEC_AK_StreamMgr_IAkFileLocationResolver WWISEC_AK_StreamMgr_IAkFileLocationResolver;

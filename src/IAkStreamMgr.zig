@@ -34,7 +34,7 @@ pub const AkFileSystemFlags = extern struct {
     custom_param: ?*anyopaque = null,
     is_language_specific: bool = false,
     is_automatic_stream: bool = false,
-    cache_id: common.AkFileID = common.AK_INVALID_FILE_ID,
+    cache_id: common.AkCacheID = common.AK_INVALID_CACHE_ID,
     num_bytes_prefetch: u32 = 0,
     directory_hash: u32 = common.AK_INVALID_UNIQUE_ID,
 
@@ -105,8 +105,8 @@ pub const AkStreamInfo = struct {
 
 pub const AkAutoStmHeuristics = extern struct {
     throughput: f32 = 0.0,
-    loop_start: u32 = 0,
-    loop_end: u32 = 0,
+    loop_start: u64 = 0,
+    loop_end: u64 = 0,
     min_num_buffers: u8 = 0,
     priority: common.AkPriority = 0,
 
@@ -218,6 +218,7 @@ pub const NativeAkStreamRecord = extern struct {
     stream_id: u32 = 0,
     device_id: common.AkDeviceID = 0,
     stream_name: [AK_MONITOR_STREAMNAME_MAXLENGTH]common.AkUtf16,
+    id_file: common.AkFileID = common.AK_INVALID_FILE_ID,
     string_size: u32 = 0,
     file_size: u64 = 0,
     is_auto_stream: bool = false,
@@ -240,6 +241,7 @@ pub const AkStreamRecord = struct {
     stream_id: u32 = 0,
     device_id: common.AkDeviceID = 0,
     stream_name: []const u8,
+    id_file: common.AkFileID = common.AK_INVALID_FILE_ID,
     file_size: u64 = 0,
     is_auto_stream: bool = false,
     is_caching_stream: bool = false,
@@ -253,6 +255,7 @@ pub const AkStreamRecord = struct {
             .stream_id = value.stream_id,
             .device_id = value.device_id,
             .stream_name = try std.unicode.utf16LeToUtf8Alloc(allocator, value.stream_name[0..]),
+            .id_file = value.id_file,
             .file_size = value.file_size,
             .is_auto_stream = value.is_auto_stream,
             .is_caching_stream = value.is_caching_stream,
@@ -270,6 +273,7 @@ pub const AkStreamRecord = struct {
         result.file_size = self.file_size;
         result.is_auto_stream = self.is_auto_stream;
         result.is_caching_stream = self.is_caching_stream;
+        result.id_file = self.id_file;
 
         return result;
     }

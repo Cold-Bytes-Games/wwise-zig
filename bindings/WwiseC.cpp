@@ -1675,11 +1675,14 @@ AkUInt64 WWISEC_AK_SoundEngine_GetSampleTick()
 }
 // END AkSoundEngine
 
+// BEGIN AkFileSystemFlags
+static_assert(sizeof(WWISEC_AkFileSystemFlags) == sizeof(AkFileSystemFlags));
+// END AkFileSystemFlags
+
 // BEGIN IAkStreamMgr
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_StmStatusError);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MoveEnd);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_OpenModeReadWrite);
-static_assert(sizeof(WWISEC_AkFileSystemFlags) == sizeof(AkFileSystemFlags));
 static_assert(sizeof(WWISEC_AkStreamInfo) == sizeof(AkStreamInfo));
 static_assert(sizeof(WWISEC_AkAutoStmHeuristics) == sizeof(AkAutoStmHeuristics));
 static_assert(sizeof(WWISEC_AkAutoStmBufSettings) == sizeof(WWISEC_AkAutoStmBufSettings));
@@ -2482,11 +2485,6 @@ class WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Wrapper : public AK::StreamMgr::IAkL
         _functions.BatchWrite(_instance, in_uNumTransfers, reinterpret_cast<WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem*>(in_pTransferItems));
     }
 
-    void BatchCancel(AkUInt32 in_uNumTransfers, BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile) override
-    {
-        _functions.BatchCancel(_instance, in_uNumTransfers, reinterpret_cast<WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem*>(in_pTransferItems), io_ppbCancelAllTransfersForThisFile);
-    }
-
     AKRESULT OutputSearchedPaths(AKRESULT in_result, const AkFileOpenData& in_FileOpen, AkOSChar* out_searchedPath, AkInt32 in_pathSize) override
     {
         return static_cast<AKRESULT>(_functions.OutputSearchedPaths(_instance, static_cast<WWISEC_AKRESULT>(in_result), reinterpret_cast<const WWISEC_AkFileOpenData*>(&in_FileOpen), out_searchedPath, in_pathSize));
@@ -2542,11 +2540,6 @@ void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchRead(WWISEC_AK_StreamMgr_IAkLowL
 void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchWrite(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems)
 {
     reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(instance)->BatchWrite(in_uNumTransfers, reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook::BatchIoTransferItem*>(in_pTransferItems));
-}
-
-void WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchCancel(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, AkUInt32 in_uNumTransfers, WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchIoTransferItem* in_pTransferItems, bool** io_ppbCancelAllTransfersForThisFile)
-{
-    reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(instance)->BatchCancel(in_uNumTransfers, reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook::BatchIoTransferItem*>(in_pTransferItems), io_ppbCancelAllTransfersForThisFile);
 }
 
 WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkLowLevelIOHook_OutputSearchedPaths(WWISEC_AK_StreamMgr_IAkLowLevelIOHook* instance, WWISEC_AKRESULT in_result, const WWISEC_AkFileOpenData* in_FileOpen, AkOSChar* out_searchedPath, AkInt32 in_pathSize)

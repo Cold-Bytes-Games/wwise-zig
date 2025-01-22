@@ -250,20 +250,6 @@ pub const IAkLowLevelIOHook = opaque {
         );
     }
 
-    pub fn batchCancel(
-        self: *IAkLowLevelIOHook,
-        in_num_transfers: u32,
-        in_transfer_items: [*]BatchIoTransferItem,
-        io_cancel_all_transfers_for_this_file: [*]*bool,
-    ) void {
-        c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_BatchCancel(
-            @ptrCast(self),
-            in_num_transfers,
-            @ptrCast(in_transfer_items),
-            @ptrCast(io_cancel_all_transfers_for_this_file),
-        );
-    }
-
     pub fn outputSearchedPaths(
         self: *IAkLowLevelIOHook,
         fallback_allocator: std.mem.Allocator,

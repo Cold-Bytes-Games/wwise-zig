@@ -237,7 +237,6 @@ pub const AkPlatformInitSettings = switch (wwise_options.platform) {
 };
 
 pub const WIN_AkPlatformInitSettings = extern struct {
-    hwnd: ?*anyopaque = null,
     thread_l_engine: WIN_AkThreadProperties = .{},
     thread_output_mgr: WIN_AkThreadProperties = .{},
     thread_bank_manager: WIN_AkThreadProperties = .{},
@@ -246,7 +245,6 @@ pub const WIN_AkPlatformInitSettings = extern struct {
     sample_rate: u32 = 0,
     enable_avx_support: bool = false,
     max_system_audio_objects: u32 = 0,
-    enable_direct_input_support: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_WIN_AkPlatformInitSettings) WIN_AkPlatformInitSettings {
         return @bitCast(value);
@@ -367,6 +365,12 @@ pub const IOS_AkAudioSessionMode = enum(common.DefaultEnumType) {
     video_chat = c.WWISEC_IOS_AkAudioSessionModeVideoChat,
 };
 
+pub const IOS_AkAudioSessionRouteSharingPolicy = enum(common.DefaultEnumType) {
+    default = c.WWISEC_IOS_AkAudioSessionRouteSharingPolicyDefault,
+    long_form_audio = c.WWISEC_IOS_AkAudioSessionRouteSharingPolicyLongFormAudio,
+    long_form_video = c.WWISEC_IOS_AkAudioSessionRouteSharingPolicyLongFormVideo,
+};
+
 pub const IOS_AkAudioSessionSetActiveOptions = enum(common.DefaultEnumType) {
     notify_others_on_deactivation = c.WWISEC_IOS_AkAudioSessionSetActiveOptionNotifyOthersOnDeactivation,
 };
@@ -379,6 +383,7 @@ pub const IOS_AkAudioSessionProperties = extern struct {
     category: IOS_AkAudioSessionCategory = .ambient,
     category_options: IOS_AkAudioSessionCategoryOptions = .mix_with_others,
     mode: IOS_AkAudioSessionMode = .default,
+    route_sharing_policy: IOS_AkAudioSessionRouteSharingPolicy = .default,
     set_activate_options: IOS_AkAudioSessionSetActiveOptions = .notify_others_on_deactivation,
     audio_session_behavior: IOS_AkAudioSessionBehaviorOptions = .suspend_in_background,
 

@@ -260,7 +260,6 @@ const ZigTestIAkLowLevelIOHook = struct {
     batch_open_called: bool = false,
     batch_read_called: bool = false,
     batch_write_called: bool = false,
-    batch_cancel_called: bool = false,
     output_searched_path_called: bool = false,
     close_size: i64 = 0,
     dummy_file_desc: AK.StreamMgr.AkFileDesc = undefined,
@@ -349,18 +348,6 @@ const ZigTestIAkLowLevelIOHook = struct {
         self.batch_write_called = true;
     }
 
-    pub fn batchCancel(
-        self: *ZigTestIAkLowLevelIOHook,
-        in_num_transfers: u32,
-        in_transfer_items: [*]AK.StreamMgr.IAkLowLevelIOHook.BatchIoTransferItem,
-        io_cancel_all_transfers_for_this_file: [*]*bool,
-    ) callconv(.C) void {
-        _ = io_cancel_all_transfers_for_this_file;
-        _ = in_transfer_items;
-        _ = in_num_transfers;
-        self.batch_cancel_called = true;
-    }
-
     pub fn outputSearchedPaths(
         self: *ZigTestIAkLowLevelIOHook,
         in_result: AK.AKRESULT,
@@ -388,7 +375,6 @@ const ZigTestIAkLowLevelIOHook = struct {
                 .batch_open = @ptrCast(&batchOpen),
                 .batch_read = @ptrCast(&batchRead),
                 .batch_write = @ptrCast(&batchWrite),
-                .batch_cancel = @ptrCast(&batchCancel),
                 .output_searched_paths = @ptrCast(&outputSearchedPaths),
             },
         );
