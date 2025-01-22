@@ -19,7 +19,6 @@ pub const AK_SA_MIN_ENVIRONMENT_SURFACE_AREA = c.WWISEC_AK_SA_MIN_ENVIRONMENT_SU
 
 pub const kDefaultDiffractionMaxEdges = c.WWISEC_kDefaultDiffractionMaxEdges;
 pub const kDefaultDiffractionMaxPaths = c.WWISEC_kDefaultDiffractionMaxPaths;
-pub const kMaxDiffraction = c.WWISEC_kMaxDiffraction;
 
 pub const kDiffractionMaxEdges = c.WWISEC_kDiffractionMaxEdges;
 pub const kDiffractionMaxPaths = c.WWISEC_kDiffractionMaxPaths;

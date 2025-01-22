@@ -3646,7 +3646,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 #define WWISEC_AK_MAX_REFLECT_ORDER 4
 #define WWISEC_AK_MAX_REFLECTION_PATH_LENGTH (WWISEC_AK_MAX_REFLECT_ORDER + 4)
 #define WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH 8
-#define WWISEC_AK_MAX_SOUND_PROPAGATION_WIDTH 8
+#define WWISEC_AK_MAX_SOUND_PROPAGATION_WIDTH 32
 #define WWISEC_AK_DEFAULT_MOVEMENT_THRESHOLD (1.0f)
 #define WWISEC_AK_SA_EPSILON (0.001f)
 #define WWISEC_AK_SA_DIFFRACTION_EPSILON (0.002f)       // Radians
@@ -3657,7 +3657,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     const AkUInt32 WWISEC_kDefaultDiffractionMaxEdges = 8;
     const AkUInt32 WWISEC_kDefaultDiffractionMaxPaths = 8;
-    const AkReal32 WWISEC_kMaxDiffraction = 1.0f;
 
     // Max values that are used for calculating diffraction paths between the listener and a portal.
     const AkUInt32 WWISEC_kDiffractionMaxEdges = 8;

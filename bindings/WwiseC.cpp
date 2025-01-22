@@ -3255,6 +3255,7 @@ static_assert(sizeof(WWISEC_AkDiffractionPathInfo) == sizeof(AkDiffractionPathIn
 static_assert(sizeof(WWISEC_AkPortalParams) == sizeof(AkPortalParams));
 static_assert(sizeof(WWISEC_AkRoomParams) == sizeof(AkRoomParams));
 static_assert(sizeof(WWISEC_AkGeometryParams) == sizeof(AkGeometryParams));
+static_assert(WWISEC_AK_MAX_SOUND_PROPAGATION_WIDTH == AK_MAX_SOUND_PROPAGATION_WIDTH);
 static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_X == AK_DEFAULT_GEOMETRY_POSITION_X);
 static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Y == AK_DEFAULT_GEOMETRY_POSITION_Y);
 static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Z == AK_DEFAULT_GEOMETRY_POSITION_Z);
