@@ -155,12 +155,6 @@ pub const IAkLowLevelIOHook = opaque {
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
         ) callconv(.C) void,
-        batch_cancel: *const fn (
-            self: *IAkLowLevelIOHook,
-            in_num_transfers: u32,
-            in_transfer_items: [*]BatchIoTransferItem,
-            io_cancel_all_transfers_for_this_file: [*]*bool,
-        ) callconv(.C) void,
         output_searched_paths: *const fn (
             self: *IAkLowLevelIOHook,
             in_result: common.AKRESULT,

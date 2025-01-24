@@ -92,7 +92,7 @@ extern "C"
     static const WWISEC_AkMemPoolId WWISEC_AK_DEFAULT_POOL_ID = -1;                                     ///< Default pool ID, same as AK_INVALID_POOL_ID
     static const WWISEC_AkAuxBusID WWISEC_AK_INVALID_AUX_ID = WWISEC_AK_INVALID_UNIQUE_ID;              ///< Invalid auxiliary bus ID (or no Aux bus ID)
     static const WWISEC_AkFileID WWISEC_AK_INVALID_FILE_ID = (WWISEC_AkFileID)-1;                       ///< Invalid file ID
-    static const WWISEC_AkCacheID AK_INVALID_CACHE_ID = (AkCacheID)-1;                                  ///< Invalid cache ID
+    static const WWISEC_AkCacheID WWISEC_AK_INVALID_CACHE_ID = (WWISEC_AkCacheID)-1;                    ///< Invalid cache ID
     static const WWISEC_AkDeviceID WWISEC_AK_INVALID_DEVICE_ID = (WWISEC_AkDeviceID)-1;                 ///< Invalid streaming device ID
     static const WWISEC_AkBankID WWISEC_AK_INVALID_BANK_ID = WWISEC_AK_INVALID_UNIQUE_ID;               ///< Invalid bank ID
     static const WWISEC_AkArgumentValueID WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID = 0;                      ///< Fallback argument value ID
@@ -1657,7 +1657,7 @@ extern "C"
     /// \note TempAllocInitSettings::bTrackDetailedStats must be enabled for the specified type to get detailed information about the underlying allocs. Otherwise, only the simple stats are listed.
     void WWISEC_AK_TempAlloc_DumpTempAllocsToFile(WWISEC_AK_TempAlloc_Type in_eType, const AkOSChar* pszFilename);
 
-    struct WWISEC_AK_BookmarkAlloc_Stats
+    typedef struct WWISEC_AK_BookmarkAlloc_Stats
     {
         AkUInt32 uRecentPeakMemUsed;   ///< Peak used memory in a single BookmarkAlloc region since the last tick (in bytes).
         AkUInt32 uRecentBlocksFetched; ///< Number of times a block was fetched from the cache, not including the base block. High values here may indicate that block sizes need to be larger.
@@ -1669,11 +1669,11 @@ extern "C"
         AkUInt32 uPeakBlocksFetched;   ///< The peak value for uRecentBlocksFetched since initialization.
         AkUInt32 uPeakBlocksAllocated; ///< The peak value for uBlocksAllocated since initialization.
         AkUInt32 uPeakBlockSize;       ///< The peak size of any single block since initialization.
-    };
+    } WWISEC_AK_BookmarkAlloc_Stats;
 
     /// Initialization settings for Bookmark-allocator memory.
     /// \remarks The debug options are intended for monitoring and analyzing potential issues in usage of the BookmarkAlloc system during development. Their functionality is specifically removed in Release configurations of the AkMemoryMgr.
-    struct WWISEC_AK_BookmarkAlloc_InitSettings
+    typedef struct WWISEC_AK_BookmarkAlloc_InitSettings
     {
         AkUInt32 uMinimumBlockCount;   ///< The number of blocks of memory the system is initialized with and is the minimum kept around forever. Defaults to 1. Higher values increase upfront memory use, but can reduce, or eliminate, the creation and destruction of memory blocks over time.
         AkUInt32 uMinimumBlockSize;    ///< The minimum size of each block. If a new allocation requests a new block of memory, then the new block is the size of the requested allocation times four, and then rounded up to the next multiple of this value. Defaults to 64 KiB.
@@ -1683,7 +1683,7 @@ extern "C"
         bool bDebugClearMemory;      ///< Enable to clear any allocation to a deterministic garbage value during allocs, and after the stack is rewound to a bookmark. Useful to make sure memory is initialized properly. Disabled by default.
         bool bDebugEnableSentinels;  ///< Enable to write out sentinels between most allocations to help detect memory overwrites, which are verified at the termination of a bookmark alloc region. Enabled by default. Increases memory usage of blocks slightly.
         bool bDebugStandaloneAllocs; ///< Enable to force the block size to be as small as possible for each allocation (smaller than can be achieved by just setting uMinimumBlockSize to very low values). Useful to investigate memory overruns in-depth, especially in conjunction with the MemoryMgr's stomp allocator. If enabled, bDebugEnableSentinels will be disabled. Greatly increases CPU and memory usage.
-    };
+    } WWISEC_AK_BookmarkAlloc_InitSettings;
 
     /// Get simple statistics for the Bookmark allocator
     void WWISEC_AK_BookmarkAlloc_GetStats(WWISEC_AK_BookmarkAlloc_Stats* out_stats);
@@ -3888,7 +3888,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
         /// The texture that were hit in the path.
         /// textureIDs[0] is closest to the emitter, textureIDs[numPathPoints-1] is closest to the listener.
-        AkUInt32 textureIDs[AK_MAX_REFLECTION_PATH_LENGTH];
+        AkUInt32 textureIDs[WWISEC_AK_MAX_REFLECTION_PATH_LENGTH];
 
         /// Number of valid elements in the \c pathPoint[], \c surfaces[], and \c diffraction[] arrays.
         AkUInt32 numPathPoints;

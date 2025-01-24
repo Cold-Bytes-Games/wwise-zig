@@ -589,9 +589,9 @@ pub fn setMaxGlobalReflectionPaths(in_max_global_reflection_paths: u32) common.W
 }
 
 pub const SetMaxDiffractionPathsOptionalArgs = struct {
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT_ID,
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
 };
-pub fn setMaxDiffractionPaths(in_max_diffraction_paths, optional_args: SetMaxDiffractionPathsOptionalArgs) common.WwiseError!void {
+pub fn setMaxDiffractionPaths(in_max_diffraction_paths: u32, optional_args: SetMaxDiffractionPathsOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(
             in_max_diffraction_paths,
@@ -619,7 +619,7 @@ pub fn setLoadBalancingSpread(in_nb_frames: u32) common.WwiseError!void {
 }
 
 pub const SetSmoothingConstantOptionalArgs = struct {
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT_ID,
+    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
 };
 pub fn setSmoothingConstant(in_smoothing_constant_ms: f32, optional_args: SetSmoothingConstantOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(

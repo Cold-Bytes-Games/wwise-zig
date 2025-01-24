@@ -27,7 +27,7 @@ pub const Stats = struct {
     }
 };
 
-pub const InitSettings = struct {
+pub const InitSettings = extern struct {
     minimum_block_count: u32 = 0,
     minimum_block_size: u32 = 0,
     maximum_unused_blocks: u32 = 0,

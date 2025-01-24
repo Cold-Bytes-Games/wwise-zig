@@ -1309,7 +1309,7 @@ pub fn prepareBusID(in_preparation_type: PreparationType, in_bus_ids: []const co
 pub fn prepareBusAsyncString(
     fallback_allocator: std.mem.Allocator,
     in_preparation_type: PreparationType,
-    in_bus_names[]const u8,
+    in_bus_names: [][]const u8,
     in_bank_callback: callbacks.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) common.WwiseError!void {

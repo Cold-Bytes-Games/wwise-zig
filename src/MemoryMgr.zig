@@ -2,7 +2,7 @@ const std = @import("std");
 const c = @import("c.zig");
 const common = @import("common.zig");
 const BookmarkAlloc = @import("BookmarkAlloc.zig");
-const MemoryArena = @import("MemoryArea.zig");
+const MemoryArena = @import("MemoryArena.zig");
 const TempAlloc = @import("TempAlloc.zig");
 
 pub const AkMemPoolId = c.WWISEC_AkMemPoolId;
@@ -88,7 +88,7 @@ pub const AkMemDebugRealloc = ?*const fn (pool_id: AkMemPoolId, old_address: ?*a
 pub const AkMemDebugReallocAligned = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, alignment: u32, new_address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
 pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) void;
 
-pub const AkMemoryMgrArena = enum(common.DefaulEnumType) {
+pub const AkMemoryMgrArena = enum(common.DefaultEnumType) {
     primary = 0,
     media,
     profiler,
@@ -107,7 +107,7 @@ pub const AkMemSettings = extern struct {
     total_reserved_memory_size: AkMemTotalReservedMemorySize = null,
     size_of_memory: AkMemSizeOfMemory = null,
 
-    memory_arena_settiongs: [std.meta.fileds(AkMemoryMgrArena).len]MemoryArena.AkMemoryAreaSettings = @splat(.{}),
+    memory_arena_settiongs: [std.meta.fields(AkMemoryMgrArena).len]MemoryArena.AkMemoryArenaSettings = @splat(.{}),
     temp_alloc_settings: [std.meta.fields(TempAlloc.Type).len]TempAlloc.InitSettings = @splat(.{}),
     bookmark_alloc_settings: BookmarkAlloc.InitSettings = .{},
 

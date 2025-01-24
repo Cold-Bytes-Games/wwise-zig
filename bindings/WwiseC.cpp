@@ -70,15 +70,15 @@ static_assert(sizeof(WWISEC_AkChannelEmitter) == sizeof(AkChannelEmitter));
 static_assert(sizeof(WWISEC_AkEmitterListenerPair) == sizeof(AkEmitterListenerPair));
 static_assert(sizeof(WWISEC_AkCodecDescriptor) == sizeof(AkCodecDescriptor));
 static_assert(WWISEC_AK_SOUNDBANK_VERSION == AK_SOUNDBANK_VERSION);
-static_assert(WWISEC_AKRESULT_Last == AKRESULT_Last);
-static_assert(WWISEC_ConnectionType_Last == ConnectionType_Last);
-static_assert(WWISEC_AkCurveInterpolation_Last == AkCurveInterpolation_Last);
-static_assert(WWISEC_AkBankType_Last == AkBankType_Last);
-static_assert(WWISEC_AK_SoundEngine_MultiPositionType_Last == AK::SoundEngine::MultiPositionType_Last);
-static_assert(WWISEC_Ak3DPositionType_AK_3DPositionType_Last == AK_3DPositionType_Last);
-static_assert(WWISEC_AkPanningRule_Last == AkPanningRule_Last);
-static_assert(WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_Last == AK_SpatializationMode_Last);
-static_assert(WWISEC_AkPluginTypeLast == AkPluginType_Last);
+static_assert(static_cast<int32_t>(WWISEC_AKRESULT_Last) == static_cast<int32_t>(AKRESULT_Last));
+static_assert(static_cast<int32_t>(WWISEC_ConnectionType_Last) == static_cast<int32_t>(ConnectionType_Last));
+static_assert(static_cast<int32_t>(WWISEC_AkCurveInterpolation_Last) == static_cast<int32_t>(AkCurveInterpolation_Last));
+static_assert(static_cast<int32_t>(WWISEC_AkBankType_Last) == static_cast<int32_t>(AkBankType_Last));
+static_assert(static_cast<int32_t>(WWISEC_AK_SoundEngine_MultiPositionType_Last) == static_cast<int32_t>(AK::SoundEngine::MultiPositionType_Last));
+static_assert(static_cast<int32_t>(WWISEC_Ak3DPositionType_AK_3DPositionType_Last) == static_cast<int32_t>(AK_3DPositionType_Last));
+static_assert(static_cast<int32_t>(WWISEC_AkPanningRule_Last) == static_cast<int32_t>(AkPanningRule_Last));
+static_assert(static_cast<int32_t>(WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_Last) == static_cast<int32_t>(AK_SpatializationMode_Last));
+static_assert(static_cast<int32_t>(WWISEC_AkPluginTypeLast) == static_cast<int32_t>(AkPluginType_Last));
 // END AkTypes
 
 // BEGIN AkSpeakerConfig
@@ -546,7 +546,7 @@ static_assert(sizeof(WWISEC_AK_MemoryArea_AkMemoryArenaSettings) == sizeof(AK::M
 // END AkMemoryArenaTypes
 
 // BEGIN AkMemoryMgrModule
-static_assert(WWISEC_AkMemoryMgrArena_NUM == AkMemoryMgrArena_NUM);
+static_assert(static_cast<int32_t>(WWISEC_AkMemoryMgrArena_NUM) == static_cast<int32_t>(AkMemoryMgrArena_NUM));
 static_assert(sizeof(WWISEC_AkMemSettings) == sizeof(AkMemSettings));
 
 WWISEC_AKRESULT WWISEC_AK_MemoryMgr_Init(WWISEC_AkMemSettings* in_pSettings)
@@ -721,9 +721,9 @@ static_assert(sizeof(WWISEC_AkInitSettings) == sizeof(AkInitSettings));
 static_assert(sizeof(WWISEC_AkPlatformInitSettings) == sizeof(AkPlatformInitSettings));
 static_assert(sizeof(WWISEC_AkSourceSettings) == sizeof(AkSourceSettings));
 static_assert(sizeof(WWISEC_AkSourcePosition) == sizeof(AkSourcePosition));
-static_assert(WWISEC_AkActionOnEventType_Last == AK::SoundEngine::AkActionOnEventType_Last);
-static_assert(WWISEC_AK_SoundEngine_Preparation_Last == AK::SoundEngine::Preparation_Last);
-static_assert(WWISEC_AK_SoundEngine_AkBankContent_Last == AK::SoundEngine::AkBankContent_Last);
+static_assert(static_cast<int32_t>(WWISEC_AkActionOnEventType_Last) == static_cast<int32_t>(AK::SoundEngine::AkActionOnEventType_Last));
+static_assert(static_cast<int32_t>(WWISEC_AK_SoundEngine_Preparation_Last) == static_cast<int32_t>(AK::SoundEngine::Preparation_Last));
+static_assert(static_cast<int32_t>(WWISEC_AK_SoundEngine_AkBankContent_Last) == static_cast<int32_t>(AK::SoundEngine::AkBankContent_Last));
 
 void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
 {
@@ -3444,7 +3444,7 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(WWISEC_AkGameObject
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetTransmissionOperation(WWISEC_AkTransmissionOperation in_eOperation)
 {
-    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetTransmissionOperation(in_eOperation));
+    return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetTransmissionOperation(static_cast<AkTransmissionOperation>(in_eOperation)));
 }
 
 WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine()

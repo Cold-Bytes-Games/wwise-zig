@@ -354,7 +354,7 @@ pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
     @"suspend": bool = false,
     wakeup_from_suspend: bool = false,
     profiler_connect: bool = false,
-    profiler_disocnnect: boll = false,
+    profiler_disconnect: bool = false,
     pad: u17 = 0,
 
     pub inline fn fromC(value: u32) AkGlobalCallbackLocation {
