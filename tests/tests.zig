@@ -35,6 +35,11 @@ test "AkSoundEngine init" {
     const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
+    defer {
+        if (stream_mgr) |stream_instance| {
+            stream_instance.destroy();
+        }
+    }
 
     var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
@@ -98,6 +103,11 @@ test "CAkDefaultIOHookDeferred create" {
     const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
+    defer {
+        if (stream_mgr) |stream_instance| {
+            stream_instance.destroy();
+        }
+    }
 
     var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
@@ -137,6 +147,11 @@ test "CAkFilePackageLowLevelIODeferred create" {
     const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
+    defer {
+        if (stream_mgr) |stream_instance| {
+            stream_instance.destroy();
+        }
+    }
 
     var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
@@ -179,6 +194,11 @@ test "AkCommunication init" {
     const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
+    defer {
+        if (stream_mgr) |stream_instance| {
+            stream_instance.destroy();
+        }
+    }
 
     var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
@@ -221,6 +241,11 @@ test "AkMusicEngine init" {
     const stream_mgr = AK.StreamMgr.create(&stream_settings);
     try std.testing.expect(stream_mgr != null);
     try std.testing.expect(AK.IAkStreamMgr.get() != null);
+    defer {
+        if (stream_mgr) |stream_instance| {
+            stream_instance.destroy();
+        }
+    }
 
     var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
     AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
@@ -483,6 +508,11 @@ test "Dummy I/O Hook works" {
         const stream_mgr = AK.StreamMgr.create(&stream_settings);
         try std.testing.expect(stream_mgr != null);
         try std.testing.expect(AK.IAkStreamMgr.get() != null);
+        defer {
+            if (stream_mgr) |stream_instance| {
+                stream_instance.destroy();
+            }
+        }
 
         var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
         AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
