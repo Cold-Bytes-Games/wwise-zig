@@ -1281,6 +1281,7 @@ extern "C"
 
     typedef struct WWISEC_AK_IAkStreamMgr WWISEC_AK_IAkStreamMgr;
     typedef struct WWISEC_AK_IAkMixerPluginContext WWISEC_AK_IAkMixerPluginContext;
+    typedef struct WWISEC_AK_IAkMixerInputContext WWISEC_AK_IAkMixerInputContext;
     typedef struct WWISEC_AK_IAkGlobalPluginContext WWISEC_AK_IAkGlobalPluginContext;
     typedef struct WWISEC_AK_IAkPlugin WWISEC_AK_IAkPlugin;
     typedef struct WWISEC_AK_IAkPluginParam WWISEC_AK_IAkPluginParam;
@@ -1366,16 +1367,6 @@ extern "C"
         void* pCustomInfo;             ///< Custom info passed to the DynamicSequence::Open function
     } WWISEC_AkDynamicSequenceItemCallbackInfo;
 
-    typedef struct WWISEC_AkMixerInputInfo
-    {
-        WWISEC_AkConnectionType eConnectionType;           ///< Nature of the connection between this input and the mixer.
-        AkReal32 fCenterPerc;                              ///< Center percentage of this input, between 0 and 1.
-        WWISEC_AkSpeakerPanningType eSpeakerPanningType;   ///< Specifies type of panning logic when object is not 3D spatialized. Applicable only when eSpatializationMode is AK_SpatializationMode_None.
-        WWISEC_Ak3DSpatializationMode eSpatializationMode; ///< The 3D spatialization mode used by this input. Applicable only when the input has listener relative routing (see bHasListenerRelativeRouting).
-        WWISEC_Ak3DPositionType e3DPositionType;           ///< Get whether the emitter position is defined by the game alone (AK_3DPositionType_Emitter), or if it is further automated. Applicable only when the input has listener relative routing (see bHasListenerRelativeRouting).
-        bool bHasListenerRelativeRouting;                  ///< Get the value of this input's Listener Relative Routing option, that is, if the emitter-listener relative association is calculated at this node.
-    } WWISEC_AkMixerInputInfo;
-
     typedef struct WWISEC_AkSpeakerVolumeMatrixCallbackInfo
     {
         WWISEC_AkEventCallbackInfo base;
@@ -1384,8 +1375,8 @@ extern "C"
         WWISEC_AkChannelConfig outputConfig;            ///< Channel configuration of the output bus.
         AkReal32* pfBaseVolume;                         ///< Base volume, common to all channels.
         AkReal32* pfEmitterListenerVolume;              ///< Emitter-listener pair-specific gain. When there are multiple emitter-listener pairs, this volume is set to that of the loudest pair, and the relative gain of other pairs is applied directly on the channel volume matrix pVolumes.
+        WWISEC_AK_IAkMixerInputContext* pContext;       ///< Context of the current voice/bus about to be mixed into the output bus with specified base volume and volume matrix.
         WWISEC_AK_IAkMixerPluginContext* pMixerContext; ///< Output mixing bus context. Use it to access a few useful panning and mixing services, as well as the ID of the output bus. NULL if pContext is the master audio bus.
-        WWISEC_AkMixerInputInfo inputInfo;              ///< Information about the current voice/bus about to be mixed into the output bus with specified base volume and volume matrix.
     } WWISEC_AkSpeakerVolumeMatrixCallbackInfo;
 
     typedef struct WWISEC_AkBusMeteringCallbackInfo

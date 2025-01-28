@@ -28,6 +28,7 @@ pub const AkPluginServiceType = enum(common.DefaultEnumType) {
 
 pub const IAkPluginService = opaque {};
 
+pub const IAkMixerInputContext = opaque {};
 pub const IAkMixerPluginContext = opaque {};
 
 pub const IAkGlobalPluginContext = opaque {
