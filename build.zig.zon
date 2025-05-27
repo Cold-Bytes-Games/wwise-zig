@@ -1,5 +1,5 @@
 .{
     .name = "wwise-zig",
-    .version = "2024.1.4-zig0",
+    .version = "2024.1.5-zig0",
     .paths = .{"."},
 }
