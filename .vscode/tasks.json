@@ -6,7 +6,7 @@
         {
             "label": "Run tests",
             "type": "shell",
-            "command": "zig build test -Dtarget=native-native-msvc  -Dinclude_file_package_io_deferred -Duse_communication -Duse_default_job_worker -Duse_spatial_audio",
+            "command": "zig build test -Dtarget=native-native-msvc -Dinclude_file_package_io_deferred -Duse_communication -Duse_default_job_worker -Duse_spatial_audio",
             "problemMatcher": [
                 "$gcc"
             ],

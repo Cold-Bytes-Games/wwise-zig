@@ -147,7 +147,7 @@ pub fn getOutputDeviceConfiguration(in_id_output: common.AkOutputDeviceID, io_ch
 }
 
 pub fn getPanningRule(in_id_output: common.AkOutputDeviceID) common.WwiseError!common.AkPanningRule {
-    var raw_panning_rule: c.WWISEC_AkPanningRule = undefined;
+    var raw_panning_rule: c.WWISEC_AkPanningRule = 0;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetPanningRule(&raw_panning_rule, in_id_output),
