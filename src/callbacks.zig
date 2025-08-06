@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 const common_defs = @import("common_defs.zig");
 const IAkPlugin = @import("IAkPlugin.zig");

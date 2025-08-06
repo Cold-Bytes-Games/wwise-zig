@@ -34,7 +34,7 @@ pub const WwiseBuildOptions = struct {
     }
 };
 
-const CppFlags: []const []const u8 = &.{ "-std=c++17", "-DUNICODE", "-Wall", "-Wpedantic", "-fno-sanitize=alignment" };
+const CppFlags: []const []const u8 = &.{ "-std=c++17", "-Wall", "-Wpedantic", "-fno-sanitize=alignment" };
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
@@ -137,12 +137,38 @@ pub fn build(b: *std.Build) !void {
     option_step.addOption(bool, "include_file_package_io_deferred", wwise_build_options.include_file_package_io_deferred);
     option_step.addOption(WwisePlatform, "platform", wwise_build_options.platform);
 
+    const wwise_c_translate_c = b.addTranslateC(.{
+        .root_source_file = b.path("bindings/WwiseC.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    if (wwise_build_options.use_communication) {
+        wwise_c_translate_c.defineCMacro("WWISEC_USE_COMMUNICATION", null);
+    }
+    if (wwise_build_options.use_default_job_worker) {
+        wwise_c_translate_c.defineCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", null);
+    }
+    if (wwise_build_options.use_spatial_audio) {
+        wwise_c_translate_c.defineCMacro("WWISEC_USE_SPATIAL_AUDIO", null);
+    }
+    if (wwise_build_options.include_default_io_hook_deferred) {
+        wwise_c_translate_c.defineCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", null);
+    }
+    if (wwise_build_options.include_file_package_io_deferred) {
+        wwise_c_translate_c.defineCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED", null);
+    }
+    wwise_c_translate_c.addSystemIncludePath(lazyPathAbsolute(b.pathJoin(&.{ wwise_build_options.wwise_sdk_path, "include" })));
+
+    const wwise_c_zig_module = wwise_c_translate_c.addModule("wwise_c");
+
     const wwise_compile_options = option_step.createModule();
 
     const wwise_zig_module = b.addModule("wwise-zig", .{
         .root_source_file = b.path("src/wwise-zig.zig"),
         .imports = &.{
             .{ .name = "wwise_options", .module = wwise_compile_options },
+            .{ .name = "wwise_c", .module = wwise_c_zig_module },
         },
         .target = target,
         .optimize = optimize,

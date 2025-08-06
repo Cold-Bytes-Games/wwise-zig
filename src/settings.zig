@@ -1,6 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 const speaker_config = @import("speaker_config.zig");
 const wwise_options = @import("wwise_options");
@@ -263,7 +263,7 @@ pub const AkAudioAPILinux = packed struct(common.DefaultEnumType) {
     alsa: bool = false,
     padding: u30 = 0,
 
-    pub const Default: AkAudioAPILinux  = .{ .pulse_audio = true, .alsa = true };
+    pub const Default: AkAudioAPILinux = .{ .pulse_audio = true, .alsa = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPILinux) AkAudioAPILinux {
         return @bitCast(value);
@@ -302,7 +302,7 @@ pub const AkAudioAPIMac = packed struct(common.DefaultEnumType) {
     audio_unit: bool = false,
     padding: u30 = 0,
 
-    pub const Default:AkAudioAPIMac = .{ .av_audio_engine = true, .audio_unit = true };
+    pub const Default: AkAudioAPIMac = .{ .av_audio_engine = true, .audio_unit = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPIMac) AkAudioAPIMac {
         return @bitCast(value);
@@ -397,7 +397,7 @@ pub const AkAudioAPIiOs = packed struct(common.DefaultEnumType) {
     audio_unit: bool = false,
     padding: u30 = 0,
 
-    pub const Default: AkAudioAPIiOs  = .{ .av_audio_engine = true, .audio_unit = true };
+    pub const Default: AkAudioAPIiOs = .{ .av_audio_engine = true, .audio_unit = true };
 
     pub fn fromC(value: c.WWISEC_AkAudioAPIiOS) AkAudioAPIiOs {
         return @bitCast(value);

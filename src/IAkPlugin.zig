@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const callbacks = @import("callbacks.zig");
 const common = @import("common.zig");
 const IAkPluginMemAlloc = @import("IAkPluginMemAlloc.zig").IAkPluginMemAlloc;

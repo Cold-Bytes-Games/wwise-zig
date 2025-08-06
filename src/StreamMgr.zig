@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 const settings = @import("settings.zig");
 const stream_interfaces = @import("IAkStreamMgr.zig");
