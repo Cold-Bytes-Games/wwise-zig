@@ -230,11 +230,23 @@ pub const AkAudioBuffer = common_defs.AkAudioBuffer;
 
 // error_message_translator.zig
 const error_message_translator = @import("error_message_translator.zig");
-pub const AK_TRANSLATOR_MAX_NAME_SIZE =error_message_translator.AK_TRANSLATOR_MAX_NAME_SIZE;
+pub const AK_TRANSLATOR_MAX_NAME_SIZE = error_message_translator.AK_TRANSLATOR_MAX_NAME_SIZE;
 pub const AkErrorMessageTranslator = error_message_translator.AkErrorMessageTranslator;
 
 // IAkPlugin.zig
-pub usingnamespace @import("IAkPlugin.zig");
+const iakplugin = @import("IAkPlugin.zig");
+pub const AkCreatePluginCallback = iakplugin.AkCreatePluginCallback;
+pub const AkCreateParamCallback = iakplugin.AkCreateParamCallback;
+pub const AkGetDeviceListCallback = iakplugin.AkGetDeviceListCallback;
+pub const AkPluginServiceType = iakplugin.AkPluginServiceType;
+pub const IAkPluginService = iakplugin.IAkPluginService;
+pub const IAkMixerPluginContext = iakplugin.IAkMixerPluginContext;
+pub const IAkMixerInputContext = iakplugin.IAkMixerInputContext;
+pub const IAkGlobalPluginContext = iakplugin.IAkGlobalPluginContext;
+pub const IAkPlugin = iakplugin.IAkPlugin;
+pub const IAkPluginParam = iakplugin.IAkPluginParam;
+
+// IAKPluginMemAlloc.zig
 pub usingnamespace @import("IAkPluginMemAlloc.zig");
 pub usingnamespace @import("IAkStreamMgr.zig");
 pub usingnamespace @import("IBytes.zig");
