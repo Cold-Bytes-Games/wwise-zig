@@ -12,7 +12,36 @@ pub const SpatialAudio = if (wwise_options.use_spatial_audio) @import("SpatialAu
 pub const SpeakerVolumes = @import("SpeakerVolumes.zig");
 pub const StreamMgr = @import("StreamMgr.zig");
 pub const TempAlloc = @import("TempAlloc.zig");
-pub usingnamespace @import("callbacks.zig");
+
+// callbacks.zig
+const callbacks = @import("callbacks.zig");
+pub const AkCallbackType = callbacks.AkCallbackType;
+pub const AkCallbackInfo = callbacks.AkCallbackInfo;
+pub const AkEventCallbackInfo = callbacks.AkEventCallbackInfo;
+pub const AkMIDIEventCallbackInfo = callbacks.AkMIDIEventCallbackInfo;
+pub const AkMarkerCallbackInfo = callbacks.AkMarkerCallbackInfo;
+pub const AkDurationCallbackInfo = callbacks.AkDurationCallbackInfo;
+pub const AkDynamicSequenceItemCallbackInfo = callbacks.AkDynamicSequenceItemCallbackInfo;
+pub const AkSpeakerVolumeMatrixCallbackInfo = callbacks.AkSpeakerVolumeMatrixCallbackInfo;
+pub const AkBusMeteringCallbackInfo = callbacks.AkBusMeteringCallbackInfo;
+pub const AkOutputDeviceMeteringCallbackInfo = callbacks.AkOutputDeviceMeteringCallbackInfo;
+pub const AkMusicPlaylistCallbackInfo = callbacks.AkMusicPlaylistCallbackInfo;
+pub const AkSegmentInfo = callbacks.AkSegmentInfo;
+pub const AkMusicSyncCallbackInfo = callbacks.AkMusicSyncCallbackInfo;
+pub const AkResourceMonitorDataSummary = callbacks.AkResourceMonitorDataSummary;
+pub const AkCallbackFunc = callbacks.AkCallbackFunc;
+pub const AkBusCallbackFunc = callbacks.AkBusCallbackFunc;
+pub const AkBusMeteringCallbackFunc = callbacks.AkBusMeteringCallbackFunc;
+pub const AkOutputDeviceMeteringCallbackFunc = callbacks.AkOutputDeviceMeteringCallbackFunc;
+pub const AkBankCallbackFunc = callbacks.AkBankCallbackFunc;
+pub const AkGlobalCallbackLocation = callbacks.AkGlobalCallbackLocation;
+pub const AkGlobalCallbackFunc = callbacks.AkGlobalCallbackFunc;
+pub const AkResourceMonitorCallbackFunc = callbacks.AkResourceMonitorCallbackFunc;
+pub const AkAudioDeviceEvent = callbacks.AkAudioDeviceEvent;
+pub const AkDeviceStatusCallbackFunc = callbacks.AkDeviceStatusCallbackFunc;
+pub const AkCaptureCallbackFunc = callbacks.AkCaptureCallbackFunc;
+
+// common.zig
 pub usingnamespace @import("common.zig");
 pub usingnamespace @import("common_defs.zig");
 pub usingnamespace @import("error_message_translator.zig");
