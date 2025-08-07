@@ -229,7 +229,11 @@ pub const AkSampleType = common_defs.AkSampleType;
 pub const AkAudioBuffer = common_defs.AkAudioBuffer;
 
 // error_message_translator.zig
-pub usingnamespace @import("error_message_translator.zig");
+const error_message_translator = @import("error_message_translator.zig");
+pub const AK_TRANSLATOR_MAX_NAME_SIZE =error_message_translator.AK_TRANSLATOR_MAX_NAME_SIZE;
+pub const AkErrorMessageTranslator = error_message_translator.AkErrorMessageTranslator;
+
+// IAkPlugin.zig
 pub usingnamespace @import("IAkPlugin.zig");
 pub usingnamespace @import("IAkPluginMemAlloc.zig");
 pub usingnamespace @import("IAkStreamMgr.zig");
