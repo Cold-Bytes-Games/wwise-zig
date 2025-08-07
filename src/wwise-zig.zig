@@ -251,7 +251,33 @@ const iakpluginmemalloc = @import("IAkPluginMemAlloc.zig");
 pub const IAkPluginMemAlloc = iakpluginmemalloc.IAkPluginMemAlloc;
 
 // IAkStreamMgr.zig
-pub usingnamespace @import("IAkStreamMgr.zig");
+const iakstreammgr = @import("IAkStreamMgr.zig");
+pub const AK_MONITOR_STREAMNAME_MAXLENGTH = iakstreammgr.AK_MONITOR_STREAMNAME_MAXLENGTH;
+pub const AK_MONITOR_DEVICENAME_MAXLENGTH = iakstreammgr.AK_MONITOR_DEVICENAME_MAXLENGTH;
+pub const AkStmStatus = iakstreammgr.AkStmStatus;
+pub const AkMoveMethod = iakstreammgr.AkMoveMethod;
+pub const AkOpenMode = iakstreammgr.AkOpenMode;
+pub const AkFileSystemFlags = iakstreammgr.AkFileSystemFlags;
+pub const NativeAkStreamInfo = iakstreammgr.NativeAkStreamInfo;
+pub const AkStreamInfo = iakstreammgr.AkStreamInfo;
+pub const AkAutoStmHeuristics = iakstreammgr.AkAutoStmHeuristics;
+pub const AkAutoStmBufSettings = iakstreammgr.AkAutoStmBufSettings;
+pub const NativeAkDeviceDesc = iakstreammgr.NativeAkDeviceDesc;
+pub const AkDeviceDesc = iakstreammgr.AkDeviceDesc;
+pub const AkDeviceData = iakstreammgr.AkDeviceData;
+pub const NativeAkStreamRecord = iakstreammgr.NativeAkStreamRecord;
+pub const AkStreamRecord = iakstreammgr.AkStreamRecord;
+pub const AkStreamData = iakstreammgr.AkStreamData;
+pub const NativeAkFileOpenData = iakstreammgr.NativeAkFileOpenData;
+pub const AkFileOpenData = iakstreammgr.AkFileOpenData;
+pub const IAkStreamProfile = iakstreammgr.IAkStreamProfile;
+pub const IAkDeviceProfile = iakstreammgr.IAkDeviceProfile;
+pub const IAkStreamMgrProfile = iakstreammgr.IAkStreamMgrProfile;
+pub const IAkStdStream = iakstreammgr.IAkStdStream;
+pub const IAkAutoStream = iakstreammgr.IAkAutoStream;
+pub const IAkStreamMgr = iakstreammgr.IAkStreamMgr;
+
+// IBytes.zig
 pub usingnamespace @import("IBytes.zig");
 pub usingnamespace @import("midi_types.zig");
 pub usingnamespace @import("platform_context.zig");
