@@ -278,7 +278,11 @@ pub const IAkAutoStream = iakstreammgr.IAkAutoStream;
 pub const IAkStreamMgr = iakstreammgr.IAkStreamMgr;
 
 // IBytes.zig
-pub usingnamespace @import("IBytes.zig");
+pub const ibytes = @import("IBytes.zig");
+pub const IReadBytes = ibytes.IReadBytes;
+pub const IWriteBytes = ibytes.IWriteBytes;
+
+// midi_types.zig
 pub usingnamespace @import("midi_types.zig");
 pub usingnamespace @import("platform_context.zig");
 pub usingnamespace @import("settings.zig");
