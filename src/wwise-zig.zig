@@ -23,11 +23,11 @@ pub usingnamespace @import("IBytes.zig");
 pub usingnamespace @import("midi_types.zig");
 pub usingnamespace @import("platform_context.zig");
 pub usingnamespace @import("settings.zig");
-pub usingnamespace if (wwise_options.use_spatial_audio) @import("reflect_game_data.zig") else struct {};
 pub usingnamespace @import("speaker_config.zig");
 pub usingnamespace @import("virtual_acoustics.zig");
 pub usingnamespace @import("wwise_platform.zig");
 
+pub const reflect_game_data = if (wwise_options.use_spatial_audio) @import("reflect_game_data.zig") else struct {};
 pub const Windows = if (wwise_options.platform == .windows) @import("win_sound_engine.zig") else struct {};
 
 comptime {
