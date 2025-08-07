@@ -220,7 +220,15 @@ pub const stackCharAllocator = common.stackCharAllocator;
 pub const DefaultEnumType = common.DefaultEnumType;
 
 // common_defs.zig
-pub usingnamespace @import("common_defs.zig");
+const common_defs = @import("common_defs.zig");
+pub const AK_INT = common_defs.AK_INT;
+pub const AK_FLOAT = common_defs.AK_FLOAT;
+pub const AkMetering = common_defs.AkMetering;
+pub const Ak3DAudioSinkCapabilities = common_defs.Ak3DAudioSinkCapabilities;
+pub const AkSampleType = common_defs.AkSampleType;
+pub const AkAudioBuffer = common_defs.AkAudioBuffer;
+
+// error_message_translator.zig
 pub usingnamespace @import("error_message_translator.zig");
 pub usingnamespace @import("IAkPlugin.zig");
 pub usingnamespace @import("IAkPluginMemAlloc.zig");
