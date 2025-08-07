@@ -247,7 +247,10 @@ pub const IAkPlugin = iakplugin.IAkPlugin;
 pub const IAkPluginParam = iakplugin.IAkPluginParam;
 
 // IAKPluginMemAlloc.zig
-pub usingnamespace @import("IAkPluginMemAlloc.zig");
+const iakpluginmemalloc = @import("IAkPluginMemAlloc.zig");
+pub const IAkPluginMemAlloc = iakpluginmemalloc.IAkPluginMemAlloc;
+
+// IAkStreamMgr.zig
 pub usingnamespace @import("IAkStreamMgr.zig");
 pub usingnamespace @import("IBytes.zig");
 pub usingnamespace @import("midi_types.zig");
