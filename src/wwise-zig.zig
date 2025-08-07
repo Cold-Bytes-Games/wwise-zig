@@ -28,7 +28,7 @@ pub usingnamespace @import("speaker_config.zig");
 pub usingnamespace @import("virtual_acoustics.zig");
 pub usingnamespace @import("wwise_platform.zig");
 
-pub usingnamespace if (wwise_options.platform == .windows) @import("win_sound_engine.zig") else struct {};
+pub const Windows = if (wwise_options.platform == .windows) @import("win_sound_engine.zig") else struct {};
 
 comptime {
     @setEvalBranchQuota(5000);
