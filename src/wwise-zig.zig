@@ -443,7 +443,14 @@ pub const AkAudioAPIAndroid = settings.AkAudioAPIAndroid;
 pub const ANDROID_AkPlatformInitSettings = settings.ANDROID_AkPlatformInitSettings;
 
 // speaker_config.zig
-pub usingnamespace @import("speaker_config.zig");
+const speaker_config = @import("speaker_config.zig");
+pub const AkSpeakerSetup = speaker_config.AkSpeakerSetup;
+pub const AK_STANDARD_MAX_NUM_CHANNELS = speaker_config.AK_STANDARD_MAX_NUM_CHANNELS;
+pub const AK_MAX_AMBISONICS_ORDER = speaker_config.AK_MAX_AMBISONICS_ORDER;
+pub const AkChannelConfigType = speaker_config.AkChannelConfigType;
+pub const AkChannelConfig = speaker_config.AkChannelConfig;
+
+// virtual_acoustics.zig
 pub usingnamespace @import("virtual_acoustics.zig");
 pub usingnamespace @import("wwise_platform.zig");
 
