@@ -451,7 +451,10 @@ pub const AkChannelConfigType = speaker_config.AkChannelConfigType;
 pub const AkChannelConfig = speaker_config.AkChannelConfig;
 
 // virtual_acoustics.zig
-pub usingnamespace @import("virtual_acoustics.zig");
+const virtual_acoustics = @import("virtual_acoustics.zig");
+pub const AkAcousticTexture = virtual_acoustics.AkAcousticTexture;
+
+// wwise_platform.zig
 pub usingnamespace @import("wwise_platform.zig");
 
 pub const reflect_game_data = if (wwise_options.use_spatial_audio) @import("reflect_game_data.zig") else struct {};
