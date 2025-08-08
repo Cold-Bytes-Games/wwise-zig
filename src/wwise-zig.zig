@@ -407,8 +407,42 @@ const platform_context = @import("platform_context.zig");
 pub const IAkPlatformContext = platform_context.IAkPlatformContext;
 
 // settings.zig
-pub usingnamespace @import("settings.zig");
+const settings = @import("settings.zig");
+pub const AkJobWorkerFunc = settings.AkJobWorkerFunc;
+pub const AkJobMgrSettings = settings.AkJobMgrSettings;
+pub const AkOutputSettings = settings.AkOutputSettings;
+pub const AkFloorPlane = settings.AkFloorPlane;
+pub const AkAssertHook = settings.AkAssertHook;
+pub const AkBackgroundMusicChangeCallbackFunc = settings.AkBackgroundMusicChangeCallbackFunc;
+pub const AkProfilerPushTimerFunc = settings.AkProfilerPushTimerFunc;
+pub const AkProfilerPopTimerFunc = settings.AkProfilerPopTimerFunc;
+pub const AkProfilerPostMarkerFunc = settings.AkProfilerPostMarkerFunc;
+pub const AkInitSettings = settings.AkInitSettings;
+pub const AkThreadProperties = settings.AkThreadProperties;
+pub const WIN_AkThreadProperties = settings.WIN_AkThreadProperties;
+pub const POSIX_AkThreadProperties = settings.POSIX_AkThreadProperties;
+pub const AkPlatformInitSettings = settings.AkPlatformInitSettings;
+pub const WIN_AkPlatformInitSettings = settings.WIN_AkPlatformInitSettings;
+pub const AkAudioAPILinux = settings.AkAudioAPILinux;
+pub const LINUX_AkPlatformInitSettings = settings.LINUX_AkPlatformInitSettings;
+pub const AkAudioAPIMac = settings.AkAudioAPIMac;
+pub const MACOSX_AkPlatformInitSettings = settings.MACOSX_AkPlatformInitSettings;
+pub const IOS_AkAudioSessionCategory = settings.IOS_AkAudioSessionCategory;
+pub const IOS_AkAudioSessionCategoryOptions = settings.IOS_AkAudioSessionCategoryOptions;
+pub const IOS_AkAudioSessionMode = settings.IOS_AkAudioSessionMode;
+pub const IOS_AkAudioSessionSetActiveOptions = settings.IOS_AkAudioSessionSetActiveOptions;
+pub const IOS_AkAudioSessionBehaviorOptions = settings.IOS_AkAudioSessionBehaviorOptions;
+pub const IOS_AkAudioSessionProperties = settings.IOS_AkAudioSessionProperties;
+pub const AkAudioAPIiOs = settings.AkAudioAPIiOs;
+pub const AKMOTION_RESIDENT_MODE = settings.AKMOTION_RESIDENT_MODE;
+pub const IOS_AudioInputCallbackFunc = settings.IOS_AudioInputCallbackFunc;
+pub const IOS_AudioInterruptionCallbackFunc = settings.IOS_AudioInputCallbackFunc;
+pub const IOS_AkAudioCallbacks = settings.IOS_AkAudioCallbacks;
+pub const IOS_AkPlatformInitSettings = settings.IOS_AkPlatformInitSettings;
+pub const AkAudioAPIAndroid = settings.AkAudioAPIAndroid;
+pub const ANDROID_AkPlatformInitSettings = settings.ANDROID_AkPlatformInitSettings;
 
+// speaker_config.zig
 pub usingnamespace @import("speaker_config.zig");
 pub usingnamespace @import("virtual_acoustics.zig");
 pub usingnamespace @import("wwise_platform.zig");
