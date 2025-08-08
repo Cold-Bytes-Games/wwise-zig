@@ -283,7 +283,7 @@ pub const IReadBytes = ibytes.IReadBytes;
 pub const IWriteBytes = ibytes.IWriteBytes;
 
 // midi_types.zig
-pub const midi_types = @import("midi_types.zig");
+const midi_types = @import("midi_types.zig");
 
 pub const AkMidiChannelNo = midi_types.AkMidiChannelNo;
 pub const AkMidiNoteNo = midi_types.AkMidiNoteNo;
@@ -403,8 +403,12 @@ pub const AlignedAkMIDIEvent = midi_types.AlignedAkMIDIEvent;
 pub const AkMIDIPost = midi_types.AkMIDIPost;
 
 // platform_context.zig
-pub usingnamespace @import("platform_context.zig");
+const platform_context = @import("platform_context.zig");
+pub const IAkPlatformContext = platform_context.IAkPlatformContext;
+
+// settings.zig
 pub usingnamespace @import("settings.zig");
+
 pub usingnamespace @import("speaker_config.zig");
 pub usingnamespace @import("virtual_acoustics.zig");
 pub usingnamespace @import("wwise_platform.zig");
