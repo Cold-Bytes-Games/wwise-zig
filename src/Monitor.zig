@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 const error_message_translator = @import("error_message_translator.zig");
 const StreamMgr = @import("StreamMgr.zig");

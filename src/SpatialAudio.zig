@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 const reflect_game_data = @import("reflect_game_data.zig");
 

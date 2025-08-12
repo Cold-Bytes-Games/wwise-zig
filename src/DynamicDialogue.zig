@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 
 pub const AkCandidateCallbackFunc = ?*const fn (in_id_event: common.AkUniqueID, in_id_candidate: common.AkUniqueID, in_cookie: ?*anyopaque) callconv(.C) bool;

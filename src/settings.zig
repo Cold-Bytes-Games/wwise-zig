@@ -1,6 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 const speaker_config = @import("speaker_config.zig");
 const wwise_options = @import("wwise_options");

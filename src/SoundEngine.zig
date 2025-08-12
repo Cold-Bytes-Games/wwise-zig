@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 const callbacks = @import("callbacks.zig");
 const common_defs = @import("common_defs.zig");
@@ -15,7 +15,7 @@ pub const DynamicDialogue = @import("DynamicDialogue.zig");
 pub const DynamicSequence = @import("DynamicSequence.zig");
 pub const Query = @import("Query.zig");
 
-pub usingnamespace if (wwise_options.platform == .android) @import("android_sound_engine.zig") else struct {};
+pub const Android = if (wwise_options.platform == .android) @import("android_sound_engine.zig") else struct {};
 pub const iOS = if (wwise_options.platform == .ios) @import("ios_sound_engine.zig") else struct {};
 
 pub const AkSourceSettings = extern struct {

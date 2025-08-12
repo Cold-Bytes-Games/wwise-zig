@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 
 pub const AkAcousticTexture = extern struct {
     id: u32 = 0,

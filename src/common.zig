@@ -1,6 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const wwise_options = @import("wwise_options");
 
 pub const AkOSChar = c.AkOSChar;

@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 const common = @import("common.zig");
 
 pub const AK_TRANSLATOR_MAX_NAME_SIZE = c.WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE;
