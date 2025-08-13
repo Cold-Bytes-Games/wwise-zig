@@ -1,5 +1,5 @@
 const std = @import("std");
-const c = @import("c.zig");
+const c = @import("wwise_c");
 
 // NOTE: Please sync this with the defines in AkSpeakerConfig.h
 pub const AkSpeakerSetup = packed struct(u20) {
