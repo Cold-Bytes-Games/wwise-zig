@@ -496,6 +496,7 @@ pub const ANDROID_AkPlatformInitSettings = extern struct {
     j_activity: ?*anyopaque = null,
     verbose_sink: bool = false,
     enable_low_latency: bool = false,
+    enable_exclusive_mode: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_ANDROID_AkPlatformInitSettings) ANDROID_AkPlatformInitSettings {
         return @bitCast(value);

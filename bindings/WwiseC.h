@@ -1973,9 +1973,22 @@ extern "C"
         WWISEC_jobject jActivity;     ///< android.app.Activity instance for this application. Usually provided through the android_app structure, or through other means if your application has an overridden activity.
 
         bool bVerboseSink;      ///< Enable this to inspect sink behavior. Useful for debugging non-standard Android devices.
-        bool bEnableLowLatency; ///< Used the lowest output latency possible for the current hardware.
+        bool bEnableLowLatency; ///< Use a low latency audio path for the current hardware.
                                 /// If true (default), the output audio device will be initialized in low-latency operation, allowing for more responsive audio playback on most devices. However, when operating in low-latency mode, some devices may have differences in audio reproduction.
                                 /// If false, the output audio device will be initialized without low-latency operation.
+
+        // When bEnableLowLatency is set to true, this dictates whether the AAudio stream should be opened in exclusive mode.
+        // This mode bypasses the system audio mixer for best latency.
+        // When available, this mode gives the best latency. However, it has several drawbacks to be aware of:
+        // - App audio will not be mixed with other apps. Other apps will be prevented from using exclusive mode while this output stream is active.
+        // - Screen recordings may not contain any audio.
+        // - When the app is put in the background, there is a possibility that another app 'steals' this path. When the Wwise app comes back to the foreground, this mode can become unavailable.
+        // - Audio will bypass system-level DSP effects like volume normalization and spatialization. 3D Audio will not work, and output volume may be abnormally loud or quiet.
+        // - Other functionality such as audio recording may be disabled when using this path.
+        //
+        // This setting has no effect when bEnableLowLatency is set to FALSE.
+        // For backward-compatibility reasons, this setting is TRUE by default. But it is recommended to turn it off if any audio output problem arises on certain device models.
+        bool bEnableExclusiveMode;
     } WWISEC_ANDROID_AkPlatformInitSettings;
 
     /// The IDs of the iOS audio session categories, useful for defining app-level audio behaviours such as inter-app audio mixing policies and audio routing behaviours. These IDs are funtionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session categories. The original prefix "AV" is replaced with "Ak" for the ID names.
