@@ -2,7 +2,7 @@ const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 
-pub const AkCandidateCallbackFunc = ?*const fn (in_id_event: common.AkUniqueID, in_id_candidate: common.AkUniqueID, in_cookie: ?*anyopaque) callconv(.C) bool;
+pub const AkCandidateCallbackFunc = ?*const fn (in_id_event: common.AkUniqueID, in_id_candidate: common.AkUniqueID, in_cookie: ?*anyopaque) callconv(.c) bool;
 
 pub const ResolveDialogueEventOptionalArgs = struct {
     id_sequence: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
@@ -32,12 +32,12 @@ pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_even
 
     const raw_event_name = try common.toCString(allocator, in_event_name);
 
-    var raw_argument_value_list = std.ArrayList([*:0]const u8).init(allocator);
-    defer raw_argument_value_list.deinit();
+    var raw_argument_value_list: std.ArrayList([*:0]const u8) = .empty;
+    defer raw_argument_value_list.deinit(allocator);
 
     for (in_argument_value_names) |argument_value_name| {
         const raw_argument_value_name = try common.toCString(allocator, argument_value_name);
-        try raw_argument_value_list.append(raw_argument_value_name);
+        try raw_argument_value_list.append(allocator, raw_argument_value_name);
     }
 
     return c.WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(

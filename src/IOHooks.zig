@@ -9,7 +9,7 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
 
     pub fn create(allocator: std.mem.Allocator) !*CAkDefaultIOHookDeferred {
         const instance_size_of = c.WWISEC_AK_CAkDefaultIOHookDeferred_Sizeof();
-        const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
+        const buffer = try allocator.alignedAlloc(u8, .fromByteUnits(Alignment), instance_size_of);
         return @ptrCast(c.WWISEC_AK_CAkDefaultIOHookDeferred_Create(@ptrCast(buffer[0..instance_size_of])));
     }
 
@@ -65,7 +65,7 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
 
     pub fn create(allocator: std.mem.Allocator) !*CAkFilePackageLowLevelIODeferred {
         const instance_size_of = c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Sizeof();
-        const buffer = try allocator.alignedAlloc(u8, Alignment, instance_size_of);
+        const buffer = try allocator.alignedAlloc(u8, .fromByteUnits(Alignment), instance_size_of);
         return @ptrCast(c.WWISEC_AK_CAkFilePackageLowLevelIODeferred_Create(@ptrCast(buffer[0..instance_size_of])));
     }
 

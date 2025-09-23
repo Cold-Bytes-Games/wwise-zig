@@ -312,11 +312,11 @@ pub const AkResourceMonitorDataSummary = extern struct {
     }
 };
 
-pub const AkCallbackFunc = ?*const fn (in_type: AkCallbackType, in_callback_info: *AkCallbackInfo) callconv(.C) void;
-pub const AkBusCallbackFunc = ?*const fn (in_callback_info: *AkSpeakerVolumeMatrixCallbackInfo) callconv(.C) void;
-pub const AkBusMeteringCallbackFunc = ?*const fn (in_callback_info: *AkBusMeteringCallbackInfo) callconv(.C) void;
-pub const AkOutputDeviceMeteringCallbackFunc = ?*const fn (in_callback_info: *AkOutputDeviceMeteringCallbackInfo) callconv(.C) void;
-pub const AkBankCallbackFunc = ?*const fn (in_bank_id: u32, in_memory_bank_ptr: ?*const anyopaque, in_load_result: common.AKRESULT, in_cookie: ?*anyopaque) callconv(.C) void;
+pub const AkCallbackFunc = ?*const fn (in_type: AkCallbackType, in_callback_info: *AkCallbackInfo) callconv(.c) void;
+pub const AkBusCallbackFunc = ?*const fn (in_callback_info: *AkSpeakerVolumeMatrixCallbackInfo) callconv(.c) void;
+pub const AkBusMeteringCallbackFunc = ?*const fn (in_callback_info: *AkBusMeteringCallbackInfo) callconv(.c) void;
+pub const AkOutputDeviceMeteringCallbackFunc = ?*const fn (in_callback_info: *AkOutputDeviceMeteringCallbackInfo) callconv(.c) void;
+pub const AkBankCallbackFunc = ?*const fn (in_bank_id: u32, in_memory_bank_ptr: ?*const anyopaque, in_load_result: common.AKRESULT, in_cookie: ?*anyopaque) callconv(.c) void;
 
 pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
     register: bool = false,
@@ -343,8 +343,8 @@ pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
     }
 };
 
-pub const AkGlobalCallbackFunc = *const fn (in_context: ?*IAkPlugin.IAkGlobalPluginContext, in_location: AkGlobalCallbackLocation, in_cookie: ?*anyopaque) callconv(.C) void;
-pub const AkResourceMonitorCallbackFunc = *const fn (in_data_summary: ?*const AkResourceMonitorDataSummary) callconv(.C) void;
+pub const AkGlobalCallbackFunc = *const fn (in_context: ?*IAkPlugin.IAkGlobalPluginContext, in_location: AkGlobalCallbackLocation, in_cookie: ?*anyopaque) callconv(.c) void;
+pub const AkResourceMonitorCallbackFunc = *const fn (in_data_summary: ?*const AkResourceMonitorDataSummary) callconv(.c) void;
 
 pub const AkAudioDeviceEvent = enum(common.DefaultEnumType) {
     initialization,
@@ -358,6 +358,6 @@ pub const AkDeviceStatusCallbackFunc = *const fn (
     in_id_device_id: u32,
     in_id_event: AkAudioDeviceEvent,
     in_ak_result: common.AKRESULT,
-) callconv(.C) void;
+) callconv(.c) void;
 
-pub const AkCaptureCallbackFunc = *const fn (in_capture_buffer: ?*common_defs.AkAudioBuffer, in_id_output: common.AkOutputDeviceID, cookie: ?*anyopaque) callconv(.C) void;
+pub const AkCaptureCallbackFunc = *const fn (in_capture_buffer: ?*common_defs.AkAudioBuffer, in_id_output: common.AkOutputDeviceID, cookie: ?*anyopaque) callconv(.c) void;

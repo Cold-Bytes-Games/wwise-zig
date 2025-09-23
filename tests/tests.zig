@@ -265,24 +265,24 @@ const ZigTestIAkLowLevelIOHook = struct {
     close_size: i64 = 0,
     dummy_file_desc: AK.StreamMgr.AkFileDesc = undefined,
 
-    pub fn destructor(self: *ZigTestIAkLowLevelIOHook) callconv(.C) void {
+    pub fn destructor(self: *ZigTestIAkLowLevelIOHook) callconv(.c) void {
         self.destructor_called = true;
     }
 
-    pub fn close(self: *ZigTestIAkLowLevelIOHook, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.C) AK.AKRESULT {
+    pub fn close(self: *ZigTestIAkLowLevelIOHook, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.c) AK.AKRESULT {
         self.close_size = in_file_desc.file_size;
         self.close_called = true;
 
         return .success;
     }
 
-    pub fn getBlockSize(self: *ZigTestIAkLowLevelIOHook, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.C) u32 {
+    pub fn getBlockSize(self: *ZigTestIAkLowLevelIOHook, in_file_desc: *AK.StreamMgr.AkFileDesc) callconv(.c) u32 {
         _ = in_file_desc;
         self.get_block_size_called = true;
         return 512;
     }
 
-    pub fn getDeviceDesc(self: *ZigTestIAkLowLevelIOHook, out_device_desc: *AK.NativeAkDeviceDesc) callconv(.C) void {
+    pub fn getDeviceDesc(self: *ZigTestIAkLowLevelIOHook, out_device_desc: *AK.NativeAkDeviceDesc) callconv(.c) void {
         self.get_device_desc_called = true;
 
         var zig_device_desc = AK.AkDeviceDesc{};
@@ -293,7 +293,7 @@ const ZigTestIAkLowLevelIOHook = struct {
         out_device_desc.* = zig_device_desc.toC() catch unreachable;
     }
 
-    pub fn getDeviceData(self: *ZigTestIAkLowLevelIOHook) callconv(.C) u32 {
+    pub fn getDeviceData(self: *ZigTestIAkLowLevelIOHook) callconv(.c) u32 {
         self.get_device_data_called = true;
         return 4269;
     }
@@ -302,7 +302,7 @@ const ZigTestIAkLowLevelIOHook = struct {
         self: *ZigTestIAkLowLevelIOHook,
         in_num_files: u32,
         in_items: [*]*AK.StreamMgr.NativeAkAsyncFileOpenData,
-    ) callconv(.C) void {
+    ) callconv(.c) void {
         for (0..in_num_files) |index| {
             self.dummy_file_desc.file_size = 6942;
             self.dummy_file_desc.device_id = 0;
@@ -321,7 +321,7 @@ const ZigTestIAkLowLevelIOHook = struct {
         self: *ZigTestIAkLowLevelIOHook,
         in_num_transfers: u32,
         in_transfer_items: [*]AK.StreamMgr.IAkLowLevelIOHook.BatchIoTransferItem,
-    ) callconv(.C) void {
+    ) callconv(.c) void {
         for (0..in_num_transfers) |index| {
             if (in_transfer_items[index].transfer_info) |transfer_info| {
                 if (transfer_info.callback) |callback| {
@@ -337,7 +337,7 @@ const ZigTestIAkLowLevelIOHook = struct {
         self: *ZigTestIAkLowLevelIOHook,
         in_num_transfers: u32,
         in_transfer_items: [*]AK.StreamMgr.IAkLowLevelIOHook.BatchIoTransferItem,
-    ) callconv(.C) void {
+    ) callconv(.c) void {
         for (0..in_num_transfers) |index| {
             if (in_transfer_items[index].transfer_info) |transfer_info| {
                 if (transfer_info.callback) |callback| {
@@ -354,7 +354,7 @@ const ZigTestIAkLowLevelIOHook = struct {
         in_num_transfers: u32,
         in_transfer_items: [*]AK.StreamMgr.IAkLowLevelIOHook.BatchIoTransferItem,
         io_cancel_all_transfers_for_this_file: [*]*bool,
-    ) callconv(.C) void {
+    ) callconv(.c) void {
         _ = io_cancel_all_transfers_for_this_file;
         _ = in_transfer_items;
         _ = in_num_transfers;
@@ -367,7 +367,7 @@ const ZigTestIAkLowLevelIOHook = struct {
         in_file_open: *const AK.NativeAkFileOpenData,
         out_searched_path: [*]AK.AkOSChar,
         in_path_size: i32,
-    ) callconv(.C) AK.AKRESULT {
+    ) callconv(.c) AK.AKRESULT {
         _ = in_path_size;
         _ = out_searched_path;
         _ = in_file_open;
@@ -399,7 +399,7 @@ const ZigTestIAkFileLocationResolver = struct {
     destructor_called: bool = false,
     get_next_preferred_device_called: bool = false,
 
-    pub fn destructor(self: *ZigTestIAkFileLocationResolver) callconv(.C) void {
+    pub fn destructor(self: *ZigTestIAkFileLocationResolver) callconv(.c) void {
         self.destructor_called = true;
     }
 
@@ -407,7 +407,7 @@ const ZigTestIAkFileLocationResolver = struct {
         self: *ZigTestIAkFileLocationResolver,
         in_file_open: *AK.StreamMgr.NativeAkAsyncFileOpenData,
         io_id_device: *AK.AkDeviceID,
-    ) callconv(.C) AK.AKRESULT {
+    ) callconv(.c) AK.AKRESULT {
         _ = in_file_open;
         io_id_device.* = 0;
         self.get_next_preferred_device_called = true;

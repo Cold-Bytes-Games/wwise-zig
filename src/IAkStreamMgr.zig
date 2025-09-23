@@ -339,11 +339,11 @@ pub const AkFileOpenData = struct {
 
 pub const IAkStreamProfile = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkStreamProfile) callconv(.C) void,
-        get_stream_record: *const fn (self: *IAkStreamProfile, out_stream_record: *AkStreamRecord) callconv(.C) void,
-        get_stream_data: *const fn (self: *IAkStreamProfile, ouut_stream_data: *AkStreamData) callconv(.C) void,
-        is_new: *const fn (self: *IAkStreamProfile) callconv(.C) bool,
-        clear_new: *const fn (self: *IAkStreamProfile) callconv(.C) void,
+        destructor: *const fn (self: *IAkStreamProfile) callconv(.c) void,
+        get_stream_record: *const fn (self: *IAkStreamProfile, out_stream_record: *AkStreamRecord) callconv(.c) void,
+        get_stream_data: *const fn (self: *IAkStreamProfile, ouut_stream_data: *AkStreamData) callconv(.c) void,
+        is_new: *const fn (self: *IAkStreamProfile) callconv(.c) bool,
+        clear_new: *const fn (self: *IAkStreamProfile) callconv(.c) void,
     };
 
     pub fn getStreamRecord(self: *IAkStreamProfile, allocator: std.mem.Allocator, out_stream_record: *AkStreamRecord) !void {
@@ -377,15 +377,15 @@ pub const IAkStreamProfile = opaque {
 
 pub const IAkDeviceProfile = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
-        on_profile_start: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
-        on_profile_end: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
-        get_desc: *const fn (self: *IAkDeviceProfile, out_device_desc: *NativeAkDeviceDesc) callconv(.C) void,
-        get_data: *const fn (self: *IAkDeviceProfile, out_device_data: *AkDeviceData) callconv(.C) void,
-        is_new: *const fn (self: *IAkDeviceProfile) callconv(.C) bool,
-        clear_new: *const fn (self: *IAkDeviceProfile) callconv(.C) void,
-        get_num_streams: *const fn (self: *IAkDeviceProfile) callconv(.C) u32,
-        get_stream_profile: *const fn (self: *IAkDeviceProfile, in_stream_index: u32) callconv(.C) ?*IAkStreamProfile,
+        destructor: *const fn (self: *IAkDeviceProfile) callconv(.c) void,
+        on_profile_start: *const fn (self: *IAkDeviceProfile) callconv(.c) void,
+        on_profile_end: *const fn (self: *IAkDeviceProfile) callconv(.c) void,
+        get_desc: *const fn (self: *IAkDeviceProfile, out_device_desc: *NativeAkDeviceDesc) callconv(.c) void,
+        get_data: *const fn (self: *IAkDeviceProfile, out_device_data: *AkDeviceData) callconv(.c) void,
+        is_new: *const fn (self: *IAkDeviceProfile) callconv(.c) bool,
+        clear_new: *const fn (self: *IAkDeviceProfile) callconv(.c) void,
+        get_num_streams: *const fn (self: *IAkDeviceProfile) callconv(.c) u32,
+        get_stream_profile: *const fn (self: *IAkDeviceProfile, in_stream_index: u32) callconv(.c) ?*IAkStreamProfile,
     };
 
     pub fn onProfileStart(self: *IAkDeviceProfile) void {
@@ -437,11 +437,11 @@ pub const IAkDeviceProfile = opaque {
 
 pub const IAkStreamMgrProfile = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkStreamMgrProfile) callconv(.C) void,
-        start_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.C) common.AKRESULT,
-        stop_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.C) void,
-        get_num_devices: *const fn (self: *IAkStreamMgrProfile) callconv(.C) u32,
-        get_device_profile: *const fn (self: *IAkStreamMgrProfile, in_device_index: u32) callconv(.C) ?*IAkDeviceProfile,
+        destructor: *const fn (self: *IAkStreamMgrProfile) callconv(.c) void,
+        start_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.c) common.AKRESULT,
+        stop_monitoring: *const fn (self: *IAkStreamMgrProfile) callconv(.c) void,
+        get_num_devices: *const fn (self: *IAkStreamMgrProfile) callconv(.c) u32,
+        get_device_profile: *const fn (self: *IAkStreamMgrProfile, in_device_index: u32) callconv(.c) ?*IAkDeviceProfile,
     };
 
     pub fn startMonitoring(self: *IAkStreamMgrProfile) common.WwiseError!void {
@@ -477,20 +477,20 @@ pub const IAkStreamMgrProfile = opaque {
 
 pub const IAkStdStream = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkStdStream) callconv(.C) void,
-        destroy: *const fn (self: *IAkStdStream) callconv(.C) void,
-        get_info: *const fn (self: *IAkStdStream, out_info: *NativeAkStreamInfo) callconv(.C) void,
-        get_file_descriptor: *const fn (self: *IAkStdStream) callconv(.C) ?*anyopaque,
-        set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) common.AKRESULT,
-        get_block_size: *const fn (self: *IAkStdStream) callconv(.C) u32,
-        read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) common.AKRESULT,
-        write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.C) common.AKRESULT,
-        get_position: *const fn (self: *IAkStdStream, out_end_of_stream: *bool) callconv(.C) u64,
-        set_position: *const fn (self: *IAkStdStream, in_move_offset: i64, in_move_method: AkMoveMethod) callconv(.C) common.AKRESULT,
-        cancel: *const fn (self: *IAkStdStream) callconv(.C) void,
-        get_data: *const fn (self: *IAkStdStream, out_size: *u32) callconv(.C) ?*anyopaque,
-        get_status: *const fn (self: *IAkStdStream) callconv(.C) AkStmStatus,
-        wait_for_pending_operation: *const fn (self: *IAkStdStream) callconv(.C) AkStmStatus,
+        destructor: *const fn (self: *IAkStdStream) callconv(.c) void,
+        destroy: *const fn (self: *IAkStdStream) callconv(.c) void,
+        get_info: *const fn (self: *IAkStdStream, out_info: *NativeAkStreamInfo) callconv(.c) void,
+        get_file_descriptor: *const fn (self: *IAkStdStream) callconv(.c) ?*anyopaque,
+        set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.c) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkStdStream) callconv(.c) u32,
+        read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) common.AKRESULT,
+        write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) common.AKRESULT,
+        get_position: *const fn (self: *IAkStdStream, out_end_of_stream: *bool) callconv(.c) u64,
+        set_position: *const fn (self: *IAkStdStream, in_move_offset: i64, in_move_method: AkMoveMethod) callconv(.c) common.AKRESULT,
+        cancel: *const fn (self: *IAkStdStream) callconv(.c) void,
+        get_data: *const fn (self: *IAkStdStream, out_size: *u32) callconv(.c) ?*anyopaque,
+        get_status: *const fn (self: *IAkStdStream) callconv(.c) AkStmStatus,
+        wait_for_pending_operation: *const fn (self: *IAkStdStream) callconv(.c) AkStmStatus,
     };
 
     pub fn destroy(self: *IAkStdStream) void {
@@ -594,23 +594,23 @@ pub const IAkStdStream = opaque {
 
 pub const IAkAutoStream = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkStdStream) callconv(.C) void,
-        destroy: *const fn (self: *IAkAutoStream) callconv(.C) void,
-        get_info: *const fn (self: *IAkAutoStream, out_info: *AkStreamInfo) callconv(.C) void,
-        get_file_descriptor: *const fn (self: *IAkAutoStream) callconv(.C) ?*anyopaque,
-        get_heuristics: *const fn (self: *IAkAutoStream, out_heuristics: *AkAutoStmHeuristics) callconv(.C) void,
-        set_heuristics: *const fn (self: *IAkAutoStream, in_heuristics: *AkAutoStmHeuristics) callconv(.C) common.AKRESULT,
-        set_minimal_buffer_size: *const fn (self: *IAkAutoStream, in_min_buffer_size: u32) callconv(.C) common.AKRESULT,
-        set_stream_name: *const fn (self: *IAkAutoStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.C) common.AKRESULT,
-        get_block_size: *const fn (self: *IAkAutoStream) callconv(.C) u32,
-        query_buffering_status: *const fn (self: *IAkAutoStream, out_num_bytes_available: *u32) callconv(.C) common.AKRESULT,
-        get_nominal_buffering: *const fn (self: *IAkAutoStream) callconv(.C) u32,
-        start: *const fn (self: *IAkAutoStream) callconv(.C) common.AKRESULT,
-        stop: *const fn (self: *IAkAutoStream) callconv(.C) common.AKRESULT,
-        get_position: *const fn (self: *IAkAutoStream, out_end_of_stream: *bool) callconv(.C) u64,
-        set_position: *const fn (self: *IAkAutoStream, in_move_offset: i64, in_move_method: AkMoveMethod) callconv(.C) common.AKRESULT,
-        get_buffer: *const fn (self: *IAkAutoStream, out_buffer: *?*anyopaque, out_size: *u32, in_wait: bool) callconv(.C) common.AKRESULT,
-        release_buffer: *const fn (self: *IAkAutoStream) callconv(.C) common.AKRESULT,
+        destructor: *const fn (self: *IAkStdStream) callconv(.c) void,
+        destroy: *const fn (self: *IAkAutoStream) callconv(.c) void,
+        get_info: *const fn (self: *IAkAutoStream, out_info: *AkStreamInfo) callconv(.c) void,
+        get_file_descriptor: *const fn (self: *IAkAutoStream) callconv(.c) ?*anyopaque,
+        get_heuristics: *const fn (self: *IAkAutoStream, out_heuristics: *AkAutoStmHeuristics) callconv(.c) void,
+        set_heuristics: *const fn (self: *IAkAutoStream, in_heuristics: *AkAutoStmHeuristics) callconv(.c) common.AKRESULT,
+        set_minimal_buffer_size: *const fn (self: *IAkAutoStream, in_min_buffer_size: u32) callconv(.c) common.AKRESULT,
+        set_stream_name: *const fn (self: *IAkAutoStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.c) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkAutoStream) callconv(.c) u32,
+        query_buffering_status: *const fn (self: *IAkAutoStream, out_num_bytes_available: *u32) callconv(.c) common.AKRESULT,
+        get_nominal_buffering: *const fn (self: *IAkAutoStream) callconv(.c) u32,
+        start: *const fn (self: *IAkAutoStream) callconv(.c) common.AKRESULT,
+        stop: *const fn (self: *IAkAutoStream) callconv(.c) common.AKRESULT,
+        get_position: *const fn (self: *IAkAutoStream, out_end_of_stream: *bool) callconv(.c) u64,
+        set_position: *const fn (self: *IAkAutoStream, in_move_offset: i64, in_move_method: AkMoveMethod) callconv(.c) common.AKRESULT,
+        get_buffer: *const fn (self: *IAkAutoStream, out_buffer: *?*anyopaque, out_size: *u32, in_wait: bool) callconv(.c) common.AKRESULT,
+        release_buffer: *const fn (self: *IAkAutoStream) callconv(.c) common.AKRESULT,
     };
 
     pub fn destroy(self: *IAkAutoStream) void {
@@ -720,19 +720,19 @@ pub const IAkAutoStream = opaque {
 
 pub const IAkStreamMgr = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkStreamMgr) callconv(.C) void,
+        destructor: *const fn (self: *IAkStreamMgr) callconv(.c) void,
         destroy: *const fn (
             self: *IAkStreamMgr,
-        ) callconv(.C) void,
+        ) callconv(.c) void,
         get_stream_mgr_profile: *const fn (
             self: *IAkStreamMgr,
-        ) callconv(.C) ?*IAkStreamMgrProfile,
+        ) callconv(.c) ?*IAkStreamMgrProfile,
         create_str: *const fn (
             self: *IAkStreamMgr,
             in_file_open: *const AkFileOpenData,
             out_stream: *?*IAkStdStream,
             in_sync_open: bool,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
         create_auto_ak_file_open_data: *const fn (
             self: *IAkStreamMgr,
             in_file_open: *const AkFileOpenData,
@@ -741,42 +741,42 @@ pub const IAkStreamMgr = opaque {
             out_stream: *?*IAkAutoStream,
             in_sync_open: bool,
             in_caching: bool,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
         create_auto_memory: *const fn (
             self: *IAkStreamMgr,
             in_buffer: ?*anyopaque,
             in_size: u64,
             in_heuristics: *const AkAutoStmHeuristics,
             out_stream: *?*IAkAutoStream,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
         pin_file_in_cache: *const fn (
             self: *IAkStreamMgr,
             in_file_id: common.AkFileID,
             in_fs_flags: ?*AkFileSystemFlags,
             in_priority: common.AkPriority,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
         unpin_file_in_cache: *const fn (
             self: *IAkStreamMgr,
             in_file_id: common.AkFileID,
             in_priority: common.AkPriority,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
         update_caching_priority: *const fn (
             self: *IAkStreamMgr,
             in_file_id: common.AkFileID,
             in_priority: common.AkPriority,
             in_old_priority: common.AkPriority,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
         get_buffer_status_for_pinned_file: *const fn (
             self: *IAkStreamMgr,
             in_file_id: common.AkFileID,
             out_percent_buffered: *f32,
             out_cache_full: *bool,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
         relocate_memory_stream: *const fn (
             self: *IAkStreamMgr,
             in_stream: *IAkAutoStream,
             in_new_start: ?*u8,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
     };
 
     pub fn destroy(self: *IAkStreamMgr) void {

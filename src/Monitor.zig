@@ -271,7 +271,7 @@ pub const ErrorCode = enum(common.DefaultEnumType) {
     spatial_audio_sibling_portal = c.WWISEC_AK_Monitor_ErrorCode_SpatialAudio_SiblingPortal,
 };
 
-pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const common.AkOSChar, in_error_level: ErrorLevel, in_playing_id: common.AkPlayingID, in_game_object_id: common.AkGameObjectID) callconv(.C) void;
+pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const common.AkOSChar, in_error_level: ErrorLevel, in_playing_id: common.AkPlayingID, in_game_object_id: common.AkGameObjectID) callconv(.c) void;
 
 pub const PostCodeOptionalArgs = struct {
     playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,

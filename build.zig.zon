@@ -1,7 +1,7 @@
 .{
     .name = .wwise_zig,
-    .version = "2023.1.14-zig0",
-    .minimum_zig_version = "0.14.1",
+    .version = "2023.1.15-zig0",
+    .minimum_zig_version = "0.15.1",
     .fingerprint = 0xbbf57a389e1f2876,
     .paths = .{"."},
 }

@@ -82,7 +82,7 @@ pub const AkIOTransferInfo = extern struct {
     }
 };
 
-pub const AkIOCallback = ?*const fn (in_transfer_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.C) void;
+pub const AkIOCallback = ?*const fn (in_transfer_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.c) void;
 
 pub const AkAsyncIOTransferInfo = extern struct {
     base: AkIOTransferInfo = .{},
@@ -105,7 +105,7 @@ pub const AkAsyncIOTransferInfo = extern struct {
 };
 
 // The first parameter is NativeAkAsyncFileOpenData but it introduce a dependency loop
-pub const AkFileOpenCallback = ?*const fn (in_open_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.C) void;
+pub const AkFileOpenCallback = ?*const fn (in_open_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.c) void;
 
 pub const NativeAkAsyncFileOpenData = extern struct {
     base: stream_interfaces.NativeAkFileOpenData,
@@ -135,39 +135,39 @@ pub const AkIoHeuristics = extern struct {
 
 pub const IAkLowLevelIOHook = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkLowLevelIOHook) callconv(.C) void,
-        close: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
-        get_block_size: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.C) u32,
-        get_device_desc: *const fn (self: *IAkLowLevelIOHook, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
-        get_device_data: *const fn (self: *IAkLowLevelIOHook) callconv(.C) u32,
+        destructor: *const fn (self: *IAkLowLevelIOHook) callconv(.c) void,
+        close: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.c) common.AKRESULT,
+        get_block_size: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.c) u32,
+        get_device_desc: *const fn (self: *IAkLowLevelIOHook, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.c) void,
+        get_device_data: *const fn (self: *IAkLowLevelIOHook) callconv(.c) u32,
         batch_open: *const fn (
             self: *IAkLowLevelIOHook,
             in_num_files: u32,
             in_items: [*]*NativeAkAsyncFileOpenData,
-        ) callconv(.C) void,
+        ) callconv(.c) void,
         batch_read: *const fn (
             self: *IAkLowLevelIOHook,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
-        ) callconv(.C) void,
+        ) callconv(.c) void,
         batch_write: *const fn (
             self: *IAkLowLevelIOHook,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
-        ) callconv(.C) void,
+        ) callconv(.c) void,
         batch_cancel: *const fn (
             self: *IAkLowLevelIOHook,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             io_cancel_all_transfers_for_this_file: [*]*bool,
-        ) callconv(.C) void,
+        ) callconv(.c) void,
         output_searched_paths: *const fn (
             self: *IAkLowLevelIOHook,
             in_result: common.AKRESULT,
             in_file_open: *const stream_interfaces.NativeAkFileOpenData,
             out_searched_path: [*]common.AkOSChar,
             in_path_size: i32,
-        ) callconv(.C) common.AKRESULT,
+        ) callconv(.c) common.AKRESULT,
     };
 
     pub const BatchIoTransferItem = extern struct {
@@ -192,7 +192,7 @@ pub const IAkLowLevelIOHook = opaque {
         return common.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Close(
                 @ptrCast(self),
-                @constCast(@ptrCast(in_file_desc)),
+                @ptrCast(@constCast(in_file_desc)),
             ),
         );
     }
@@ -200,7 +200,7 @@ pub const IAkLowLevelIOHook = opaque {
     pub fn getBlockSize(self: *IAkLowLevelIOHook, in_file_desc: *const AkFileDesc) u32 {
         return c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_GetBlockSize(
             @ptrCast(self),
-            @constCast(@ptrCast(in_file_desc)),
+            @ptrCast(@constCast(in_file_desc)),
         );
     }
 
@@ -301,8 +301,8 @@ pub const IAkLowLevelIOHook = opaque {
 
 pub const IAkFileLocationResolver = opaque {
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *IAkFileLocationResolver) callconv(.C) void,
-        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *common.AkDeviceID) callconv(.C) common.AKRESULT,
+        destructor: *const fn (self: *IAkFileLocationResolver) callconv(.c) void,
+        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *common.AkDeviceID) callconv(.c) common.AKRESULT,
     };
 
     pub fn getNextPreferredDevice(self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *common.AkDeviceID) common.WwiseError!void {
