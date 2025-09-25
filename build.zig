@@ -268,7 +268,7 @@ pub const GenerateSoundBanksArgs = struct {
 };
 
 pub fn addGenerateSoundBanksStep(b: *std.Build, wwise_project_path: []const u8, args: GenerateSoundBanksArgs) !*std.Build.Step.Run {
-    var arg_list = std.ArrayList([]const u8).init(b.allocator);
+    var arg_list = std.array_list.Managed([]const u8).init(b.allocator);
     defer arg_list.deinit();
 
     const absolute_wwise_project_path = b.pathFromRoot(wwise_project_path);
