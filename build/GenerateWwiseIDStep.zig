@@ -35,9 +35,9 @@ const NamespaceKeyword = "namespace";
 const AkUniqueIDKeyword = "AkUniqueID";
 const SpaceCount = 4;
 
-pub fn writeIndent(writer: anytype, indent_factor: usize) !void {
+pub fn writeIndent(writer: *std.Io.Writer, indent_factor: usize) !void {
     const spaces_to_insert = indent_factor * SpaceCount;
-    try writer.writeByteNTimes(' ', spaces_to_insert);
+    _ = try writer.writeSplat(&.{" "}, spaces_to_insert);
 }
 
 fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
@@ -74,14 +74,13 @@ fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
     const input_file = try std.fs.cwd().openFile(full_input_file_path, .{});
     defer input_file.close();
 
-    var read_buffer = std.io.bufferedReaderSize(4096, input_file.reader());
-    var reader = read_buffer.reader();
+    var read_buffer: [8 * 1024]u8 = undefined;
+    var file_reader = input_file.reader(read_buffer[0..]);
+    var reader = &file_reader.interface;
 
-    var output = std.ArrayList(u8).init(gpa);
-    defer output.deinit();
-
-    var write_buffer = std.io.bufferedWriter(output.writer());
-    var writer = write_buffer.writer();
+    var allocating_writer = std.Io.Writer.Allocating.init(gpa);
+    defer allocating_writer.deinit();
+    var writer = &allocating_writer.writer;
 
     var indent_factor: usize = 0;
 
@@ -89,91 +88,89 @@ fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
 
     var last_wrote_entry = true;
 
-    while (true) {
-        const read_line = try reader.readUntilDelimiterOrEofAlloc(gpa, '\n', 8 * 1024);
-        if (read_line) |line| {
-            const end_brace_index_opt = std.mem.indexOf(u8, line, "}");
-            if (end_brace_index_opt != null) {
-                if (indent_factor > 0) {
-                    indent_factor -= 1;
-
-                    try writeIndent(writer, indent_factor);
-                    try writer.writeAll("};\n");
-                }
-            }
-
-            const namespace_index_opt = std.mem.indexOf(u8, line, NamespaceKeyword);
-            if (namespace_index_opt) |namespace_index| {
-                const comment_index_opt = std.mem.indexOf(u8, line, "//");
-                if (comment_index_opt != null) {
-                    continue;
-                }
-
-                var start_name_index = namespace_index + NamespaceKeyword.len + 1;
-                while (start_name_index < line.len and (line[start_name_index] == ' ' or line[start_name_index] == '\t')) {
-                    start_name_index += 1;
-                }
-
-                var end_name_index = start_name_index;
-                while (end_name_index < line.len and line[end_name_index] != '\r' and line[end_name_index] != '\n') {
-                    end_name_index += 1;
-                }
-
-                const name = line[start_name_index..end_name_index];
-                if (std.mem.eql(u8, name, "AK")) {
-                    continue;
-                }
-
-                if (last_wrote_entry) {
-                    try writer.writeAll("\n");
-                }
+    while (reader.takeDelimiterExclusive('\n')) |line| {
+        const end_brace_index_opt = std.mem.indexOf(u8, line, "}");
+        if (end_brace_index_opt != null) {
+            if (indent_factor > 0) {
+                indent_factor -= 1;
 
                 try writeIndent(writer, indent_factor);
-                try writer.print("pub const {s} = struct {{\n", .{name});
-
-                last_wrote_entry = false;
-                indent_factor += 1;
+                try writer.writeAll("};\n");
             }
-
-            const unique_id_index_opt = std.mem.indexOf(u8, line, AkUniqueIDKeyword);
-            if (unique_id_index_opt) |unique_id_index| {
-                var start_name_index = unique_id_index + AkUniqueIDKeyword.len + 1;
-                while (start_name_index < line.len and (line[start_name_index] == ' ' or line[start_name_index] == '\t')) {
-                    start_name_index += 1;
-                }
-
-                var end_name_index = start_name_index;
-                while (end_name_index < line.len and line[end_name_index] != ' ') {
-                    end_name_index += 1;
-                }
-
-                const name = line[start_name_index..end_name_index];
-
-                var start_number_index = end_name_index;
-                while (start_number_index < line.len and line[start_number_index] != '=') {
-                    start_number_index += 1;
-                }
-                start_number_index += 1;
-                while (start_number_index < line.len and (line[start_number_index] == ' ' or line[start_number_index] == '\t')) {
-                    start_number_index += 1;
-                }
-
-                var end_number_index = start_number_index;
-                while (end_number_index < line.len and line[end_number_index] != 'U') {
-                    end_number_index += 1;
-                }
-
-                const number = line[start_number_index..end_number_index];
-                try writeIndent(writer, indent_factor);
-                try writer.print("pub const {s}: AK.AkUniqueID = {s};\n", .{ name, number });
-                last_wrote_entry = true;
-            }
-        } else {
-            break;
         }
+
+        const namespace_index_opt = std.mem.indexOf(u8, line, NamespaceKeyword);
+        if (namespace_index_opt) |namespace_index| {
+            const comment_index_opt = std.mem.indexOf(u8, line, "//");
+            if (comment_index_opt != null) {
+                continue;
+            }
+
+            var start_name_index = namespace_index + NamespaceKeyword.len + 1;
+            while (start_name_index < line.len and (line[start_name_index] == ' ' or line[start_name_index] == '\t')) {
+                start_name_index += 1;
+            }
+
+            var end_name_index = start_name_index;
+            while (end_name_index < line.len and line[end_name_index] != '\r' and line[end_name_index] != '\n') {
+                end_name_index += 1;
+            }
+
+            const name = line[start_name_index..end_name_index];
+            if (std.mem.eql(u8, name, "AK")) {
+                continue;
+            }
+
+            if (last_wrote_entry) {
+                try writer.writeAll("\n");
+            }
+
+            try writeIndent(writer, indent_factor);
+            try writer.print("pub const {s} = struct {{\n", .{name});
+
+            last_wrote_entry = false;
+            indent_factor += 1;
+        }
+
+        const unique_id_index_opt = std.mem.indexOf(u8, line, AkUniqueIDKeyword);
+        if (unique_id_index_opt) |unique_id_index| {
+            var start_name_index = unique_id_index + AkUniqueIDKeyword.len + 1;
+            while (start_name_index < line.len and (line[start_name_index] == ' ' or line[start_name_index] == '\t')) {
+                start_name_index += 1;
+            }
+
+            var end_name_index = start_name_index;
+            while (end_name_index < line.len and line[end_name_index] != ' ') {
+                end_name_index += 1;
+            }
+
+            const name = line[start_name_index..end_name_index];
+
+            var start_number_index = end_name_index;
+            while (start_number_index < line.len and line[start_number_index] != '=') {
+                start_number_index += 1;
+            }
+            start_number_index += 1;
+            while (start_number_index < line.len and (line[start_number_index] == ' ' or line[start_number_index] == '\t')) {
+                start_number_index += 1;
+            }
+
+            var end_number_index = start_number_index;
+            while (end_number_index < line.len and line[end_number_index] != 'U') {
+                end_number_index += 1;
+            }
+
+            const number = line[start_number_index..end_number_index];
+            try writeIndent(writer, indent_factor);
+            try writer.print("pub const {s}: AK.AkUniqueID = {s};\n", .{ name, number });
+            last_wrote_entry = true;
+        }
+    } else |err| switch (err) {
+        error.EndOfStream => {},
+        else => return err,
     }
 
-    try write_buffer.flush();
+    try writer.flush();
 
     const digest = manifest.final();
 
@@ -181,13 +178,13 @@ fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
     const sub_path_dirname = std.fs.path.dirname(sub_path).?;
 
     b.cache_root.handle.makePath(sub_path_dirname) catch |err| {
-        return step.fail("unable to make path '{}{s}': {s}", .{
+        return step.fail("unable to make path '{f}{s}': {s}", .{
             b.cache_root, sub_path_dirname, @errorName(err),
         });
     };
 
-    b.cache_root.handle.writeFile(.{ .sub_path = sub_path, .data = output.items }) catch |err| {
-        return step.fail("unable to write file '{}{s}': {s}", .{
+    b.cache_root.handle.writeFile(.{ .sub_path = sub_path, .data = allocating_writer.written() }) catch |err| {
+        return step.fail("unable to write file '{f}{s}': {s}", .{
             b.cache_root, sub_path, @errorName(err),
         });
     };
