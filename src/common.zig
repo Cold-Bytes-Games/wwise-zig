@@ -151,10 +151,10 @@ pub const IAkSoftwareCodec = opaque {};
 pub const IAkFileCodec = opaque {};
 pub const IAkGrainCodec = opaque {};
 
-pub const AkCreateFileSourceCallback = ?*const fn (in_ctx: ?*anyopaque) callconv(.C) ?*IAkSoftwareCodec;
-pub const AkCreateBankSourceCallback = ?*const fn (in_ctx: ?*anyopaque) callconv(.C) ?*IAkSoftwareCodec;
-pub const AkCreateFileCodecCallback = ?*const fn () callconv(.C) ?*IAkFileCodec;
-pub const AkCreateGrainCodecCallback = ?*const fn () callconv(.C) ?*IAkGrainCodec;
+pub const AkCreateFileSourceCallback = ?*const fn (in_ctx: ?*anyopaque) callconv(.c) ?*IAkSoftwareCodec;
+pub const AkCreateBankSourceCallback = ?*const fn (in_ctx: ?*anyopaque) callconv(.c) ?*IAkSoftwareCodec;
+pub const AkCreateFileCodecCallback = ?*const fn () callconv(.c) ?*IAkFileCodec;
+pub const AkCreateGrainCodecCallback = ?*const fn () callconv(.c) ?*IAkGrainCodec;
 
 pub const AkCodecDescriptor = extern struct {
     file_src_create_func: AkCreateFileSourceCallback,

@@ -79,10 +79,15 @@ pub fn build(b: *std.Build) !void {
         .static_plugins = wwise_static_plugins_option orelse &.{},
     };
 
-    const wwise_c = b.addStaticLibrary(.{
-        .name = "wwise-c",
+    const wwise_c_module = b.createModule(.{
         .target = target,
         .optimize = optimize,
+    });
+
+    const wwise_c = b.addLibrary(.{
+        .name = "wwise-c",
+        .linkage = .static,
+        .root_module = wwise_c_module,
     });
     wwise_c.addCSourceFile(.{
         .file = b.path("bindings/WwiseC.cpp"),
@@ -112,6 +117,7 @@ pub fn build(b: *std.Build) !void {
 
     if (target.result.os.tag == .windows) {
         wwise_c.root_module.addCMacro("UNICODE", &.{});
+        wwise_c.root_module.addCMacro("_Avx2WmemEnabledWeakValue", "_Avx2WmemEnabled");
     }
 
     if (wwise_build_options.use_communication) {
@@ -142,6 +148,11 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
+
+    if (target.result.os.tag == .windows) {
+        wwise_c_translate_c.defineCMacro("UNICODE", &.{});
+        wwise_c_translate_c.defineCMacro("_Avx2WmemEnabledWeakValue", "_Avx2WmemEnabled");
+    }
 
     if (wwise_build_options.use_communication) {
         wwise_c_translate_c.defineCMacro("WWISEC_USE_COMMUNICATION", null);
@@ -177,13 +188,22 @@ pub fn build(b: *std.Build) !void {
     wwise_zig_module.linkLibrary(wwise_c);
     try wwiseLinkModule(wwise_zig_module, wwise_build_options);
 
-    const wwise_test = b.addTest(.{
-        .name = "wwise_zig_test",
+    const wwise_test_module = b.createModule(.{
         .root_source_file = b.path("tests/tests.zig"),
         .target = target,
         .optimize = optimize,
+        .imports = &.{
+            .{
+                .name = "wwise-zig",
+                .module = wwise_zig_module,
+            },
+        },
     });
-    wwise_test.root_module.addImport("wwise-zig", wwise_zig_module);
+
+    const wwise_test = b.addTest(.{
+        .name = "wwise_zig_test",
+        .root_module = wwise_test_module,
+    });
     b.installArtifact(wwise_test);
 
     const run_test_cmd = b.addRunArtifact(wwise_test);

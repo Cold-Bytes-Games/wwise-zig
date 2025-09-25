@@ -5,7 +5,7 @@ const common = @import("common.zig");
 const speaker_config = @import("speaker_config.zig");
 const wwise_options = @import("wwise_options");
 
-pub const AkJobWorkerFunc = ?*const fn (in_job_type: common.AkJobType, in_execution_time_usec: u32) callconv(.C) void;
+pub const AkJobWorkerFunc = ?*const fn (in_job_type: common.AkJobType, in_execution_time_usec: u32) callconv(.c) void;
 
 pub const AkJobMgrSettings = extern struct {
     fn_request_job_worker: FuncRequestJobWorker = null,
@@ -76,11 +76,11 @@ pub const AkFloorPlane = enum(common.DefaultEnumType) {
     pub const Default = AkFloorPlane.xz;
 };
 
-pub const AkAssertHook = ?*const fn (in_expression: ?[*:0]const u8, in_filename: ?[*:0]const u8, in_line_number: i32) callconv(.C) void;
-pub const AkBackgroundMusicChangeCallbackFunc = ?*const fn (in_background_music_muted: bool, in_cookie: ?*anyopaque) callconv(.C) common.AKRESULT;
-pub const AkProfilerPushTimerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_zone_name: ?[*:0]const u8) callconv(.C) void;
-pub const AkProfilerPopTimerFunc = ?*const fn () callconv(.C) void;
-pub const AkProfilerPostMarkerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_marker_name: ?[*:0]const u8) callconv(.C) void;
+pub const AkAssertHook = ?*const fn (in_expression: ?[*:0]const u8, in_filename: ?[*:0]const u8, in_line_number: i32) callconv(.c) void;
+pub const AkBackgroundMusicChangeCallbackFunc = ?*const fn (in_background_music_muted: bool, in_cookie: ?*anyopaque) callconv(.c) common.AKRESULT;
+pub const AkProfilerPushTimerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_zone_name: ?[*:0]const u8) callconv(.c) void;
+pub const AkProfilerPopTimerFunc = ?*const fn () callconv(.c) void;
+pub const AkProfilerPostMarkerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_marker_name: ?[*:0]const u8) callconv(.c) void;
 
 pub const AkInitSettings = struct {
     pfn_assert_hook: AkAssertHook = null,

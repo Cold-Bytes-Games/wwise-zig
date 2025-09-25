@@ -1188,12 +1188,12 @@ pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_
 
     const allocator = area_allocator.allocator();
 
-    var raw_event_names_list = std.ArrayList([*:0]const u8).init(allocator);
-    defer raw_event_names_list.deinit();
+    var raw_event_names_list: std.ArrayList([*:0]const u8) = .empty;
+    defer raw_event_names_list.deinit(allocator);
 
     for (in_event_names) |event_name| {
         const raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
-        raw_event_names_list.append(raw_event_name) catch return common.WwiseError.Fail;
+        raw_event_names_list.append(allocator, raw_event_name) catch return common.WwiseError.Fail;
     }
 
     return common.handleAkResult(
@@ -1230,12 +1230,12 @@ pub fn prepareEventAsyncString(
 
     const allocator = area_allocator.allocator();
 
-    var raw_event_names_list = std.ArrayList([*:0]const u8).init(allocator);
-    defer raw_event_names_list.deinit();
+    var raw_event_names_list: std.ArrayList([*:0]const u8) = .empty;
+    defer raw_event_names_list.deinit(allocator);
 
     for (in_event_names) |event_name| {
         const raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
-        raw_event_names_list.append(raw_event_name) catch return common.WwiseError.Fail;
+        raw_event_names_list.append(allocator, raw_event_name) catch return common.WwiseError.Fail;
     }
 
     return common.handleAkResult(
@@ -1279,12 +1279,12 @@ pub fn prepareBusString(
 
     const allocator = area_allocator.allocator();
 
-    var raw_bus_names_list = std.ArrayList([*:0]const u8).init(allocator);
-    defer raw_bus_names_list.deinit();
+    var raw_bus_names_list: std.ArrayList([*:0]const u8) = .empty;
+    defer raw_bus_names_list.deinit(allocator);
 
     for (in_bus_names) |bus_name| {
         const raw_bus_name = common.toCString(allocator, bus_name) catch return common.WwiseError.Fail;
-        raw_bus_names_list.append(raw_bus_name) catch return common.WwiseError.Fail;
+        raw_bus_names_list.append(allocator, raw_bus_name) catch return common.WwiseError.Fail;
     }
 
     return common.handleAkResult(
@@ -1321,12 +1321,12 @@ pub fn prepareBusAsyncString(
 
     const allocator = area_allocator.allocator();
 
-    var raw_bus_names_list = std.ArrayList([*:0]const u8).init(allocator);
-    defer raw_bus_names_list.deinit();
+    var raw_bus_names_list: std.ArrayList([*:0]const u8) = .empty;
+    defer raw_bus_names_list.deinit(allocator);
 
     for (in_bus_names) |bus_name| {
         const raw_bus_name = common.toCString(allocator, bus_name) catch return common.WwiseError.Fail;
-        raw_bus_names_list.append(raw_bus_name) catch return common.WwiseError.Fail;
+        raw_bus_names_list.append(allocator, raw_bus_name) catch return common.WwiseError.Fail;
     }
 
     return common.handleAkResult(
@@ -1393,12 +1393,12 @@ pub fn prepareGameSyncsString(
 
     const raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
 
-    var raw_game_sync_names_list = std.ArrayList([*:0]const u8).init(allocator);
-    defer raw_game_sync_names_list.deinit();
+    var raw_game_sync_names_list: std.ArrayList([*:0]const u8) = .empty;
+    defer raw_game_sync_names_list.deinit(allocator);
 
     for (in_game_sync_names) |game_sync_name| {
         const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
-        raw_game_sync_names_list.append(raw_game_sync_name) catch return common.WwiseError.Fail;
+        raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return common.WwiseError.Fail;
     }
 
     return common.handleAkResult(
@@ -1448,12 +1448,12 @@ pub fn prepareGameSyncsAsyncString(
 
     const raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
 
-    var raw_game_sync_names_list = std.ArrayList([*:0]const u8).init(allocator);
-    defer raw_game_sync_names_list.deinit();
+    var raw_game_sync_names_list: std.ArrayList([*:0]const u8) = .empty;
+    defer raw_game_sync_names_list.deinit(allocator);
 
     for (in_game_sync_names) |game_sync_name| {
         const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
-        raw_game_sync_names_list.append(raw_game_sync_name) catch return common.WwiseError.Fail;
+        raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return common.WwiseError.Fail;
     }
 
     return common.handleAkResult(

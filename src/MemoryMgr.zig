@@ -72,21 +72,21 @@ pub const GlobalStats = extern struct {
 };
 
 // BEGIN MemoryMgrModule
-pub const AkMemInitForThread = ?*const fn () callconv(.C) void;
-pub const AkMemTermForThread = ?*const fn () callconv(.C) void;
-pub const AkMemTrimForThread = ?*const fn () callconv(.C) void;
-pub const AkMemMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize) callconv(.C) ?*anyopaque;
-pub const AkMemMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32) callconv(.C) ?*anyopaque;
-pub const AkMemRealloc = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize) callconv(.C) ?*anyopaque;
-pub const AkMemReallocAligned = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize, alignment: u32) callconv(.C) ?*anyopaque;
-pub const AkMemFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) void;
-pub const AkMemTotalReservedMemorySize = ?*const fn () callconv(.C) usize;
-pub const AkMemSizeOfMemory = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) usize;
-pub const AkMemDebugMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugRealloc = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, new_addresss: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugReallocAligned = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, alignment: u32, new_address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.C) void;
-pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.C) void;
+pub const AkMemInitForThread = ?*const fn () callconv(.c) void;
+pub const AkMemTermForThread = ?*const fn () callconv(.c) void;
+pub const AkMemTrimForThread = ?*const fn () callconv(.c) void;
+pub const AkMemMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize) callconv(.c) ?*anyopaque;
+pub const AkMemMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32) callconv(.c) ?*anyopaque;
+pub const AkMemRealloc = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize) callconv(.c) ?*anyopaque;
+pub const AkMemReallocAligned = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque, size: usize, alignment: u32) callconv(.c) ?*anyopaque;
+pub const AkMemFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.c) void;
+pub const AkMemTotalReservedMemorySize = ?*const fn () callconv(.c) usize;
+pub const AkMemSizeOfMemory = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.c) usize;
+pub const AkMemDebugMalloc = ?*const fn (pool_id: AkMemPoolId, size: usize, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.c) void;
+pub const AkMemDebugMalign = ?*const fn (pool_id: AkMemPoolId, size: usize, alignment: u32, address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.c) void;
+pub const AkMemDebugRealloc = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, new_addresss: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.c) void;
+pub const AkMemDebugReallocAligned = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, alignment: u32, new_address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.c) void;
+pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.c) void;
 
 pub const AkMemoryMgrArena = enum(common.DefaultEnumType) {
     primary = 0,

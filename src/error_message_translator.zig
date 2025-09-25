@@ -28,10 +28,10 @@ pub const AkErrorMessageTranslator = opaque {
     };
 
     pub const FunctionTable = extern struct {
-        destructor: *const fn (self: *AkErrorMessageTranslator) callconv(.C) void,
-        term: *const fn (self: *AkErrorMessageTranslator) callconv(.C) void,
-        translate: *const fn (self: *AkErrorMessageTranslator, in_error: [*:0]const common.AkOSChar, out_translated_error: [*:0]const common.AkOSChar, in_max_error_size: i32, in_args: [*:0]const u8, in_arg_size: u32) callconv(.C) bool,
-        get_info: *const fn (self: *AkErrorMessageTranslator, in_tag_list: [*]TagInformation, in_count: u32, out_translated: *u32) callconv(.C) bool,
+        destructor: *const fn (self: *AkErrorMessageTranslator) callconv(.c) void,
+        term: *const fn (self: *AkErrorMessageTranslator) callconv(.c) void,
+        translate: *const fn (self: *AkErrorMessageTranslator, in_error: [*:0]const common.AkOSChar, out_translated_error: [*:0]const common.AkOSChar, in_max_error_size: i32, in_args: [*:0]const u8, in_arg_size: u32) callconv(.c) bool,
+        get_info: *const fn (self: *AkErrorMessageTranslator, in_tag_list: [*]TagInformation, in_count: u32, out_translated: *u32) callconv(.c) bool,
     };
 
     pub fn term(self: *AkErrorMessageTranslator) void {
