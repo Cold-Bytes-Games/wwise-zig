@@ -88,7 +88,7 @@ fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
 
     var last_wrote_entry = true;
 
-    while (reader.takeDelimiterExclusive('\n')) |line| {
+    while (reader.takeDelimiterInclusive('\n')) |line| {
         const end_brace_index_opt = std.mem.indexOf(u8, line, "}");
         if (end_brace_index_opt != null) {
             if (indent_factor > 0) {
