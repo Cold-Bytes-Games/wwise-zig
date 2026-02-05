@@ -1,6 +1,6 @@
 const std = @import("std");
 const c = @import("wwise_c");
-const callbacks = @import("callbacks.zig");
+const callback_types = @import("callback_types.zig");
 const common = @import("common.zig");
 const IAkPluginMemAlloc = @import("IAkPluginMemAlloc.zig").IAkPluginMemAlloc;
 const IAkStreamMgr = @import("IAkStreamMgr.zig");
@@ -96,11 +96,11 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub const RegisterGlobalCallbackOptionalArgs = struct {
-        location: callbacks.AkGlobalCallbackLocation = .{ .begin_render = true },
+        location: callback_types.AkGlobalCallbackLocation = .{ .begin_render = true },
         cookie: ?*anyopaque = null,
     };
 
-    pub fn registerGlobalCallback(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_callback: callbacks.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) common.WwiseError!void {
+    pub fn registerGlobalCallback(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_callback: callback_types.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterGlobalCallback(
                 @ptrCast(self),
@@ -115,12 +115,12 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub const UnregisterGlobalCallbackOptionArgs = struct {
-        location: callbacks.AkGlobalCallbackLocation = .{ .begin_render = true },
+        location: callback_types.AkGlobalCallbackLocation = .{ .begin_render = true },
     };
 
     pub fn unregisterGlobalCallback(
         self: *IAkGlobalPluginContext,
-        in_callback: callbacks.AkGlobalCallbackFunc,
+        in_callback: callback_types.AkGlobalCallbackFunc,
         optional_args: UnregisterGlobalCallbackOptionArgs,
     ) common.WwiseError!void {
         return common.handleAkResult(
@@ -274,8 +274,8 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub const PostEventSyncOptionalArgs = struct {
-        flags: callbacks.AkCallbackType = .{},
-        callback: callbacks.AkCallbackFunc = null,
+        flags: callback_types.AkCallbackType = .{},
+        callback: callback_types.AkCallbackFunc = null,
         cookie: ?*anyopaque = null,
         allocator: ?std.mem.Allocator = null,
         external_sources: ?[]const common.AkExternalSourceInfo = null,
@@ -343,8 +343,8 @@ pub const IAkGlobalPluginContext = opaque {
 
     pub const PostMIDIOnEventSyncOptionalArgs = struct {
         absolute_offsets: bool = false,
-        flags: callbacks.AkCallbackType = .{},
-        callback: callbacks.AkCallbackFunc = null,
+        flags: callback_types.AkCallbackType = .{},
+        callback: callback_types.AkCallbackFunc = null,
         cookie: ?*anyopaque = null,
         playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
     };

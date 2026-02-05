@@ -14,33 +14,35 @@ pub const SpeakerVolumes = @import("SpeakerVolumes.zig");
 pub const StreamMgr = @import("StreamMgr.zig");
 pub const TempAlloc = @import("TempAlloc.zig");
 
-// callbacks.zig
-const callbacks = @import("callbacks.zig");
-pub const AkCallbackType = callbacks.AkCallbackType;
-pub const AkCallbackInfo = callbacks.AkCallbackInfo;
-pub const AkEventCallbackInfo = callbacks.AkEventCallbackInfo;
-pub const AkMIDIEventCallbackInfo = callbacks.AkMIDIEventCallbackInfo;
-pub const AkMarkerCallbackInfo = callbacks.AkMarkerCallbackInfo;
-pub const AkDurationCallbackInfo = callbacks.AkDurationCallbackInfo;
-pub const AkDynamicSequenceItemCallbackInfo = callbacks.AkDynamicSequenceItemCallbackInfo;
-pub const AkSpeakerVolumeMatrixCallbackInfo = callbacks.AkSpeakerVolumeMatrixCallbackInfo;
-pub const AkBusMeteringCallbackInfo = callbacks.AkBusMeteringCallbackInfo;
-pub const AkOutputDeviceMeteringCallbackInfo = callbacks.AkOutputDeviceMeteringCallbackInfo;
-pub const AkMusicPlaylistCallbackInfo = callbacks.AkMusicPlaylistCallbackInfo;
-pub const AkSegmentInfo = callbacks.AkSegmentInfo;
-pub const AkMusicSyncCallbackInfo = callbacks.AkMusicSyncCallbackInfo;
-pub const AkResourceMonitorDataSummary = callbacks.AkResourceMonitorDataSummary;
-pub const AkCallbackFunc = callbacks.AkCallbackFunc;
-pub const AkBusCallbackFunc = callbacks.AkBusCallbackFunc;
-pub const AkBusMeteringCallbackFunc = callbacks.AkBusMeteringCallbackFunc;
-pub const AkOutputDeviceMeteringCallbackFunc = callbacks.AkOutputDeviceMeteringCallbackFunc;
-pub const AkBankCallbackFunc = callbacks.AkBankCallbackFunc;
-pub const AkGlobalCallbackLocation = callbacks.AkGlobalCallbackLocation;
-pub const AkGlobalCallbackFunc = callbacks.AkGlobalCallbackFunc;
-pub const AkResourceMonitorCallbackFunc = callbacks.AkResourceMonitorCallbackFunc;
-pub const AkAudioDeviceEvent = callbacks.AkAudioDeviceEvent;
-pub const AkDeviceStatusCallbackFunc = callbacks.AkDeviceStatusCallbackFunc;
-pub const AkCaptureCallbackFunc = callbacks.AkCaptureCallbackFunc;
+// callback_types.zig
+const callback_types = @import("callback_types.zig");
+pub const AkCallbackType = callback_types.AkCallbackType;
+pub const AkCallbackInfo = callback_types.AkCallbackInfo;
+pub const AkEventCallbackInfo = callback_types.AkEventCallbackInfo;
+pub const AkMIDIEventCallbackInfo = callback_types.AkMIDIEventCallbackInfo;
+pub const AkMarkerCallbackInfo = callback_types.AkMarkerCallbackInfo;
+pub const AkDurationCallbackInfo = callback_types.AkDurationCallbackInfo;
+pub const AkDynamicSequenceItemCallbackInfo = callback_types.AkDynamicSequenceItemCallbackInfo;
+pub const AkSpeakerVolumeMatrixCallbackInfo = callback_types.AkSpeakerVolumeMatrixCallbackInfo;
+pub const AkBusMeteringCallbackInfo = callback_types.AkBusMeteringCallbackInfo;
+pub const AkOutputDeviceMeteringCallbackInfo = callback_types.AkOutputDeviceMeteringCallbackInfo;
+pub const AkMusicPlaylistCallbackInfo = callback_types.AkMusicPlaylistCallbackInfo;
+pub const AkSegmentInfo = callback_types.AkSegmentInfo;
+pub const AkMusicSyncCallbackInfo = callback_types.AkMusicSyncCallbackInfo;
+pub const AkResourceMonitorDataSummary = callback_types.AkResourceMonitorDataSummary;
+pub const AkDynamicSequenceSelectCallbackInfo = callback_types.AkDynamicSequenceSelectCallbackInfo;
+pub const AkEventCallbackFunc = callback_types.AkEventCallbackFunc;
+pub const AkCallbackFunc = callback_types.AkCallbackFunc;
+pub const AkBusCallbackFunc = callback_types.AkBusCallbackFunc;
+pub const AkBusMeteringCallbackFunc = callback_types.AkBusMeteringCallbackFunc;
+pub const AkOutputDeviceMeteringCallbackFunc = callback_types.AkOutputDeviceMeteringCallbackFunc;
+pub const AkBankCallbackFunc = callback_types.AkBankCallbackFunc;
+pub const AkGlobalCallbackLocation = callback_types.AkGlobalCallbackLocation;
+pub const AkGlobalCallbackFunc = callback_types.AkGlobalCallbackFunc;
+pub const AkResourceMonitorCallbackFunc = callback_types.AkResourceMonitorCallbackFunc;
+pub const AkAudioDeviceEvent = callback_types.AkAudioDeviceEvent;
+pub const AkDeviceStatusCallbackFunc = callback_types.AkDeviceStatusCallbackFunc;
+pub const AkCaptureCallbackFunc = callback_types.AkCaptureCallbackFunc;
 
 // common.zig
 const common = @import("common.zig");
@@ -454,6 +456,10 @@ pub const AK_MAX_AMBISONICS_ORDER = speaker_config.AK_MAX_AMBISONICS_ORDER;
 pub const AK_DEFAULT_HEIGHT_ANGLE = speaker_config.AK_DEFAULT_HEIGHT_ANGLE;
 pub const AkChannelConfigType = speaker_config.AkChannelConfigType;
 pub const AkChannelConfig = speaker_config.AkChannelConfig;
+
+// typedefs.zig
+const typedefs = @import("typedefs.zig");
+pub const AkExternalSourceArray = typedefs.AkExternalSourceArray; // TODO: Replace with actual implementation
 
 // virtual_acoustics.zig
 const virtual_acoustics = @import("virtual_acoustics.zig");

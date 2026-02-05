@@ -6,6 +6,7 @@ const IAkPlugin = @import("IAkPlugin.zig");
 const midi_types = @import("midi_types.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     end_of_event: bool = false,
@@ -24,12 +25,11 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     music_sync_user_ue: bool = false,
     music_sync_point: bool = false,
     midi_event: bool = false,
-    pad0: bool = false,
-    pad1: u3 = 0,
-    enable_get_source_play_position: bool = false,
-    enable_get_music_play_position: bool = false,
-    enable_get_source_stream_buffering: bool = false,
-    pad2: u9 = 0,
+    dynamic_sequence_select: bool = false, // 16
+    pad1: u5 = 0,
+    enable_get_music_play_position: bool = false, // 21
+    enable_get_source_stream_buffering: bool = false, // 22
+    pad2: u10 = 0,
 
     pub const music_sync_all: AkCallbackType = @bitCast(c.WWISEC_AK_MusicSyncAll);
     pub const callback_bits: AkCallbackType = @bitCast(c.WWISEC_AK_CallbackBits);
@@ -47,28 +47,69 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
         std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_play_position = true })) == c.WWISEC_AK_EnableGetSourcePlayPosition);
         std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_music_play_position = true })) == c.WWISEC_AK_EnableGetMusicPlayPosition);
         std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_stream_buffering = true })) == c.WWISEC_AK_EnableGetSourceStreamBuffering);
+        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .dynamic_sequence_select = true })) == c.WWISEC_AK_DynamicSequenceSelect);
     }
 };
 
-pub const AkCallbackInfo = extern struct {
-    cookie: ?*anyopaque = null,
-    game_obj_id: common.AkGameObjectID = 0,
+pub const AkAudioDeviceEvent = enum(common.DefaultEnumType) {
+    initialization,
+    removal,
+    system_removal,
+};
 
-    pub inline fn fromC(value: c.WWISEC_AkCallbackInfo) AkCallbackInfo {
+pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
+    register: bool = false,
+    begin: bool = false,
+    pre_process_message_queue_for_render: bool = false,
+    post_messages_processed: bool = false,
+    begin_render: bool = false,
+    end_render: bool = false,
+    end: bool = false,
+    term: bool = false,
+    monitor: bool = false,
+    monitor_recap: bool = false,
+    init: bool = false,
+    @"suspend": bool = false,
+    wakeup_from_suspend: bool = false,
+    profiler_connect: bool = false,
+    profiler_disconnect: bool = false,
+    pad: u17 = 0,
+
+    pub inline fn fromC(value: u32) AkGlobalCallbackLocation {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkCallbackInfo) c.WWISEC_AkCallbackInfo {
+    pub inline fn toC(self: AkGlobalCallbackLocation) u32 {
+        return @bitCast(self);
+    }
+};
+
+pub const AkSegmentInfo = extern struct {
+    current_position: common.AkTimeMs = 0,
+    pre_entry_duration: common.AkTimeMs = 0,
+    active_duration: common.AkTimeMs = 0,
+    post_exit_duration: common.AkTimeMs = 0,
+    remaining_look_ahead_time: common.AkTimeMs = 0,
+    beat_duration: f32 = 0.0,
+    bar_duration: f32 = 0.0,
+    grid_duration: f32 = 0.0,
+    grid_offset: f32 = 0.0,
+
+    pub inline fn fromC(value: c.WWISEC_AkSegmentInfo) AkSegmentInfo {
+        return @bitCast(value);
+    }
+
+    pub inline fn toC(self: AkSegmentInfo) c.WWISEC_AkSegmentInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkCallbackInfo) == @sizeOf(c.WWISEC_AkCallbackInfo));
+        std.debug.assert(@sizeOf(AkSegmentInfo) == @sizeOf(c.WWISEC_AkSegmentInfo));
     }
 };
 
 pub const AkEventCallbackInfo = extern struct {
-    base: AkCallbackInfo = .{},
+    game_obj_id: common.AkGameObjectID = 0,
     playing_id: common.AkPlayingID = 0,
     event_id: common.AkUniqueID = 0,
 
@@ -86,7 +127,6 @@ pub const AkEventCallbackInfo = extern struct {
 };
 
 pub const AkMIDIEventCallbackInfo = extern struct {
-    base: AkEventCallbackInfo = .{},
     midi_event: midi_types.AkMIDIEvent,
 
     pub inline fn fromC(value: c.WWISEC_AkMIDIEventCallbackInfo) AkMIDIEventCallbackInfo {
@@ -103,7 +143,6 @@ pub const AkMIDIEventCallbackInfo = extern struct {
 };
 
 pub const AkMarkerCallbackInfo = extern struct {
-    base: AkEventCallbackInfo = .{},
     identifier: u32 = 0,
     position: u32 = 0,
     str_label: ?[*:0]const u8 = null,
@@ -123,7 +162,6 @@ pub const AkMarkerCallbackInfo = extern struct {
 };
 
 pub const AkDurationCallbackInfo = extern struct {
-    base: AkEventCallbackInfo,
     duration: f32,
     estimate_duration: f32,
     audio_node_id: common.AkUniqueID,
@@ -144,8 +182,6 @@ pub const AkDurationCallbackInfo = extern struct {
 };
 
 pub const AkDynamicSequenceItemCallbackInfo = extern struct {
-    base: AkCallbackInfo = .{},
-    playing_id: common.AkPlayingID = 0,
     audio_node_id: common.AkUniqueID = 0,
     custom_info: ?*anyopaque = null,
 
@@ -163,7 +199,6 @@ pub const AkDynamicSequenceItemCallbackInfo = extern struct {
 };
 
 pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
-    base: AkEventCallbackInfo = .{},
     volumes: SpeakerVolumes.MatrixPtr,
     input_config: speaker_config.AkChannelConfig = .{},
     output_config: speaker_config.AkChannelConfig = .{},
@@ -182,6 +217,60 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
 
     comptime {
         std.debug.assert(@sizeOf(AkSpeakerVolumeMatrixCallbackInfo) == @sizeOf(c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo));
+    }
+};
+
+pub const AkMusicPlaylistCallbackInfo = extern struct {
+    playlist_id: common.AkUniqueID = 0,
+    num_playlist_items: u32 = 0,
+    playlist_selection: u32 = 0,
+    playlist_item_done: u32 = 0,
+
+    pub inline fn fromC(value: c.WWISEC_AkMusicPlaylistCallbackInfo) AkMusicPlaylistCallbackInfo {
+        return @bitCast(value);
+    }
+
+    pub inline fn toC(self: AkMusicPlaylistCallbackInfo) c.WWISEC_AkMusicPlaylistCallbackInfo {
+        return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkMusicPlaylistCallbackInfo) == @sizeOf(c.WWISEC_AkMusicPlaylistCallbackInfo));
+    }
+};
+
+pub const AkMusicSyncCallbackInfo = extern struct {
+    segment_info: AkSegmentInfo = .{},
+    music_sync_type: AkCallbackType = .{},
+    user_cue_name: ?[*:0]const u8 = null,
+
+    pub inline fn fromC(value: c.WWISEC_AkMusicSyncCallbackInfo) AkMusicSyncCallbackInfo {
+        return @bitCast(value);
+    }
+
+    pub inline fn toC(self: AkMusicSyncCallbackInfo) c.WWISEC_AkMusicSyncCallbackInfo {
+        return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkMusicSyncCallbackInfo) == @sizeOf(c.WWISEC_AkMusicSyncCallbackInfo));
+    }
+};
+
+pub const AkCallbackInfo = extern struct {
+    cookie: ?*anyopaque = null,
+    game_obj_id: common.AkGameObjectID = 0,
+
+    pub inline fn fromC(value: c.WWISEC_AkCallbackInfo) AkCallbackInfo {
+        return @bitCast(value);
+    }
+
+    pub inline fn toC(self: AkCallbackInfo) c.WWISEC_AkCallbackInfo {
+        return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkCallbackInfo) == @sizeOf(c.WWISEC_AkCallbackInfo));
     }
 };
 
@@ -227,70 +316,6 @@ pub const AkOutputDeviceMeteringCallbackInfo = extern struct {
     }
 };
 
-pub const AkMusicPlaylistCallbackInfo = extern struct {
-    base: AkEventCallbackInfo = .{},
-    playlist_id: common.AkUniqueID = 0,
-    num_playlist_items: u32 = 0,
-    playlist_selection: u32 = 0,
-    playlist_item_done: u32 = 0,
-
-    pub inline fn fromC(value: c.WWISEC_AkMusicPlaylistCallbackInfo) AkMusicPlaylistCallbackInfo {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: AkMusicPlaylistCallbackInfo) c.WWISEC_AkMusicPlaylistCallbackInfo {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(AkMusicPlaylistCallbackInfo) == @sizeOf(c.WWISEC_AkMusicPlaylistCallbackInfo));
-    }
-};
-
-pub const AkSegmentInfo = extern struct {
-    current_position: common.AkTimeMs = 0,
-    pre_entry_duration: common.AkTimeMs = 0,
-    active_duration: common.AkTimeMs = 0,
-    post_exit_duration: common.AkTimeMs = 0,
-    remaining_look_ahead_time: common.AkTimeMs = 0,
-    beat_duration: f32 = 0.0,
-    bar_duration: f32 = 0.0,
-    grid_duration: f32 = 0.0,
-    grid_offset: f32 = 0.0,
-
-    pub inline fn fromC(value: c.WWISEC_AkSegmentInfo) AkSegmentInfo {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: AkSegmentInfo) c.WWISEC_AkSegmentInfo {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(AkSegmentInfo) == @sizeOf(c.WWISEC_AkSegmentInfo));
-    }
-};
-
-pub const AkMusicSyncCallbackInfo = extern struct {
-    base: AkCallbackInfo = .{},
-    playing_id: common.AkPlayingID = 0,
-    segment_info: AkSegmentInfo = .{},
-    music_sync_type: AkCallbackType = .{},
-    user_cue_name: ?[*:0]const u8 = null,
-
-    pub inline fn fromC(value: c.WWISEC_AkMusicSyncCallbackInfo) AkMusicSyncCallbackInfo {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: AkMusicSyncCallbackInfo) c.WWISEC_AkMusicSyncCallbackInfo {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(AkMusicSyncCallbackInfo) == @sizeOf(c.WWISEC_AkMusicSyncCallbackInfo));
-    }
-};
-
 pub const AkResourceMonitorDataSummary = extern struct {
     total_cpu: f32 = 0.0,
     plugin_cpu: f32 = 0.0,
@@ -312,48 +337,31 @@ pub const AkResourceMonitorDataSummary = extern struct {
     }
 };
 
-pub const AkCallbackFunc = ?*const fn (in_type: AkCallbackType, in_callback_info: *AkCallbackInfo) callconv(.c) void;
-pub const AkBusCallbackFunc = ?*const fn (in_callback_info: *AkSpeakerVolumeMatrixCallbackInfo) callconv(.c) void;
-pub const AkBusMeteringCallbackFunc = ?*const fn (in_callback_info: *AkBusMeteringCallbackInfo) callconv(.c) void;
-pub const AkOutputDeviceMeteringCallbackFunc = ?*const fn (in_callback_info: *AkOutputDeviceMeteringCallbackInfo) callconv(.c) void;
-pub const AkBankCallbackFunc = ?*const fn (in_bank_id: u32, in_memory_bank_ptr: ?*const anyopaque, in_load_result: common.AKRESULT, in_cookie: ?*anyopaque) callconv(.c) void;
+pub const AkDynamicSequenceSelectCallbackInfo = struct {
+    audio_node_id: common.AkUniqueID = 0,
+    ms_delay: common.AkTimeMs = 0,
+    custom_info: ?*anyopaque = null,
+    ar_external_sources: typedefs.AkExternalSourceArray = null,
 
-pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
-    register: bool = false,
-    begin: bool = false,
-    pre_process_message_queue_for_render: bool = false,
-    post_messages_processed: bool = false,
-    begin_render: bool = false,
-    end_render: bool = false,
-    end: bool = false,
-    term: bool = false,
-    monitor: bool = false,
-    monitor_recap: bool = false,
-    init: bool = false,
-    @"suspend": bool = false,
-    wakeup_from_suspend: bool = false,
-    profiler_connect: bool = false,
-    profiler_disconnect: bool = false,
-    pad: u17 = 0,
-
-    pub inline fn fromC(value: u32) AkGlobalCallbackLocation {
+    pub inline fn fromC(value: c.WWISEC_AkDynamicSequenceSelectCallbackInfo) AkDynamicSequenceSelectCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkGlobalCallbackLocation) u32 {
+    pub inline fn toC(self: AkDynamicSequenceSelectCallbackInfo) c.WWISEC_AkDynamicSequenceSelectCallbackInfo {
         return @bitCast(self);
+    }
+
+    comptime {
+        std.debug.assert(@sizeOf(AkDynamicSequenceSelectCallbackInfo) == @sizeOf(c.WWISEC_AkDynamicSequenceSelectCallbackInfo));
     }
 };
 
+pub const AkEventCallbackFunc = ?*const fn (in_type: AkCallbackType, in_event_info: *AkEventCallbackInfo, in_callback_info: ?*anyopaque, in_cookie: ?*anyopaque) callconv(.c) void;
+pub const AkCallbackFunc = AkEventCallbackFunc;
+pub const AkBusCallbackFunc = ?*const fn (in_callback_info: *AkSpeakerVolumeMatrixCallbackInfo, in_cookie: ?*anyopaque) callconv(.c) void;
+pub const AkBankCallbackFunc = ?*const fn (in_bank_id: u32, in_memory_bank_ptr: ?*const anyopaque, in_load_result: common.AKRESULT, in_cookie: ?*anyopaque) callconv(.c) void;
 pub const AkGlobalCallbackFunc = *const fn (in_context: ?*IAkPlugin.IAkGlobalPluginContext, in_location: AkGlobalCallbackLocation, in_cookie: ?*anyopaque) callconv(.c) void;
 pub const AkResourceMonitorCallbackFunc = *const fn (in_data_summary: ?*const AkResourceMonitorDataSummary) callconv(.c) void;
-
-pub const AkAudioDeviceEvent = enum(common.DefaultEnumType) {
-    initialization,
-    removal,
-    system_removal,
-};
-
 pub const AkDeviceStatusCallbackFunc = *const fn (
     in_context: ?*IAkPlugin.IAkGlobalPluginContext,
     in_id_audio_device_shareset: common.AkUniqueID,
@@ -362,4 +370,6 @@ pub const AkDeviceStatusCallbackFunc = *const fn (
     in_ak_result: common.AKRESULT,
 ) callconv(.c) void;
 
+pub const AkBusMeteringCallbackFunc = ?*const fn (in_callback_info: *AkBusMeteringCallbackInfo) callconv(.c) void;
+pub const AkOutputDeviceMeteringCallbackFunc = ?*const fn (in_callback_info: *AkOutputDeviceMeteringCallbackInfo) callconv(.c) void;
 pub const AkCaptureCallbackFunc = *const fn (in_capture_buffer: ?*common_defs.AkAudioBuffer, in_id_output: common.AkOutputDeviceID, cookie: ?*anyopaque) callconv(.c) void;
