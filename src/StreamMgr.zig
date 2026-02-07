@@ -3,6 +3,7 @@ const c = @import("wwise_c");
 const common = @import("common.zig");
 const settings = @import("settings.zig");
 const stream_interfaces = @import("IAkStreamMgr.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const AkStreamMgrSettings = extern struct {
     dummy: u8 = 0,
@@ -49,7 +50,7 @@ pub const AkFileDesc = extern struct {
     file_size: i64 = 0,
     sector: u64 = 0,
     file_handle: common.AkFileHandle = null,
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkFileDesc) AkFileDesc {
         return @bitCast(value);
@@ -118,7 +119,7 @@ pub const NativeAkAsyncFileOpenData = extern struct {
 
 pub const AkIoHeuristics = extern struct {
     deadline: f32 = 0.0,
-    priority: common.AkPriority = 0,
+    priority: typedefs.AkPriority = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkIoHeuristics) AkIoHeuristics {
         return @bitCast(value);
@@ -282,10 +283,10 @@ pub const IAkLowLevelIOHook = opaque {
 pub const IAkFileLocationResolver = opaque {
     pub const FunctionTable = extern struct {
         destructor: *const fn (self: *IAkFileLocationResolver) callconv(.c) void,
-        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *common.AkDeviceID) callconv(.c) common.AKRESULT,
+        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *typedefs.AkDeviceID) callconv(.c) common.AKRESULT,
     };
 
-    pub fn getNextPreferredDevice(self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *common.AkDeviceID) common.WwiseError!void {
+    pub fn getNextPreferredDevice(self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *typedefs.AkDeviceID) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(
                 @ptrCast(self),
@@ -322,8 +323,8 @@ pub fn setFileLocationResolver(in_file_location_resolver: ?*IAkFileLocationResol
     c.WWISEC_AK_StreamMgr_SetFileLocationResolver(in_file_location_resolver);
 }
 
-pub fn createDevice(in_settings: *const AkDeviceSettings, in_low_level_hook: ?*IAkLowLevelIOHook) common.WwiseError!common.AkDeviceID {
-    var result: common.AkDeviceID = undefined;
+pub fn createDevice(in_settings: *const AkDeviceSettings, in_low_level_hook: ?*IAkLowLevelIOHook) common.WwiseError!typedefs.AkDeviceID {
+    var result: typedefs.AkDeviceID = undefined;
 
     try common.handleAkResult(
         c.WWISEC_AK_StreamMgr_CreateDevice(@ptrCast(in_settings), in_low_level_hook, @ptrCast(&result)),
@@ -332,7 +333,7 @@ pub fn createDevice(in_settings: *const AkDeviceSettings, in_low_level_hook: ?*I
     return result;
 }
 
-pub fn destroyDevice(in_device_id: common.AkDeviceID) common.WwiseError!void {
+pub fn destroyDevice(in_device_id: typedefs.AkDeviceID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_StreamMgr_DestroyDevice(in_device_id),
     );

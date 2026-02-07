@@ -2,6 +2,7 @@ const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const reflect_game_data = @import("reflect_game_data.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const ReverbEstimation = @import("ReverbEstimation.zig");
 
@@ -50,7 +51,7 @@ pub const AkSpatialAudioID = extern struct {
         return self.id != std.math.maxInt(u64);
     }
 
-    pub fn asGameObjectID(self: AkSpatialAudioID) common.AkGameObjectID {
+    pub fn asGameObjectID(self: AkSpatialAudioID) typedefs.AkGameObjectID {
         return self.id;
     }
 };
@@ -72,11 +73,11 @@ pub const AkRoomID = extern struct {
         return self.id != std.math.maxInt(u64);
     }
 
-    pub fn asGameObjectID(self: AkRoomID) common.AkGameObjectID {
+    pub fn asGameObjectID(self: AkRoomID) typedefs.AkGameObjectID {
         return if (self.isValid()) self.id else OutdoorsGameObjID;
     }
 
-    pub fn fromGameObjectID(game_object_id: common.AkGameObjectID) AkRoomID {
+    pub fn fromGameObjectID(game_object_id: typedefs.AkGameObjectID) AkRoomID {
         return if (game_object_id != OutdoorsGameObjID) AkRoomID{ .id = game_object_id } else AkRoomID{};
     }
 };
@@ -257,7 +258,7 @@ pub const AkPortalParams = extern struct {
 pub const AkRoomParams = extern struct {
     front: common.AkVector = .{ .z = 1.0 },
     up: common.AkVector = .{ .y = 1.0 },
-    reverb_aux_bus: common.AkAuxBusID = common.AK_INVALID_AUX_ID,
+    reverb_aux_bus: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
     reverb_level: f32 = 1.0,
     transmission_loss: f32 = 1.0,
     room_game_obj_aux_send_level_to_self: f32 = 0.0,
@@ -346,30 +347,30 @@ pub fn init(in_init_settings: *const AkSpatialAudioInitSettings) common.WwiseErr
     );
 }
 
-pub fn registerListener(in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+pub fn registerListener(in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_RegisterListener(in_game_object_id),
     );
 }
 
-pub fn unregisterListener(in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+pub fn unregisterListener(in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_UnregisterListener(in_game_object_id),
     );
 }
 
-pub fn setGameObjectRadius(in_game_object_id: common.AkGameObjectID, in_outer_radius: f32, in_inner_radius: f32) common.WwiseError!void {
+pub fn setGameObjectRadius(in_game_object_id: typedefs.AkGameObjectID, in_outer_radius: f32, in_inner_radius: f32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetGameObjectRadius(in_game_object_id, in_outer_radius, in_inner_radius),
     );
 }
 
 pub const SetImageSourceOptionalArgs = struct {
-    aux_bus_id: common.AkAuxBusID = common.AK_INVALID_AUX_ID,
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    aux_bus_id: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
+    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
 };
 
-pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: common.AkImageSourceID, in_info: *const AkImageSourceSettings, in_name: []const u8, optional_args: SetImageSourceOptionalArgs) common.WwiseError!void {
+pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: typedefs.AkImageSourceID, in_info: *const AkImageSourceSettings, in_name: []const u8, optional_args: SetImageSourceOptionalArgs) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
@@ -388,11 +389,11 @@ pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: common.A
 }
 
 pub const RemoveImageSourceOptionalArgs = struct {
-    aux_bus_id: common.AkAuxBusID = common.AK_INVALID_AUX_ID,
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    aux_bus_id: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
+    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
 };
 
-pub fn removeImageSource(in_src_id: common.AkImageSourceID, optional_args: RemoveImageSourceOptionalArgs) common.WwiseError!void {
+pub fn removeImageSource(in_src_id: typedefs.AkImageSourceID, optional_args: RemoveImageSourceOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_RemoveImageSource(
             in_src_id,
@@ -403,8 +404,8 @@ pub fn removeImageSource(in_src_id: common.AkImageSourceID, optional_args: Remov
 }
 
 pub const ClearImageSourcesOptionalArgs = struct {
-    aux_bus_id: common.AkAuxBusID = common.AK_INVALID_AUX_ID,
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    aux_bus_id: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
+    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
 };
 
 pub fn clearImageSources(optional_args: ClearImageSourcesOptionalArgs) common.WwiseError!void {
@@ -447,7 +448,7 @@ pub fn removeGeometryInstance(in_geometry_instance_id: AkGeometryInstanceID) com
 }
 
 pub fn queryReflectionPaths(
-    in_game_object_id: common.AkGameObjectID,
+    in_game_object_id: typedefs.AkGameObjectID,
     in_position_index: u32,
     out_listener_pos: *common.AkVector64,
     out_emitter_pos: *common.AkVector64,
@@ -558,13 +559,13 @@ pub fn removeReverbZone(in_reverb_zone: AkRoomID) common.WwiseError!void {
     );
 }
 
-pub fn setGameObjectInRoom(in_game_object_id: common.AkGameObjectID, in_current_room_id: AkRoomID) common.WwiseError!void {
+pub fn setGameObjectInRoom(in_game_object_id: typedefs.AkGameObjectID, in_current_room_id: AkRoomID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetGameObjectInRoom(in_game_object_id, in_current_room_id.toC()),
     );
 }
 
-pub fn unsetGameObjectInRoom(in_game_object_id: common.AkGameObjectID) common.WwiseError!void {
+pub fn unsetGameObjectInRoom(in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(in_game_object_id),
     );
@@ -589,7 +590,7 @@ pub fn setMaxGlobalReflectionPaths(in_max_global_reflection_paths: u32) common.W
 }
 
 pub const SetMaxDiffractionPathsOptionalArgs = struct {
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
 };
 pub fn setMaxDiffractionPaths(in_max_diffraction_paths: u32, optional_args: SetMaxDiffractionPathsOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
@@ -619,7 +620,7 @@ pub fn setLoadBalancingSpread(in_nb_frames: u32) common.WwiseError!void {
 }
 
 pub const SetSmoothingConstantOptionalArgs = struct {
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
 };
 pub fn setSmoothingConstant(in_smoothing_constant_ms: f32, optional_args: SetSmoothingConstantOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
@@ -630,13 +631,13 @@ pub fn setSmoothingConstant(in_smoothing_constant_ms: f32, optional_args: SetSmo
     );
 }
 
-pub fn setEarlyReflectionsAuxSend(in_game_object_id: common.AkGameObjectID, in_aux_bus_id: common.AkAuxBusID) common.WwiseError!void {
+pub fn setEarlyReflectionsAuxSend(in_game_object_id: typedefs.AkGameObjectID, in_aux_bus_id: typedefs.AkAuxBusID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(in_game_object_id, in_aux_bus_id),
     );
 }
 
-pub fn setEarlyReflectionsVolume(in_game_object_id: common.AkGameObjectID, in_send_volume: f32) common.WwiseError!void {
+pub fn setEarlyReflectionsVolume(in_game_object_id: typedefs.AkGameObjectID, in_send_volume: f32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(in_game_object_id, in_send_volume),
     );
@@ -648,7 +649,7 @@ pub fn setPortalObstructionAndOcclusion(in_portal_id: AkPortalID, obstruction: f
     );
 }
 
-pub fn setGameObjectToPortalObstruction(in_game_object_id: common.AkGameObjectID, in_portal_id: AkPortalID, in_obstruction: f32) common.WwiseError!void {
+pub fn setGameObjectToPortalObstruction(in_game_object_id: typedefs.AkGameObjectID, in_portal_id: AkPortalID, in_obstruction: f32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(in_game_object_id, in_portal_id.toC(), in_obstruction),
     );
@@ -671,7 +672,7 @@ pub fn queryWetDiffraction(in_portal: AkPortalID) common.WwiseError!f32 {
 }
 
 pub fn queryDiffractionPaths(
-    in_game_object_id: common.AkGameObjectID,
+    in_game_object_id: typedefs.AkGameObjectID,
     in_position_index: u32,
     out_listener_pos: *common.AkVector64,
     out_emitter_pos: *common.AkVector64,

@@ -2,6 +2,7 @@ const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const settings = @import("settings.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const AK_MONITOR_STREAMNAME_MAXLENGTH = c.WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH;
 pub const AK_MONITOR_DEVICENAME_MAXLENGTH = c.WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH;
@@ -52,7 +53,7 @@ pub const AkFileSystemFlags = extern struct {
 };
 
 pub const NativeAkStreamInfo = extern struct {
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
     name: ?[*:0]const common.AkOSChar,
     size: u64 = 0,
     is_open: bool = false,
@@ -72,7 +73,7 @@ pub const NativeAkStreamInfo = extern struct {
 };
 
 pub const AkStreamInfo = struct {
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
     name: []const u8,
     size: u64 = 0,
     is_open: bool = false,
@@ -108,7 +109,7 @@ pub const AkAutoStmHeuristics = extern struct {
     loop_start: u64 = 0,
     loop_end: u64 = 0,
     min_num_buffers: u8 = 0,
-    priority: common.AkPriority = 0,
+    priority: typedefs.AkPriority = 0,
 
     pub fn fromC(value: c.WWISEC_AkAutoStmHeuristics) AkAutoStmHeuristics {
         return @bitCast(value);
@@ -142,7 +143,7 @@ pub const AkAutoStmBufSettings = extern struct {
 };
 
 pub const NativeAkDeviceDesc = extern struct {
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
     can_write: bool = false,
     can_read: bool = false,
     device_name: [AK_MONITOR_DEVICENAME_MAXLENGTH]common.AkUtf16 = undefined,
@@ -154,7 +155,7 @@ pub const NativeAkDeviceDesc = extern struct {
 };
 
 pub const AkDeviceDesc = struct {
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
     can_write: bool = false,
     can_read: bool = false,
     device_name: []const u8 = "",
@@ -183,7 +184,7 @@ pub const AkDeviceDesc = struct {
 };
 
 pub const AkDeviceData = extern struct {
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
     mem_size: u32 = 0,
     mem_used: u32 = 0,
     allocs: u32 = 0,
@@ -216,9 +217,9 @@ pub const AkDeviceData = extern struct {
 
 pub const NativeAkStreamRecord = extern struct {
     stream_id: u32 = 0,
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
     stream_name: [AK_MONITOR_STREAMNAME_MAXLENGTH]common.AkUtf16,
-    id_file: common.AkFileID = common.AK_INVALID_FILE_ID,
+    id_file: typedefs.AkFileID = common.AK_INVALID_FILE_ID,
     string_size: u32 = 0,
     file_size: u64 = 0,
     is_auto_stream: bool = false,
@@ -239,9 +240,9 @@ pub const NativeAkStreamRecord = extern struct {
 
 pub const AkStreamRecord = struct {
     stream_id: u32 = 0,
-    device_id: common.AkDeviceID = 0,
+    device_id: typedefs.AkDeviceID = 0,
     stream_name: []const u8,
-    id_file: common.AkFileID = common.AK_INVALID_FILE_ID,
+    id_file: typedefs.AkFileID = common.AK_INVALID_FILE_ID,
     file_size: u64 = 0,
     is_auto_stream: bool = false,
     is_caching_stream: bool = false,
@@ -307,14 +308,14 @@ pub const AkStreamData = extern struct {
 
 pub const NativeAkFileOpenData = extern struct {
     file_name: ?[*:0]const common.AkOSChar align(4) = null,
-    file_id: common.AkFileID align(4) = common.AK_INVALID_FILE_ID,
+    file_id: typedefs.AkFileID align(4) = common.AK_INVALID_FILE_ID,
     flags: ?*AkFileSystemFlags align(4) = null,
     open_mode: AkOpenMode align(4) = .read,
 };
 
 pub const AkFileOpenData = struct {
     file_name: []const u8 = &.{},
-    file_id: common.AkFileID = common.AK_INVALID_FILE_ID,
+    file_id: typedefs.AkFileID = common.AK_INVALID_FILE_ID,
     flags: ?AkFileSystemFlags = null,
     open_mode: AkOpenMode = .read,
 
@@ -487,8 +488,8 @@ pub const IAkStdStream = opaque {
         get_file_descriptor: *const fn (self: *IAkStdStream) callconv(.c) ?*anyopaque,
         set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.c) common.AKRESULT,
         get_block_size: *const fn (self: *IAkStdStream) callconv(.c) u32,
-        read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) common.AKRESULT,
-        write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) common.AKRESULT,
+        read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: typedefs.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) common.AKRESULT,
+        write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: typedefs.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) common.AKRESULT,
         get_position: *const fn (self: *IAkStdStream, out_end_of_stream: *bool) callconv(.c) u64,
         set_position: *const fn (self: *IAkStdStream, in_move_offset: i64, in_move_method: AkMoveMethod) callconv(.c) common.AKRESULT,
         cancel: *const fn (self: *IAkStdStream) callconv(.c) void,
@@ -527,7 +528,7 @@ pub const IAkStdStream = opaque {
         return c.WWISEC_AK_IAkStdStream_GetBlockSize(@ptrCast(self));
     }
 
-    pub fn read(self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
+    pub fn read(self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: typedefs.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkStdStream_Read(
                 @ptrCast(self),
@@ -541,7 +542,7 @@ pub const IAkStdStream = opaque {
         );
     }
 
-    pub fn write(self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: common.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
+    pub fn write(self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: typedefs.AkPriority, in_deadline: f32, out_size: *u32) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkStdStream_Write(
                 @ptrCast(self),
@@ -755,24 +756,24 @@ pub const IAkStreamMgr = opaque {
         ) callconv(.c) common.AKRESULT,
         pin_file_in_cache: *const fn (
             self: *IAkStreamMgr,
-            in_file_id: common.AkFileID,
+            in_file_id: typedefs.AkFileID,
             in_fs_flags: ?*AkFileSystemFlags,
-            in_priority: common.AkPriority,
+            in_priority: typedefs.AkPriority,
         ) callconv(.c) common.AKRESULT,
         unpin_file_in_cache: *const fn (
             self: *IAkStreamMgr,
-            in_file_id: common.AkFileID,
-            in_priority: common.AkPriority,
+            in_file_id: typedefs.AkFileID,
+            in_priority: typedefs.AkPriority,
         ) callconv(.c) common.AKRESULT,
         update_caching_priority: *const fn (
             self: *IAkStreamMgr,
-            in_file_id: common.AkFileID,
-            in_priority: common.AkPriority,
-            in_old_priority: common.AkPriority,
+            in_file_id: typedefs.AkFileID,
+            in_priority: typedefs.AkPriority,
+            in_old_priority: typedefs.AkPriority,
         ) callconv(.c) common.AKRESULT,
         get_buffer_status_for_pinned_file: *const fn (
             self: *IAkStreamMgr,
-            in_file_id: common.AkFileID,
+            in_file_id: typedefs.AkFileID,
             out_percent_buffered: *f32,
             out_cache_full: *bool,
         ) callconv(.c) common.AKRESULT,
@@ -887,9 +888,9 @@ pub const IAkStreamMgr = opaque {
 
     pub fn pinFileInCache(
         self: *IAkStreamMgr,
-        in_file_id: common.AkFileID,
+        in_file_id: typedefs.AkFileID,
         in_fs_flags: ?*AkFileSystemFlags,
-        in_priority: common.AkPriority,
+        in_priority: typedefs.AkPriority,
     ) common.WwiseError!void {
         return common.handleAkResult(c.WWISEC_AK_IAkStreamMgr_PinFileInCache(
             @ptrCast(self),
@@ -901,8 +902,8 @@ pub const IAkStreamMgr = opaque {
 
     pub fn unpinFileInCache(
         self: *IAkStreamMgr,
-        in_file_id: common.AkFileID,
-        in_priority: common.AkPriority,
+        in_file_id: typedefs.AkFileID,
+        in_priority: typedefs.AkPriority,
     ) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkStreamMgr_UnpinFileInCache(
@@ -915,9 +916,9 @@ pub const IAkStreamMgr = opaque {
 
     pub fn updateCachingPriority(
         self: *IAkStreamMgr,
-        in_file_id: common.AkFileID,
-        in_priority: common.AkPriority,
-        in_old_priority: common.AkPriority,
+        in_file_id: typedefs.AkFileID,
+        in_priority: typedefs.AkPriority,
+        in_old_priority: typedefs.AkPriority,
     ) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(
@@ -931,7 +932,7 @@ pub const IAkStreamMgr = opaque {
 
     pub fn getBufferStatusForPinnedFile(
         self: *IAkStreamMgr,
-        in_file_id: common.AkFileID,
+        in_file_id: typedefs.AkFileID,
         out_percent_buffered: *f32,
         out_cache_full: *bool,
     ) common.WwiseError!void {

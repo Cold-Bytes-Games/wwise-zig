@@ -11,6 +11,7 @@ const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const virtual_acoustics = @import("virtual_acoustics.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const AkCreatePluginCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPlugin;
 pub const AkCreateParamCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPluginParam;
@@ -137,16 +138,16 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub const SetRtpcValueOptionalArgs = struct {
-        game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-        value_change_duration: common.AkTimeMs = 0,
+        game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+        value_change_duration: typedefs.AkTimeMs = 0,
         fade_curve: common.AkCurveInterpolation = .linear,
         bypass_internal_value_interpolation: bool = false,
     };
 
     pub fn setRTPCValue(
         self: *IAkGlobalPluginContext,
-        in_rtpcID: common.AkRtpcID,
-        in_value: common.AkRtpcValue,
+        in_rtpcID: typedefs.AkRtpcID,
+        in_value: typedefs.AkRtpcValue,
         optional_args: SetRtpcValueOptionalArgs,
     ) common.WwiseError!void {
         return common.handleAkResult(
@@ -164,8 +165,8 @@ pub const IAkGlobalPluginContext = opaque {
 
     pub fn sendPluginCustomGameData(
         self: *IAkGlobalPluginContext,
-        in_bus_id: common.AkUniqueID,
-        in_bus_object_id: common.AkGameObjectID,
+        in_bus_id: typedefs.AkUniqueID,
+        in_bus_object_id: typedefs.AkGameObjectID,
         in_type: common.AkPluginType,
         in_company_id: u32,
         in_plugin_id: u32,
@@ -219,7 +220,7 @@ pub const IAkGlobalPluginContext = opaque {
         );
     }
 
-    pub fn getAcousticTexture(self: *IAkGlobalPluginContext, in_acoustic_texture_id: common.AkAcousticTextureID) ?*const virtual_acoustics.AkAcousticTexture {
+    pub fn getAcousticTexture(self: *IAkGlobalPluginContext, in_acoustic_texture_id: typedefs.AkAcousticTextureID) ?*const virtual_acoustics.AkAcousticTexture {
         return @ptrCast(
             c.WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(@ptrCast(self), in_acoustic_texture_id),
         );
@@ -279,15 +280,15 @@ pub const IAkGlobalPluginContext = opaque {
         cookie: ?*anyopaque = null,
         allocator: ?std.mem.Allocator = null,
         external_sources: ?[]const common.AkExternalSourceInfo = null,
-        playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+        playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
     };
 
     pub fn postEventSync(
         self: *IAkGlobalPluginContext,
-        in_event_id: common.AkUniqueID,
-        in_game_object_id: common.AkGameObjectID,
+        in_event_id: typedefs.AkUniqueID,
+        in_game_object_id: typedefs.AkGameObjectID,
         optional_args: PostEventSyncOptionalArgs,
-    ) !common.AkPlayingID {
+    ) !typedefs.AkPlayingID {
         var num_external_sources: u32 = 0;
 
         var area_allocator_opt: ?std.heap.ArenaAllocator = null;
@@ -346,7 +347,7 @@ pub const IAkGlobalPluginContext = opaque {
         flags: callback_types.AkCallbackType = .{},
         callback: callback_types.AkCallbackFunc = null,
         cookie: ?*anyopaque = null,
-        playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+        playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
     };
 
     // NOTE: mlarouche: Workaround for translate-c that does not put the proper alignment on AkMIDIPost
@@ -354,11 +355,11 @@ pub const IAkGlobalPluginContext = opaque {
 
     pub fn postMIDIOnEventSync(
         self: *IAkGlobalPluginContext,
-        in_event_id: common.AkUniqueID,
-        in_game_object_id: common.AkGameObjectID,
+        in_event_id: typedefs.AkUniqueID,
+        in_game_object_id: typedefs.AkGameObjectID,
         in_midi_posts: []const midi_types.AkMIDIPost,
         optional_args: PostMIDIOnEventSyncOptionalArgs,
-    ) common.AkPlayingID {
+    ) typedefs.AkPlayingID {
         return WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(
             @ptrCast(self),
             in_event_id,
@@ -374,9 +375,9 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub const StopMIDIOnEventSync = struct {
-        event_id: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
-        game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-        playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+        event_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+        game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+        playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
     };
 
     pub fn stopMIDIOnEventSync(self: *IAkGlobalPluginContext, optional_args: StopMIDIOnEventSync) common.WwiseError!void {

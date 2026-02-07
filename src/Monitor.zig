@@ -4,11 +4,12 @@ const common = @import("common.zig");
 const error_message_translator = @import("error_message_translator.zig");
 const StreamMgr = @import("StreamMgr.zig");
 const builtin = @import("builtin");
+const typedefs = @import("typedefs.zig");
 
 pub const MsgContext = extern struct {
-    in_playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
-    in_game_obj_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-    in_sound_id: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    in_playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    in_game_obj_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    in_sound_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
     in_is_bus: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_AK_Monitor_MsgContext) MsgContext {
@@ -266,12 +267,12 @@ pub const ErrorCode = enum(common.DefaultEnumType) {
     io_device = c.WWISEC_AK_Monitor_ErrorCode_IODevice,
 };
 
-pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const common.AkOSChar, in_error_level: ErrorLevel, in_playing_id: common.AkPlayingID, in_game_object_id: common.AkGameObjectID) callconv(.c) void;
+pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const common.AkOSChar, in_error_level: ErrorLevel, in_playing_id: typedefs.AkPlayingID, in_game_object_id: typedefs.AkGameObjectID) callconv(.c) void;
 
 pub const PostCodeOptionalArgs = struct {
-    playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
-    game_obj_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-    audio_node_id: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    game_obj_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    audio_node_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
     is_bus: bool = false,
 };
 
@@ -289,9 +290,9 @@ pub fn postCode(in_error: ErrorCode, in_error_level: ErrorLevel, optional_args: 
 }
 
 pub const PostStringOptionalArgs = struct {
-    playing_id: common.AkPlayingID = common.AK_INVALID_PLAYING_ID,
-    game_obj_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-    audio_node_id: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    game_obj_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    audio_node_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
     is_bus: bool = false,
 };
 
@@ -347,7 +348,7 @@ pub fn resetTranslator() common.WwiseError!void {
     );
 }
 
-pub fn getTimeStamp() common.AkTimeMs {
+pub fn getTimeStamp() typedefs.AkTimeMs {
     return c.WWISEC_AK_Monitor_GetTimeStamp();
 }
 
@@ -355,11 +356,11 @@ pub fn monitorStreamMgrInit(in_stream_mgr_settings: *const StreamMgr.AkStreamMgr
     c.WWISEC_AK_Monitor_MonitorStreamMgrInit(@ptrCast(in_stream_mgr_settings));
 }
 
-pub fn monitorStreamingDeviceInit(in_device_id: common.AkDeviceID, in_device_settings: *const StreamMgr.AkDeviceSettings) void {
+pub fn monitorStreamingDeviceInit(in_device_id: typedefs.AkDeviceID, in_device_settings: *const StreamMgr.AkDeviceSettings) void {
     c.WWISEC_AK_Monitor_MonitorStreamingDeviceInit(in_device_id, @ptrCast(in_device_settings));
 }
 
-pub fn monitorStreamingDeviceDestroyed(in_device_id: common.AkDeviceID) void {
+pub fn monitorStreamingDeviceDestroyed(in_device_id: typedefs.AkDeviceID) void {
     c.WWISEC_AK_Monitor_MonitorStreamingDeviceDestroyed(in_device_id);
 }
 
@@ -379,13 +380,13 @@ pub inline fn akMonitorStreamMgrInit(in_stream_mgr_settings: *const StreamMgr.Ak
     }
 }
 
-pub inline fn akMonitorStreamingDeviceInit(in_device_id: common.AkDeviceID, in_device_settings: *const StreamMgr.AkDeviceSettings) void {
+pub inline fn akMonitorStreamingDeviceInit(in_device_id: typedefs.AkDeviceID, in_device_settings: *const StreamMgr.AkDeviceSettings) void {
     if (builtin.mode == .debug) {
         monitorStreamingDeviceInit(in_device_id, in_device_settings);
     }
 }
 
-pub inline fn akMonitorStreamingDeviceDestroyed(in_device_id: common.AkDeviceID) void {
+pub inline fn akMonitorStreamingDeviceDestroyed(in_device_id: typedefs.AkDeviceID) void {
     if (builtin.mode == .debug) {
         monitorStreamingDeviceDestroyed(in_device_id);
     }

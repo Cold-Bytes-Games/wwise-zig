@@ -3,6 +3,7 @@ const c = @import("wwise_c");
 const common = @import("common.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const speaker_config = @import("speaker_config.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const AkPositioningInfo = extern struct {
     center_pct: f32 = 0,
@@ -15,14 +16,14 @@ pub const AkPositioningInfo = extern struct {
     inner_angle: f32 = 0.0,
     outer_angle: f32 = 0.0,
     cone_max_attenuation: f32 = 0.0,
-    lpf_cone: common.AkLPFType = 0,
-    hpf_cone: common.AkLPFType = 0,
+    lpf_cone: typedefs.AkLPFType = 0,
+    hpf_cone: typedefs.AkLPFType = 0,
     max_distance: f32 = 0.0,
     vol_dry_at_max_dist: f32 = 0.0,
     vol_aux_game_def_at_max_dist: f32 = 0.0,
     vol_aux_user_def_at_max_dist: f32 = 0.0,
-    lpf_value_at_max_dist: common.AkLPFType = 0.0,
-    hpf_value_at_max_dist: common.AkLPFType = 0.0,
+    lpf_value_at_max_dist: typedefs.AkLPFType = 0.0,
+    hpf_value_at_max_dist: typedefs.AkLPFType = 0.0,
 
     pub inline fn fromC(value: c.WWISEC_AkPositioningInfo) AkPositioningInfo {
         return @bitCast(value);
@@ -38,8 +39,8 @@ pub const AkPositioningInfo = extern struct {
 };
 
 pub const AkObjectInfo = extern struct {
-    obj_id: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
-    parent_id: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    obj_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    parent_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
     depth: i32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkObjectInfo) AkObjectInfo {
@@ -55,7 +56,7 @@ pub const AkObjectInfo = extern struct {
     }
 };
 
-pub fn getPosition(in_game_object_id: common.AkGameObjectID) common.WwiseError!common.AkSoundPosition {
+pub fn getPosition(in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!common.AkSoundPosition {
     var result: common.AkSoundPosition = .{};
 
     try common.handleAkResult(
@@ -68,7 +69,7 @@ pub fn getPosition(in_game_object_id: common.AkGameObjectID) common.WwiseError!c
     return result;
 }
 
-pub fn getListeners(in_game_object_id: common.AkGameObjectID, out_listener_object_ids: [*]common.AkGameObjectID, oi_num_listeners: *u32) common.WwiseError!void {
+pub fn getListeners(in_game_object_id: typedefs.AkGameObjectID, out_listener_object_ids: [*]typedefs.AkGameObjectID, oi_num_listeners: *u32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetListeners(
             in_game_object_id,
@@ -78,7 +79,7 @@ pub fn getListeners(in_game_object_id: common.AkGameObjectID, out_listener_objec
     );
 }
 
-pub fn getListenerPosition(in_listener_id: common.AkGameObjectID) common.WwiseError!common.AkListenerPosition {
+pub fn getListenerPosition(in_listener_id: typedefs.AkGameObjectID) common.WwiseError!common.AkListenerPosition {
     var result: common.AkListenerPosition = .{};
 
     try common.handleAkResult(
@@ -91,7 +92,7 @@ pub fn getListenerPosition(in_listener_id: common.AkGameObjectID) common.WwiseEr
     return result;
 }
 
-pub fn getListenerSpatialization(in_listener_id: common.AkGameObjectID, out_spatialized: *bool, out_volume_offsets: *[*]SpeakerVolumes.VectorPtr, out_channel_config: *speaker_config.AkChannelConfig) common.WwiseError!void {
+pub fn getListenerSpatialization(in_listener_id: typedefs.AkGameObjectID, out_spatialized: *bool, out_volume_offsets: *[*]SpeakerVolumes.VectorPtr, out_channel_config: *speaker_config.AkChannelConfig) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(
             in_listener_id,
@@ -110,7 +111,7 @@ pub const RTPCValue_type = enum(common.DefaultEnumType) {
     unavailable = c.WWISEC_AK_SoundEngine_Query_RTPCValue_type_RTPCValue_Unavailable,
 };
 
-pub fn getRTPCValueID(in_rtpc_id: common.AkRtpcID, in_game_object_id: common.AkGameObjectID, in_playing_id: common.AkPlayingID, out_value: *common.AkRtpcValue, io_value_type: *RTPCValue_type) common.WwiseError!void {
+pub fn getRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, in_game_object_id: typedefs.AkGameObjectID, in_playing_id: typedefs.AkPlayingID, out_value: *typedefs.AkRtpcValue, io_value_type: *RTPCValue_type) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(
             in_rtpc_id,
@@ -122,7 +123,7 @@ pub fn getRTPCValueID(in_rtpc_id: common.AkRtpcID, in_game_object_id: common.AkG
     );
 }
 
-pub fn getRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_game_object_id: common.AkGameObjectID, in_playing_id: common.AkPlayingID, out_value: *common.AkRtpcValue, io_value_type: *RTPCValue_type) common.WwiseError!void {
+pub fn getRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_game_object_id: typedefs.AkGameObjectID, in_playing_id: typedefs.AkPlayingID, out_value: *typedefs.AkRtpcValue, io_value_type: *RTPCValue_type) common.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
@@ -140,8 +141,8 @@ pub fn getRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: [
     );
 }
 
-pub fn getSwitchID(in_switch_group: common.AkSwitchGroupID, in_game_object_id: common.AkGameObjectID) common.WwiseError!common.AkSwitchStateID {
-    var result: common.AkSwitchStateID = 0;
+pub fn getSwitchID(in_switch_group: typedefs.AkSwitchGroupID, in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!typedefs.AkSwitchStateID {
+    var result: typedefs.AkSwitchStateID = 0;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetSwitch_ID(
@@ -154,14 +155,14 @@ pub fn getSwitchID(in_switch_group: common.AkSwitchGroupID, in_game_object_id: c
     return result;
 }
 
-pub fn getSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group_name: []const u8, in_game_object_id: common.AkGameObjectID) common.WwiseError!common.AkSwitchStateID {
+pub fn getSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group_name: []const u8, in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!typedefs.AkSwitchStateID {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
     const raw_switch_group_name = common.toCString(allocator, in_switch_group_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_switch_group_name);
 
-    var result: common.AkSwitchStateID = 0;
+    var result: typedefs.AkSwitchStateID = 0;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetSwitch_String(
@@ -174,8 +175,8 @@ pub fn getSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group_na
     return result;
 }
 
-pub fn getStateID(in_state_group: common.AkStateGroupID) common.WwiseError!common.AkStateID {
-    var result: common.AkStateID = 0;
+pub fn getStateID(in_state_group: typedefs.AkStateGroupID) common.WwiseError!typedefs.AkStateID {
+    var result: typedefs.AkStateID = 0;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetState_ID(
@@ -187,14 +188,14 @@ pub fn getStateID(in_state_group: common.AkStateGroupID) common.WwiseError!commo
     return result;
 }
 
-pub fn getStateString(fallback_allocator: std.mem.Allocator, in_state_group_name: []const u8) common.WwiseError!common.AkStateID {
+pub fn getStateString(fallback_allocator: std.mem.Allocator, in_state_group_name: []const u8) common.WwiseError!typedefs.AkStateID {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
     const raw_state_group_name = common.toCString(allocator, in_state_group_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_state_group_name);
 
-    var result: common.AkStateID = 0;
+    var result: typedefs.AkStateID = 0;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetState_String(
@@ -206,7 +207,7 @@ pub fn getStateString(fallback_allocator: std.mem.Allocator, in_state_group_name
     return result;
 }
 
-pub fn getGameObjectAuxSendValues(in_game_object_id: common.AkGameObjectID, out_aux_send_values: ?[*]common.AkAuxSendValue, io_num_send_values: *u32) common.WwiseError!void {
+pub fn getGameObjectAuxSendValues(in_game_object_id: typedefs.AkGameObjectID, out_aux_send_values: ?[*]common.AkAuxSendValue, io_num_send_values: *u32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(
             in_game_object_id,
@@ -216,7 +217,7 @@ pub fn getGameObjectAuxSendValues(in_game_object_id: common.AkGameObjectID, out_
     );
 }
 
-pub fn getGameObjectDryLevelValue(in_emitter_id: common.AkGameObjectID, in_listener_id: common.AkGameObjectID) common.WwiseError!f32 {
+pub fn getGameObjectDryLevelValue(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID) common.WwiseError!f32 {
     var result: f32 = 0.0;
 
     try common.handleAkResult(
@@ -230,7 +231,7 @@ pub fn getGameObjectDryLevelValue(in_emitter_id: common.AkGameObjectID, in_liste
     return result;
 }
 
-pub fn getObjectObstructionAndOcclusion(in_emitter_id: common.AkGameObjectID, in_listener_id: common.AkGameObjectID, out_obstruction_level: *f32, out_occlusion_level: *f32) common.WwiseError!void {
+pub fn getObjectObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID, out_obstruction_level: *f32, out_occlusion_level: *f32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetObjectObstructionAndOcclusion(
             in_emitter_id,
@@ -241,7 +242,7 @@ pub fn getObjectObstructionAndOcclusion(in_emitter_id: common.AkGameObjectID, in
     );
 }
 
-pub fn queryAudioObjectIDsID(in_event_id: common.AkUniqueID, io_num_items: *u32, out_object_infos: ?[*]AkObjectInfo) common.WwiseError!void {
+pub fn queryAudioObjectIDsID(in_event_id: typedefs.AkUniqueID, io_num_items: *u32, out_object_infos: ?[*]AkObjectInfo) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_ID(
             in_event_id,
@@ -267,7 +268,7 @@ pub fn queryAudioObjectIDsString(fallback_allocator: std.mem.Allocator, in_event
     );
 }
 
-pub fn getPositioningInfo(in_object_id: common.AkUniqueID, out_positioning_info: *AkPositioningInfo) common.WwiseError!void {
+pub fn getPositioningInfo(in_object_id: typedefs.AkUniqueID, out_positioning_info: *AkPositioningInfo) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetPositioningInfo(
             in_object_id,
@@ -277,7 +278,7 @@ pub fn getPositioningInfo(in_object_id: common.AkUniqueID, out_positioning_info:
 }
 
 pub const AkGameObjectsList = extern struct {
-    items: ?[*]common.AkGameObjectID = null,
+    items: ?[*]typedefs.AkGameObjectID = null,
     length: u32 = 0,
     reserved: u32 = 0,
 
@@ -300,12 +301,12 @@ pub fn getActiveGameObjects(io_game_object_list: *AkGameObjectsList) common.Wwis
     );
 }
 
-pub fn WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(in_game_object_id: common.AkGameObjectID) bool {
+pub fn WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(in_game_object_id: typedefs.AkGameObjectID) bool {
     return c.WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(in_game_object_id);
 }
 
 pub const GameObjDst = extern struct {
-    game_object_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
     distance: f32 = -1.0,
 
     pub inline fn fromC(value: c.WWISEC_AK_SoundEngine_Query_GameObjDst) GameObjDst {
@@ -345,19 +346,19 @@ pub fn getMaxRadiusList(io_radius_list: *AkRadiusList) common.WwiseError!void {
     );
 }
 
-pub fn getMaxRadiusSingle(in_game_object_id: common.AkGameObjectID) f32 {
+pub fn getMaxRadiusSingle(in_game_object_id: typedefs.AkGameObjectID) f32 {
     return c.WWISEC_AK_SoundEngine_Query_GetMaxRadius_Single(in_game_object_id);
 }
 
-pub fn getEventIDFromPlayingID(in_playing_id: common.AkPlayingID) common.AkUniqueID {
+pub fn getEventIDFromPlayingID(in_playing_id: typedefs.AkPlayingID) typedefs.AkUniqueID {
     return c.WWISEC_AK_SoundEngine_Query_GetEventIDFromPlayingID(in_playing_id);
 }
 
-pub fn getGameObjectFromPlayingID(in_playing_id: common.AkPlayingID) common.AkGameObjectID {
+pub fn getGameObjectFromPlayingID(in_playing_id: typedefs.AkPlayingID) typedefs.AkGameObjectID {
     return c.WWISEC_AK_SoundEngine_Query_GetGameObjectFromPlayingID(in_playing_id);
 }
 
-pub fn getPlayingIDsFromGameObject(in_game_object_id: common.AkGameObjectID, io_num_ids: *u32, out_playing_ids: ?[*]common.AkPlayingID) common.WwiseError!void {
+pub fn getPlayingIDsFromGameObject(in_game_object_id: typedefs.AkGameObjectID, io_num_ids: *u32, out_playing_ids: ?[*]typedefs.AkPlayingID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetPlayingIDsFromGameObject(
             in_game_object_id,
@@ -367,7 +368,7 @@ pub fn getPlayingIDsFromGameObject(in_game_object_id: common.AkGameObjectID, io_
     );
 }
 
-pub fn getCustomPropertyValueInt(in_object_id: common.AkUniqueID, in_prop_id: u32) common.WwiseError!i32 {
+pub fn getCustomPropertyValueInt(in_object_id: typedefs.AkUniqueID, in_prop_id: u32) common.WwiseError!i32 {
     var out_value: i32 = 0;
 
     try common.handleAkResult(
@@ -381,7 +382,7 @@ pub fn getCustomPropertyValueInt(in_object_id: common.AkUniqueID, in_prop_id: u3
     return out_value;
 }
 
-pub fn getCustomPropertyValueFloat(in_object_id: common.AkUniqueID, in_prop_id: u32) common.WwiseError!f32 {
+pub fn getCustomPropertyValueFloat(in_object_id: typedefs.AkUniqueID, in_prop_id: u32) common.WwiseError!f32 {
     var out_value: f32 = 0.0;
 
     try common.handleAkResult(

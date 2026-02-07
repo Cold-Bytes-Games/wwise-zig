@@ -1,11 +1,12 @@
-const std = @import("std");
 const builtin = @import("builtin");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const speaker_config = @import("speaker_config.zig");
+const std = @import("std");
+const typedefs = @import("typedefs.zig");
 const wwise_options = @import("wwise_options");
 
-pub const AkJobWorkerFunc = ?*const fn (in_job_type: common.AkJobType, in_execution_time_usec: u32) callconv(.c) void;
+pub const AkJobWorkerFunc = ?*const fn (in_job_type: typedefs.AkJobType, in_execution_time_usec: u32) callconv(.c) void;
 
 pub const AkJobMgrSettings = extern struct {
     fn_request_job_worker: FuncRequestJobWorker = null,
@@ -30,13 +31,13 @@ pub const AkJobMgrSettings = extern struct {
 };
 
 pub const AkOutputSettings = extern struct {
-    audio_device_shareset: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    audio_device_shareset: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
     id_device: u32 = 0,
     panning_rule: common.AkPanningRule = .speakers,
     channel_config: speaker_config.AkChannelConfig = .{},
 
     pub const InitOptionalArgs = struct {
-        id_device: common.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+        id_device: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
         channel_config: speaker_config.AkChannelConfig = .{},
         panning: common.AkPanningRule = .speakers,
     };
@@ -78,9 +79,9 @@ pub const AkFloorPlane = enum(common.DefaultEnumType) {
 
 pub const AkAssertHook = ?*const fn (in_expression: ?[*:0]const u8, in_filename: ?[*:0]const u8, in_line_number: i32) callconv(.c) void;
 pub const AkBackgroundMusicChangeCallbackFunc = ?*const fn (in_background_music_muted: bool, in_cookie: ?*anyopaque) callconv(.c) common.AKRESULT;
-pub const AkProfilerPushTimerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_zone_name: ?[*:0]const u8) callconv(.c) void;
+pub const AkProfilerPushTimerFunc = ?*const fn (in_plugin_id: typedefs.AkPluginID, in_zone_name: ?[*:0]const u8) callconv(.c) void;
 pub const AkProfilerPopTimerFunc = ?*const fn () callconv(.c) void;
-pub const AkProfilerPostMarkerFunc = ?*const fn (in_plugin_id: common.AkPluginID, in_marker_name: ?[*:0]const u8) callconv(.c) void;
+pub const AkProfilerPostMarkerFunc = ?*const fn (in_plugin_id: typedefs.AkPluginID, in_marker_name: ?[*:0]const u8) callconv(.c) void;
 
 pub const AkInitSettings = struct {
     pfn_assert_hook: AkAssertHook = null,

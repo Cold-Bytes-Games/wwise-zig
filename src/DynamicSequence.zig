@@ -1,13 +1,14 @@
 const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
-const callbacks = @import("callbacks.zig");
+const callback_types = @import("callback_types.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const AkExternalSourceArray = ?*anyopaque;
 
 pub const PlaylistItem = extern struct {
-    audio_node_id: common.AkUniqueID = 0,
-    ms_delay: common.AkTimeMs = 0,
+    audio_node_id: typedefs.AkUniqueID = 0,
+    ms_delay: typedefs.AkTimeMs = 0,
     custom_info: ?*anyopaque = null,
     external_srcs: AkExternalSourceArray = null,
 
@@ -36,12 +37,12 @@ pub const PlaylistItem = extern struct {
 
 pub const Playlist = opaque {
     pub const EnqueueOptionalArgs = struct {
-        ms_delay: common.AkTimeMs = 0,
+        ms_delay: typedefs.AkTimeMs = 0,
         custom_info: ?*anyopaque = null,
         external_sources: []const common.AkExternalSourceInfo = &.{},
     };
 
-    pub fn enqueue(self: *Playlist, in_audio_node_id: common.AkUniqueID, optional_args: EnqueueOptionalArgs) common.WwiseError!void {
+    pub fn enqueue(self: *Playlist, in_audio_node_id: typedefs.AkUniqueID, optional_args: EnqueueOptionalArgs) common.WwiseError!void {
         return common.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(
                 @ptrCast(self),
@@ -200,13 +201,13 @@ pub const DynamicSequenceType = enum(common.DefaultEnumType) {
 };
 
 pub const OpenOptionalArgs = struct {
-    flags: callbacks.AkCallbackType = .{},
-    callback: callbacks.AkCallbackFunc = null,
+    flags: callback_types.AkCallbackType = .{},
+    callback: callback_types.AkCallbackFunc = null,
     cookie: ?*anyopaque = null,
     dynamic_sequence_type: DynamicSequenceType = .sample_accurate,
 };
 
-pub fn open(in_game_object_id: common.AkGameObjectID, optional_args: OpenOptionalArgs) common.AkPlayingID {
+pub fn open(in_game_object_id: typedefs.AkGameObjectID, optional_args: OpenOptionalArgs) typedefs.AkPlayingID {
     return c.WWISEC_AK_SoundEngine_DynamicSequence_Open(
         in_game_object_id,
         @intCast(optional_args.flags.toC()),
@@ -216,18 +217,18 @@ pub fn open(in_game_object_id: common.AkGameObjectID, optional_args: OpenOptiona
     );
 }
 
-pub fn close(in_playing_id: common.AkPlayingID) common.WwiseError!void {
+pub fn close(in_playing_id: typedefs.AkPlayingID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Close(in_playing_id),
     );
 }
 
 pub const PlayOptionalArgs = struct {
-    transition_duration: common.AkTimeMs = 0,
+    transition_duration: typedefs.AkTimeMs = 0,
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn play(in_playing_id: common.AkPlayingID, optional_args: PlayOptionalArgs) common.WwiseError!void {
+pub fn play(in_playing_id: typedefs.AkPlayingID, optional_args: PlayOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Play(
             in_playing_id,
@@ -238,11 +239,11 @@ pub fn play(in_playing_id: common.AkPlayingID, optional_args: PlayOptionalArgs) 
 }
 
 pub const PauseOptionalArgs = struct {
-    transition_duration: common.AkTimeMs = 0,
+    transition_duration: typedefs.AkTimeMs = 0,
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn pause(in_playing_id: common.AkPlayingID, optional_args: PauseOptionalArgs) common.WwiseError!void {
+pub fn pause(in_playing_id: typedefs.AkPlayingID, optional_args: PauseOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Pause(
             in_playing_id,
@@ -253,11 +254,11 @@ pub fn pause(in_playing_id: common.AkPlayingID, optional_args: PauseOptionalArgs
 }
 
 pub const ResumeOptionalArgs = struct {
-    transition_duration: common.AkTimeMs = 0,
+    transition_duration: typedefs.AkTimeMs = 0,
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn @"resume"(in_playing_id: common.AkPlayingID, optional_args: ResumeOptionalArgs) common.WwiseError!void {
+pub fn @"resume"(in_playing_id: typedefs.AkPlayingID, optional_args: ResumeOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Resume(
             in_playing_id,
@@ -268,11 +269,11 @@ pub fn @"resume"(in_playing_id: common.AkPlayingID, optional_args: ResumeOptiona
 }
 
 pub const StopOptionalArgs = struct {
-    transition_duration: common.AkTimeMs = 0,
+    transition_duration: typedefs.AkTimeMs = 0,
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn stop(in_playing_id: common.AkPlayingID, optional_args: StopOptionalArgs) common.WwiseError!void {
+pub fn stop(in_playing_id: typedefs.AkPlayingID, optional_args: StopOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Stop(
             in_playing_id,
@@ -282,41 +283,41 @@ pub fn stop(in_playing_id: common.AkPlayingID, optional_args: StopOptionalArgs) 
     );
 }
 
-pub fn @"break"(in_playing_id: common.AkPlayingID) common.WwiseError!void {
+pub fn @"break"(in_playing_id: typedefs.AkPlayingID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Break(in_playing_id),
     );
 }
 
-pub fn seekTime(in_playing_id: common.AkPlayingID, in_position: common.AkTimeMs, in_seek_to_nearest_marker: bool) common.WwiseError!void {
+pub fn seekTime(in_playing_id: typedefs.AkPlayingID, in_position: typedefs.AkTimeMs, in_seek_to_nearest_marker: bool) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Seek_Time(in_playing_id, in_position, in_seek_to_nearest_marker),
     );
 }
 
-pub fn seekPercent(in_playing_id: common.AkPlayingID, in_percent: f32, in_seek_to_nearest_marker: bool) common.WwiseError!void {
+pub fn seekPercent(in_playing_id: typedefs.AkPlayingID, in_percent: f32, in_seek_to_nearest_marker: bool) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Seek_Percent(in_playing_id, in_percent, in_seek_to_nearest_marker),
     );
 }
 
-pub fn getPauseTimes(in_playing_id: common.AkPlayingID, out_time: *u32, out_duration: *u32) common.WwiseError!void {
+pub fn getPauseTimes(in_playing_id: typedefs.AkPlayingID, out_time: *u32, out_duration: *u32) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_GetPauseTimes(in_playing_id, out_time, out_duration),
     );
 }
 
-pub fn getPlayingItem(in_playing_id: common.AkPlayingID, out_audio_node_id: *common.AkUniqueID, out_custom_info: *?*anyopaque) common.WwiseError!void {
+pub fn getPlayingItem(in_playing_id: typedefs.AkPlayingID, out_audio_node_id: *typedefs.AkUniqueID, out_custom_info: *?*anyopaque) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_GetPlayingItem(in_playing_id, out_audio_node_id, out_custom_info),
     );
 }
 
-pub fn lockPlaylist(in_playing_id: common.AkPlayingID) ?*Playlist {
+pub fn lockPlaylist(in_playing_id: typedefs.AkPlayingID) ?*Playlist {
     return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(in_playing_id));
 }
 
-pub fn unlockPlaylist(in_playing_id: common.AkPlayingID) common.WwiseError!void {
+pub fn unlockPlaylist(in_playing_id: typedefs.AkPlayingID) common.WwiseError!void {
     return common.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(in_playing_id),
     );

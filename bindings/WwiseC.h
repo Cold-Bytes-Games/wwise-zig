@@ -1,4 +1,4 @@
-// wwise-c headers are manually copied and edited code from Wwise SDK so I put the original license here
+/* wwise-c headers are manually copied and edited code from Wwise SDK so I put the original license here */
 /*******************************************************************************
 The content of this file includes portions of the AUDIOKINETIC Wwise Technology
 released in source code form as part of the SDK installer package.
@@ -39,89 +39,50 @@ extern "C"
 #include <AK/AkPlatforms.h>
 #include <AK/SoundEngine/Common/AkSoundEngineExport.h>
 
-    // BEGIN AkTypedefs
-    typedef void* WWISEC_AkExternalSourceArray;
+// BEGIN AkTypedefs
+#include <AK/SoundEngine/Common/AkTypedefs.h>
     // END AkTypedefs
 
     // BEGIN AkTypes
-    typedef AkUInt32 WWISEC_AkUniqueID;          ///< Unique 32-bit ID
-    typedef AkUInt32 WWISEC_AkStateID;           ///< State ID
-    typedef AkUInt32 WWISEC_AkStateGroupID;      ///< State group ID
-    typedef AkUInt32 WWISEC_AkPlayingID;         ///< Playing ID
-    typedef AkInt32 WWISEC_AkTimeMs;             ///< Time in ms
-    typedef AkUInt16 WWISEC_AkPortNumber;        ///< Port number
-    typedef AkReal32 WWISEC_AkPitchValue;        ///< Pitch value
-    typedef AkReal32 WWISEC_AkVolumeValue;       ///< Volume value( also apply to LFE )
-    typedef AkUInt64 WWISEC_AkGameObjectID;      ///< Game object ID
-    typedef AkReal32 WWISEC_AkLPFType;           ///< Low-pass filter type
-    typedef AkInt32 WWISEC_AkMemPoolId;          ///< Memory pool ID
-    typedef AkUInt32 WWISEC_AkPluginID;          ///< Source or effect plug-in ID
-    typedef AkUInt32 WWISEC_AkCodecID;           ///< Codec plug-in ID
-    typedef AkUInt32 WWISEC_AkAuxBusID;          ///< Auxilliary bus ID
-    typedef AkInt16 WWISEC_AkPluginParamID;      ///< Source or effect plug-in parameter ID
-    typedef AkInt8 WWISEC_AkPriority;            ///< Priority
-    typedef AkUInt16 WWISEC_AkDataCompID;        ///< Data compression format ID
-    typedef AkUInt16 WWISEC_AkDataTypeID;        ///< Data sample type ID
-    typedef AkUInt8 WWISEC_AkDataInterleaveID;   ///< Data interleaved state ID
-    typedef AkUInt32 WWISEC_AkSwitchGroupID;     ///< Switch group ID
-    typedef AkUInt32 WWISEC_AkSwitchStateID;     ///< Switch ID
-    typedef AkUInt32 WWISEC_AkRtpcID;            ///< Real time parameter control ID
-    typedef AkReal32 WWISEC_AkRtpcValue;         ///< Real time parameter control value
-    typedef AkUInt32 WWISEC_AkBankID;            ///< Run time bank ID
-    typedef AkUInt32 WWISEC_AkBankType;          ///< Run time bank type
-    typedef AkUInt32 WWISEC_AkFileID;            ///< Integer-type file identifier
-    typedef AkUInt32 WWISEC_AkDeviceID;          ///< I/O device ID
-    typedef AkUInt32 WWISEC_AkTriggerID;         ///< Trigger ID
-    typedef AkUInt32 WWISEC_AkArgumentValueID;   ///< Argument value ID
-    typedef AkUInt32 WWISEC_AkChannelMask;       ///< Channel mask (similar to WAVE_FORMAT_EXTENSIBLE). Bit values are defined in AkSpeakerConfig.h.
-    typedef AkUInt32 WWISEC_AkModulatorID;       ///< Modulator ID
-    typedef AkUInt32 WWISEC_AkAcousticTextureID; ///< Acoustic Texture ID
-    typedef AkUInt32 WWISEC_AkImageSourceID;     ///< Image Source ID
-    typedef AkUInt64 WWISEC_AkOutputDeviceID;    ///< Audio Output device ID
-    typedef AkUInt32 WWISEC_AkPipelineID;        ///< Unique node (bus, voice) identifier for profiling.
-    typedef AkUInt32 WWISEC_AkRayID;             ///< Unique (per emitter) identifier for an emitter-listener ray.
-    typedef AkUInt64 WWISEC_AkAudioObjectID;     ///< Audio Object ID
-    typedef AkUInt32 WWISEC_AkJobType;           ///< Job type identifier
-    typedef AkUInt64 WWISEC_AkCacheID;           ///< Stream cache block ID.
 
     // Constants.
-    static const WWISEC_AkPluginID WWISEC_AK_INVALID_PLUGINID = (WWISEC_AkPluginID)-1;                  ///< Invalid FX ID
-    static const WWISEC_AkPluginID WWISEC_AK_INVALID_SHARE_SET_ID = (WWISEC_AkPluginID)-1;              ///< Invalid Share Set ID
-    static const WWISEC_AkGameObjectID WWISEC_AK_INVALID_GAME_OBJECT = (WWISEC_AkGameObjectID)-1;       ///< Invalid game object (may also mean all game objects)
-    static const WWISEC_AkUniqueID WWISEC_AK_INVALID_UNIQUE_ID = 0;                                     ///< Invalid unique 32-bit ID
-    static const WWISEC_AkRtpcID WWISEC_AK_INVALID_RTPC_ID = WWISEC_AK_INVALID_UNIQUE_ID;               ///< Invalid RTPC ID
-    static const WWISEC_AkPlayingID WWISEC_AK_INVALID_PLAYING_ID = WWISEC_AK_INVALID_UNIQUE_ID;         ///< Invalid playing ID
-    static const AkUInt32 WWISEC_AK_DEFAULT_SWITCH_STATE = 0;                                           ///< Switch selected if no switch has been set yet
-    static const WWISEC_AkMemPoolId WWISEC_AK_INVALID_POOL_ID = -1;                                     ///< Invalid pool ID
-    static const WWISEC_AkMemPoolId WWISEC_AK_DEFAULT_POOL_ID = -1;                                     ///< Default pool ID, same as AK_INVALID_POOL_ID
-    static const WWISEC_AkAuxBusID WWISEC_AK_INVALID_AUX_ID = WWISEC_AK_INVALID_UNIQUE_ID;              ///< Invalid auxiliary bus ID (or no Aux bus ID)
-    static const WWISEC_AkFileID WWISEC_AK_INVALID_FILE_ID = (WWISEC_AkFileID)-1;                       ///< Invalid file ID
-    static const WWISEC_AkCacheID WWISEC_AK_INVALID_CACHE_ID = (WWISEC_AkCacheID)-1;                    ///< Invalid cache ID
-    static const WWISEC_AkDeviceID WWISEC_AK_INVALID_DEVICE_ID = (WWISEC_AkDeviceID)-1;                 ///< Invalid streaming device ID
-    static const WWISEC_AkBankID WWISEC_AK_INVALID_BANK_ID = WWISEC_AK_INVALID_UNIQUE_ID;               ///< Invalid bank ID
-    static const WWISEC_AkArgumentValueID WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID = 0;                      ///< Fallback argument value ID
-    static const WWISEC_AkChannelMask WWISEC_AK_INVALID_CHANNELMASK = 0;                                ///< Invalid channel mask
-    static const AkUInt32 WWISEC_AK_INVALID_OUTPUT_DEVICE_ID = WWISEC_AK_INVALID_UNIQUE_ID;             ///< Invalid Device ID
-    static const WWISEC_AkPipelineID WWISEC_AK_INVALID_PIPELINE_ID = WWISEC_AK_INVALID_UNIQUE_ID;       ///< Invalid pipeline ID (for profiling)
-    static const WWISEC_AkAudioObjectID WWISEC_AK_INVALID_AUDIO_OBJECT_ID = (WWISEC_AkAudioObjectID)-1; ///< Invalid audio object ID
+    static const AkPluginID WWISEC_AK_INVALID_PLUGINID = (AkPluginID)-1;                    ///< Invalid FX ID
+    static const AkPluginID WWISEC_AK_INVALID_SHARE_SET_ID = (AkPluginID)-1;                ///< Invalid Share Set ID
+    static const AkGameObjectID WWISEC_AK_INVALID_GAME_OBJECT = (AkGameObjectID)-1;         ///< Invalid game object (may also mean all game objects)
+    static const AkUniqueID WWISEC_AK_INVALID_UNIQUE_ID = 0;                                ///< Invalid unique 32-bit ID
+    static const AkRtpcID WWISEC_AK_INVALID_RTPC_ID = WWISEC_AK_INVALID_UNIQUE_ID;          ///< Invalid RTPC ID
+    static const AkPlayingID WWISEC_AK_INVALID_PLAYING_ID = WWISEC_AK_INVALID_UNIQUE_ID;    ///< Invalid playing ID
+    static const AkUInt32 WWISEC_AK_DEFAULT_SWITCH_STATE = 0;                               ///< Switch selected if no switch has been set yet
+    static const AkMemPoolId WWISEC_AK_INVALID_POOL_ID = -1;                                ///< Invalid pool ID
+    static const AkMemPoolId WWISEC_AK_DEFAULT_POOL_ID = -1;                                ///< Default pool ID, same as AK_INVALID_POOL_ID
+    static const AkAuxBusID WWISEC_AK_INVALID_AUX_ID = WWISEC_AK_INVALID_UNIQUE_ID;         ///< Invalid auxiliary bus ID (or no Aux bus ID)
+    static const AkFileID WWISEC_AK_INVALID_FILE_ID = (AkFileID)-1;                         ///< Invalid file ID
+    static const AkCacheID WWISEC_AK_INVALID_CACHE_ID = (AkCacheID)-1;                      ///< Invalid cache ID
+    static const AkDeviceID WWISEC_AK_INVALID_DEVICE_ID = (AkDeviceID)-1;                   ///< Invalid streaming device ID
+    static const AkBankID WWISEC_AK_INVALID_BANK_ID = WWISEC_AK_INVALID_UNIQUE_ID;          ///< Invalid bank ID
+    static const AkArgumentValueID WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID = 0;                 ///< Fallback argument value ID
+    static const AkChannelMask WWISEC_AK_INVALID_CHANNELMASK = 0;                           ///< Invalid channel mask
+    static const AkUInt32 WWISEC_AK_INVALID_OUTPUT_DEVICE_ID = WWISEC_AK_INVALID_UNIQUE_ID; ///< Invalid Device ID
+    static const AkPipelineID WWISEC_AK_INVALID_PIPELINE_ID = WWISEC_AK_INVALID_UNIQUE_ID;  ///< Invalid pipeline ID (for profiling)
+    static const AkAudioObjectID WWISEC_AK_INVALID_AUDIO_OBJECT_ID = (AkAudioObjectID)-1;   ///< Invalid audio object ID
 
     // Priority.
-    static const WWISEC_AkPriority WWISEC_AK_DEFAULT_PRIORITY = 50; ///< Default sound / I/O priority
-    static const WWISEC_AkPriority WWISEC_AK_MIN_PRIORITY = 0;      ///< Minimal priority value [0,100]
-    static const WWISEC_AkPriority WWISEC_AK_MAX_PRIORITY = 100;    ///< Maximal priority value [0,100]
+    static const AkPriority WWISEC_AK_DEFAULT_PRIORITY = 50; ///< Default sound / I/O priority
+    static const AkPriority WWISEC_AK_MIN_PRIORITY = 0;      ///< Minimal priority value [0,100]
+    static const AkPriority WWISEC_AK_MAX_PRIORITY = 100;    ///< Maximal priority value [0,100]
 
     // Default bank I/O settings.
-    static const WWISEC_AkPriority WWISEC_AK_DEFAULT_BANK_IO_PRIORITY = WWISEC_AK_DEFAULT_PRIORITY; ///<  Default bank load I/O priority
-    static const AkReal32 WWISEC_AK_DEFAULT_BANK_THROUGHPUT = 1 * 1024 * 1024 / 1000.f;             ///<  Default bank load throughput (1 Mb/ms)
+    static const AkPriority WWISEC_AK_DEFAULT_BANK_IO_PRIORITY = WWISEC_AK_DEFAULT_PRIORITY; ///<  Default bank load I/O priority
+    static const AkReal32 WWISEC_AK_DEFAULT_BANK_THROUGHPUT = 1 * 1024 * 1024 / 1000.f;      ///<  Default bank load throughput (1 Mb/ms)
 
     // Bank version
     static const AkUInt32 WWISEC_AK_SOUNDBANK_VERSION = 154; ///<  Version of the soundbank reader
 
     // Job types
-    static const WWISEC_AkJobType WWISEC_AkJobType_Generic = 0;         ///< Job type for general-purpose work
-    static const WWISEC_AkJobType WWISEC_AkJobType_AudioProcessing = 1; ///< Job type for DSP work
-    static const WWISEC_AkJobType WWISEC_AkJobType_SpatialAudio = 2;    ///< Job type for Spatial Audio computations
-    static const AkUInt32 WWISEC_AK_NUM_JOB_TYPES = 3;                  ///< Number of possible job types recognized by the Sound Engine
+    static const AkJobType WWISEC_AkJobType_Generic = 0;         ///< Job type for general-purpose work
+    static const AkJobType WWISEC_AkJobType_AudioProcessing = 1; ///< Job type for DSP work
+    static const AkJobType WWISEC_AkJobType_SpatialAudio = 2;    ///< Job type for Spatial Audio computations
+    static const AkUInt32 WWISEC_AK_NUM_JOB_TYPES = 3;           ///< Number of possible job types recognized by the Sound Engine
 
 #ifndef WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT
 #define WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT 24024 ///< Default discovery port for most platforms using IP sockets for communication.
@@ -244,11 +205,11 @@ extern "C"
     typedef struct WWISEC_AkExternalSourceInfo
     {
         AkUInt32 iExternalSrcCookie; ///< Cookie identifying the source, given by hashing the name of the source given in the project.  See \ref AK::SoundEngine::GetIDFromString. \aknote If an event triggers the playback of more than one external source, they must be named uniquely in the project therefore have a unique cookie) in order to tell them apart when filling the AkExternalSourceInfo structures. \endaknote
-        WWISEC_AkCodecID idCodec;    ///< Codec ID for the file.  One of the audio formats defined in AkTypes.h (AKCODECID_XXX)
+        AkCodecID idCodec;           ///< Codec ID for the file.  One of the audio formats defined in AkTypes.h (AKCODECID_XXX)
         AkOSChar* szFile;            ///< File path for the source.  If not NULL, the source will be streaming from disk. Set pInMemory to NULL. If idFile is set, this field is used as stream name (for profiling purposes). /// The only file format accepted is a fully formed WEM file, as converted by Wwise.
         void* pInMemory;             ///< Pointer to the in-memory file.  If not NULL, the source will be read from memory. Set szFile and idFile to NULL. The only file format accepted is a fully formed WEM file, as converted by Wwise.
         AkUInt32 uiMemorySize;       ///< Size of the data pointed by pInMemory
-        WWISEC_AkFileID idFile;      ///< File ID.  If not zero, the source will be streaming from disk.  This ID can be anything.  Note that you must override the low-level IO to resolve this ID to a real file.  See \ref streamingmanager_lowlevel for more information on overriding the Low Level IO.
+        AkFileID idFile;             ///< File ID.  If not zero, the source will be streaming from disk.  This ID can be anything.  Note that you must override the low-level IO to resolve this ID to a real file.  See \ref streamingmanager_lowlevel for more information on overriding the Low Level IO.
     } WWISEC_AkExternalSourceInfo;
 
     typedef enum WWISEC_AK_SoundEngine_MultiPositionType
@@ -338,11 +299,11 @@ extern "C"
 
     typedef struct WWISEC_AkAuxSendValue
     {
-        WWISEC_AkGameObjectID listenerID; ///< Game object ID of the listener associated with this send. Use AK_INVALID_GAME_OBJECT as a wildcard to set the auxiliary send to all connected listeners (see AK::SoundEngine::SetListeners).
-        WWISEC_AkAuxBusID auxBusID;       ///< Auxiliary bus ID.
-        AkReal32 fControlValue;           ///< A value in the range [0.0f:16.0f] ( -∞ dB to +24 dB).
-                                          ///< Represents the attenuation or amplification factor applied to the volume of the sound going through the auxiliary bus.
-                                          ///< A value greater than 1.0f will amplify the sound.
+        AkGameObjectID listenerID; ///< Game object ID of the listener associated with this send. Use AK_INVALID_GAME_OBJECT as a wildcard to set the auxiliary send to all connected listeners (see AK::SoundEngine::SetListeners).
+        AkAuxBusID auxBusID;       ///< Auxiliary bus ID.
+        AkReal32 fControlValue;    ///< A value in the range [0.0f:16.0f] ( -∞ dB to +24 dB).
+                                   ///< Represents the attenuation or amplification factor applied to the volume of the sound going through the auxiliary bus.
+                                   ///< A value greater than 1.0f will amplify the sound.
     } WWISEC_AkAuxSendValue;
 
     typedef enum WWISEC_AkConnectionType
@@ -393,31 +354,31 @@ extern "C"
 
     typedef struct WWISEC_AkChannelEmitter
     {
-        WWISEC_AkWorldTransform position;    ///< Emitter position.
-        WWISEC_AkChannelMask uInputChannels; ///< Channels to which the above position applies.
-        char padding[4];                     ///< In order to preserve consistent struct size across archs, we need some padding
+        WWISEC_AkWorldTransform position; ///< Emitter position.
+        AkChannelMask uInputChannels;     ///< Channels to which the above position applies.
+        char padding[4];                  ///< In order to preserve consistent struct size across archs, we need some padding
     } WWISEC_AkChannelEmitter;
 
     typedef struct WWISEC_AkEmitterListenerPair
     {
-        WWISEC_AkWorldTransform emitter;          ///< Emitter position.
-        AkReal32 fDistance;                       ///< Distance between emitter and listener.
-        AkReal32 fEmitterAngle;                   ///< Angle between position vector and emitter orientation.
-        AkReal32 fListenerAngle;                  ///< Angle between position vector and listener orientation.
-        AkReal32 fDryMixGain;                     ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for direct connections.
-        AkReal32 fGameDefAuxMixGain;              ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for game-defined send connections.
-        AkReal32 fUserDefAuxMixGain;              ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for user-defined send connections.
-        AkReal32 fOcclusion;                      ///< Emitter-listener-pair-specific occlusion factor
-        AkReal32 fObstruction;                    ///< Emitter-listener-pair-specific obstruction factor
-        AkReal32 fDiffraction;                    ///< Emitter-listener-pair-specific diffraction coefficient
-        AkReal32 fTransmissionLoss;               ///< Emitter-listener-pair-specific transmission occlusion.
-        AkReal32 fSpread;                         ///< Emitter-listener-pair-specific spread
-        AkReal32 fAperture;                       ///< Emitter-listener-pair-specific aperture
-        AkReal32 fScalingFactor;                  ///< Combined scaling factor due to both emitter and listener.
-        AkReal32 fPathGain;                       ///< Emitter-listener-pair-specific overall gain that scales fDryMixGain, fGameDefAuxMixGain and fUserDefAuxMixGain
-        WWISEC_AkChannelMask uEmitterChannelMask; ///< Channels of the emitter that apply to this ray.
-        WWISEC_AkRayID id;                        ///< ID of this emitter-listener pair, unique for a given emitter.
-        WWISEC_AkGameObjectID m_uListenerID;      ///< Listener game object ID.
+        WWISEC_AkWorldTransform emitter;   ///< Emitter position.
+        AkReal32 fDistance;                ///< Distance between emitter and listener.
+        AkReal32 fEmitterAngle;            ///< Angle between position vector and emitter orientation.
+        AkReal32 fListenerAngle;           ///< Angle between position vector and listener orientation.
+        AkReal32 fDryMixGain;              ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for direct connections.
+        AkReal32 fGameDefAuxMixGain;       ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for game-defined send connections.
+        AkReal32 fUserDefAuxMixGain;       ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for user-defined send connections.
+        AkReal32 fOcclusion;               ///< Emitter-listener-pair-specific occlusion factor
+        AkReal32 fObstruction;             ///< Emitter-listener-pair-specific obstruction factor
+        AkReal32 fDiffraction;             ///< Emitter-listener-pair-specific diffraction coefficient
+        AkReal32 fTransmissionLoss;        ///< Emitter-listener-pair-specific transmission occlusion.
+        AkReal32 fSpread;                  ///< Emitter-listener-pair-specific spread
+        AkReal32 fAperture;                ///< Emitter-listener-pair-specific aperture
+        AkReal32 fScalingFactor;           ///< Combined scaling factor due to both emitter and listener.
+        AkReal32 fPathGain;                ///< Emitter-listener-pair-specific overall gain that scales fDryMixGain, fGameDefAuxMixGain and fUserDefAuxMixGain
+        AkChannelMask uEmitterChannelMask; ///< Channels of the emitter that apply to this ray.
+        AkRayID id;                        ///< ID of this emitter-listener pair, unique for a given emitter.
+        AkGameObjectID m_uListenerID;      ///< Listener game object ID.
     } WWISEC_AkEmitterListenerPair;
 
     // ---------------------------------------------------------------
@@ -811,10 +772,7 @@ extern "C"
     // END AkMidiTypes
 
     // BEGIN AkSpeakerVolumes
-    typedef AkReal32* WWISEC_AK_SpeakerVolumes_VectorPtr;            ///< Volume vector. Access each element with the standard bracket [] operator.
-    typedef AkReal32* WWISEC_AK_SpeakerVolumes_MatrixPtr;            ///< Volume matrix. Access each input channel vector with AK::SpeakerVolumes::Matrix::GetChannel().
-    typedef const AkReal32* WWISEC_AK_SpeakerVolumes_ConstVectorPtr; ///< Constant volume vector. Access each element with the standard bracket [] operator.
-    typedef const AkReal32* WWISEC_AK_SpeakerVolumes_ConstMatrixPtr; ///< Constant volume matrix. Access each input channel vector with AK::SpeakerVolumes::Matrix::GetChannel().
+
     // END AkSpeakerVolumes
 
 // BEGIN AkErrorMessageTranslator
@@ -855,10 +813,10 @@ extern "C"
     // BEGIN AkMonitorError
     typedef struct WWISEC_AK_Monitor_MsgContext
     {
-        WWISEC_AkPlayingID in_playingID;    ///< Related Playing ID if applicable
-        WWISEC_AkGameObjectID in_gameObjID; ///< Related Game Object ID if applicable, AK_INVALID_GAME_OBJECT otherwise
-        WWISEC_AkUniqueID in_soundID;       ///< Related Audio Node ID if applicable, AK_INVALID_UNIQUE_ID otherwise
-        bool in_bIsBus;                     ///< true if in_audioNodeID is a bus
+        AkPlayingID in_playingID;    ///< Related Playing ID if applicable
+        AkGameObjectID in_gameObjID; ///< Related Game Object ID if applicable, AK_INVALID_GAME_OBJECT otherwise
+        AkUniqueID in_soundID;       ///< Related Audio Node ID if applicable, AK_INVALID_UNIQUE_ID otherwise
+        bool in_bIsBus;              ///< true if in_audioNodeID is a bus
     } WWISEC_AK_Monitor_MsgContext;
 
     typedef enum WWISEC_AK_Monitor_ErrorLevel
@@ -1175,22 +1133,22 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode in_eErrorCode,   ///< Error code number value
         const AkOSChar* in_pszError,                 ///< Message or error string to be displayed
         WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, ///< Specifies whether it should be displayed as a message or an error
-        WWISEC_AkPlayingID in_playingID,             ///< Related Playing ID if applicable, AK_INVALID_PLAYING_ID otherwise
-        WWISEC_AkGameObjectID in_gameObjID           ///< Related Game Object ID if applicable, AK_INVALID_GAME_OBJECT otherwise
+        AkPlayingID in_playingID,                    ///< Related Playing ID if applicable, AK_INVALID_PLAYING_ID otherwise
+        AkGameObjectID in_gameObjID                  ///< Related Game Object ID if applicable, AK_INVALID_GAME_OBJECT otherwise
     );
 
     typedef struct WWISEC_AkStreamMgrSettings WWISEC_AkStreamMgrSettings;
     typedef struct WWISEC_AkDeviceSettings WWISEC_AkDeviceSettings;
 
-    WWISEC_AKRESULT WWISEC_AK_Monitor_PostCode(WWISEC_AK_Monitor_ErrorCode in_eError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus);
-    WWISEC_AKRESULT WWISEC_AK_Monitor_PostString(const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus);
+    WWISEC_AKRESULT WWISEC_AK_Monitor_PostCode(WWISEC_AK_Monitor_ErrorCode in_eError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, AkPlayingID in_playingID, AkGameObjectID in_gameObjID, AkUniqueID in_audioNodeID, bool in_bIsBus);
+    WWISEC_AKRESULT WWISEC_AK_Monitor_PostString(const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, AkPlayingID in_playingID, AkGameObjectID in_gameObjID, AkUniqueID in_audioNodeID, bool in_bIsBus);
     WWISEC_AKRESULT WWISEC_AK_Monitor_SetLocalOutput(AkUInt32 in_uErrorLevel, WWISEC_AK_Monitor_LocalOutputFunc in_pMonitorFunc);
     WWISEC_AKRESULT WWISEC_AK_Monitor_AddTranslator(WWISEC_AkErrorMessageTranslator* translator, bool overridePreviousTranslators);
     WWISEC_AKRESULT WWISEC_AK_Monitor_ResetTranslator();
-    WWISEC_AkTimeMs WWISEC_AK_Monitor_GetTimeStamp();
+    AkTimeMs WWISEC_AK_Monitor_GetTimeStamp();
     void WWISEC_AK_Monitor_MonitorStreamMgrInit(const WWISEC_AkStreamMgrSettings* in_streamMgrSettings);
-    void WWISEC_AK_Monitor_MonitorStreamingDeviceInit(WWISEC_AkDeviceID in_deviceID, const WWISEC_AkDeviceSettings* in_deviceSettings);
-    void WWISEC_AK_Monitor_MonitorStreamingDeviceDestroyed(WWISEC_AkDeviceID in_deviceID);
+    void WWISEC_AK_Monitor_MonitorStreamingDeviceInit(AkDeviceID in_deviceID, const WWISEC_AkDeviceSettings* in_deviceSettings);
+    void WWISEC_AK_Monitor_MonitorStreamingDeviceDestroyed(AkDeviceID in_deviceID);
     void WWISEC_AK_Monitor_MonitorStreamMgrTerm();
     // END AkMonitorError
 
@@ -1221,22 +1179,22 @@ extern "C"
     // END IBytes
 
     // BEGIN AkCommonDefs
-    const WWISEC_AkDataTypeID WWISEC_AK_INT = 0;   ///< Integer data type (uchar, short, and so on)
-    const WWISEC_AkDataTypeID WWISEC_AK_FLOAT = 1; ///< Float data type
+    const AkDataTypeID WWISEC_AK_INT = 0;   ///< Integer data type (uchar, short, and so on)
+    const AkDataTypeID WWISEC_AK_FLOAT = 1; ///< Float data type
 
     typedef struct WWISEC_AK_AkMetering
     {
         /// Peak of each channel in this frame.
         /// Vector of linear peak levels, corresponding to each channel. NULL if AK_EnableBusMeter_Peak is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
-        WWISEC_AK_SpeakerVolumes_VectorPtr peak;
+        AkSpeakerVolumesMatrixPtr peak;
 
         /// True peak of each channel (as defined by ITU-R BS.1770) in this frame.
         /// Vector of linear true peak levels, corresponding to each channel. NULL if AK_EnableBusMeter_TruePeak is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
-        WWISEC_AK_SpeakerVolumes_VectorPtr truePeak;
+        AkSpeakerVolumesMatrixPtr truePeak;
 
         /// RMS value of each channel in this frame.
         /// Vector of linear rms levels, corresponding to each channel. NULL if AK_EnableBusMeter_RMS is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
-        WWISEC_AK_SpeakerVolumes_VectorPtr rms;
+        AkSpeakerVolumesMatrixPtr rms;
 
         /// Mean k-weighted power value in this frame, used to compute loudness (as defined by ITU-R BS.1770).
         /// Total linear k-weighted power of all channels. 0 if AK_EnableBusMeter_KPower is not set (see IAkMixerPluginContext::SetMeteringFlags() or AK::SoundEngine::RegisterBusMeteringCallback()).
@@ -1333,6 +1291,8 @@ extern "C"
         WWISEC_AK_AkAudioDeviceEvent_Last            ///< End of enum, invalid value.
     } WWISEC_AK_AkAudioDeviceEvent;
 
+    typedef AkUInt8 WWISEC_AkAudioDeviceEvent_t;
+
     typedef enum WWISEC_AkGlobalCallbackLocation
     {
         WWISEC_AkGlobalCallbackLocation_Register = (1 << 0),                        ///< Right after successful registration of callback/plugin. Typically used by plugins along with AkGlobalCallbackLocation_Term for allocating memory for the lifetime of the sound engine.
@@ -1355,22 +1315,22 @@ extern "C"
 
     typedef struct WWISEC_AkSegmentInfo
     {
-        WWISEC_AkTimeMs iCurrentPosition;        ///< Current position of the segment, relative to the Entry Cue, in milliseconds. Range is [-iPreEntryDuration, iActiveDuration+iPostExitDuration].
-        WWISEC_AkTimeMs iPreEntryDuration;       ///< Duration of the pre-entry region of the segment, in milliseconds.
-        WWISEC_AkTimeMs iActiveDuration;         ///< Duration of the active region of the segment (between the Entry and Exit Cues), in milliseconds.
-        WWISEC_AkTimeMs iPostExitDuration;       ///< Duration of the post-exit region of the segment, in milliseconds.
-        WWISEC_AkTimeMs iRemainingLookAheadTime; ///< Number of milliseconds remaining in the "looking-ahead" state of the segment, when it is silent but streamed tracks are being prefetched.
-        AkReal32 fBeatDuration;                  ///< Beat Duration in seconds.
-        AkReal32 fBarDuration;                   ///< Bar Duration in seconds.
-        AkReal32 fGridDuration;                  ///< Grid duration in seconds.
-        AkReal32 fGridOffset;                    ///< Grid offset in seconds.
+        AkTimeMs iCurrentPosition;        ///< Current position of the segment, relative to the Entry Cue, in milliseconds. Range is [-iPreEntryDuration, iActiveDuration+iPostExitDuration].
+        AkTimeMs iPreEntryDuration;       ///< Duration of the pre-entry region of the segment, in milliseconds.
+        AkTimeMs iActiveDuration;         ///< Duration of the active region of the segment (between the Entry and Exit Cues), in milliseconds.
+        AkTimeMs iPostExitDuration;       ///< Duration of the post-exit region of the segment, in milliseconds.
+        AkTimeMs iRemainingLookAheadTime; ///< Number of milliseconds remaining in the "looking-ahead" state of the segment, when it is silent but streamed tracks are being prefetched.
+        AkReal32 fBeatDuration;           ///< Beat Duration in seconds.
+        AkReal32 fBarDuration;            ///< Bar Duration in seconds.
+        AkReal32 fGridDuration;           ///< Grid duration in seconds.
+        AkReal32 fGridOffset;             ///< Grid offset in seconds.
     } WWISEC_AkSegmentInfo;
 
     typedef struct WWISEC_AkEventCallbackInfo
     {
-        WWISEC_AkGameObjectID gameObjID; ///< Game object ID
-        WWISEC_AkPlayingID playingID;    ///< Playing ID of Event, returned by PostEvent()
-        WWISEC_AkUniqueID eventID;       ///< Unique ID of Event, passed to PostEvent()
+        AkGameObjectID gameObjID; ///< Game object ID
+        AkPlayingID playingID;    ///< Playing ID of Event, returned by PostEvent()
+        AkUniqueID eventID;       ///< Unique ID of Event, passed to PostEvent()
     } WWISEC_AkEventCallbackInfo;
 
     typedef struct WWISEC_AkMIDIEventCallbackInfo
@@ -1388,22 +1348,22 @@ extern "C"
 
     typedef struct WWISEC_AkDurationCallbackInfo
     {
-        AkReal32 fDuration;            ///< Duration of the sound (unit: milliseconds)
-        AkReal32 fEstimatedDuration;   ///< Estimated duration of the sound depending on source settings such as pitch. (unit: milliseconds)
-        WWISEC_AkUniqueID audioNodeID; ///< Audio Node ID of playing item
-        WWISEC_AkUniqueID mediaID;     ///< Media ID of playing item. (corresponds to 'ID' attribute of 'File' element in SoundBank metadata file)
-        bool bStreaming;               ///< True if source is streaming, false otherwise.
+        AkReal32 fDuration;          ///< Duration of the sound (unit: milliseconds)
+        AkReal32 fEstimatedDuration; ///< Estimated duration of the sound depending on source settings such as pitch. (unit: milliseconds)
+        AkUniqueID audioNodeID;      ///< Audio Node ID of playing item
+        AkUniqueID mediaID;          ///< Media ID of playing item. (corresponds to 'ID' attribute of 'File' element in SoundBank metadata file)
+        bool bStreaming;             ///< True if source is streaming, false otherwise.
     } WWISEC_AkDurationCallbackInfo;
 
     typedef struct WWISEC_AkDynamicSequenceItemCallbackInfo
     {
-        WWISEC_AkUniqueID audioNodeID; ///< Audio Node ID of finished item
-        void* pCustomInfo;             ///< Custom info passed to the DynamicSequence::Open function
+        AkUniqueID audioNodeID; ///< Audio Node ID of finished item
+        void* pCustomInfo;      ///< Custom info passed to the DynamicSequence::Open function
     } WWISEC_AkDynamicSequenceItemCallbackInfo;
 
     typedef struct WWISEC_AkSpeakerVolumeMatrixCallbackInfo
     {
-        WWISEC_AK_SpeakerVolumes_MatrixPtr pVolumes;    ///< Pointer to volume matrix describing the contribution of each source channel to destination channels. Use methods of AK::SpeakerVolumes::Matrix to interpret them.
+        AkSpeakerVolumesMatrixPtr pVolumes;             ///< Pointer to volume matrix describing the contribution of each source channel to destination channels. Use methods of AK::SpeakerVolumes::Matrix to interpret them.
         WWISEC_AkChannelConfig inputConfig;             ///< Channel configuration of the voice/bus.
         WWISEC_AkChannelConfig outputConfig;            ///< Channel configuration of the output bus.
         AkReal32* pfBaseVolume;                         ///< Base volume, common to all channels.
@@ -1414,10 +1374,10 @@ extern "C"
 
     typedef struct WWISEC_AkMusicPlaylistCallbackInfo
     {
-        WWISEC_AkUniqueID playlistID; ///< ID of playlist node
-        AkUInt32 uNumPlaylistItems;   ///< Number of items in playlist node (may be segments or other playlists)
-        AkUInt32 uPlaylistSelection;  ///< Selection: set by sound engine, modifWWISEC_AkMusicPlaylistCallbackInfoied by callback function (if not in range 0 <= uPlaylistSelection < uNumPlaylistItems then ignored).
-        AkUInt32 uPlaylistItemDone;   ///< Playlist node done: set by sound engine, modified by callback function (if set to anything but 0 then the current playlist item is done, and uPlaylistSelection is ignored)
+        AkUniqueID playlistID;       ///< ID of playlist node
+        AkUInt32 uNumPlaylistItems;  ///< Number of items in playlist node (may be segments or other playlists)
+        AkUInt32 uPlaylistSelection; ///< Selection: set by sound engine, modifWWISEC_AkMusicPlaylistCallbackInfoied by callback function (if not in range 0 <= uPlaylistSelection < uNumPlaylistItems then ignored).
+        AkUInt32 uPlaylistItemDone;  ///< Playlist node done: set by sound engine, modified by callback function (if set to anything but 0 then the current playlist item is done, and uPlaylistSelection is ignored)
     } WWISEC_AkMusicPlaylistCallbackInfo;
 
     typedef struct WWISEC_AkMusicSyncCallbackInfo
@@ -1429,8 +1389,8 @@ extern "C"
 
     typedef struct WWISEC_AkCallbackInfo
     {
-        void* pCookie;                   ///< User data, passed to PostEvent()
-        WWISEC_AkGameObjectID gameObjID; ///< Game object ID
+        void* pCookie;            ///< User data, passed to PostEvent()
+        AkGameObjectID gameObjID; ///< Game object ID
     } WWISEC_AkCallbackInfo;
 
     typedef struct WWISEC_AkBusMeteringCallbackInfo
@@ -1465,10 +1425,10 @@ extern "C"
 
     typedef struct WWISEC_AkDynamicSequenceSelectCallbackInfo
     {
-        WWISEC_AkUniqueID audioNodeID;                  ///< Unique ID of Audio Node (can be resolved using AK::SoundEngine::DynamicDialogue API). Set to AK_INVALID_UNIQUE_ID to signal that no item is available to play.
-        WWISEC_AkTimeMs msDelay;                        ///< Delay before playing this item, in milliseconds
-        void* pCustomInfo;                              ///< Optional user data
-        WWISEC_AkExternalSourceArray arExternalSources; ///< Optional external sources. Use API described in AkExternalSourceArray.h to add required external sources to play the next item.
+        AkUniqueID audioNodeID;                  ///< Unique ID of Audio Node (can be resolved using AK::SoundEngine::DynamicDialogue API). Set to AK_INVALID_UNIQUE_ID to signal that no item is available to play.
+        AkTimeMs msDelay;                        ///< Delay before playing this item, in milliseconds
+        void* pCustomInfo;                       ///< Optional user data
+        AkExternalSourceArray arExternalSources; ///< Optional external sources. Use API described in AkExternalSourceArray.h to add required external sources to play the next item.
     } WWISEC_AkDynamicSequenceSelectCallbackInfo;
 
     AK_CALLBACK(void, WWISEC_AkEventCallbackFunc)
@@ -1507,7 +1467,7 @@ extern "C"
     AK_CALLBACK(void, WWISEC_AK_AkDeviceStatusCallbackFunc)
     (
         WWISEC_AK_IAkGlobalPluginContext* in_pContext, ///< Engine context.
-        WWISEC_AkUniqueID in_idAudioDeviceShareset,    ///< The audio device shareset attached, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
+        AkUniqueID in_idAudioDeviceShareset,           ///< The audio device shareset attached, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
         AkUInt32 in_idDeviceID,                        ///< The audio device specific id, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
         WWISEC_AK_AkAudioDeviceEvent in_idEvent,       ///< The event for which this callback was called.  See AK::AkAudioDeviceEvent.  AKRESULT may provide more information.
         WWISEC_AKRESULT in_AkResult                    ///< Result of the last operation.
@@ -1526,7 +1486,7 @@ extern "C"
     AK_CALLBACK(void, WWISEC_AkCaptureCallbackFunc)
     (
         WWISEC_AkAudioBuffer* in_CaptureBuffer, ///< Capture audio buffer. The data is always float interleaved.
-        WWISEC_AkOutputDeviceID in_idOutput,    ///< The audio device specific id, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
+        AkOutputDeviceID in_idOutput,           ///< The audio device specific id, as passed to AK::SoundEngine::AddOutput or AK::SoundEngine::Init
         void* in_pCookie                        ///< Callback cookie that will be sent to the callback function along with additional information
     );
     // END AkCallbackType
@@ -1600,11 +1560,11 @@ extern "C"
     void WWISEC_AK_MemoryMgr_Term();
     void WWISEC_AK_MemoryMgr_InitForThread();
     void WWISEC_AK_MemoryMgr_TermForThread();
-    void* WWISEC_AK_MemoryMgr_Malloc(WWISEC_AkMemPoolId in_poolId, size_t in_uSize);
-    void* WWISEC_AK_MemoryMgr_ReallocAligned(WWISEC_AkMemPoolId in_poolId, void* in_pAlloc, size_t in_uSize, AkUInt32 in_uAlignment);
-    void WWISEC_AK_MemoryMgr_Free(WWISEC_AkMemPoolId in_poolId, void* in_pMemAddress);
-    void* WWISEC_AK_MemoryMgr_Malign(WWISEC_AkMemPoolId in_poolId, size_t in_USize, AkUInt32 in_uAlignment);
-    void WWISEC_AK_MemoryMgr_GetCategoryStats(WWISEC_AkMemPoolId in_poolId, WWISEC_AK_MemoryMgr_CategoryStats* out_poolStats);
+    void* WWISEC_AK_MemoryMgr_Malloc(AkMemPoolId in_poolId, size_t in_uSize);
+    void* WWISEC_AK_MemoryMgr_ReallocAligned(AkMemPoolId in_poolId, void* in_pAlloc, size_t in_uSize, AkUInt32 in_uAlignment);
+    void WWISEC_AK_MemoryMgr_Free(AkMemPoolId in_poolId, void* in_pMemAddress);
+    void* WWISEC_AK_MemoryMgr_Malign(AkMemPoolId in_poolId, size_t in_USize, AkUInt32 in_uAlignment);
+    void WWISEC_AK_MemoryMgr_GetCategoryStats(AkMemPoolId in_poolId, WWISEC_AK_MemoryMgr_CategoryStats* out_poolStats);
     void WWISEC_AK_MemoryMgr_GetGlobalStats(WWISEC_AK_MemoryMgr_GlobalStats* out_stats);
     void WWISEC_AK_MemoryMgr_StartProfileThreadUsage();
     AkUInt64 WWISEC_AK_MemoryMgr_StopProfileThreadUsage();
@@ -1728,44 +1688,44 @@ extern "C"
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemTrimForThread)();
 
     typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemMalloc)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         size_t uSize);
 
     typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemMalign)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         size_t uSize,
         AkUInt32 uAlignment);
 
     typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemRealloc)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         void* pAddress,
         size_t uSize);
 
     typedef void*(AKSOUNDENGINE_CALL* WWISEC_AkMemReallocAligned)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         void* pAddress,
         size_t uSize,
         AkUInt32 uAlignment);
 
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemFree)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         void* pAddress);
 
     typedef size_t(AKSOUNDENGINE_CALL* WWISEC_AkMemTotalReservedMemorySize)();
 
     typedef size_t(AKSOUNDENGINE_CALL* WWISEC_AkMemSizeOfMemory)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         void* pAddress);
 
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugMalloc)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         size_t uSize,
         void* pAddress,
         char const* pszFile,
         AkUInt32 uLine);
 
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugMalign)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         size_t uSize,
         AkUInt32 uAlignment,
         void* pAddress,
@@ -1773,7 +1733,7 @@ extern "C"
         AkUInt32 uLine);
 
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugRealloc)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         void* pOldAddress,
         size_t uSize,
         void* pNewAddress,
@@ -1781,7 +1741,7 @@ extern "C"
         AkUInt32 uLine);
 
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugReallocAligned)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         void* pOldAddress,
         size_t uSize,
         AkUInt32 uAlignment,
@@ -1790,7 +1750,7 @@ extern "C"
         AkUInt32 uLine);
 
     typedef void(AKSOUNDENGINE_CALL* WWISEC_AkMemDebugFree)(
-        WWISEC_AkMemPoolId poolId,
+        AkMemPoolId poolId,
         void* pAddress);
 
     // Listing of every memory arena used by the AkMemoryMgr, when using default AkMemoryMgr systems in Wwise
@@ -1908,7 +1868,7 @@ extern "C"
         WWISEC_AkAudioAPILinux eAudioAPI; ///< Main audio API to use. Leave to AkAPI_Default for the default sink (default value).
                                           ///< If a valid audioDeviceShareset plug-in is provided, the AkAudioAPI will be Ignored.
                                           ///< \ref AkAudioAPI
-        WWISEC_AkDataTypeID sampleType;   ///< Sample type. AK_FLOAT for 32 bit float, AK_INT for 16 bit signed integer, defaults to AK_FLOAT.
+        AkDataTypeID sampleType;          ///< Sample type. AK_FLOAT for 32 bit float, AK_INT for 16 bit signed integer, defaults to AK_FLOAT.
                                           ///< Supported by AkAPI_PulseAudio only.
     } WWISEC_LINUX_AkPlatformInitSettings;
 
@@ -2226,19 +2186,19 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_RegisterGlobalCallback(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkPluginType in_eType, AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation, void* in_pCookie);
     WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_UnregisterGlobalCallback(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkGlobalCallbackFunc in_pCallback, AkUInt32 in_eLocation);
     WWISEC_AK_IAkPluginMemAlloc* WWISEC_AK_IAkGlobalPluginContext_GetAllocator(WWISEC_AK_IAkGlobalPluginContext* self);
-    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
-    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_busID, WWISEC_AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
-    void WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(WWISEC_AK_IAkGlobalPluginContext* self, AkReal32 in_fAzimuth, AkReal32 in_fElevation, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_VectorPtr out_vVolumes);
-    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_MatrixPtr out_mxVolume);
-    const WWISEC_AkAcousticTexture* WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkAcousticTextureID in_AcousticTextureID);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(WWISEC_AK_IAkGlobalPluginContext* self, AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_busID, AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
+    void WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(WWISEC_AK_IAkGlobalPluginContext* self, AkReal32 in_fAzimuth, AkReal32 in_fElevation, WWISEC_AkChannelConfig in_cfgAmbisonics, AkSpeakerVolumesMatrixPtr out_vVolumes);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, AkSpeakerVolumesMatrixPtr out_mxVolume);
+    const WWISEC_AkAcousticTexture* WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(WWISEC_AK_IAkGlobalPluginContext* self, AkAcousticTextureID in_AcousticTextureID);
     WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(const WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkEmitterListenerPair* in_pair, AkReal32* out_fAzimuth, AkReal32* out_fElevation);
     const WWISEC_AkPlatformInitSettings* WWISEC_AK_IAkGlobalPluginContext_GetPlatformInitSettings(const WWISEC_AK_IAkGlobalPluginContext* self);
     const WWISEC_AkInitSettings* WWISEC_AK_IAkGlobalPluginContext_GetInitSettings(const WWISEC_AK_IAkGlobalPluginContext* self);
     WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(const WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkAudioSettings* out_audioSettings);
     AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(const WWISEC_AK_IAkGlobalPluginContext* self, const char* in_pszString);
-    WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID);
-    WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AkPlayingID in_playingID);
-    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID);
+    AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, AkPlayingID in_PlayingID);
+    AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID);
+    WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID);
     WWISEC_IAkPlatformContext* WWISEC_AK_IAkGlobalPluginContext_GetPlatformContext(const WWISEC_AK_IAkGlobalPluginContext* self);
     WWISEC_IAkPluginService* WWISEC_AK_IAkGlobalPluginContext_GetPluginService(const WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AK_AkPluginServiceType in_pluginService);
     AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetBufferTick(const WWISEC_AK_IAkGlobalPluginContext* self);
@@ -2259,13 +2219,13 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkOutputSettings
     {
-        WWISEC_AkUniqueID audioDeviceShareset; ///< Unique ID of a custom audio device to be used. Custom audio devices are defined in the Audio Device Shareset section of the Wwise project.
-                                               ///< If you want to output normally through the output device defined on the Master Bus in your project, leave this field to its default value (AK_INVALID_UNIQUE_ID, or value 0).
-                                               ///< Typical usage: AkInitSettings.eOutputSettings.audioDeviceShareset = AK::SoundEngine::GetIDFromString("InsertYourAudioDeviceSharesetNameHere");
-                                               /// \sa <tt>\ref AK::SoundEngine::GetIDFromString()</tt>
-                                               /// \sa \ref soundengine_plugins_audiodevices
-                                               /// \sa \ref integrating_secondary_outputs
-                                               /// \sa \ref default_audio_devices
+        AkUniqueID audioDeviceShareset; ///< Unique ID of a custom audio device to be used. Custom audio devices are defined in the Audio Device Shareset section of the Wwise project.
+                                        ///< If you want to output normally through the output device defined on the Master Bus in your project, leave this field to its default value (AK_INVALID_UNIQUE_ID, or value 0).
+                                        ///< Typical usage: AkInitSettings.eOutputSettings.audioDeviceShareset = AK::SoundEngine::GetIDFromString("InsertYourAudioDeviceSharesetNameHere");
+                                        /// \sa <tt>\ref AK::SoundEngine::GetIDFromString()</tt>
+                                        /// \sa \ref soundengine_plugins_audiodevices
+                                        /// \sa \ref integrating_secondary_outputs
+                                        /// \sa \ref default_audio_devices
 
         AkUInt32 idDevice; ///< Device specific identifier, when multiple devices of the same type are possible.  If only one device is possible, leave to 0.
                            ///< - PS4 Controller-Speakers: UserID as returned from sceUserServiceGetLoginUserIdList
@@ -2281,7 +2241,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
                                               ///< Hardware might not support the selected configuration.
     } WWISEC_AkOutputSettings;
 
-    void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning);
+    void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning);
 
     typedef enum WWISEC_AkFloorPlane
     {
@@ -2299,13 +2259,13 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     // A value of 0 means that the function will run until there are no more jobs ready to be immediately executed.
     AK_CALLBACK(void, WWISEC_AkJobWorkerFunc)
     (
-        WWISEC_AkJobType in_jobType,
+        AkJobType in_jobType,
         AkUInt32 in_uExecutionTimeUsec);
 
     AK_CALLBACK(void, WWISEC_AkJobMgrSettings_FuncRequestJobWorker)
     (
         WWISEC_AkJobWorkerFunc in_fnJobWorker, ///< Function passed to host runtime that should be executed. Note that the function provided will exist for as long as the soundengine code is loaded, and will always be the same.
-        WWISEC_AkJobType in_jobType,           ///< The type of job worker that has been requested. This should be passed forward to in_fnJobWorker
+        AkJobType in_jobType,                  ///< The type of job worker that has been requested. This should be passed forward to in_fnJobWorker
         AkUInt32 in_uNumWorkers,               ///< Number of workers requested
         void* in_pClientData                   ///< Data provided by client in AkJobMgrSettings
     );
@@ -2328,7 +2288,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     /// in_pszZoneName will point to a static string, so the pointer can be stored for later use, not just the contents of the string itself.
     AK_CALLBACK(void, WWISEC_AkProfilerPushTimerFunc)
     (
-        WWISEC_AkPluginID in_uPluginID,
+        AkPluginID in_uPluginID,
         const char* in_pszZoneName);
 
     /// External (optional) function for tracking performance of the sound engine that is called when a timer stops. (only called in Debug and Profile binaries; this is not called in Release)
@@ -2340,7 +2300,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     /// in_pszMarkerName will point to a static string, so the pointer can be stored for later use, not just the contents of the string itself.
     AK_CALLBACK(void, WWISEC_AkProfilerPostMarkerFunc)
     (
-        WWISEC_AkPluginID in_uPluginID,
+        AkPluginID in_uPluginID,
         const char* in_pszMarkerName);
 
     /// Platform-independent initialization settings of the sound engine
@@ -2407,18 +2367,18 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkSourceSettings
     {
-        WWISEC_AkUniqueID sourceID; ///< Source ID (available in the SoundBank content files)
-        AkUInt8* pMediaMemory;      ///< Pointer to the data to be set for the source
-        AkUInt32 uMediaSize;        ///< Size, in bytes, of the data to be set for the source
+        AkUniqueID sourceID;   ///< Source ID (available in the SoundBank content files)
+        AkUInt8* pMediaMemory; ///< Pointer to the data to be set for the source
+        AkUInt32 uMediaSize;   ///< Size, in bytes, of the data to be set for the source
     } WWISEC_AkSourceSettings;
 
     typedef struct WWISEC_AkSourcePosition
     {
-        WWISEC_AkUniqueID audioNodeID; ///< Audio Node ID of playing item
-        WWISEC_AkUniqueID mediaID;     ///< Media ID of playing item. (corresponds to 'ID' attribute of 'File' element in SoundBank metadata file)
-        WWISEC_AkTimeMs msTime;        ///< Position of the source (in ms) associated with that playing item
-        AkUInt32 samplePosition;       ///< Position of the source (in samples) associated with that playing item
-        AkUInt32 updateBufferTick;     ///< Value of GetBufferTick() at the time the position was updated
+        AkUniqueID audioNodeID;    ///< Audio Node ID of playing item
+        AkUniqueID mediaID;        ///< Media ID of playing item. (corresponds to 'ID' attribute of 'File' element in SoundBank metadata file)
+        AkTimeMs msTime;           ///< Position of the source (in ms) associated with that playing item
+        AkUInt32 samplePosition;   ///< Position of the source (in samples) associated with that playing item
+        AkUInt32 updateBufferTick; ///< Value of GetBufferTick() at the time the position was updated
     } WWISEC_AkSourcePosition;
 
     typedef enum WWISEC_AK_SoundEngine_PreparationType
@@ -2448,23 +2408,23 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetAudioSettings(WWISEC_AkAudioSettings* out_audioSettings);
 
-    WWISEC_AkChannelConfig WWISEC_AK_SoundEngine_GetSpeakerConfiguration(WWISEC_AkOutputDeviceID in_idOutput);
+    WWISEC_AkChannelConfig WWISEC_AK_SoundEngine_GetSpeakerConfiguration(AkOutputDeviceID in_idOutput);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(WWISEC_AkOutputDeviceID in_idOutput, WWISEC_AkChannelConfig* io_channelConfig, WWISEC_Ak3DAudioSinkCapabilities* io_capabilities);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(AkOutputDeviceID in_idOutput, WWISEC_AkChannelConfig* io_channelConfig, WWISEC_Ak3DAudioSinkCapabilities* io_capabilities);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetPanningRule(WWISEC_AkPanningRule* out_ePanningRule, WWISEC_AkOutputDeviceID in_idOutput);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetPanningRule(WWISEC_AkPanningRule* out_ePanningRule, AkOutputDeviceID in_idOutput);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPanningRule(WWISEC_AkPanningRule in_ePanningRule, WWISEC_AkOutputDeviceID in_idOutput);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPanningRule(WWISEC_AkPanningRule in_ePanningRule, AkOutputDeviceID in_idOutput);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSpeakerAngles(AkReal32* io_pfSpeakerAngles, AkUInt32* io_uNumAngles, AkReal32* out_fHeightAngle, WWISEC_AkOutputDeviceID in_idOutput);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSpeakerAngles(AkReal32* io_pfSpeakerAngles, AkUInt32* io_uNumAngles, AkReal32* out_fHeightAngle, AkOutputDeviceID in_idOutput);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSpeakerAngles(const AkReal32* in_pfSpeakerAngles, AkUInt32 in_uNumAngles, AkReal32 in_fHeightAngle, WWISEC_AkOutputDeviceID in_idOutput);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSpeakerAngles(const AkReal32* in_pfSpeakerAngles, AkUInt32 in_uNumAngles, AkReal32 in_fHeightAngle, AkOutputDeviceID in_idOutput);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetVolumeThreshold(AkReal32 in_fVolumeThresholdDB);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMaxNumVoicesLimit(AkUInt16 in_maxNumberVoices);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetJobMgrMaxActiveWorkers(WWISEC_AkJobType in_jobType, AkUInt32 in_uNewMaxActiveWorkers);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetJobMgrMaxActiveWorkers(AkJobType in_jobType, AkUInt32 in_uNewMaxActiveWorkers);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_RenderAudio(bool in_bAllowSyncRender);
 
@@ -2490,55 +2450,55 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     AkUInt32 WWISEC_AK_SoundEngine_GetIDFromString(const char* in_pszString);
 
-    WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID);
+    AkPlayingID WWISEC_AK_SoundEngine_PostEvent_ID(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, AkPlayingID in_PlayingID);
 
-    WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID);
+    AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEventName, AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, AkPlayingID in_PlayingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(AkUniqueID in_eventID, WWISEC_AkActionOnEventType in_ActionType, AkGameObjectID in_gameObjectID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, AkPlayingID in_PlayingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEventName, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEventName, WWISEC_AkActionOnEventType in_ActionType, AkGameObjectID in_gameObjectID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, AkPlayingID in_PlayingID);
 
-    WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AkPlayingID in_playingID);
+    AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopMIDIOnEvent(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkPriority in_uActivePriority, WWISEC_AkPriority in_uInactivePriority);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_ID(AkUniqueID in_eventID, AkPriority in_uActivePriority, AkPriority in_uInactivePriority);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_String(const char* in_pszEventName, WWISEC_AkPriority in_uActivePriority, WWISEC_AkPriority in_uInactivePriority);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_String(const char* in_pszEventName, AkPriority in_uActivePriority, AkPriority in_uInactivePriority);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnpinEventInStreamCache_ID(WWISEC_AkUniqueID in_eventID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnpinEventInStreamCache_ID(AkUniqueID in_eventID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnpinEventInStreamCache_String(const char* in_pszEventName);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_ID(WWISEC_AkUniqueID in_eventID, AkReal32* out_fPercentBuffered, bool* out_bCachePinnedMemoryFull);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_ID(AkUniqueID in_eventID, AkReal32* out_fPercentBuffered, bool* out_bCachePinnedMemoryFull);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_String(const char* in_pszEventName, AkReal32* out_fPercentBuffered, bool* out_bCachePinnedMemoryFull);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_ID(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_String(const char* in_pszEventName, AkGameObjectID in_gameObjectID, AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_ID(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_String(const char* in_pszEventName, AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID);
 
     void WWISEC_AK_SoundEngine_CancelEventCallbackCookie(void* in_pCookie);
 
-    void WWISEC_AK_SoundEngine_CancelEventCallbackGameObject(WWISEC_AkGameObjectID in_gameObjectID);
+    void WWISEC_AK_SoundEngine_CancelEventCallbackGameObject(AkGameObjectID in_gameObjectID);
 
-    void WWISEC_AK_SoundEngine_CancelEventCallback(WWISEC_AkPlayingID in_playingID);
+    void WWISEC_AK_SoundEngine_CancelEventCallback(AkPlayingID in_playingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPosition(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_puPosition, bool in_bExtrapolate);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPosition(AkPlayingID in_PlayingID, AkTimeMs* out_puPosition, bool in_bExtrapolate);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPositions(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSourcePosition* out_puPositions, AkUInt32* io_pcPositions, bool in_bExtrapolate);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPositions(AkPlayingID in_PlayingID, WWISEC_AkSourcePosition* out_puPositions, AkUInt32* io_pcPositions, bool in_bExtrapolate);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourceStreamBuffering(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_buffering, bool* out_bIsBuffering);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourceStreamBuffering(AkPlayingID in_PlayingID, AkTimeMs* out_buffering, bool* out_bIsBuffering);
 
-    void WWISEC_AK_SoundEngine_StopAll(WWISEC_AkGameObjectID in_gameObjectID);
+    void WWISEC_AK_SoundEngine_StopAll(AkGameObjectID in_gameObjectID);
 
-    void WWISEC_AK_SoundEngine_StopPlayingID(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+    void WWISEC_AK_SoundEngine_StopPlayingID(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
 
-    void WWISEC_AK_SoundEngine_ExecuteActionOnPlayingID(WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+    void WWISEC_AK_SoundEngine_ExecuteActionOnPlayingID(WWISEC_AkActionOnEventType in_ActionType, AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
 
     void WWISEC_AK_SoundEngine_SetRandomSeed(AkUInt32 in_uSeed);
 
@@ -2546,89 +2506,89 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     bool WWISEC_AK_SoundEngine_GetBackgroundMusicMute();
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SendPluginCustomGameData(WWISEC_AkUniqueID in_busID, WWISEC_AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SendPluginCustomGameData(AkUniqueID in_busID, AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObj(WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObj(AkGameObjectID in_gameObjectID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObjWithName(WWISEC_AkGameObjectID in_gameObjectID, const char* in_pszObjName);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObjWithName(AkGameObjectID in_gameObjectID, const char* in_pszObjName);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterGameObj(WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterGameObj(AkGameObjectID in_gameObjectID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAllGameObj();
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, WWISEC_AkSetPositionFlags in_eFlags);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, WWISEC_AkSetPositionFlags in_eFlags);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(WWISEC_AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDistanceProbe(WWISEC_AkGameObjectID in_listenerGameObjectID, WWISEC_AkGameObjectID in_distanceProbeGameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDistanceProbe(AkGameObjectID in_listenerGameObjectID, AkGameObjectID in_distanceProbeGameObjectID);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ClearBanks();
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBankLoadIOSettings(AkReal32 in_fThroughput, WWISEC_AkPriority in_priority);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBankLoadIOSettings(AkReal32 in_fThroughput, AkPriority in_priority);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_String(const char* in_pszString, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_String(const char* in_pszString, AkBankID* out_bankID, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_ID(WWISEC_AkBankID in_bankID, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_ID(AkBankID in_bankID, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType* out_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID, AkBankType* out_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType* out_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID, AkBankType* out_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DecodeBank(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkMemPoolId in_uPoolForDecodedBank, void** out_pDecodedBankPtr, AkUInt32* out_uDecodedBankSize);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DecodeBank(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkMemPoolId in_uPoolForDecodedBank, void** out_pDecodedBankPtr, AkUInt32* out_uDecodedBankSize);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_String(const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_String(const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_ID(WWISEC_AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_ID(AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType* out_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID, AkBankType* out_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_String(const char* in_pszString, const void* in_pInMemoryBankPtr, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_String(const char* in_pszString, const void* in_pInMemoryBankPtr, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_ID(WWISEC_AkBankID in_bankID, const void* in_pInMemoryBankPtr, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_ID(AkBankID in_bankID, const void* in_pInMemoryBankPtr, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_String(const char* in_pszString, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_String(const char* in_pszString, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_ID(WWISEC_AkBankID in_bankID, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_ID(AkBankID in_bankID, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankType in_bankType);
 
     void WWISEC_AK_SoundEngine_CancelBankCallbackCookie(void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkBankID in_bankID, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkBankID in_bankID, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_ClearPreparedEvents();
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uNumEvent);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uBusses);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pBusID, AkUInt32 in_uBusses);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char** in_ppszString, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pBusID, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMedia(WWISEC_AkSourceSettings* in_pSourceSettings, AkUInt32 in_uNumSourceSettings);
 
@@ -2642,75 +2602,75 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkGroupType in_eGameSyncType, AkUInt32 in_GroupID, AkUInt32* in_paGameSyncID, AkUInt32 in_uNumGameSyncs, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListeners(WWISEC_AkGameObjectID in_emitterGameObj, const WWISEC_AkGameObjectID* in_pListenerGameObjs, AkUInt32 in_uNumListeners);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListeners(AkGameObjectID in_emitterGameObj, const AkGameObjectID* in_pListenerGameObjs, AkUInt32 in_uNumListeners);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddListener(WWISEC_AkGameObjectID in_emitterGameObj, WWISEC_AkGameObjectID in_listenerGameObj);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddListener(AkGameObjectID in_emitterGameObj, AkGameObjectID in_listenerGameObj);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveListener(WWISEC_AkGameObjectID in_emitterGameObj, WWISEC_AkGameObjectID in_listenerGameObj);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveListener(AkGameObjectID in_emitterGameObj, AkGameObjectID in_listenerGameObj);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDefaultListeners(const WWISEC_AkGameObjectID* in_pListenerObjs, AkUInt32 in_uNumListeners);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDefaultListeners(const AkGameObjectID* in_pListenerObjs, AkUInt32 in_uNumListeners);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddDefaultListener(WWISEC_AkGameObjectID in_listenerGameObj);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddDefaultListener(AkGameObjectID in_listenerGameObj);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveDefaultListener(WWISEC_AkGameObjectID in_listenerGameObj);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveDefaultListener(AkGameObjectID in_listenerGameObj);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetListenersToDefault(WWISEC_AkGameObjectID in_emitterGameObj);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetListenersToDefault(AkGameObjectID in_emitterGameObj);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListenerSpatialization(WWISEC_AkGameObjectID in_uListenerID, bool in_bSpatialized, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AK_SpeakerVolumes_VectorPtr in_pVolumeOffsets);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListenerSpatialization(AkGameObjectID in_uListenerID, bool in_bSpatialized, WWISEC_AkChannelConfig in_channelConfig, AkSpeakerVolumesMatrixPtr in_pVolumeOffsets);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_ID(AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_String(const char* in_pszRtpcName, AkRtpcValue in_value, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_ID(AkRtpcID in_rtpcID, AkRtpcValue in_value, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_String(const char* in_pszRtpcName, WWISEC_AkRtpcValue in_value, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_String(const char* in_pszRtpcName, AkRtpcValue in_value, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_ID(AkRtpcID in_rtpcID, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_String(const char* in_pszRtpcName, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_ID(AkRtpcID in_rtpcID, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_String(const char* in_pszRtpcName, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_String(const char* in_pszRtpcName, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkSwitchStateID in_switchState, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_ID(AkSwitchGroupID in_switchGroup, AkSwitchStateID in_switchState, AkGameObjectID in_gameObjectID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_String(const char* in_pszSwitchGroup, const char* in_pszSwitchState, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_String(const char* in_pszSwitchGroup, const char* in_pszSwitchState, AkGameObjectID in_gameObjectID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_ID(WWISEC_AkTriggerID in_triggerID, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_ID(AkTriggerID in_triggerID, AkGameObjectID in_gameObjectID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_String(const char* in_pszTrigger, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_String(const char* in_pszTrigger, AkGameObjectID in_gameObjectID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_ID(WWISEC_AkStateGroupID in_stateGroup, WWISEC_AkStateID in_state);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_ID(AkStateGroupID in_stateGroup, AkStateID in_state);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_String(const char* in_pszStateGroup, const char* in_pszState);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* in_aAuxSendValues, AkUInt32 in_uNumSendValues);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* in_aAuxSendValues, AkUInt32 in_uNumSendValues);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusCallbackFunc in_pfnCallback, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(AkUniqueID in_busID, WWISEC_AkBusCallbackFunc in_pfnCallback, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(AkUniqueID in_busID, WWISEC_AkBusMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(WWISEC_AkOutputDeviceID in_idOutput, WWISEC_AkOutputDeviceMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(AkOutputDeviceID in_idOutput, WWISEC_AkOutputDeviceMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(WWISEC_AkGameObjectID in_emitterObjID, WWISEC_AkGameObjectID in_listenerObjID, AkReal32 in_fControlValue);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(AkGameObjectID in_emitterObjID, AkGameObjectID in_listenerObjID, AkReal32 in_fControlValue);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_ID(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_ID(AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(WWISEC_AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_FXShareSetID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, AkUniqueID in_FXShareSetID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_String(const char* in_pszBusName, WWISEC_AkChannelConfig in_channelConfig);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32 in_fObstructionLevel, AkReal32 in_fOcclusionLevel);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(AkGameObjectID in_EmitterID, AkGameObjectID in_ListenerID, AkReal32 in_fObstructionLevel, AkReal32 in_fOcclusionLevel);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkObstructionOcclusionValues* in_fObstructionOcclusionValues, AkUInt32 in_uNumOcclusionObstruction);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(AkGameObjectID in_EmitterID, AkGameObjectID in_uListenerID, WWISEC_AkObstructionOcclusionValues* in_fObstructionOcclusionValues, AkUInt32 in_uNumOcclusionObstruction);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetContainerHistory(WWISEC_AK_IWriteBytes* in_pBytes);
 
@@ -2726,9 +2686,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     AkUInt32 WWISEC_AK_SoundEngine_GetSampleRate();
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, WWISEC_AkOutputDeviceID in_idOutput, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, AkOutputDeviceID in_idOutput, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, WWISEC_AkOutputDeviceID in_idOutput, void* in_pCookie);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, AkOutputDeviceID in_idOutput, void* in_pCookie);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_StartProfilerCapture(const AkOSChar* in_CaptureFileName);
 
@@ -2738,25 +2698,25 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOfflineRendering(bool in_bEnableOfflineRendering);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, AkOutputDeviceID* out_pDeviceID, const AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(AkOutputDeviceID in_idOutput);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSettings* in_Settings, AkOutputDeviceID in_outputDeviceId, AkOutputDeviceID* out_pOutputDeviceId);
 
-    WWISEC_AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_ID(WWISEC_AkUniqueID in_idShareset, AkUInt32 in_idDevice);
+    AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_ID(AkUniqueID in_idShareset, AkUInt32 in_idDevice);
 
-    WWISEC_AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_String(const char* in_szShareSet, AkUInt32 in_idDevice);
+    AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_String(const char* in_szShareSet, AkUInt32 in_idDevice);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusDevice_ID(WWISEC_AkUniqueID in_idBus, WWISEC_AkUniqueID in_idNewDevice);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusDevice_ID(AkUniqueID in_idBus, AkUniqueID in_idNewDevice);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusDevice_String(const char* in_BusName, const char* in_DeviceName);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_Plugin(AkUInt32 in_ulCompanyID, AkUInt32 in_ulPluginID, AkUInt32* io_maxNumDevices, WWISEC_AkDeviceDescription* out_deviceDescriptions);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_ShareSet(WWISEC_AkUniqueID in_audioDeviceShareSetID, AkUInt32* io_maxNumDevices, WWISEC_AkDeviceDescription* out_deviceDescriptions);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_ShareSet(AkUniqueID in_audioDeviceShareSetID, AkUInt32* io_maxNumDevices, WWISEC_AkDeviceDescription* out_deviceDescriptions);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputVolume(WWISEC_AkOutputDeviceID in_idOutput, AkReal32 in_fVolume);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputVolume(AkOutputDeviceID in_idOutput, AkReal32 in_fVolume);
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceSpatialAudioSupport(AkUInt32 in_idDevice);
 
@@ -2779,7 +2739,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         bool bIsLanguageSpecific;   ///< True when the file location depends on language
         bool bIsAutomaticStream;    ///< True when the file is opened to be used as an automatic stream. Note that you don't need to set it.
                                     ///< If you pass an AkFileSystemFlags to IAkStreamMgr CreateStd|Auto(), it will be set internally to the correct value.
-        WWISEC_AkCacheID uCacheID;  ///< Cache ID for caching system used by automatic streams. The user is responsible for guaranteeing unicity of IDs.
+        AkCacheID uCacheID;         ///< Cache ID for caching system used by automatic streams. The user is responsible for guaranteeing unicity of IDs.
                                     ///< When set, it supersedes the file ID passed to AK::IAkStreamMgr::CreateAuto() (ID version). Caching is optional and depends on the implementation.
         AkUInt32 uNumBytesPrefetch; ///< Indicates the number of bytes from the beginning of the file that should be streamed into cache via a caching stream. This field is only relevant when opening caching streams via
                                     ///< AK::IAkStreamMgr::PinFileInCache() and AK::SoundEngine::PinEventInStreamCache().  When using AK::SoundEngine::PinEventInStreamCache(),
@@ -2824,24 +2784,24 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkStreamInfo
     {
-        WWISEC_AkDeviceID deviceID; ///< Device ID
-        const AkOSChar* pszName;    ///< User-defined stream name (specified through AK::IAkStdStream::SetStreamName() or AK::IAkAutoStream::SetStreamName())
-        AkUInt64 uSize;             ///< Total stream/file size in bytes
-        bool bIsOpen;               ///< True when the file is open (implementations may defer file opening)
-        bool bIsLanguageSpecific;   ///< True when the file was found in a language specific location
+        AkDeviceID deviceID;      ///< Device ID
+        const AkOSChar* pszName;  ///< User-defined stream name (specified through AK::IAkStdStream::SetStreamName() or AK::IAkAutoStream::SetStreamName())
+        AkUInt64 uSize;           ///< Total stream/file size in bytes
+        bool bIsOpen;             ///< True when the file is open (implementations may defer file opening)
+        bool bIsLanguageSpecific; ///< True when the file was found in a language specific location
     } WWISEC_AkStreamInfo;
 
     /// Automatic streams heuristics.
     typedef struct WWISEC_AkAutoStmHeuristics
     {
-        AkReal32 fThroughput;       ///< Average throughput in bytes/ms
-        AkUInt64 uLoopStart;        ///< Set to the start of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
-        AkUInt64 uLoopEnd;          ///< Set to the end of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
-        AkUInt8 uMinNumBuffers;     ///< Minimum number of buffers if you plan to own more than one buffer at a time, 0 or 1 otherwise
-                                    ///< \remarks You should always release buffers as fast as possible, therefore this heuristic should be used only when
-                                    ///< dealing with special contraints, like drivers or hardware that require more than one buffer at a time.\n
-                                    ///< Also, this is only a heuristic: it does not guarantee that data will be ready when calling AK::IAkAutoStream::GetBuffer().
-        WWISEC_AkPriority priority; ///< The stream priority. it should be between AK_MIN_PRIORITY and AK_MAX_PRIORITY (included).
+        AkReal32 fThroughput;   ///< Average throughput in bytes/ms
+        AkUInt64 uLoopStart;    ///< Set to the start of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
+        AkUInt64 uLoopEnd;      ///< Set to the end of loop (byte offset from the beginning of the stream) for streams that loop, 0 otherwise
+        AkUInt8 uMinNumBuffers; ///< Minimum number of buffers if you plan to own more than one buffer at a time, 0 or 1 otherwise
+                                ///< \remarks You should always release buffers as fast as possible, therefore this heuristic should be used only when
+                                ///< dealing with special contraints, like drivers or hardware that require more than one buffer at a time.\n
+                                ///< Also, this is only a heuristic: it does not guarantee that data will be ready when calling AK::IAkAutoStream::GetBuffer().
+        AkPriority priority;    ///< The stream priority. it should be between AK_MIN_PRIORITY and AK_MAX_PRIORITY (included).
     } WWISEC_AkAutoStmHeuristics;
 
     /// Automatic streams buffer settings/constraints.
@@ -2860,7 +2820,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     /// Device descriptor.
     typedef struct WWISEC_AkDeviceDesc
     {
-        WWISEC_AkDeviceID deviceID;                                   ///< Device ID
+        AkDeviceID deviceID;                                          ///< Device ID
         bool bCanWrite;                                               ///< Specifies whether or not the device is writable
         bool bCanRead;                                                ///< Specifies whether or not the device is readable
         AkUtf16 szDeviceName[WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH]; ///< Device name
@@ -2870,7 +2830,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     /// Device descriptor.
     typedef struct WWISEC_AkDeviceData
     {
-        WWISEC_AkDeviceID deviceID;             ///< Device ID
+        AkDeviceID deviceID;                    ///< Device ID
         AkUInt32 uMemSize;                      ///< IO memory pool size
         AkUInt32 uMemUsed;                      ///< IO memory pool used
         AkUInt32 uAllocs;                       ///< Cumulative number of allocations
@@ -2893,9 +2853,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     typedef struct WWISEC_AkStreamRecord
     {
         AkUInt32 uStreamID;                                           ///< Unique stream identifier
-        WWISEC_AkDeviceID deviceID;                                   ///< Device ID
+        AkDeviceID deviceID;                                          ///< Device ID
         AkUtf16 szStreamName[WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH]; ///< Stream name
-        WWISEC_AkFileID idFile;
+        AkFileID idFile;
         AkUInt32 uStringSize;  ///< Stream name string's size (number of characters)
         AkUInt64 uFileSize;    ///< File size
         bool bIsAutoStream;    ///< True for auto streams
@@ -2922,7 +2882,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     typedef struct WWISEC_AkFileOpenData
     {
         const AkOSChar* pszFileName;      ///< File name. Only one of pszFileName or fileID should be valid (pszFileName null while fileID is not AK_INVALID_FILE_ID, or vice versa)
-        WWISEC_AkFileID fileID;           ///< File ID. Only one of pszFileName or fileID should be valid (pszFileName null while fileID is not AK_INVALID_FILE_ID, or vice versa)
+        AkFileID fileID;                  ///< File ID. Only one of pszFileName or fileID should be valid (pszFileName null while fileID is not AK_INVALID_FILE_ID, or vice versa)
         WWISEC_AkFileSystemFlags* pFlags; ///< Flags for opening, null when unused
         WWISEC_AkOpenMode eOpenMode;      ///< Open mode.
     } WWISEC_AkFileOpenData;
@@ -3018,7 +2978,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         (void* instance, void* in_pBuffer,
          AkUInt32 in_uReqSize,
          bool in_bWait,
-         WWISEC_AkPriority in_priority,
+         AkPriority in_priority,
          AkReal32 in_fDeadline,
          AkUInt32* out_uSize);
 
@@ -3027,7 +2987,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
          void* in_pBuffer,
          AkUInt32 in_uReqSize,
          bool in_bWait,
-         WWISEC_AkPriority in_priority,
+         AkPriority in_priority,
          AkReal32 in_fDeadline,
          AkUInt32* out_uSize);
 
@@ -3050,8 +3010,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void* WWISEC_AK_IAkStdStream_GetFileDescriptor(WWISEC_AK_IAkStdStream* instance);
     WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetStreamName(WWISEC_AK_IAkStdStream* instance, const AkOSChar* in_pszStreamName);
     AkUInt32 WWISEC_AK_IAkStdStream_GetBlockSize(WWISEC_AK_IAkStdStream* instance);
-    WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Read(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize);
-    WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Write(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize);
+    WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Read(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize);
+    WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Write(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize);
     AkUInt64 WWISEC_AK_IAkStdStream_GetPosition(WWISEC_AK_IAkStdStream* instance, bool* out_pbEndOfStream);
     WWISEC_AKRESULT WWISEC_AK_IAkStdStream_SetPosition(WWISEC_AK_IAkStdStream* instance, AkInt64 in_iMoveOffset, WWISEC_AkMoveMethod in_eMoveMethod);
     void WWISEC_AK_IAkStdStream_Cancel(WWISEC_AK_IAkStdStream* instance);
@@ -3162,27 +3122,27 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AKRESULT(*PinFileInCache)
         (
             void* instance,
-            WWISEC_AkFileID in_fileID,
+            AkFileID in_fileID,
             WWISEC_AkFileSystemFlags* in_pFSFlags,
-            WWISEC_AkPriority in_uPriority);
+            AkPriority in_uPriority);
 
         WWISEC_AKRESULT(*UnpinFileInCache)
         (
             void* instance,
-            WWISEC_AkFileID in_fileID,
-            WWISEC_AkPriority in_uPriority);
+            AkFileID in_fileID,
+            AkPriority in_uPriority);
 
         WWISEC_AKRESULT(*UpdateCachingPriority)
         (
             void* instance,
-            WWISEC_AkFileID in_fileID,
-            WWISEC_AkPriority in_uPriority,
-            WWISEC_AkPriority in_uOldPriority);
+            AkFileID in_fileID,
+            AkPriority in_uPriority,
+            AkPriority in_uOldPriority);
 
         WWISEC_AKRESULT(*GetBufferStatusForPinnedFile)
         (
             void* instance,
-            WWISEC_AkFileID in_fileID,
+            AkFileID in_fileID,
             AkReal32* out_fPercentBuffered,
             bool* out_bCacheFull);
 
@@ -3200,12 +3160,12 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AK_IAkStreamMgrProfile* WWISEC_AK_IAkStreamMgr_GetStreamMgrProfile(WWISEC_AK_IAkStreamMgr* instance);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateStd(WWISEC_AK_IAkStreamMgr* instance, const WWISEC_AkFileOpenData* in_FileOpen, WWISEC_AK_IAkStdStream** out_pStream, bool in_bSyncOpen);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_AkFileOpenData(WWISEC_AK_IAkStreamMgr* instance, const WWISEC_AkFileOpenData* in_FileOpen, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen, bool in_bCaching);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_ID(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_ID(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AkAutoStmBufSettings* in_pBufferSettings, WWISEC_AK_IAkAutoStream** out_pStream, bool in_bSyncOpen);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_Memory(WWISEC_AK_IAkStreamMgr* instance, void* in_pBuffer, AkUInt64 in_uSize, const WWISEC_AkAutoStmHeuristics* in_heuristics, WWISEC_AK_IAkAutoStream** out_pStream);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkPriority in_uPriority);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority, WWISEC_AkPriority in_uOldPriority);
-    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, AkReal32* out_fPercentBuffered, bool* out_bCacheFull);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, AkPriority in_uPriority);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, AkPriority in_uPriority);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, AkPriority in_uPriority, AkPriority in_uOldPriority);
+    WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, AkReal32* out_fPercentBuffered, bool* out_bCacheFull);
     WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_RelocateMemoryStream(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AK_IAkAutoStream* in_pStream, AkUInt8* in_pNewStart);
 
     WWISEC_AK_IAkStreamMgr* WWISEC_AK_IAkStreamMgr_Get();
@@ -3235,13 +3195,13 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkFileDesc
     {
-        AkInt64 iFileSize;          ///< File size in bytes
-        AkUInt64 uSector;           ///< Start sector (the sector size is specified by the low-level I/O)
-                                    ///< \sa
-                                    ///< - AK::StreamMgr::IAkFileLocationResolver::Open()
-                                    ///< - AK::StreamMgr::IAkLowLevelIOHook::GetBlockSize()
-        AkFileHandle hFile;         ///< File handle/identifier
-        WWISEC_AkDeviceID deviceID; ///< Device ID, obtained from CreateDevice() \sa AK::IAkStreamMgr::CreateDevice()
+        AkInt64 iFileSize;   ///< File size in bytes
+        AkUInt64 uSector;    ///< Start sector (the sector size is specified by the low-level I/O)
+                             ///< \sa
+                             ///< - AK::StreamMgr::IAkFileLocationResolver::Open()
+                             ///< - AK::StreamMgr::IAkLowLevelIOHook::GetBlockSize()
+        AkFileHandle hFile;  ///< File handle/identifier
+        AkDeviceID deviceID; ///< Device ID, obtained from CreateDevice() \sa AK::IAkStreamMgr::CreateDevice()
     } WWISEC_AkFileDesc;
 
     typedef struct WWISEC_AkIOTransferInfo
@@ -3292,8 +3252,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkIoHeuristics
     {
-        AkReal32 fDeadline;         ///< Operation deadline (ms).
-        WWISEC_AkPriority priority; ///< Operation priority (at the time it was scheduled and sent to the Low-Level I/O). Range is [AK_MIN_PRIORITY,AK_MAX_PRIORITY], inclusively.
+        AkReal32 fDeadline;  ///< Operation deadline (ms).
+        AkPriority priority; ///< Operation priority (at the time it was scheduled and sent to the Low-Level I/O). Range is [AK_MIN_PRIORITY,AK_MAX_PRIORITY], inclusively.
     } WWISEC_AkIoHeuristics;
 
     AK_CALLBACK(void, WWISEC_AK_StreamMgr_AkLanguageChangeHandler)
@@ -3349,20 +3309,20 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         void (*Destructor)(void* instance);
 
         WWISEC_AKRESULT(*GetNextPreferredDevice)
-        (void* instance, WWISEC_AkAsyncFileOpenData* in_FileOpen, WWISEC_AkDeviceID* io_idDevice);
+        (void* instance, WWISEC_AkAsyncFileOpenData* in_FileOpen, AkDeviceID* io_idDevice);
     } WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable;
 
     WWISEC_AK_StreamMgr_IAkFileLocationResolver* WWISEC_AK_StreamMgr_IAkFileLocationResolver_CreateInstance(void* instance, const WWISEC_AK_StreamMgr_IAkFileLocationResolver_FunctionTable* functionTable);
     void WWISEC_AK_StreamMgr_IAkFileLocationResolver_DestroyInstance(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance);
 
-    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkAsyncFileOpenData* in_FileOpen, WWISEC_AkDeviceID* io_idDevice);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkAsyncFileOpenData* in_FileOpen, AkDeviceID* io_idDevice);
 
     void* WWISEC_AK_StreamMgr_Create(WWISEC_AkStreamMgrSettings* in_settings);
     void WWISEC_AK_StreamMgr_GetDefaultSettings(WWISEC_AkStreamMgrSettings* out_settings);
     void* WWISEC_AK_StreamMgr_GetFileLocationResolver();
     void WWISEC_AK_StreamMgr_SetFileLocationResolver(void* in_pFileLocationResolver);
-    WWISEC_AKRESULT WWISEC_AK_StreamMgr_CreateDevice(const WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook, WWISEC_AkDeviceID* out_idDevice);
-    WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(WWISEC_AkDeviceID in_deviceID);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_CreateDevice(const WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook, AkDeviceID* out_idDevice);
+    WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(AkDeviceID in_deviceID);
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_PerformIO();
     void WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(WWISEC_AkDeviceSettings* out_settings);
     WWISEC_AKRESULT WWISEC_AK_StreamMgr_SetCurrentLanguage(const AkOSChar* in_pszLanguageName);
@@ -3381,7 +3341,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     WWISEC_AKRESULT WWISEC_AK_MusicEngine_Init(WWISEC_AkMusicSettings* in_pSettings);
     void WWISEC_AK_MusicEngine_GetDefaultInitSettings(WWISEC_AkMusicSettings* out_settings);
     void WWISEC_AK_MusicEngine_Term();
-    WWISEC_AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate);
+    WWISEC_AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(AkPlayingID in_PlayingID, WWISEC_AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate);
 // END AkMusicEngine
 
 // BEGIN AkCommunication
@@ -3422,31 +3382,31 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     // BEGIN AkDynamicDialogue
     AK_CALLBACK(bool, WWISEC_AkCandidateCallbackFunc)
     (
-        WWISEC_AkUniqueID in_idEvent,
-        WWISEC_AkUniqueID in_idCandidate,
+        AkUniqueID in_idEvent,
+        AkUniqueID in_idCandidate,
         void* in_cookie);
 
-    WWISEC_AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkArgumentValueID* in_aArgumentValues, AkUInt32 in_uNumArguments, WWISEC_AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie);
+    AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_ID(AkUniqueID in_eventID, AkArgumentValueID* in_aArgumentValues, AkUInt32 in_uNumArguments, AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie);
 
-    WWISEC_AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(const char* in_pszEventName, const char** in_aArgumentValueNames, AkUInt32 in_uNumArguments, WWISEC_AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie);
+    AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(const char* in_pszEventName, const char** in_aArgumentValueNames, AkUInt32 in_uNumArguments, AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicDialogue_GetDialogueEventCustomPropertyValue(WWISEC_AkUniqueID in_eventID, AkUInt32 in_uPropID, AkInt32* out_iValue);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicDialogue_GetDialogueEventCustomPropertyValue(AkUniqueID in_eventID, AkUInt32 in_uPropID, AkInt32* out_iValue);
     // END AkDynamicDialogue
 
     // BEGIN AkDynamicSequence
     typedef struct WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem
     {
-        WWISEC_AkUniqueID audioNodeID; ///< Unique ID of Audio Node
-        WWISEC_AkTimeMs msDelay;       ///< Delay before playing this item, in milliseconds
-        void* pCustomInfo;             ///< Optional user data
-        WWISEC_AkExternalSourceArray pExternalSrcs;
+        AkUniqueID audioNodeID; ///< Unique ID of Audio Node
+        AkTimeMs msDelay;       ///< Delay before playing this item, in milliseconds
+        void* pCustomInfo;      ///< Optional user data
+        AkExternalSourceArray pExternalSrcs;
     } WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem_SetExternalSources(WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem* self, AkUInt32 in_nExternalSrc, WWISEC_AkExternalSourceInfo* in_pExternalSrc);
 
     typedef struct WWISEC_AK_SoundEngine_DynamicSequence_Playlist WWISEC_AK_SoundEngine_DynamicSequence_Playlist;
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkTimeMs in_msDelay, void* in_pCustomInfo, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, AkUniqueID in_audioNodeID, AkTimeMs in_msDelay, void* in_pCustomInfo, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources);
     void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Erase(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, unsigned int in_uIndex);
     void WWISEC_AK_SoundEngine_DynamicSequence_Playlist_EraseSwap(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, unsigned int in_uIndex);
     bool WWISEC_AK_SoundEngine_DynamicSequence_Playlist_IsGrowingAllowed(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self);
@@ -3479,31 +3439,31 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType_NormalTransition ///< Normal transition mode, allows the entire playlist to be edited at all times.
     } WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType;
 
-    WWISEC_AkPlayingID WWISEC_AK_SoundEngine_DynamicSequence_Open(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType in_eDynamicSequenceType);
+    AkPlayingID WWISEC_AK_SoundEngine_DynamicSequence_Open(AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType in_eDynamicSequenceType);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Close(WWISEC_AkPlayingID in_playingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Close(AkPlayingID in_playingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Play(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Play(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Pause(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Pause(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Resume(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Resume(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Stop(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Stop(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Break(WWISEC_AkPlayingID in_playingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Break(AkPlayingID in_playingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Time(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_iPosition, bool in_bSeekToNearestMarker);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Time(AkPlayingID in_playingID, AkTimeMs in_iPosition, bool in_bSeekToNearestMarker);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Percent(WWISEC_AkPlayingID in_playingID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Percent(AkPlayingID in_playingID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPauseTimes(WWISEC_AkPlayingID in_playingID, AkUInt32* out_uTime, AkUInt32* out_uDuration);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPauseTimes(AkPlayingID in_playingID, AkUInt32* out_uTime, AkUInt32* out_uDuration);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPlayingItem(WWISEC_AkPlayingID in_playingID, WWISEC_AkUniqueID* out_audioNodeID, void** out_pCustomInfo);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPlayingItem(AkPlayingID in_playingID, AkUniqueID* out_audioNodeID, void** out_pCustomInfo);
 
-    WWISEC_AK_SoundEngine_DynamicSequence_Playlist* WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(WWISEC_AkPlayingID in_playingID);
+    WWISEC_AK_SoundEngine_DynamicSequence_Playlist* WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(AkPlayingID in_playingID);
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPlayingID in_playingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(AkPlayingID in_playingID);
     // END AkDynamicSequence
 
     // BEGIN AkQueryParameters
@@ -3522,29 +3482,29 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkReal32 fInnerAngle;         ///< Inner angle
         AkReal32 fOuterAngle;         ///< Outer angle
         AkReal32 fConeMaxAttenuation; ///< Cone max attenuation
-        WWISEC_AkLPFType LPFCone;     ///< Cone low pass filter value
-        WWISEC_AkLPFType HPFCone;     ///< Cone low pass filter value
+        AkLPFType LPFCone;            ///< Cone low pass filter value
+        AkLPFType HPFCone;            ///< Cone low pass filter value
 
-        AkReal32 fMaxDistance;              ///< Maximum distance
-        AkReal32 fVolDryAtMaxDist;          ///< Volume dry at maximum distance
-        AkReal32 fVolAuxGameDefAtMaxDist;   ///< Volume wet at maximum distance (if any) (based on the Game defined distance attenuation)
-        AkReal32 fVolAuxUserDefAtMaxDist;   ///< Volume wet at maximum distance (if any) (based on the User defined distance attenuation)
-        WWISEC_AkLPFType LPFValueAtMaxDist; ///< Low pass filter value at max distance (if any)
-        WWISEC_AkLPFType HPFValueAtMaxDist; ///< High pass filter value at max distance (if any)
+        AkReal32 fMaxDistance;            ///< Maximum distance
+        AkReal32 fVolDryAtMaxDist;        ///< Volume dry at maximum distance
+        AkReal32 fVolAuxGameDefAtMaxDist; ///< Volume wet at maximum distance (if any) (based on the Game defined distance attenuation)
+        AkReal32 fVolAuxUserDefAtMaxDist; ///< Volume wet at maximum distance (if any) (based on the User defined distance attenuation)
+        AkLPFType LPFValueAtMaxDist;      ///< Low pass filter value at max distance (if any)
+        AkLPFType HPFValueAtMaxDist;      ///< High pass filter value at max distance (if any)
     } WWISEC_AkPositioningInfo;
 
     /// Object information structure for QueryAudioObjectsIDs
     typedef struct WWISEC_AkObjectInfo
     {
-        WWISEC_AkUniqueID objID;    ///< Object ID
-        WWISEC_AkUniqueID parentID; ///< Object ID of the parent
-        AkInt32 iDepth;             ///< Depth in tree
+        AkUniqueID objID;    ///< Object ID
+        AkUniqueID parentID; ///< Object ID of the parent
+        AkInt32 iDepth;      ///< Depth in tree
     } WWISEC_AkObjectInfo;
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(WWISEC_AkGameObjectID in_uListenerID, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(AkGameObjectID in_GameObjectID, AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(AkGameObjectID in_uListenerID, bool* out_rbSpatialized, AkSpeakerVolumesMatrixPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig);
 
     typedef enum WWISEC_AK_SoundEngine_Query_RTPCValue_type
     {
@@ -3555,33 +3515,33 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AK_SoundEngine_Query_RTPCValue_type_RTPCValue_Unavailable ///< The value is not available for the RTPC specified.
     } WWISEC_AK_SoundEngine_Query_RTPCValue_type;
 
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkSwitchStateID* out_rSwitchState);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_String(const char* in_pstrSwitchGroupName, WWISEC_AkGameObjectID in_GameObj, WWISEC_AkSwitchStateID* out_rSwitchState);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_ID(WWISEC_AkStateGroupID in_stateGroup, WWISEC_AkStateID* out_rState);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_String(const char* in_pstrStateGroupName, WWISEC_AkStateID* out_rState);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* out_paAuxSendValues, AkUInt32* io_ruNumSendValues);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectDryLevelValue(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfControlValue);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfObstructionLevel, AkReal32* out_rfOcclusionLevel);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_ID(WWISEC_AkUniqueID in_eventID, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(AkRtpcID in_rtpcID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID, AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_String(const char* in_pszRtpcName, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID, AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_ID(AkSwitchGroupID in_switchGroup, AkGameObjectID in_gameObjectID, AkSwitchStateID* out_rSwitchState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_String(const char* in_pstrSwitchGroupName, AkGameObjectID in_GameObj, AkSwitchStateID* out_rSwitchState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_ID(AkStateGroupID in_stateGroup, AkStateID* out_rState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_String(const char* in_pstrStateGroupName, AkStateID* out_rState);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* out_paAuxSendValues, AkUInt32* io_ruNumSendValues);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectDryLevelValue(AkGameObjectID in_EmitterID, AkGameObjectID in_ListenerID, AkReal32* out_rfControlValue);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetObjectObstructionAndOcclusion(AkGameObjectID in_EmitterID, AkGameObjectID in_ListenerID, AkReal32* out_rfObstructionLevel, AkReal32* out_rfOcclusionLevel);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_ID(AkUniqueID in_eventID, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos);
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_String(const char* in_pszEventName, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPositioningInfo(WWISEC_AkUniqueID in_ObjectID, WWISEC_AkPositioningInfo* out_rPositioningInfo);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPositioningInfo(AkUniqueID in_ObjectID, WWISEC_AkPositioningInfo* out_rPositioningInfo);
 
     typedef struct WWISEC_AK_SoundEngine_Query_AkGameObjectsList
     {
-        WWISEC_AkGameObjectID* items;
+        AkGameObjectID* items;
         AkUInt32 length;
         AkUInt32 reserved;
     } WWISEC_AK_SoundEngine_Query_AkGameObjectsList;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetActiveGameObjects(WWISEC_AK_SoundEngine_Query_AkGameObjectsList* io_GameObjectList);
-    bool WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(WWISEC_AkGameObjectID in_GameObjId);
+    bool WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(AkGameObjectID in_GameObjId);
 
     typedef struct WWISEC_AK_SoundEngine_Query_GameObjDst
     {
-        WWISEC_AkGameObjectID m_gameObjID; ///< Game object ID
-        AkReal32 m_dst;                    ///< MaxDistance
+        AkGameObjectID m_gameObjID; ///< Game object ID
+        AkReal32 m_dst;             ///< MaxDistance
     } WWISEC_AK_SoundEngine_Query_GameObjDst;
 
     typedef struct WWISEC_AK_SoundEngine_Query_AkRadiusList
@@ -3592,12 +3552,12 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     } WWISEC_AK_SoundEngine_Query_AkRadiusList;
 
     WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetMaxRadius_List(WWISEC_AK_SoundEngine_Query_AkRadiusList* io_RadiusList);
-    AkReal32 WWISEC_AK_SoundEngine_Query_GetMaxRadius_Single(WWISEC_AkGameObjectID in_GameObjId);
-    WWISEC_AkUniqueID WWISEC_AK_SoundEngine_Query_GetEventIDFromPlayingID(WWISEC_AkPlayingID in_playingID);
-    WWISEC_AkGameObjectID WWISEC_AK_SoundEngine_Query_GetGameObjectFromPlayingID(WWISEC_AkPlayingID in_playingID);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPlayingIDsFromGameObject(WWISEC_AkGameObjectID in_GameObjId, AkUInt32* io_ruNumIDs, WWISEC_AkPlayingID* out_aPlayingIDs);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Int(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkInt32* out_iValue);
-    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Float(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkReal32* out_fValue);
+    AkReal32 WWISEC_AK_SoundEngine_Query_GetMaxRadius_Single(AkGameObjectID in_GameObjId);
+    AkUniqueID WWISEC_AK_SoundEngine_Query_GetEventIDFromPlayingID(AkPlayingID in_playingID);
+    AkGameObjectID WWISEC_AK_SoundEngine_Query_GetGameObjectFromPlayingID(AkPlayingID in_playingID);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPlayingIDsFromGameObject(AkGameObjectID in_GameObjId, AkUInt32* io_ruNumIDs, AkPlayingID* out_aPlayingIDs);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Int(AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkInt32* out_iValue);
+    WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Float(AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkReal32* out_fValue);
 // END AkQueryParameters
 
 // BEGIN IO Hooks
@@ -3689,7 +3649,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUInt64 id;
     } WWISEC_AkRoomID;
 
-    static const WWISEC_AkGameObjectID WWISEC_OutdoorsGameObjID = (WWISEC_AkGameObjectID)-4;
+    static const AkGameObjectID WWISEC_OutdoorsGameObjID = (AkGameObjectID)-4;
 
     extern const WWISEC_AkRoomID WWISEC_AK_SpatialAudio_kOutdoorRoomID;
 
@@ -3727,8 +3687,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkImageSourceTexture
     {
-        AkUInt32 uNumTexture;                                     ///< Number of valid textures in the texture array.
-        WWISEC_AkUniqueID arTextureID[WWISEC_AK_MAX_NUM_TEXTURE]; ///< Unique IDs of the Acoustics Texture ShareSets used to filter this image source.
+        AkUInt32 uNumTexture;                              ///< Number of valid textures in the texture array.
+        AkUniqueID arTextureID[WWISEC_AK_MAX_NUM_TEXTURE]; ///< Unique IDs of the Acoustics Texture ShareSets used to filter this image source.
     } WWISEC_AkImageSourceTexture;
 
     typedef struct WWISEC_AkImageSourceParams
@@ -3744,7 +3704,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkReflectImageSource
     {
-        WWISEC_AkImageSourceID uID; ///< Image source ID (for matching delay lines across frames)
+        AkImageSourceID uID; ///< Image source ID (for matching delay lines across frames)
         WWISEC_AkImageSourceParams params;
         WWISEC_AkImageSourceTexture texture;
         WWISEC_AkImageSourceName name;
@@ -3753,7 +3713,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     /// Data structure sent by the game to an instance of the Reflect plug-in.
     typedef struct WWISEC_AkReflectGameData
     {
-        WWISEC_AkGameObjectID listenerID;         ///< ID of the listener used to compute spatialization and distance evaluation from within the targeted Reflect plug-in instance. It needs to be one of the listeners that are listening to the game object associated with the targeted plug-in instance. See AK::SoundEngine::SetListeners and AK::SoundEngine::SetGameObjectAuxSendValues.
+        AkGameObjectID listenerID;                ///< ID of the listener used to compute spatialization and distance evaluation from within the targeted Reflect plug-in instance. It needs to be one of the listeners that are listening to the game object associated with the targeted plug-in instance. See AK::SoundEngine::SetListeners and AK::SoundEngine::SetGameObjectAuxSendValues.
         AkUInt32 uNumImageSources;                ///< Number of image sources passed in the variable array, below.
         WWISEC_AkReflectImageSource arSources[1]; ///< Variable array of image sources. You should allocate storage for the structure by calling AkReflectGameData::GetSize() with the desired number of sources.
     } WWISEC_AkReflectGameData;
@@ -4043,7 +4003,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// If more advanced control of reverb is desired, SetGameObjectAuxSendValues can be used to add additional sends on to a game object.
         /// - \ref AK::SpatialAudio::SetGameObjectInRoom
         /// - \ref AK::SoundEngine::SetGameObjectAuxSendValues
-        WWISEC_AkAuxBusID ReverbAuxBus;
+        AkAuxBusID ReverbAuxBus;
 
         /// The reverb control value for the send to ReverbAuxBus. Valid range: (0.f-1.f)
         /// Can be used to implement multiple rooms that share the same aux bus, but have different reverb levels.
@@ -4186,40 +4146,40 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     } WWISEC_AkGeometryInstanceParams;
 
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_Init(const WWISEC_AkSpatialAudioInitSettings* in_initSettings);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RegisterListener(WWISEC_AkGameObjectID in_gameObjectID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnregisterListener(WWISEC_AkGameObjectID in_gameObjectID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectRadius(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_outerRadius, AkReal32 in_innerRadius);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(WWISEC_AkImageSourceID in_srcID, const WWISEC_AkImageSourceSettings* in_info, const char* in_name, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveImageSource(WWISEC_AkImageSourceID in_srcID, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ClearImageSources(WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RegisterListener(AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnregisterListener(AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectRadius(AkGameObjectID in_gameObjectID, AkReal32 in_outerRadius, AkReal32 in_innerRadius);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(AkImageSourceID in_srcID, const WWISEC_AkImageSourceSettings* in_info, const char* in_name, AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveImageSource(AkImageSourceID in_srcID, AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ClearImageSources(AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGeometry(WWISEC_AkGeometrySetID in_GeomSetID, const WWISEC_AkGeometryParams* in_params);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometry(WWISEC_AkGeometrySetID in_SetID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID, const WWISEC_AkGeometryInstanceParams* in_params);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetRoom(WWISEC_AkRoomID in_RoomID, const WWISEC_AkRoomParams* in_Params, const char* in_RoomName);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveRoom(WWISEC_AkRoomID in_RoomID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortal(WWISEC_AkPortalID in_PortalID, const WWISEC_AkPortalParams* in_Params, const char* in_PortalName);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemovePortal(WWISEC_AkPortalID in_PortalID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReverbZone(WWISEC_AkRoomID in_ReverbZone, WWISEC_AkRoomID in_ParentRoom, AkReal32 in_transitionRegionWidth);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveReverbZone(WWISEC_AkRoomID in_ReverbZone);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(AkGameObjectID in_gameObjectID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflectionsOrder, bool in_bUpdatePaths);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetDiffractionOrder(AkUInt32 in_uDiffractionOrder, bool in_bUpdatePaths);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxGlobalReflectionPaths(AkUInt32 in_uMaxGlobalReflectionPaths);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(AkUInt32 in_uMaxDiffractionPaths, WWISEC_AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(AkUInt32 in_uMaxDiffractionPaths, AkGameObjectID in_gameObjectID);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxEmitterRoomAuxSends(AkUInt32 in_uMaxEmitterRoomAuxSends);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetNumberOfPrimaryRays(AkUInt32 in_uNbPrimaryRays);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(AkUInt32 in_uNbFrames);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetSmoothingConstant(AkReal32 in_fSmoothingConstantMs, WWISEC_AkGameObjectID in_gameObjectID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fSendVolume);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetSmoothingConstant(AkReal32 in_fSmoothingConstantMs, AkGameObjectID in_gameObjectID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(AkGameObjectID in_gameObjectID, AkAuxBusID in_auxBusID);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(AkGameObjectID in_gameObjectID, AkReal32 in_fSendVolume);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction, AkReal32 in_fOcclusion);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalToPortalObstruction(WWISEC_AkPortalID in_PortalID0, WWISEC_AkPortalID in_PortalID1, AkReal32 in_fObstruction);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_portal, AkReal32* out_wetDiffraction);
-    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
+    WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetTransmissionOperation(WWISEC_AkTransmissionOperation in_eOperation);
     WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine();
     // END AkSpatialAudio

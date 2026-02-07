@@ -173,12 +173,12 @@ bool WWISEC_AkErrorMessageTranslator_Translate(WWISEC_AkErrorMessageTranslator* 
 static_assert(sizeof(WWISEC_AK_Monitor_MsgContext) == sizeof(AK::Monitor::MsgContext));
 static_assert(static_cast<std::size_t>(WWISEC_AK_Monitor_Num_ErrorCodes) == static_cast<std::size_t>(AK::Monitor::Num_ErrorCodes));
 
-WWISEC_AKRESULT WWISEC_AK_Monitor_PostCode(WWISEC_AK_Monitor_ErrorCode in_eError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus)
+WWISEC_AKRESULT WWISEC_AK_Monitor_PostCode(WWISEC_AK_Monitor_ErrorCode in_eError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, AkPlayingID in_playingID, AkGameObjectID in_gameObjID, AkUniqueID in_audioNodeID, bool in_bIsBus)
 {
     return static_cast<WWISEC_AKRESULT>(AK::Monitor::PostCode(static_cast<AK::Monitor::ErrorCode>(in_eError), static_cast<AK::Monitor::ErrorLevel>(in_eErrorLevel), in_playingID, in_gameObjID, in_audioNodeID, in_bIsBus));
 }
 
-WWISEC_AKRESULT WWISEC_AK_Monitor_PostString(const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, WWISEC_AkPlayingID in_playingID, WWISEC_AkGameObjectID in_gameObjID, WWISEC_AkUniqueID in_audioNodeID, bool in_bIsBus)
+WWISEC_AKRESULT WWISEC_AK_Monitor_PostString(const char* in_pszError, WWISEC_AK_Monitor_ErrorLevel in_eErrorLevel, AkPlayingID in_playingID, AkGameObjectID in_gameObjID, AkUniqueID in_audioNodeID, bool in_bIsBus)
 {
     return static_cast<WWISEC_AKRESULT>(AK::Monitor::PostString(in_pszError, static_cast<AK::Monitor::ErrorLevel>(in_eErrorLevel), in_playingID, in_gameObjID, in_audioNodeID, in_bIsBus));
 }
@@ -198,7 +198,7 @@ WWISEC_AKRESULT WWISEC_AK_Monitor_ResetTranslator()
     return static_cast<WWISEC_AKRESULT>(AK::Monitor::ResetTranslator());
 }
 
-WWISEC_AkTimeMs WWISEC_AK_Monitor_GetTimeStamp()
+AkTimeMs WWISEC_AK_Monitor_GetTimeStamp()
 {
     return AK::Monitor::GetTimeStamp();
 }
@@ -208,12 +208,12 @@ void WWISEC_AK_Monitor_MonitorStreamMgrInit(const WWISEC_AkStreamMgrSettings* in
     AK::Monitor::MonitorStreamMgrInit(*reinterpret_cast<const AkStreamMgrSettings*>(in_streamMgrSettings));
 }
 
-void WWISEC_AK_Monitor_MonitorStreamingDeviceInit(WWISEC_AkDeviceID in_deviceID, const WWISEC_AkDeviceSettings* in_deviceSettings)
+void WWISEC_AK_Monitor_MonitorStreamingDeviceInit(AkDeviceID in_deviceID, const WWISEC_AkDeviceSettings* in_deviceSettings)
 {
     AK::Monitor::MonitorStreamingDeviceInit(in_deviceID, *reinterpret_cast<const AkDeviceSettings*>(in_deviceSettings));
 }
 
-void WWISEC_AK_Monitor_MonitorStreamingDeviceDestroyed(WWISEC_AkDeviceID in_deviceID)
+void WWISEC_AK_Monitor_MonitorStreamingDeviceDestroyed(AkDeviceID in_deviceID)
 {
     AK::Monitor::MonitorStreamingDeviceDestroyed(in_deviceID);
 }
@@ -471,27 +471,27 @@ void WWISEC_AK_MemoryMgr_TermForThread()
     AK::MemoryMgr::TermForThread();
 }
 
-void* WWISEC_AK_MemoryMgr_Malloc(WWISEC_AkMemPoolId in_poolId, size_t in_uSize)
+void* WWISEC_AK_MemoryMgr_Malloc(AkMemPoolId in_poolId, size_t in_uSize)
 {
     return AK::MemoryMgr::Malloc(static_cast<AkMemPoolId>(in_poolId), in_uSize);
 }
 
-void* WWISEC_AK_MemoryMgr_ReallocAligned(WWISEC_AkMemPoolId in_poolId, void* in_pAlloc, size_t in_uSize, AkUInt32 in_uAlignment)
+void* WWISEC_AK_MemoryMgr_ReallocAligned(AkMemPoolId in_poolId, void* in_pAlloc, size_t in_uSize, AkUInt32 in_uAlignment)
 {
     return AK::MemoryMgr::ReallocAligned(static_cast<AkMemPoolId>(in_poolId), in_pAlloc, in_uSize, in_uAlignment);
 }
 
-void WWISEC_AK_MemoryMgr_Free(WWISEC_AkMemPoolId in_poolId, void* in_pMemAddress)
+void WWISEC_AK_MemoryMgr_Free(AkMemPoolId in_poolId, void* in_pMemAddress)
 {
     AK::MemoryMgr::Free(in_poolId, in_pMemAddress);
 }
 
-void* WWISEC_AK_MemoryMgr_Malign(WWISEC_AkMemPoolId in_poolId, size_t in_USize, AkUInt32 in_uAlignment)
+void* WWISEC_AK_MemoryMgr_Malign(AkMemPoolId in_poolId, size_t in_USize, AkUInt32 in_uAlignment)
 {
     return AK::MemoryMgr::Malign(in_poolId, in_USize, in_uAlignment);
 }
 
-void WWISEC_AK_MemoryMgr_GetCategoryStats(WWISEC_AkMemPoolId in_poolId, WWISEC_AK_MemoryMgr_CategoryStats* out_poolStats)
+void WWISEC_AK_MemoryMgr_GetCategoryStats(AkMemPoolId in_poolId, WWISEC_AK_MemoryMgr_CategoryStats* out_poolStats)
 {
     AK::MemoryMgr::GetCategoryStats(in_poolId, *reinterpret_cast<AK::MemoryMgr::CategoryStats*>(out_poolStats));
 }
@@ -627,12 +627,12 @@ WWISEC_AK_IAkPluginMemAlloc* WWISEC_AK_IAkGlobalPluginContext_GetAllocator(WWISE
     return reinterpret_cast<WWISEC_AK_IAkPluginMemAlloc*>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->GetAllocator());
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(WWISEC_AK_IAkGlobalPluginContext* self, AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->SetRTPCValue(in_rtpcID, in_value, in_gameObjectID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_busID, WWISEC_AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes)
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_busID, AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->SendPluginCustomGameData(in_busID, in_busObjectID, static_cast<AkPluginType>(in_eType), in_uCompanyID, in_uPluginID, in_pData, in_uSizeInBytes));
 }
@@ -653,7 +653,7 @@ WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodi
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->ComputeWeightedAmbisonicsDecodingFromSampledSphere(reinterpret_cast<const AkVector*>(in_samples), in_uNumSamples, channelConfig, out_mxVolume));
 }
 
-const WWISEC_AkAcousticTexture* WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkAcousticTextureID in_AcousticTextureID)
+const WWISEC_AkAcousticTexture* WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(WWISEC_AK_IAkGlobalPluginContext* self, AkAcousticTextureID in_AcousticTextureID)
 {
     return reinterpret_cast<const WWISEC_AkAcousticTexture*>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->GetAcousticTexture(in_AcousticTextureID));
 }
@@ -683,17 +683,17 @@ AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(const WWISEC_AK_IAkGlo
     return reinterpret_cast<const AK::IAkGlobalPluginContext*>(self)->GetIDFromString(in_pszString);
 }
 
-WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID)
+AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, AkPlayingID in_PlayingID)
 {
-    return static_cast<WWISEC_AkPlayingID>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostEventSync(in_eventID, in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_cExternals, reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources), in_PlayingID));
+    return static_cast<AkPlayingID>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostEventSync(in_eventID, in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_cExternals, reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources), in_PlayingID));
 }
 
-WWISEC_AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AkPlayingID in_playingID)
+AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID)
 {
     return reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostMIDIOnEventSync(in_eventID, in_gameObjectID, reinterpret_cast<AkMIDIPost*>(in_pPosts), in_uNumPosts, in_bAbsoluteOffsets, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_playingID);
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID)
+WWISEC_AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->StopMIDIOnEventSync(in_eventID, in_gameObjectID, in_playingID));
 }
@@ -724,7 +724,7 @@ static_assert(static_cast<int32_t>(WWISEC_AkActionOnEventType_Last) == static_ca
 static_assert(static_cast<int32_t>(WWISEC_AK_SoundEngine_Preparation_Last) == static_cast<int32_t>(AK::SoundEngine::Preparation_Last));
 static_assert(static_cast<int32_t>(WWISEC_AK_SoundEngine_AkBankContent_Last) == static_cast<int32_t>(AK::SoundEngine::AkBankContent_Last));
 
-void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, WWISEC_AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
+void WWISEC_AkOutputSettings_Init(WWISEC_AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, AkUniqueID in_idDevice, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AkPanningRule in_ePanning)
 {
     ::new (outputSettings) AkOutputSettings(in_szDeviceShareSet, static_cast<AkUniqueID>(in_idDevice), *reinterpret_cast<AkChannelConfig*>(&in_channelConfig), static_cast<AkPanningRule>(in_ePanning));
 }
@@ -761,32 +761,32 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetAudioSettings(WWISEC_AkAudioSettings* o
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetAudioSettings(*reinterpret_cast<AkAudioSettings*>(out_audioSettings)));
 }
 
-WWISEC_AkChannelConfig WWISEC_AK_SoundEngine_GetSpeakerConfiguration(WWISEC_AkOutputDeviceID in_idOutput)
+WWISEC_AkChannelConfig WWISEC_AK_SoundEngine_GetSpeakerConfiguration(AkOutputDeviceID in_idOutput)
 {
     return static_cast<WWISEC_AkChannelConfig>(AK::SoundEngine::GetSpeakerConfiguration(in_idOutput).Serialize());
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(WWISEC_AkOutputDeviceID in_idOutput, WWISEC_AkChannelConfig* io_channelConfig, WWISEC_Ak3DAudioSinkCapabilities* io_capabilities)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(AkOutputDeviceID in_idOutput, WWISEC_AkChannelConfig* io_channelConfig, WWISEC_Ak3DAudioSinkCapabilities* io_capabilities)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetOutputDeviceConfiguration(in_idOutput, *reinterpret_cast<AkChannelConfig*>(io_channelConfig), *reinterpret_cast<Ak3DAudioSinkCapabilities*>(io_capabilities)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetPanningRule(WWISEC_AkPanningRule* out_ePanningRule, WWISEC_AkOutputDeviceID in_idOutput)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetPanningRule(WWISEC_AkPanningRule* out_ePanningRule, AkOutputDeviceID in_idOutput)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetPanningRule(*reinterpret_cast<AkPanningRule*>(out_ePanningRule), in_idOutput));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPanningRule(WWISEC_AkPanningRule in_ePanningRule, WWISEC_AkOutputDeviceID in_idOutput)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPanningRule(WWISEC_AkPanningRule in_ePanningRule, AkOutputDeviceID in_idOutput)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetPanningRule(static_cast<AkPanningRule>(in_ePanningRule), in_idOutput));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSpeakerAngles(AkReal32* io_pfSpeakerAngles, AkUInt32* io_uNumAngles, AkReal32* out_fHeightAngle, WWISEC_AkOutputDeviceID in_idOutput)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSpeakerAngles(AkReal32* io_pfSpeakerAngles, AkUInt32* io_uNumAngles, AkReal32* out_fHeightAngle, AkOutputDeviceID in_idOutput)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetSpeakerAngles(io_pfSpeakerAngles, *io_uNumAngles, *out_fHeightAngle, in_idOutput));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSpeakerAngles(const AkReal32* in_pfSpeakerAngles, AkUInt32 in_uNumAngles, AkReal32 in_fHeightAngle, WWISEC_AkOutputDeviceID in_idOutput)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSpeakerAngles(const AkReal32* in_pfSpeakerAngles, AkUInt32 in_uNumAngles, AkReal32 in_fHeightAngle, AkOutputDeviceID in_idOutput)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetSpeakerAngles(in_pfSpeakerAngles, in_uNumAngles, in_fHeightAngle, in_idOutput));
 }
@@ -801,7 +801,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMaxNumVoicesLimit(AkUInt16 in_maxNumber
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMaxNumVoicesLimit(in_maxNumberVoices));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetJobMgrMaxActiveWorkers(WWISEC_AkJobType in_jobType, AkUInt32 in_uNewMaxActiveWorkers)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetJobMgrMaxActiveWorkers(AkJobType in_jobType, AkUInt32 in_uNewMaxActiveWorkers)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetJobMgrMaxActiveWorkers(in_jobType, in_uNewMaxActiveWorkers));
 }
@@ -866,7 +866,7 @@ AkUInt32 WWISEC_AK_SoundEngine_GetIDFromString(const char* in_pszString)
     return AK::SoundEngine::GetIDFromString(in_pszString);
 }
 
-WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID)
+AkPlayingID WWISEC_AK_SoundEngine_PostEvent_ID(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, AkPlayingID in_PlayingID)
 {
     return AK::SoundEngine::PostEvent(
         in_eventID,
@@ -879,7 +879,7 @@ WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_ID(WWISEC_AkUniqueID in_event
         in_PlayingID);
 }
 
-WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, WWISEC_AkPlayingID in_PlayingID)
+AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEventName, AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources, AkPlayingID in_PlayingID)
 {
     return AK::SoundEngine::PostEvent(
         in_pszEventName,
@@ -892,7 +892,7 @@ WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostEvent_String(const char* in_pszEven
         in_PlayingID);
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(AkUniqueID in_eventID, WWISEC_AkActionOnEventType in_ActionType, AkGameObjectID in_gameObjectID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, AkPlayingID in_PlayingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ExecuteActionOnEvent(
         in_eventID,
@@ -903,7 +903,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(WWISEC_AkUniqueID 
         in_PlayingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEventName, WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, WWISEC_AkPlayingID in_PlayingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEventName, WWISEC_AkActionOnEventType in_ActionType, AkGameObjectID in_gameObjectID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, AkPlayingID in_PlayingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ExecuteActionOnEvent(
         in_pszEventName,
@@ -914,7 +914,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in
         in_PlayingID));
 }
 
-WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AkPlayingID in_playingID)
+AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID)
 {
     return AK::SoundEngine::PostMIDIOnEvent(
         in_eventID,
@@ -928,22 +928,22 @@ WWISEC_AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(WWISEC_AkUniqueID in_ev
         in_playingID);
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopMIDIOnEvent(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_StopMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::StopMIDIOnEvent(in_eventID, in_gameObjectID, in_playingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkPriority in_uActivePriority, WWISEC_AkPriority in_uInactivePriority)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_ID(AkUniqueID in_eventID, AkPriority in_uActivePriority, AkPriority in_uInactivePriority)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PinEventInStreamCache(in_eventID, in_uActivePriority, in_uInactivePriority));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_String(const char* in_pszEventName, WWISEC_AkPriority in_uActivePriority, WWISEC_AkPriority in_uInactivePriority)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PinEventInStreamCache_String(const char* in_pszEventName, AkPriority in_uActivePriority, AkPriority in_uInactivePriority)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PinEventInStreamCache(in_pszEventName, in_uActivePriority, in_uInactivePriority));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnpinEventInStreamCache_ID(WWISEC_AkUniqueID in_eventID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnpinEventInStreamCache_ID(AkUniqueID in_eventID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnpinEventInStreamCache(in_eventID));
 }
@@ -953,7 +953,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnpinEventInStreamCache_String(const char*
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnpinEventInStreamCache(in_pszEventName));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_ID(WWISEC_AkUniqueID in_eventID, AkReal32* out_fPercentBuffered, bool* out_bCachePinnedMemoryFull)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_ID(AkUniqueID in_eventID, AkReal32* out_fPercentBuffered, bool* out_bCachePinnedMemoryFull)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetBufferStatusForPinnedEvent(in_eventID, *out_fPercentBuffered, *out_bCachePinnedMemoryFull));
 }
@@ -963,22 +963,22 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_String(const
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetBufferStatusForPinnedEvent(in_pszEventName, *out_fPercentBuffered, *out_bCachePinnedMemoryFull));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_ID(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SeekOnEvent(in_eventID, in_gameObjectID, in_iPosition, in_bSeekToNearestMarker, in_PlayingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Time_String(const char* in_pszEventName, AkGameObjectID in_gameObjectID, AkTimeMs in_iPosition, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SeekOnEvent(in_pszEventName, in_gameObjectID, in_iPosition, in_bSeekToNearestMarker, in_PlayingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_ID(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SeekOnEvent(in_eventID, in_gameObjectID, in_fPercent, in_bSeekToNearestMarker, in_PlayingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_String(const char* in_pszEventName, WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, WWISEC_AkPlayingID in_PlayingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SeekOnEvent_Percent_String(const char* in_pszEventName, AkGameObjectID in_gameObjectID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker, AkPlayingID in_PlayingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SeekOnEvent(in_pszEventName, in_gameObjectID, in_fPercent, in_bSeekToNearestMarker, in_PlayingID));
 }
@@ -988,42 +988,42 @@ void WWISEC_AK_SoundEngine_CancelEventCallbackCookie(void* in_pCookie)
     AK::SoundEngine::CancelEventCallbackCookie(in_pCookie);
 }
 
-void WWISEC_AK_SoundEngine_CancelEventCallbackGameObject(WWISEC_AkGameObjectID in_gameObjectID)
+void WWISEC_AK_SoundEngine_CancelEventCallbackGameObject(AkGameObjectID in_gameObjectID)
 {
     AK::SoundEngine::CancelEventCallbackGameObject(in_gameObjectID);
 }
 
-void WWISEC_AK_SoundEngine_CancelEventCallback(WWISEC_AkPlayingID in_playingID)
+void WWISEC_AK_SoundEngine_CancelEventCallback(AkPlayingID in_playingID)
 {
     AK::SoundEngine::CancelEventCallback(in_playingID);
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPosition(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_puPosition, bool in_bExtrapolate)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPosition(AkPlayingID in_PlayingID, AkTimeMs* out_puPosition, bool in_bExtrapolate)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetSourcePlayPosition(in_PlayingID, reinterpret_cast<AkTimeMs*>(out_puPosition), in_bExtrapolate));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPositions(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSourcePosition* out_puPositions, AkUInt32* io_pcPositions, bool in_bExtrapolate)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPositions(AkPlayingID in_PlayingID, WWISEC_AkSourcePosition* out_puPositions, AkUInt32* io_pcPositions, bool in_bExtrapolate)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetSourcePlayPositions(in_PlayingID, reinterpret_cast<AkSourcePosition*>(out_puPositions), io_pcPositions, in_bExtrapolate));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourceStreamBuffering(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkTimeMs* out_buffering, bool* out_bIsBuffering)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetSourceStreamBuffering(AkPlayingID in_PlayingID, AkTimeMs* out_buffering, bool* out_bIsBuffering)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetSourceStreamBuffering(in_PlayingID, *out_buffering, *out_bIsBuffering));
 }
 
-void WWISEC_AK_SoundEngine_StopAll(WWISEC_AkGameObjectID in_gameObjectID)
+void WWISEC_AK_SoundEngine_StopAll(AkGameObjectID in_gameObjectID)
 {
     AK::SoundEngine::StopAll(in_gameObjectID);
 }
 
-void WWISEC_AK_SoundEngine_StopPlayingID(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
+void WWISEC_AK_SoundEngine_StopPlayingID(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
 {
     AK::SoundEngine::StopPlayingID(in_playingID, in_uTransitionDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve));
 }
 
-void WWISEC_AK_SoundEngine_ExecuteActionOnPlayingID(WWISEC_AkActionOnEventType in_ActionType, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
+void WWISEC_AK_SoundEngine_ExecuteActionOnPlayingID(WWISEC_AkActionOnEventType in_ActionType, AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
 {
     AK::SoundEngine::ExecuteActionOnPlayingID(static_cast<AK::SoundEngine::AkActionOnEventType>(in_ActionType), in_playingID, in_uTransitionDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve));
 }
@@ -1043,22 +1043,22 @@ bool WWISEC_AK_SoundEngine_GetBackgroundMusicMute()
     return AK::SoundEngine::GetBackgroundMusicMute();
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SendPluginCustomGameData(WWISEC_AkUniqueID in_busID, WWISEC_AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SendPluginCustomGameData(AkUniqueID in_busID, AkGameObjectID in_busObjectID, WWISEC_AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SendPluginCustomGameData(in_busID, in_busObjectID, static_cast<AkPluginType>(in_eType), in_uCompanyID, in_uPluginID, in_pData, in_uSizeInBytes));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObj(WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObj(AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterGameObj(in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObjWithName(WWISEC_AkGameObjectID in_gameObjectID, const char* in_pszObjName)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterGameObjWithName(AkGameObjectID in_gameObjectID, const char* in_pszObjName)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterGameObj(in_gameObjectID, in_pszObjName));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterGameObj(WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterGameObj(AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterGameObj(in_gameObjectID));
 }
@@ -1068,27 +1068,27 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterAllGameObj()
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterAllGameObj());
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, WWISEC_AkSetPositionFlags in_eFlags)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, WWISEC_AkSetPositionFlags in_eFlags)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetPosition(in_GameObjectID, *reinterpret_cast<const AkSoundPosition*>(in_Position), static_cast<AkSetPositionFlags>(in_eFlags)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMultiplePositions(in_GameObjectID, reinterpret_cast<const AkSoundPosition*>(in_pPositions), in_NumPositions, static_cast<AK::SoundEngine::MultiPositionType>(in_eMultiPositionType), static_cast<AkSetPositionFlags>(in_eFlags)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(WWISEC_AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, WWISEC_AK_SoundEngine_MultiPositionType in_eMultiPositionType, WWISEC_AkSetPositionFlags in_eFlags)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMultiplePositions(in_GameObjectID, reinterpret_cast<const AkChannelEmitter*>(in_pPositions), in_NumPositions, static_cast<AK::SoundEngine::MultiPositionType>(in_eMultiPositionType), static_cast<AkSetPositionFlags>(in_eFlags)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(WWISEC_AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetScalingFactor(in_GameObjectID, in_fAttenuationScalingFactor));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDistanceProbe(WWISEC_AkGameObjectID in_listenerGameObjectID, WWISEC_AkGameObjectID in_distanceProbeGameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDistanceProbe(AkGameObjectID in_listenerGameObjectID, AkGameObjectID in_distanceProbeGameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetDistanceProbe(in_listenerGameObjectID, in_distanceProbeGameObjectID));
 }
@@ -1098,87 +1098,87 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_ClearBanks()
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ClearBanks());
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBankLoadIOSettings(AkReal32 in_fThroughput, WWISEC_AkPriority in_priority)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBankLoadIOSettings(AkReal32 in_fThroughput, AkPriority in_priority)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBankLoadIOSettings(in_fThroughput, in_priority));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_String(const char* in_pszString, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_String(const char* in_pszString, AkBankID* out_bankID, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBank(in_pszString, *out_bankID, in_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_ID(WWISEC_AkBankID in_bankID, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_ID(AkBankID in_bankID, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBank(in_bankID, in_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBankMemoryView(in_pInMemoryBankPtr, in_uInMemoryBankSize, *out_bankID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType* out_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID, AkBankType* out_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBankMemoryView(in_pInMemoryBankPtr, in_uInMemoryBankSize, *out_bankID, *out_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBankMemoryCopy(in_pInMemoryBankPtr, in_uInMemoryBankSize, *out_bankID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType* out_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkBankID* out_bankID, AkBankType* out_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBankMemoryCopy(in_pInMemoryBankPtr, in_uInMemoryBankSize, *out_bankID, *out_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DecodeBank(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkMemPoolId in_uPoolForDecodedBank, void** out_pDecodedBankPtr, AkUInt32* out_uDecodedBankSize)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DecodeBank(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, AkMemPoolId in_uPoolForDecodedBank, void** out_pDecodedBankPtr, AkUInt32* out_uDecodedBankSize)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DecodeBank(in_pInMemoryBankPtr, in_uInMemoryBankSize, in_uPoolForDecodedBank, *out_pDecodedBankPtr, *out_uDecodedBankSize));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_String(const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_String(const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBank(in_pszString, reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback), in_pCookie, *out_bankID, in_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_ID(WWISEC_AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBank_Async_ID(AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBank(in_bankID, reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback), in_pCookie, in_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBankMemoryView(in_pInMemoryBankPtr, in_uInMemoryBankSize, reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback), in_pCookie, *out_bankID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID, WWISEC_AkBankType* out_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryView_Async_OutBankType(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID, AkBankType* out_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBankMemoryView(in_pInMemoryBankPtr, in_uInMemoryBankSize, reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback), in_pCookie, *out_bankID, *out_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankID* out_bankID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_LoadBankMemoryCopy_Async(const void* in_pInMemoryBankPtr, AkUInt32 in_uInMemoryBankSize, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankID* out_bankID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::LoadBankMemoryCopy(in_pInMemoryBankPtr, in_uInMemoryBankSize, reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback), in_pCookie, *out_bankID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_String(const char* in_pszString, const void* in_pInMemoryBankPtr, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_String(const char* in_pszString, const void* in_pInMemoryBankPtr, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnloadBank(in_pszString, in_pInMemoryBankPtr, in_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_ID(WWISEC_AkBankID in_bankID, const void* in_pInMemoryBankPtr, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_ID(AkBankID in_bankID, const void* in_pInMemoryBankPtr, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnloadBank(in_bankID, in_pInMemoryBankPtr, in_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_String(const char* in_pszString, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_String(const char* in_pszString, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnloadBank(in_pszString, in_pInMemoryBankPtr, reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback), in_pCookie, in_bankType));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_ID(WWISEC_AkBankID in_bankID, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnloadBank_Async_ID(AkBankID in_bankID, const void* in_pInMemoryBankPtr, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnloadBank(in_bankID, in_pInMemoryBankPtr, reinterpret_cast<AkBankCallbackFunc>(in_pfnBankCallback), in_pCookie, in_bankType));
 }
@@ -1188,17 +1188,17 @@ void WWISEC_AK_SoundEngine_CancelBankCallbackCookie(void* in_pCookie)
     AK::SoundEngine::CancelBankCallbackCookie(in_pCookie);
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareBank(static_cast<AK::SoundEngine::PreparationType>(in_PreparationType), in_pszString, static_cast<AK::SoundEngine::AkBankContent>(in_uFlags), static_cast<AkBankType>(in_bankType)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkBankID in_bankID, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkBankID in_bankID, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareBank(static_cast<AK::SoundEngine::PreparationType>(in_PreparationType), static_cast<AkBankID>(in_bankID), static_cast<AK::SoundEngine::AkBankContent>(in_uFlags), static_cast<AkBankType>(in_bankType)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_String(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, const char* in_pszString, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareBank(
         static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
@@ -1209,7 +1209,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_String(WWISEC_AK_SoundEn
         static_cast<AkBankType>(in_bankType)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, WWISEC_AkBankType in_bankType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBank_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkBankID in_bankID, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie, WWISEC_AK_SoundEngine_AkBankContent in_uFlags, AkBankType in_bankType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareBank(
         static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
@@ -1230,7 +1230,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_String(WWISEC_AK_SoundEngine_
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareEvent(static_cast<AK::SoundEngine::PreparationType>(in_PreparationType), in_ppszString, in_uNumEvent));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareEvent(static_cast<AK::SoundEngine::PreparationType>(in_PreparationType), in_pEventID, in_uNumEvent));
 }
@@ -1245,7 +1245,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_String(WWISEC_AK_SoundE
         in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pEventID, AkUInt32 in_uNumEvent, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PrepareEvent(
         static_cast<AK::SoundEngine::PreparationType>(in_PreparationType),
@@ -1264,7 +1264,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_String(WWISEC_AK_SoundEngine_Pr
             in_uBusses));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pBusID, AkUInt32 in_uBusses)
 {
     return static_cast<WWISEC_AKRESULT>(
         AK::SoundEngine::PrepareBus(
@@ -1284,7 +1284,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_String(WWISEC_AK_SoundEng
             in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, WWISEC_AkUniqueID* in_pBusID, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareBus_Async_ID(WWISEC_AK_SoundEngine_PreparationType in_PreparationType, AkUniqueID* in_pBusID, AkUInt32 in_uBusses, WWISEC_AkBankCallbackFunc in_pfnBankCallback, void* in_pCookie)
 {
     return static_cast<WWISEC_AKRESULT>(
         AK::SoundEngine::PrepareBus(
@@ -1349,42 +1349,42 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_ID(WWISEC_AK_SoundE
         in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListeners(WWISEC_AkGameObjectID in_emitterGameObj, const WWISEC_AkGameObjectID* in_pListenerGameObjs, AkUInt32 in_uNumListeners)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListeners(AkGameObjectID in_emitterGameObj, const AkGameObjectID* in_pListenerGameObjs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetListeners(in_emitterGameObj, reinterpret_cast<const AkGameObjectID*>(in_pListenerGameObjs), in_uNumListeners));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddListener(WWISEC_AkGameObjectID in_emitterGameObj, WWISEC_AkGameObjectID in_listenerGameObj)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddListener(AkGameObjectID in_emitterGameObj, AkGameObjectID in_listenerGameObj)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddListener(in_emitterGameObj, in_listenerGameObj));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveListener(WWISEC_AkGameObjectID in_emitterGameObj, WWISEC_AkGameObjectID in_listenerGameObj)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveListener(AkGameObjectID in_emitterGameObj, AkGameObjectID in_listenerGameObj)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RemoveListener(in_emitterGameObj, in_listenerGameObj));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDefaultListeners(const WWISEC_AkGameObjectID* in_pListenerObjs, AkUInt32 in_uNumListeners)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetDefaultListeners(const AkGameObjectID* in_pListenerObjs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetDefaultListeners(reinterpret_cast<const AkGameObjectID*>(in_pListenerObjs), in_uNumListeners));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddDefaultListener(WWISEC_AkGameObjectID in_listenerGameObj)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddDefaultListener(AkGameObjectID in_listenerGameObj)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddDefaultListener(in_listenerGameObj));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveDefaultListener(WWISEC_AkGameObjectID in_listenerGameObj)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveDefaultListener(AkGameObjectID in_listenerGameObj)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RemoveDefaultListener(in_listenerGameObj));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetListenersToDefault(WWISEC_AkGameObjectID in_emitterGameObj)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetListenersToDefault(AkGameObjectID in_emitterGameObj)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetListenersToDefault(in_emitterGameObj));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListenerSpatialization(WWISEC_AkGameObjectID in_uListenerID, bool in_bSpatialized, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AK_SpeakerVolumes_VectorPtr in_pVolumeOffsets)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListenerSpatialization(AkGameObjectID in_uListenerID, bool in_bSpatialized, WWISEC_AkChannelConfig in_channelConfig, WWISEC_AK_SpeakerVolumes_VectorPtr in_pVolumeOffsets)
 {
     AkChannelConfig converted_channel_config;
     converted_channel_config.Deserialize(in_channelConfig);
@@ -1392,67 +1392,67 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetListenerSpatialization(WWISEC_AkGameObj
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetListenerSpatialization(in_uListenerID, in_bSpatialized, converted_channel_config, reinterpret_cast<AK::SpeakerVolumes::VectorPtr>(in_pVolumeOffsets)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_ID(AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValue(in_rtpcID, in_value, in_gameObjectID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkRtpcValue in_value, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValue_String(const char* in_pszRtpcName, AkRtpcValue in_value, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValue(in_pszRtpcName, in_value, in_gameObjectID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkRtpcValue in_value, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_ID(AkRtpcID in_rtpcID, AkRtpcValue in_value, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValueByPlayingID(in_rtpcID, in_value, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_String(const char* in_pszRtpcName, WWISEC_AkRtpcValue in_value, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_String(const char* in_pszRtpcName, AkRtpcValue in_value, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetRTPCValueByPlayingID(in_pszRtpcName, in_value, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_ID(AkRtpcID in_rtpcID, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetRTPCValue(in_rtpcID, in_gameObjectID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValue_String(const char* in_pszRtpcName, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetRTPCValue(in_pszRtpcName, in_gameObjectID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_ID(AkRtpcID in_rtpcID, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetRTPCValueByPlayingID(in_rtpcID, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_String(const char* in_pszRtpcName, WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_String(const char* in_pszRtpcName, AkPlayingID in_playingID, AkTimeMs in_uValueChangeDuration, WWISEC_AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ResetRTPCValueByPlayingID(in_pszRtpcName, in_playingID, in_uValueChangeDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve), in_bBypassInternalValueInterpolation));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkSwitchStateID in_switchState, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_ID(AkSwitchGroupID in_switchGroup, AkSwitchStateID in_switchState, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetSwitch(in_switchGroup, in_switchState, in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_String(const char* in_pszSwitchGroup, const char* in_pszSwitchState, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetSwitch_String(const char* in_pszSwitchGroup, const char* in_pszSwitchState, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetSwitch(in_pszSwitchGroup, in_pszSwitchState, in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_ID(WWISEC_AkTriggerID in_triggerID, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_ID(AkTriggerID in_triggerID, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PostTrigger(in_triggerID, in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_String(const char* in_pszTrigger, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_PostTrigger_String(const char* in_pszTrigger, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::PostTrigger(in_pszTrigger, in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_ID(WWISEC_AkStateGroupID in_stateGroup, WWISEC_AkStateID in_state)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_ID(AkStateGroupID in_stateGroup, AkStateID in_state)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetState(in_stateGroup, in_state));
 }
@@ -1462,52 +1462,52 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetState_String(const char* in_pszStateGro
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetState(in_pszStateGroup, in_pszState));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* in_aAuxSendValues, AkUInt32 in_uNumSendValues)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* in_aAuxSendValues, AkUInt32 in_uNumSendValues)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetGameObjectAuxSendValues(in_gameObjectID, reinterpret_cast<AkAuxSendValue*>(in_aAuxSendValues), in_uNumSendValues));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusCallbackFunc in_pfnCallback, void* in_pCookie)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(AkUniqueID in_busID, WWISEC_AkBusCallbackFunc in_pfnCallback, void* in_pCookie)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterBusVolumeCallback(in_busID, reinterpret_cast<AkBusCallbackFunc>(in_pfnCallback), in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(WWISEC_AkUniqueID in_busID, WWISEC_AkBusMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(AkUniqueID in_busID, WWISEC_AkBusMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterBusMeteringCallback(in_busID, reinterpret_cast<AkBusMeteringCallbackFunc>(in_pfnCallback), static_cast<AkMeteringFlags>(in_eMeteringFlags), in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(WWISEC_AkOutputDeviceID in_idOutput, WWISEC_AkOutputDeviceMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(AkOutputDeviceID in_idOutput, WWISEC_AkOutputDeviceMeteringCallbackFunc in_pfnCallback, WWISEC_AkMeteringFlags in_eMeteringFlags, void* in_pCookie)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterOutputDeviceMeteringCallback(in_idOutput, reinterpret_cast<AkOutputDeviceMeteringCallbackFunc>(in_pfnCallback), static_cast<AkMeteringFlags>(in_eMeteringFlags), in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(WWISEC_AkGameObjectID in_emitterObjID, WWISEC_AkGameObjectID in_listenerObjID, AkReal32 in_fControlValue)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(AkGameObjectID in_emitterObjID, AkGameObjectID in_listenerObjID, AkReal32 in_fControlValue)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetGameObjectOutputBusVolume(in_emitterObjID, in_listenerObjID, in_fControlValue));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetActorMixerEffect(in_audioNodeID, in_uFXIndex, in_shareSetID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_ID(WWISEC_AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_ID(AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusEffect(in_audioNodeID, in_uFXIndex, in_shareSetID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_shareSetID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusEffect(in_pszBusName, in_uFXIndex, in_shareSetID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(WWISEC_AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, WWISEC_AkUniqueID in_FXShareSetID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, AkUniqueID in_FXShareSetID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOutputDeviceEffect(in_outputDeviceID, in_uFXIndex, in_FXShareSetID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_ID(AkUniqueID in_audioNodeID, WWISEC_AkChannelConfig in_channelConfig)
 {
     AkChannelConfig converted_channel_config;
     converted_channel_config.Deserialize(in_channelConfig);
@@ -1523,12 +1523,12 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusConfig_String(const char* in_pszBusN
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusConfig(in_pszBusName, converted_channel_config));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32 in_fObstructionLevel, AkReal32 in_fOcclusionLevel)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(AkGameObjectID in_EmitterID, AkGameObjectID in_ListenerID, AkReal32 in_fObstructionLevel, AkReal32 in_fOcclusionLevel)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetObjectObstructionAndOcclusion(in_EmitterID, in_ListenerID, in_fObstructionLevel, in_fOcclusionLevel));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkObstructionOcclusionValues* in_fObstructionOcclusionValues, AkUInt32 in_uNumOcclusionObstruction)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(AkGameObjectID in_EmitterID, AkGameObjectID in_uListenerID, WWISEC_AkObstructionOcclusionValues* in_fObstructionOcclusionValues, AkUInt32 in_uNumOcclusionObstruction)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetMultipleObstructionAndOcclusion(in_EmitterID, in_uListenerID, reinterpret_cast<AkObstructionOcclusionValues*>(in_fObstructionOcclusionValues), in_uNumOcclusionObstruction));
 }
@@ -1568,12 +1568,12 @@ AkUInt32 WWISEC_AK_SoundEngine_GetSampleRate()
     return AK::SoundEngine::GetSampleRate();
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, WWISEC_AkOutputDeviceID in_idOutput, void* in_pCookie)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RegisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, AkOutputDeviceID in_idOutput, void* in_pCookie)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RegisterCaptureCallback(reinterpret_cast<AkCaptureCallbackFunc>(in_pfnCallback), in_idOutput, in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, WWISEC_AkOutputDeviceID in_idOutput, void* in_pCookie)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_UnregisterCaptureCallback(WWISEC_AkCaptureCallbackFunc in_pfnCallback, AkOutputDeviceID in_idOutput, void* in_pCookie)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::UnregisterCaptureCallback(reinterpret_cast<AkCaptureCallbackFunc>(in_pfnCallback), in_idOutput, in_pCookie));
 }
@@ -1598,32 +1598,32 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOfflineRendering(bool in_bEnableOffline
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOfflineRendering(in_bEnableOfflineRendering));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID* out_pDeviceID, const WWISEC_AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_AddOutput(const WWISEC_AkOutputSettings* in_Settings, AkOutputDeviceID* out_pDeviceID, const AkGameObjectID* in_pListenerIDs, AkUInt32 in_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::AddOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), reinterpret_cast<AkOutputDeviceID*>(out_pDeviceID), reinterpret_cast<const AkGameObjectID*>(in_pListenerIDs), in_uNumListeners));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(WWISEC_AkOutputDeviceID in_idOutput)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_RemoveOutput(AkOutputDeviceID in_idOutput)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::RemoveOutput(in_idOutput));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSettings* in_Settings, WWISEC_AkOutputDeviceID in_outputDeviceId, WWISEC_AkOutputDeviceID* out_pOutputDeviceId)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_ReplaceOutput(const WWISEC_AkOutputSettings* in_Settings, AkOutputDeviceID in_outputDeviceId, AkOutputDeviceID* out_pOutputDeviceId)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::ReplaceOutput(*reinterpret_cast<const AkOutputSettings*>(in_Settings), in_outputDeviceId, reinterpret_cast<AkOutputDeviceID*>(out_pOutputDeviceId)));
 }
 
-WWISEC_AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_ID(WWISEC_AkUniqueID in_idShareset, AkUInt32 in_idDevice)
+AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_ID(AkUniqueID in_idShareset, AkUInt32 in_idDevice)
 {
-    return static_cast<WWISEC_AkOutputDeviceID>(AK::SoundEngine::GetOutputID(in_idShareset, in_idDevice));
+    return static_cast<AkOutputDeviceID>(AK::SoundEngine::GetOutputID(in_idShareset, in_idDevice));
 }
 
-WWISEC_AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_String(const char* in_szShareSet, AkUInt32 in_idDevice)
+AkOutputDeviceID WWISEC_AK_SoundEngine_GetOutputID_String(const char* in_szShareSet, AkUInt32 in_idDevice)
 {
-    return static_cast<WWISEC_AkOutputDeviceID>(AK::SoundEngine::GetOutputID(in_szShareSet, in_idDevice));
+    return static_cast<AkOutputDeviceID>(AK::SoundEngine::GetOutputID(in_szShareSet, in_idDevice));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusDevice_ID(WWISEC_AkUniqueID in_idBus, WWISEC_AkUniqueID in_idNewDevice)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetBusDevice_ID(AkUniqueID in_idBus, AkUniqueID in_idNewDevice)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetBusDevice(in_idBus, in_idNewDevice));
 }
@@ -1638,12 +1638,12 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_Plugin(AkUInt32 in_ulCompany
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetDeviceList(in_ulCompanyID, in_ulPluginID, *io_maxNumDevices, reinterpret_cast<AkDeviceDescription*>(out_deviceDescriptions)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_ShareSet(WWISEC_AkUniqueID in_audioDeviceShareSetID, AkUInt32* io_maxNumDevices, WWISEC_AkDeviceDescription* out_deviceDescriptions)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_GetDeviceList_ShareSet(AkUniqueID in_audioDeviceShareSetID, AkUInt32* io_maxNumDevices, WWISEC_AkDeviceDescription* out_deviceDescriptions)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::GetDeviceList(in_audioDeviceShareSetID, *io_maxNumDevices, reinterpret_cast<AkDeviceDescription*>(out_deviceDescriptions)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputVolume(WWISEC_AkOutputDeviceID in_idOutput, AkReal32 in_fVolume)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_SetOutputVolume(AkOutputDeviceID in_idOutput, AkReal32 in_fVolume)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::SetOutputVolume(in_idOutput, in_fVolume));
 }
@@ -1979,12 +1979,12 @@ class WWISEC_AK_IAkStdStream_Wrapper : public AK::IAkStdStream
 
     AKRESULT Read(void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32& out_uSize) override
     {
-        return static_cast<AKRESULT>(_functions.Read(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<WWISEC_AkPriority>(in_priority), in_fDeadline, &out_uSize));
+        return static_cast<AKRESULT>(_functions.Read(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, &out_uSize));
     }
 
     AKRESULT Write(void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32& out_uSize) override
     {
-        return static_cast<AKRESULT>(_functions.Write(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<WWISEC_AkPriority>(in_priority), in_fDeadline, &out_uSize));
+        return static_cast<AKRESULT>(_functions.Write(_instance, in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, &out_uSize));
     }
 
     AkUInt64 GetPosition(bool* out_pbEndOfStream) override
@@ -2059,12 +2059,12 @@ AkUInt32 WWISEC_AK_IAkStdStream_GetBlockSize(WWISEC_AK_IAkStdStream* instance)
     return reinterpret_cast<AK::IAkStdStream*>(instance)->GetBlockSize();
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Read(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Read(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->Read(in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, *out_uSize));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Write(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, WWISEC_AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
+WWISEC_AKRESULT WWISEC_AK_IAkStdStream_Write(WWISEC_AK_IAkStdStream* instance, void* in_pBuffer, AkUInt32 in_uReqSize, bool in_bWait, AkPriority in_priority, AkReal32 in_fDeadline, AkUInt32* out_uSize)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStdStream*>(instance)->Write(in_pBuffer, in_uReqSize, in_bWait, static_cast<AkPriority>(in_priority), in_fDeadline, *out_uSize));
 }
@@ -2330,17 +2330,17 @@ class WWISEC_AK_IAkStreamMgr_Wrapper : public AK::IAkStreamMgr
 
     AKRESULT PinFileInCache(AkFileID in_fileID, AkFileSystemFlags* in_pFSFlags, AkPriority in_uPriority) override
     {
-        return static_cast<AKRESULT>(_functions.PinFileInCache(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<WWISEC_AkPriority>(in_uPriority)));
+        return static_cast<AKRESULT>(_functions.PinFileInCache(_instance, in_fileID, reinterpret_cast<WWISEC_AkFileSystemFlags*>(in_pFSFlags), static_cast<AkPriority>(in_uPriority)));
     }
 
     AKRESULT UnpinFileInCache(AkFileID in_fileID, AkPriority in_uPriority) override
     {
-        return static_cast<AKRESULT>(_functions.UnpinFileInCache(_instance, in_fileID, static_cast<WWISEC_AkPriority>(in_uPriority)));
+        return static_cast<AKRESULT>(_functions.UnpinFileInCache(_instance, in_fileID, static_cast<AkPriority>(in_uPriority)));
     }
 
     AKRESULT UpdateCachingPriority(AkFileID in_fileID, AkPriority in_uPriority, AkPriority in_uOldPriority) override
     {
-        return static_cast<AKRESULT>(_functions.UpdateCachingPriority(_instance, in_fileID, static_cast<WWISEC_AkPriority>(in_uPriority), static_cast<WWISEC_AkPriority>(in_uOldPriority)));
+        return static_cast<AKRESULT>(_functions.UpdateCachingPriority(_instance, in_fileID, static_cast<AkPriority>(in_uPriority), static_cast<AkPriority>(in_uOldPriority)));
     }
 
     AKRESULT GetBufferStatusForPinnedFile(AkFileID in_fileID, AkReal32& out_fPercentBuffered, bool& out_bCacheFull) override
@@ -2395,22 +2395,22 @@ WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_CreateAuto_Memory(WWISEC_AK_IAkStreamMgr*
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->CreateAuto(in_pBuffer, in_uSize, *reinterpret_cast<const AkAutoStmHeuristics*>(in_heuristics), *reinterpret_cast<AK::IAkAutoStream**>(out_pStream)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, WWISEC_AkPriority in_uPriority)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_PinFileInCache(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, WWISEC_AkFileSystemFlags* in_pFSFlags, AkPriority in_uPriority)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->PinFileInCache(in_fileID, reinterpret_cast<AkFileSystemFlags*>(in_pFSFlags), static_cast<AkPriority>(in_uPriority)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UnpinFileInCache(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, AkPriority in_uPriority)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->UnpinFileInCache(in_fileID, static_cast<AkPriority>(in_uPriority)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, WWISEC_AkPriority in_uPriority, WWISEC_AkPriority in_uOldPriority)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_UpdateCachingPriority(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, AkPriority in_uPriority, AkPriority in_uOldPriority)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->UpdateCachingPriority(in_fileID, static_cast<AkPriority>(in_uPriority), static_cast<AkPriority>(in_uOldPriority)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(WWISEC_AK_IAkStreamMgr* instance, WWISEC_AkFileID in_fileID, AkReal32* out_fPercentBuffered, bool* out_bCacheFull)
+WWISEC_AKRESULT WWISEC_AK_IAkStreamMgr_GetBufferStatusForPinnedFile(WWISEC_AK_IAkStreamMgr* instance, AkFileID in_fileID, AkReal32* out_fPercentBuffered, bool* out_bCacheFull)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::IAkStreamMgr*>(instance)->GetBufferStatusForPinnedFile(in_fileID, *out_fPercentBuffered, *out_bCacheFull));
 }
@@ -2561,7 +2561,7 @@ class WWISEC_AK_StreamMgr_IAkFileLocationResolver_Wrapper : public AK::StreamMgr
 
     AKRESULT GetNextPreferredDevice(AkAsyncFileOpenData& in_FileOpen, AkDeviceID& io_idDevice) override
     {
-        return static_cast<AKRESULT>(_functions.GetNextPreferredDevice(_instance, reinterpret_cast<WWISEC_AkAsyncFileOpenData*>(&in_FileOpen), reinterpret_cast<WWISEC_AkDeviceID*>(&io_idDevice)));
+        return static_cast<AKRESULT>(_functions.GetNextPreferredDevice(_instance, reinterpret_cast<WWISEC_AkAsyncFileOpenData*>(&in_FileOpen), reinterpret_cast<AkDeviceID*>(&io_idDevice)));
     }
 
   private:
@@ -2580,7 +2580,7 @@ void WWISEC_AK_StreamMgr_IAkFileLocationResolver_DestroyInstance(WWISEC_AK_Strea
     AK::MemoryMgr::Free(AkMemID_Integration, wrapper);
 }
 
-WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkAsyncFileOpenData* in_FileOpen, WWISEC_AkDeviceID* io_idDevice)
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(WWISEC_AK_StreamMgr_IAkFileLocationResolver* instance, WWISEC_AkAsyncFileOpenData* in_FileOpen, AkDeviceID* io_idDevice)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(instance)->GetNextPreferredDevice(*reinterpret_cast<AkAsyncFileOpenData*>(in_FileOpen), *reinterpret_cast<AkDeviceID*>(io_idDevice)));
 }
@@ -2605,12 +2605,12 @@ void WWISEC_AK_StreamMgr_SetFileLocationResolver(void* in_pFileLocationResolver)
     AK::StreamMgr::SetFileLocationResolver(reinterpret_cast<AK::StreamMgr::IAkFileLocationResolver*>(in_pFileLocationResolver));
 }
 
-WWISEC_AKRESULT WWISEC_AK_StreamMgr_CreateDevice(const WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook, WWISEC_AkDeviceID* out_idDevice)
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_CreateDevice(const WWISEC_AkDeviceSettings* in_settings, void* in_pLowLevelHook, AkDeviceID* out_idDevice)
 {
     return static_cast<WWISEC_AKRESULT>(AK::StreamMgr::CreateDevice(*reinterpret_cast<const AkDeviceSettings*>(in_settings), reinterpret_cast<AK::StreamMgr::IAkLowLevelIOHook*>(in_pLowLevelHook), *reinterpret_cast<AkDeviceID*>(out_idDevice)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(WWISEC_AkDeviceID in_deviceID)
+WWISEC_AKRESULT WWISEC_AK_StreamMgr_DestroyDevice(AkDeviceID in_deviceID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::StreamMgr::DestroyDevice(static_cast<AkDeviceID>(in_deviceID)));
 }
@@ -2670,7 +2670,7 @@ void WWISEC_AK_MusicEngine_Term()
     AK::MusicEngine::Term();
 }
 
-WWISEC_AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(WWISEC_AkPlayingID in_PlayingID, WWISEC_AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate)
+WWISEC_AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(AkPlayingID in_PlayingID, WWISEC_AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate)
 {
     return static_cast<WWISEC_AKRESULT>(AK::MusicEngine::GetPlayingSegmentInfo(in_PlayingID, *reinterpret_cast<AkSegmentInfo*>(out_segmentInfo), in_bExtrapolate));
 }
@@ -2718,17 +2718,17 @@ AkUInt16 WWISEC_AK_Comm_GetCommandPort()
 // END AkCommunication
 
 // BEGIN AkDynamicDialogue
-WWISEC_AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_ID(WWISEC_AkUniqueID in_eventID, WWISEC_AkArgumentValueID* in_aArgumentValues, AkUInt32 in_uNumArguments, WWISEC_AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie)
+AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_ID(AkUniqueID in_eventID, AkArgumentValueID* in_aArgumentValues, AkUInt32 in_uNumArguments, AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie)
 {
-    return static_cast<WWISEC_AkUniqueID>(AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent(in_eventID, reinterpret_cast<AkArgumentValueID*>(in_aArgumentValues), in_uNumArguments, in_idSequence, reinterpret_cast<AkCandidateCallbackFunc>(in_candidateCallbackFunc), in_pCookie));
+    return static_cast<AkUniqueID>(AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent(in_eventID, reinterpret_cast<AkArgumentValueID*>(in_aArgumentValues), in_uNumArguments, in_idSequence, reinterpret_cast<AkCandidateCallbackFunc>(in_candidateCallbackFunc), in_pCookie));
 }
 
-WWISEC_AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(const char* in_pszEventName, const char** in_aArgumentValueNames, AkUInt32 in_uNumArguments, WWISEC_AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie)
+AkUniqueID WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_String(const char* in_pszEventName, const char** in_aArgumentValueNames, AkUInt32 in_uNumArguments, AkPlayingID in_idSequence, WWISEC_AkCandidateCallbackFunc in_candidateCallbackFunc, void* in_pCookie)
 {
-    return static_cast<WWISEC_AkUniqueID>(AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent(in_pszEventName, in_aArgumentValueNames, in_uNumArguments, in_idSequence, reinterpret_cast<AkCandidateCallbackFunc>(in_candidateCallbackFunc), in_pCookie));
+    return static_cast<AkUniqueID>(AK::SoundEngine::DynamicDialogue::ResolveDialogueEvent(in_pszEventName, in_aArgumentValueNames, in_uNumArguments, in_idSequence, reinterpret_cast<AkCandidateCallbackFunc>(in_candidateCallbackFunc), in_pCookie));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicDialogue_GetDialogueEventCustomPropertyValue(WWISEC_AkUniqueID in_eventID, AkUInt32 in_uPropID, AkInt32* out_iValue)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicDialogue_GetDialogueEventCustomPropertyValue(AkUniqueID in_eventID, AkUInt32 in_uPropID, AkInt32* out_iValue)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicDialogue::GetDialogueEventCustomPropertyValue(in_eventID, in_uPropID, *out_iValue));
 }
@@ -2742,7 +2742,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem_SetExternalSo
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::SoundEngine::DynamicSequence::PlaylistItem*>(self)->SetExternalSources(in_nExternalSrc, reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSrc)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, WWISEC_AkUniqueID in_audioNodeID, WWISEC_AkTimeMs in_msDelay, void* in_pCustomInfo, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(WWISEC_AK_SoundEngine_DynamicSequence_Playlist* self, AkUniqueID in_audioNodeID, AkTimeMs in_msDelay, void* in_pCustomInfo, AkUInt32 in_cExternals, WWISEC_AkExternalSourceInfo* in_pExternalSources)
 {
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::SoundEngine::DynamicSequence::Playlist*>(self)->Enqueue(in_audioNodeID, in_msDelay, in_pCustomInfo, in_cExternals, reinterpret_cast<AkExternalSourceInfo*>(in_pExternalSources)));
 }
@@ -2872,67 +2872,67 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Copy(WWISEC_AK_So
     return static_cast<WWISEC_AKRESULT>(reinterpret_cast<AK::SoundEngine::DynamicSequence::Playlist*>(self)->Copy(*reinterpret_cast<const AK::SoundEngine::DynamicSequence::Playlist*>(in_rSource)));
 }
 
-WWISEC_AkPlayingID WWISEC_AK_SoundEngine_DynamicSequence_Open(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType in_eDynamicSequenceType)
+AkPlayingID WWISEC_AK_SoundEngine_DynamicSequence_Open(AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType in_eDynamicSequenceType)
 {
-    return static_cast<WWISEC_AkPlayingID>(AK::SoundEngine::DynamicSequence::Open(in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, static_cast<AK::SoundEngine::DynamicSequence::DynamicSequenceType>(in_eDynamicSequenceType)));
+    return static_cast<AkPlayingID>(AK::SoundEngine::DynamicSequence::Open(in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, static_cast<AK::SoundEngine::DynamicSequence::DynamicSequenceType>(in_eDynamicSequenceType)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Close(WWISEC_AkPlayingID in_playingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Close(AkPlayingID in_playingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Close(in_playingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Play(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Play(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Play(in_playingID, in_uTransitionDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Pause(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Pause(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Pause(in_playingID, in_uTransitionDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Resume(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Resume(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Resume(in_playingID, in_uTransitionDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Stop(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Stop(AkPlayingID in_playingID, AkTimeMs in_uTransitionDuration, WWISEC_AkCurveInterpolation in_eFadeCurve)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Stop(in_playingID, in_uTransitionDuration, static_cast<AkCurveInterpolation>(in_eFadeCurve)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Break(WWISEC_AkPlayingID in_playingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Break(AkPlayingID in_playingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Break(in_playingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Time(WWISEC_AkPlayingID in_playingID, WWISEC_AkTimeMs in_iPosition, bool in_bSeekToNearestMarker)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Time(AkPlayingID in_playingID, AkTimeMs in_iPosition, bool in_bSeekToNearestMarker)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Seek(in_playingID, in_iPosition, in_bSeekToNearestMarker));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Percent(WWISEC_AkPlayingID in_playingID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_Seek_Percent(AkPlayingID in_playingID, AkReal32 in_fPercent, bool in_bSeekToNearestMarker)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::Seek(in_playingID, in_fPercent, in_bSeekToNearestMarker));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPauseTimes(WWISEC_AkPlayingID in_playingID, AkUInt32* out_uTime, AkUInt32* out_uDuration)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPauseTimes(AkPlayingID in_playingID, AkUInt32* out_uTime, AkUInt32* out_uDuration)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::GetPauseTimes(in_playingID, *out_uTime, *out_uDuration));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPlayingItem(WWISEC_AkPlayingID in_playingID, WWISEC_AkUniqueID* out_audioNodeID, void** out_pCustomInfo)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_GetPlayingItem(AkPlayingID in_playingID, AkUniqueID* out_audioNodeID, void** out_pCustomInfo)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::GetPlayingItem(in_playingID, *out_audioNodeID, *out_pCustomInfo));
 }
 
-WWISEC_AK_SoundEngine_DynamicSequence_Playlist* WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(WWISEC_AkPlayingID in_playingID)
+WWISEC_AK_SoundEngine_DynamicSequence_Playlist* WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(AkPlayingID in_playingID)
 {
     return reinterpret_cast<WWISEC_AK_SoundEngine_DynamicSequence_Playlist*>(AK::SoundEngine::DynamicSequence::LockPlaylist(in_playingID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(WWISEC_AkPlayingID in_playingID)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(AkPlayingID in_playingID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::DynamicSequence::UnlockPlaylist(in_playingID));
 }
@@ -2945,72 +2945,72 @@ static_assert(sizeof(WWISEC_AK_SoundEngine_Query_AkGameObjectsList) == sizeof(AK
 static_assert(sizeof(WWISEC_AK_SoundEngine_Query_GameObjDst) == sizeof(AK::SoundEngine::Query::GameObjDst));
 static_assert(sizeof(WWISEC_AK_SoundEngine_Query_AkRadiusList) == sizeof(AK::SoundEngine::Query::AkRadiusList));
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetPosition(in_GameObjectID, *reinterpret_cast<AkSoundPosition*>(out_rPosition)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(WWISEC_AkGameObjectID in_GameObjectID, WWISEC_AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(AkGameObjectID in_GameObjectID, AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListeners(in_GameObjectID, out_ListenerObjectIDs, *oi_uNumListeners));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(WWISEC_AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerPosition(in_uListenerID, *reinterpret_cast<AkListenerPosition*>(out_rPosition)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(WWISEC_AkGameObjectID in_uListenerID, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(AkGameObjectID in_uListenerID, bool* out_rbSpatialized, WWISEC_AK_SpeakerVolumes_VectorPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetListenerSpatialization(in_uListenerID, *out_rbSpatialized, *out_pVolumeOffsets, *reinterpret_cast<AkChannelConfig*>(out_channelConfig)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(WWISEC_AkRtpcID in_rtpcID, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_ID(AkRtpcID in_rtpcID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID, AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetRTPCValue(in_rtpcID, in_gameObjectID, in_playingID, *out_rValue, *reinterpret_cast<AK::SoundEngine::Query::RTPCValue_type*>(io_rValueType)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_String(const char* in_pszRtpcName, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPlayingID in_playingID, WWISEC_AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetRTPCValue_String(const char* in_pszRtpcName, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID, AkRtpcValue* out_rValue, WWISEC_AK_SoundEngine_Query_RTPCValue_type* io_rValueType)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetRTPCValue(in_pszRtpcName, in_gameObjectID, in_playingID, *out_rValue, *reinterpret_cast<AK::SoundEngine::Query::RTPCValue_type*>(io_rValueType)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_ID(WWISEC_AkSwitchGroupID in_switchGroup, WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkSwitchStateID* out_rSwitchState)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_ID(AkSwitchGroupID in_switchGroup, AkGameObjectID in_gameObjectID, AkSwitchStateID* out_rSwitchState)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetSwitch(in_switchGroup, in_gameObjectID, *reinterpret_cast<AkSwitchStateID*>(out_rSwitchState)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_String(const char* in_pstrSwitchGroupName, WWISEC_AkGameObjectID in_GameObj, WWISEC_AkSwitchStateID* out_rSwitchState)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetSwitch_String(const char* in_pstrSwitchGroupName, AkGameObjectID in_GameObj, AkSwitchStateID* out_rSwitchState)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetSwitch(in_pstrSwitchGroupName, in_GameObj, *reinterpret_cast<AkSwitchStateID*>(out_rSwitchState)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_ID(WWISEC_AkStateGroupID in_stateGroup, WWISEC_AkStateID* out_rState)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_ID(AkStateGroupID in_stateGroup, AkStateID* out_rState)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetState(in_stateGroup, *reinterpret_cast<AkStateGroupID*>(out_rState)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_String(const char* in_pstrStateGroupName, WWISEC_AkStateID* out_rState)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetState_String(const char* in_pstrStateGroupName, AkStateID* out_rState)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetState(in_pstrStateGroupName, *reinterpret_cast<AkStateGroupID*>(out_rState)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* out_paAuxSendValues, AkUInt32* io_ruNumSendValues)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(AkGameObjectID in_gameObjectID, WWISEC_AkAuxSendValue* out_paAuxSendValues, AkUInt32* io_ruNumSendValues)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetGameObjectAuxSendValues(in_gameObjectID, reinterpret_cast<AkAuxSendValue*>(out_paAuxSendValues), *io_ruNumSendValues));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectDryLevelValue(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfControlValue)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetGameObjectDryLevelValue(AkGameObjectID in_EmitterID, AkGameObjectID in_ListenerID, AkReal32* out_rfControlValue)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetGameObjectDryLevelValue(in_EmitterID, in_ListenerID, *out_rfControlValue));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetObjectObstructionAndOcclusion(WWISEC_AkGameObjectID in_EmitterID, WWISEC_AkGameObjectID in_ListenerID, AkReal32* out_rfObstructionLevel, AkReal32* out_rfOcclusionLevel)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetObjectObstructionAndOcclusion(AkGameObjectID in_EmitterID, AkGameObjectID in_ListenerID, AkReal32* out_rfObstructionLevel, AkReal32* out_rfOcclusionLevel)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetObjectObstructionAndOcclusion(in_EmitterID, in_ListenerID, *out_rfObstructionLevel, *out_rfOcclusionLevel));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_ID(WWISEC_AkUniqueID in_eventID, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_ID(AkUniqueID in_eventID, AkUInt32* io_ruNumItems, WWISEC_AkObjectInfo* out_aObjectInfos)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::QueryAudioObjectIDs(in_eventID, *io_ruNumItems, reinterpret_cast<AkObjectInfo*>(out_aObjectInfos)));
 }
@@ -3020,7 +3020,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_QueryAudioObjectIDs_String(const cha
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::QueryAudioObjectIDs(in_pszEventName, *io_ruNumItems, reinterpret_cast<AkObjectInfo*>(out_aObjectInfos)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPositioningInfo(WWISEC_AkUniqueID in_ObjectID, WWISEC_AkPositioningInfo* out_rPositioningInfo)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPositioningInfo(AkUniqueID in_ObjectID, WWISEC_AkPositioningInfo* out_rPositioningInfo)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetPositioningInfo(in_ObjectID, *reinterpret_cast<AkPositioningInfo*>(out_rPositioningInfo)));
 }
@@ -3030,7 +3030,7 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetActiveGameObjects(WWISEC_AK_Sound
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetActiveGameObjects(*reinterpret_cast<AK::SoundEngine::Query::AkGameObjectsList*>(io_GameObjectList)));
 }
 
-bool WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(WWISEC_AkGameObjectID in_GameObjId)
+bool WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(AkGameObjectID in_GameObjId)
 {
     return AK::SoundEngine::Query::GetIsGameObjectActive(in_GameObjId);
 }
@@ -3040,32 +3040,32 @@ WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetMaxRadius_List(WWISEC_AK_SoundEng
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetMaxRadius(*reinterpret_cast<AK::SoundEngine::Query::AkRadiusList*>(io_RadiusList)));
 }
 
-AkReal32 WWISEC_AK_SoundEngine_Query_GetMaxRadius_Single(WWISEC_AkGameObjectID in_GameObjId)
+AkReal32 WWISEC_AK_SoundEngine_Query_GetMaxRadius_Single(AkGameObjectID in_GameObjId)
 {
     return AK::SoundEngine::Query::GetMaxRadius(in_GameObjId);
 }
 
-WWISEC_AkUniqueID WWISEC_AK_SoundEngine_Query_GetEventIDFromPlayingID(WWISEC_AkPlayingID in_playingID)
+AkUniqueID WWISEC_AK_SoundEngine_Query_GetEventIDFromPlayingID(AkPlayingID in_playingID)
 {
     return AK::SoundEngine::Query::GetEventIDFromPlayingID(in_playingID);
 }
 
-WWISEC_AkGameObjectID WWISEC_AK_SoundEngine_Query_GetGameObjectFromPlayingID(WWISEC_AkPlayingID in_playingID)
+AkGameObjectID WWISEC_AK_SoundEngine_Query_GetGameObjectFromPlayingID(AkPlayingID in_playingID)
 {
     return AK::SoundEngine::Query::GetGameObjectFromPlayingID(in_playingID);
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPlayingIDsFromGameObject(WWISEC_AkGameObjectID in_GameObjId, AkUInt32* io_ruNumIDs, WWISEC_AkPlayingID* out_aPlayingIDs)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetPlayingIDsFromGameObject(AkGameObjectID in_GameObjId, AkUInt32* io_ruNumIDs, AkPlayingID* out_aPlayingIDs)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetPlayingIDsFromGameObject(in_GameObjId, *io_ruNumIDs, out_aPlayingIDs));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Int(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkInt32* out_iValue)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Int(AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkInt32* out_iValue)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetCustomPropertyValue(in_ObjectID, in_uPropID, *out_iValue));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Float(WWISEC_AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkReal32* out_fValue)
+WWISEC_AKRESULT WWISEC_AK_SoundEngine_Query_GetCustomPropertyValue_Float(AkUniqueID in_ObjectID, AkUInt32 in_uPropID, AkReal32* out_fValue)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SoundEngine::Query::GetCustomPropertyValue(in_ObjectID, in_uPropID, *out_fValue));
 }
@@ -3271,32 +3271,32 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_Init(const WWISEC_AkSpatialAudioInitSetti
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::Init(*reinterpret_cast<const AkSpatialAudioInitSettings*>(in_initSettings)));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RegisterListener(WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RegisterListener(AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RegisterListener(in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnregisterListener(WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnregisterListener(AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::UnregisterListener(in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectRadius(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_outerRadius, AkReal32 in_innerRadius)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectRadius(AkGameObjectID in_gameObjectID, AkReal32 in_outerRadius, AkReal32 in_innerRadius)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGameObjectRadius(in_gameObjectID, in_outerRadius, in_innerRadius));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(WWISEC_AkImageSourceID in_srcID, const WWISEC_AkImageSourceSettings* in_info, const char* in_name, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(AkImageSourceID in_srcID, const WWISEC_AkImageSourceSettings* in_info, const char* in_name, AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetImageSource(in_srcID, *reinterpret_cast<const AkImageSourceSettings*>(in_info), in_name, in_AuxBusID, in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveImageSource(WWISEC_AkImageSourceID in_srcID, WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveImageSource(AkImageSourceID in_srcID, AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveImageSource(in_srcID, in_AuxBusID, in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ClearImageSources(WWISEC_AkUniqueID in_AuxBusID, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_ClearImageSources(AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::ClearImageSources(in_AuxBusID, in_gameObjectID));
 }
@@ -3321,7 +3321,7 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(WWISEC_AkGeometryI
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveGeometryInstance(in_GeometryInstanceID.id));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::QueryReflectionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkReflectionPathInfo*>(out_aPaths), *io_uArraySize));
 }
@@ -3356,12 +3356,12 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_RemoveReverbZone(WWISEC_AkRoomID in_Rever
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::RemoveReverbZone(in_ReverbZone.id));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGameObjectInRoom(in_gameObjectID, in_CurrentRoomID.id));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::UnsetGameObjectInRoom(in_gameObjectID));
 }
@@ -3381,7 +3381,7 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxGlobalReflectionPaths(AkUInt32 in_u
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxGlobalReflectionPaths(in_uMaxGlobalReflectionPaths));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(AkUInt32 in_uMaxDiffractionPaths, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetMaxDiffractionPaths(AkUInt32 in_uMaxDiffractionPaths, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetMaxDiffractionPaths(in_uMaxDiffractionPaths, in_gameObjectID));
 }
@@ -3401,17 +3401,17 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetLoadBalancingSpread(AkUInt32 in_uNbFra
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetLoadBalancingSpread(in_uNbFrames));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetSmoothingConstant(AkReal32 in_fSmoothingConstantMs, WWISEC_AkGameObjectID in_gameObjectID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetSmoothingConstant(AkReal32 in_fSmoothingConstantMs, AkGameObjectID in_gameObjectID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetSmoothingConstant(in_fSmoothingConstantMs, in_gameObjectID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsAuxSend(AkGameObjectID in_gameObjectID, WWISEC_AkAuxBusID in_auxBusID)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetEarlyReflectionsAuxSend(in_gameObjectID, in_auxBusID));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(WWISEC_AkGameObjectID in_gameObjectID, AkReal32 in_fSendVolume)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(AkGameObjectID in_gameObjectID, AkReal32 in_fSendVolume)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetEarlyReflectionsVolume(in_gameObjectID, in_fSendVolume));
 }
@@ -3421,7 +3421,7 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(WWISEC_A
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetPortalObstructionAndOcclusion(in_PortalID.id, in_fObstruction, in_fOcclusion));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(WWISEC_AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::SetGameObjectToPortalObstruction(in_gameObjectID, in_PortalID.id, in_fObstruction));
 }
@@ -3436,7 +3436,7 @@ WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::QueryWetDiffraction(in_portal.id, *out_wetDiffraction));
 }
 
-WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(WWISEC_AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+WWISEC_AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
 {
     return static_cast<WWISEC_AKRESULT>(AK::SpatialAudio::QueryDiffractionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkDiffractionPathInfo*>(out_aPaths), *io_uArraySize));
 }

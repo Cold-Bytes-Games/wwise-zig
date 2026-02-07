@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const typedefs = @import("typedefs.zig");
 
 pub const AK_MAX_NUM_TEXTURE = c.WWISEC_AK_MAX_NUM_TEXTURE;
 
@@ -19,7 +20,7 @@ pub const AkImageSourceName = extern struct {
 
 pub const AkImageSourceTexture = extern struct {
     num_texture: u32 = 0,
-    texture_ids: [AK_MAX_NUM_TEXTURE]common.AkUniqueID = undefined,
+    texture_ids: [AK_MAX_NUM_TEXTURE]typedefs.AkUniqueID = undefined,
 
     pub fn fromC(value: c.WWISEC_AkImageSourceTexture) AkImageSourceTexture {
         return @bitCast(value);
@@ -49,7 +50,7 @@ pub const AkImageSourceParams = extern struct {
 };
 
 pub const AkReflectImageSource = extern struct {
-    id: common.AkImageSourceID = std.math.maxInt(u32),
+    id: typedefs.AkImageSourceID = std.math.maxInt(u32),
     params: AkImageSourceParams = .{},
     texture: AkImageSourceTexture = .{},
     name: AkImageSourceName = .{},
@@ -64,7 +65,7 @@ pub const AkReflectImageSource = extern struct {
 };
 
 pub const AkReflectGameData = extern struct {
-    listener_id: common.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    listener_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
     num_image_sources: u32 = 0,
     sources: [1]AkReflectImageSource = undefined,
 

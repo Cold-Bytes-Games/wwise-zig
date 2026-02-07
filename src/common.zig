@@ -6,45 +6,6 @@ const wwise_options = @import("wwise_options");
 pub const AkOSChar = c.AkOSChar;
 pub const AkUtf16 = c.AkUtf16;
 
-pub const AkUniqueID = c.WWISEC_AkUniqueID;
-pub const AkStateID = c.WWISEC_AkStateID;
-pub const AkStateGroupID = c.WWISEC_AkStateGroupID;
-pub const AkPlayingID = c.WWISEC_AkPlayingID;
-pub const AkTimeMs = c.WWISEC_AkTimeMs;
-pub const AkPortNumber = c.WWISEC_AkPortNumber;
-pub const AkPitchValue = c.WWISEC_AkPitchValue;
-pub const AkVolumeValue = c.WWISEC_AkVolumeValue;
-pub const AkGameObjectID = c.WWISEC_AkGameObjectID;
-pub const AkLPFType = c.WWISEC_AkLPFType;
-pub const AkMemPoolId = c.WWISEC_AkMemPoolId;
-pub const AkPluginID = c.WWISEC_AkPluginID;
-pub const AkCodecID = c.WWISEC_AkCodecID;
-pub const AkAuxBusID = c.WWISEC_AkAuxBusID;
-pub const AkPluginParamID = c.WWISEC_AkPluginParamID;
-pub const AkPriority = c.WWISEC_AkPriority;
-pub const AkDataCompID = c.WWISEC_AkDataCompID;
-pub const AkDataTypeID = c.WWISEC_AkDataTypeID;
-pub const AkDataInterleaveID = c.WWISEC_AkDataInterleaveID;
-pub const AkSwitchGroupID = c.WWISEC_AkSwitchGroupID;
-pub const AkSwitchStateID = c.WWISEC_AkSwitchStateID;
-pub const AkRtpcID = c.WWISEC_AkRtpcID;
-pub const AkRtpcValue = c.WWISEC_AkRtpcValue;
-pub const AkBankID = c.WWISEC_AkBankID;
-pub const AkFileID = c.WWISEC_AkFileID;
-pub const AkDeviceID = c.WWISEC_AkDeviceID;
-pub const AkTriggerID = c.WWISEC_AkTriggerID;
-pub const AkArgumentValueID = c.WWISEC_AkArgumentValueID;
-pub const AkChannelMask = c.WWISEC_AkChannelMask;
-pub const AkModulatorID = c.WWISEC_AkModulatorID;
-pub const AkAcousticTextureID = c.WWISEC_AkAcousticTextureID;
-pub const AkImageSourceID = c.WWISEC_AkImageSourceID;
-pub const AkOutputDeviceID = c.WWISEC_AkOutputDeviceID;
-pub const AkPipelineID = c.WWISEC_AkPipelineID;
-pub const AkRayID = c.WWISEC_AkRayID;
-pub const AkAudioObjectID = c.WWISEC_AkAudioObjectID;
-pub const AkJobType = c.WWISEC_AkJobType;
-pub const AkCacheID = c.WWISEC_AkCacheID;
-
 pub const AkJobType_Generic = c.WWISEC_AkJobType_Generic;
 pub const AkJobType_AudioProcessing = c.WWISEC_AkJobType_AudioProcessing;
 pub const AkJobType_SpatialAudio = c.WWISEC_AkJobType_SpatialAudio;
@@ -169,12 +130,6 @@ pub const AkCodecDescriptor = extern struct {
     pub fn toC(self: AkCodecDescriptor) c.WWISEC_AkCodecDescriptor {
         return @bitCast(self);
     }
-};
-
-pub const AkBankType = enum(u32) {
-    user = c.WWISEC_AkBankType_User,
-    event = c.WWISEC_AkBankType_Event,
-    bus = c.WWISEC_AkBankType_Bus,
 };
 
 pub const AkFileHandle = ?*anyopaque;

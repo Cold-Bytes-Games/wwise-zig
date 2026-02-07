@@ -51,7 +51,7 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     }
 };
 
-pub const AkAudioDeviceEvent = enum(common.DefaultEnumType) {
+pub const AkAudioDeviceEvent = enum(u8) {
     initialization,
     removal,
     system_removal,
@@ -85,11 +85,11 @@ pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
 };
 
 pub const AkSegmentInfo = extern struct {
-    current_position: common.AkTimeMs = 0,
-    pre_entry_duration: common.AkTimeMs = 0,
-    active_duration: common.AkTimeMs = 0,
-    post_exit_duration: common.AkTimeMs = 0,
-    remaining_look_ahead_time: common.AkTimeMs = 0,
+    current_position: typedefs.AkTimeMs = 0,
+    pre_entry_duration: typedefs.AkTimeMs = 0,
+    active_duration: typedefs.AkTimeMs = 0,
+    post_exit_duration: typedefs.AkTimeMs = 0,
+    remaining_look_ahead_time: typedefs.AkTimeMs = 0,
     beat_duration: f32 = 0.0,
     bar_duration: f32 = 0.0,
     grid_duration: f32 = 0.0,
@@ -109,9 +109,9 @@ pub const AkSegmentInfo = extern struct {
 };
 
 pub const AkEventCallbackInfo = extern struct {
-    game_obj_id: common.AkGameObjectID = 0,
-    playing_id: common.AkPlayingID = 0,
-    event_id: common.AkUniqueID = 0,
+    game_obj_id: typedefs.AkGameObjectID = 0,
+    playing_id: typedefs.AkPlayingID = 0,
+    event_id: typedefs.AkUniqueID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkEventCallbackInfo) AkEventCallbackInfo {
         return @bitCast(value);
@@ -164,8 +164,8 @@ pub const AkMarkerCallbackInfo = extern struct {
 pub const AkDurationCallbackInfo = extern struct {
     duration: f32,
     estimate_duration: f32,
-    audio_node_id: common.AkUniqueID,
-    media_id: common.AkUniqueID,
+    audio_node_id: typedefs.AkUniqueID,
+    media_id: typedefs.AkUniqueID,
     streaming: bool,
 
     pub inline fn fromC(value: c.WWISEC_AkDurationCallbackInfo) AkDurationCallbackInfo {
@@ -182,7 +182,7 @@ pub const AkDurationCallbackInfo = extern struct {
 };
 
 pub const AkDynamicSequenceItemCallbackInfo = extern struct {
-    audio_node_id: common.AkUniqueID = 0,
+    audio_node_id: typedefs.AkUniqueID = 0,
     custom_info: ?*anyopaque = null,
 
     pub inline fn fromC(value: c.WWISEC_AkDynamicSequenceItemCallbackInfo) AkDynamicSequenceItemCallbackInfo {
@@ -221,7 +221,7 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
 };
 
 pub const AkMusicPlaylistCallbackInfo = extern struct {
-    playlist_id: common.AkUniqueID = 0,
+    playlist_id: typedefs.AkUniqueID = 0,
     num_playlist_items: u32 = 0,
     playlist_selection: u32 = 0,
     playlist_item_done: u32 = 0,
@@ -259,7 +259,7 @@ pub const AkMusicSyncCallbackInfo = extern struct {
 
 pub const AkCallbackInfo = extern struct {
     cookie: ?*anyopaque = null,
-    game_obj_id: common.AkGameObjectID = 0,
+    game_obj_id: typedefs.AkGameObjectID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkCallbackInfo) AkCallbackInfo {
         return @bitCast(value);
@@ -338,8 +338,8 @@ pub const AkResourceMonitorDataSummary = extern struct {
 };
 
 pub const AkDynamicSequenceSelectCallbackInfo = struct {
-    audio_node_id: common.AkUniqueID = 0,
-    ms_delay: common.AkTimeMs = 0,
+    audio_node_id: typedefs.AkUniqueID = 0,
+    ms_delay: typedefs.AkTimeMs = 0,
     custom_info: ?*anyopaque = null,
     ar_external_sources: typedefs.AkExternalSourceArray = null,
 
@@ -364,7 +364,7 @@ pub const AkGlobalCallbackFunc = *const fn (in_context: ?*IAkPlugin.IAkGlobalPlu
 pub const AkResourceMonitorCallbackFunc = *const fn (in_data_summary: ?*const AkResourceMonitorDataSummary) callconv(.c) void;
 pub const AkDeviceStatusCallbackFunc = *const fn (
     in_context: ?*IAkPlugin.IAkGlobalPluginContext,
-    in_id_audio_device_shareset: common.AkUniqueID,
+    in_id_audio_device_shareset: typedefs.AkUniqueID,
     in_id_device_id: u32,
     in_id_event: AkAudioDeviceEvent,
     in_ak_result: common.AKRESULT,
@@ -372,4 +372,4 @@ pub const AkDeviceStatusCallbackFunc = *const fn (
 
 pub const AkBusMeteringCallbackFunc = ?*const fn (in_callback_info: *AkBusMeteringCallbackInfo) callconv(.c) void;
 pub const AkOutputDeviceMeteringCallbackFunc = ?*const fn (in_callback_info: *AkOutputDeviceMeteringCallbackInfo) callconv(.c) void;
-pub const AkCaptureCallbackFunc = *const fn (in_capture_buffer: ?*common_defs.AkAudioBuffer, in_id_output: common.AkOutputDeviceID, cookie: ?*anyopaque) callconv(.c) void;
+pub const AkCaptureCallbackFunc = *const fn (in_capture_buffer: ?*common_defs.AkAudioBuffer, in_id_output: typedefs.AkOutputDeviceID, cookie: ?*anyopaque) callconv(.c) void;

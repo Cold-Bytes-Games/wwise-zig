@@ -1,8 +1,6 @@
-const std = @import("std");
-const c = @import("wwise_c");
-const common = @import("common.zig");
+const typedefs = @import("typedefs.zig");
 
-pub const VectorPtr = c.WWISEC_AK_SpeakerVolumes_VectorPtr;
-pub const MatrixPtr = c.WWISEC_AK_SpeakerVolumes_MatrixPtr;
-pub const ConstVectorPtr = c.WWISEC_AK_SpeakerVolumes_ConstVectorPtr;
-pub const ConstMatrixPtr = c.WWISEC_AK_SpeakerVolumes_ConstMatrixPtr;
+pub const VectorPtr = typedefs.AkSpeakerVolumesConstVectorPtr;
+pub const MatrixPtr = typedefs.AkSpeakerVolumesMatrixPtr;
+pub const ConstVectorPtr = typedefs.AkSpeakerVolumesConstVectorPtr;
+pub const ConstMatrixPtr = typedefs.AkSpeakerVolumesConstMatrixPtr;
