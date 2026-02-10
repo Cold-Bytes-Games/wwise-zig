@@ -1,8 +1,9 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
-const SpeakerVolumes = @import("SpeakerVolumes.zig");
+const constants = @import("constants.zig");
 const speaker_config = @import("speaker_config.zig");
+const SpeakerVolumes = @import("SpeakerVolumes.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
 
 pub const AkPositioningInfo = extern struct {
@@ -39,8 +40,8 @@ pub const AkPositioningInfo = extern struct {
 };
 
 pub const AkObjectInfo = extern struct {
-    obj_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
-    parent_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    obj_id: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
+    parent_id: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
     depth: i32 = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkObjectInfo) AkObjectInfo {
@@ -306,7 +307,7 @@ pub fn WWISEC_AK_SoundEngine_Query_GetIsGameObjectActive(in_game_object_id: type
 }
 
 pub const GameObjDst = extern struct {
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     distance: f32 = -1.0,
 
     pub inline fn fromC(value: c.WWISEC_AK_SoundEngine_Query_GameObjDst) GameObjDst {

@@ -1,16 +1,17 @@
-const std = @import("std");
 const c = @import("wwise_c");
-const common = @import("common.zig");
 const callback_types = @import("callback_types.zig");
+const common = @import("common.zig");
 const common_defs = @import("common_defs.zig");
+const constants = @import("constants.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
 const IBytes = @import("IBytes.zig");
 const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
-const wwise_options = @import("wwise_options");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
+const wwise_options = @import("wwise_options");
 
 pub const DynamicDialogue = @import("DynamicDialogue.zig");
 pub const DynamicSequence = @import("DynamicSequence.zig");
@@ -445,10 +446,10 @@ pub const AkActionOnEventType = enum(common.DefaultEnumType) {
 };
 
 pub const ExecuteActionOnEventOptionalArgs = struct {
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     transition_duration: typedefs.AkTimeMs = 0,
     fade_curve: common.AkCurveInterpolation = .linear,
-    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
 pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) common.WwiseError!void {
@@ -488,7 +489,7 @@ pub const PostMIDIOnEventOptionalArgs = struct {
     flags: callback_types.AkCallbackType = .{},
     callback: callback_types.AkCallbackFunc = null,
     cookie: ?*anyopaque = null,
-    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
 // NOTE: mlarouche: Workaround for translate-c that does not put the proper alignment on AkMIDIPost
@@ -514,9 +515,9 @@ pub fn postMIDIOnEvent(
 }
 
 pub const StopMIDIOnEventOptionalArgs = struct {
-    event_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    event_id: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
+    playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
 pub fn stopMIDIOnEvent(optional_args: StopMIDIOnEventOptionalArgs) common.WwiseError!void {
@@ -601,7 +602,7 @@ pub fn getBufferStatusForPinnedEventString(fallback_allocator: std.mem.Allocator
 
 pub const SeekOnEventOptionalArgs = struct {
     seek_to_nearest_marker: bool = false,
-    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
 pub fn seekOnEventTimeID(in_event_id: typedefs.AkUniqueID, in_game_object: typedefs.AkGameObjectID, in_position: typedefs.AkTimeMs, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
@@ -712,7 +713,7 @@ pub fn getSourceStreamBuffering(in_playing_id: typedefs.AkPlayingID, out_bufferi
 }
 
 pub const StopAllOptionalArgs = struct {
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
 };
 
 pub fn stopAll(optional_args: StopAllOptionalArgs) void {
@@ -888,7 +889,7 @@ pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []con
     const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
-    var out_bank_id: typedefs.AkBankID = common.AK_INVALID_BANK_ID;
+    var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_String(raw_bank_name, &out_bank_id, @intFromEnum(optional_args.bank_type)),
@@ -904,7 +905,7 @@ pub fn loadBankID(in_bank_id: typedefs.AkBankID, optional_args: LoadBankOptional
 }
 
 pub fn loadBankMemoryView(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32) common.WwiseError!typedefs.AkBankID {
-    var out_bank_id: typedefs.AkBankID = common.AK_INVALID_BANK_ID;
+    var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView(in_memory_bank, in_memory_bank_size, &out_bank_id),
@@ -924,7 +925,7 @@ pub fn loadBankMemoryViewOutBankType(in_memory_bank: ?*const anyopaque, in_memor
 }
 
 pub fn loadBankMemoryCopy(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32) common.WwiseError!typedefs.AkBankID {
-    var out_bank_id: typedefs.AkBankID = common.AK_INVALID_BANK_ID;
+    var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryCopy(in_memory_bank, in_memory_bank_size, &out_bank_id),
@@ -962,7 +963,7 @@ pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: 
     const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
-    var out_bank_id: typedefs.AkBankID = common.AK_INVALID_BANK_ID;
+    var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_Async_String(
@@ -988,7 +989,7 @@ pub fn loadBankAsyncID(in_bank_id: typedefs.AkBankID, in_bank_callback: callback
 }
 
 pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!typedefs.AkBankID {
-    var out_bank_id: typedefs.AkBankID = common.AK_INVALID_BANK_ID;
+    var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView_Async(
@@ -1557,7 +1558,7 @@ pub fn setListenerSpatialization(
 }
 
 pub const SetRTPCValueOptionalArgs = struct {
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     value_change_duration: typedefs.AkTimeMs = 0,
     fade_curve: common.AkCurveInterpolation = .linear,
     bypass_internal_value_interpolation: bool = false,
@@ -1645,7 +1646,7 @@ pub fn setRTPCValueByPlayingIDString(
 }
 
 pub const ResetRTPCValueOptionalArgs = struct {
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     value_change_duration: typedefs.AkTimeMs = 0,
     fade_curve: common.AkCurveInterpolation = .linear,
     bypass_internal_value_interpolation: bool = false,
@@ -1952,7 +1953,7 @@ pub fn getSampleRate() u32 {
 }
 
 pub const RegistereCaptureCallbackOptionalArgs = struct {
-    id_output: typedefs.AkOutputDeviceID = common.AK_INVALID_OUTPUT_DEVICE_ID,
+    id_output: typedefs.AkOutputDeviceID = constants.AK_INVALID_OUTPUT_DEVICE_ID,
     cookie: ?*anyopaque = null,
 };
 
@@ -1967,7 +1968,7 @@ pub fn regiserCaptureCallback(in_callback: callback_types.AkCaptureCallbackFunc,
 }
 
 pub const UnregistereCaptureCallbackOptionalArgs = struct {
-    id_output: typedefs.AkOutputDeviceID = common.AK_INVALID_OUTPUT_DEVICE_ID,
+    id_output: typedefs.AkOutputDeviceID = constants.AK_INVALID_OUTPUT_DEVICE_ID,
     cookie: ?*anyopaque = null,
 };
 
@@ -2012,7 +2013,7 @@ pub fn setOfflineRendering(in_enable_offline_rendering: bool) common.WwiseError!
 }
 
 pub fn addOutput(output_settings: *const settings.AkOutputSettings, listeners: []typedefs.AkGameObjectID) common.WwiseError!typedefs.AkOutputDeviceID {
-    var out_device_id: typedefs.AkOutputDeviceID = common.AK_INVALID_OUTPUT_DEVICE_ID;
+    var out_device_id: typedefs.AkOutputDeviceID = constants.AK_INVALID_OUTPUT_DEVICE_ID;
 
     try common.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(

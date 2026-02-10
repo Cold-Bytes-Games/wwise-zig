@@ -2,11 +2,12 @@ const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const typedefs = @import("typedefs.zig");
+const constants = @import("constants.zig");
 
 pub const AkCandidateCallbackFunc = ?*const fn (in_id_event: typedefs.AkUniqueID, in_id_candidate: typedefs.AkUniqueID, in_cookie: ?*anyopaque) callconv(.c) bool;
 
 pub const ResolveDialogueEventOptionalArgs = struct {
-    id_sequence: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+    id_sequence: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
     candidate_callback_func: AkCandidateCallbackFunc = null,
     cookie: ?*anyopaque = null,
 };

@@ -1,6 +1,7 @@
 const builtin = @import("builtin");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const constants = @import("constants.zig");
 const speaker_config = @import("speaker_config.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
@@ -10,7 +11,7 @@ pub const AkJobWorkerFunc = ?*const fn (in_job_type: typedefs.AkJobType, in_exec
 
 pub const AkJobMgrSettings = extern struct {
     fn_request_job_worker: FuncRequestJobWorker = null,
-    max_active_workers: [common.AK_NUM_JOB_TYPES]u32 = [_]u32{0} ** common.AK_NUM_JOB_TYPES,
+    max_active_workers: [constants.AK_NUM_JOB_TYPES]u32 = @splat(0),
     num_memory_slabs: u32 = 0,
     memory_slab_size: u32 = 0,
     p_client_data: ?*anyopaque = null,
@@ -31,13 +32,13 @@ pub const AkJobMgrSettings = extern struct {
 };
 
 pub const AkOutputSettings = extern struct {
-    audio_device_shareset: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    audio_device_shareset: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
     id_device: u32 = 0,
     panning_rule: common.AkPanningRule = .speakers,
     channel_config: speaker_config.AkChannelConfig = .{},
 
     pub const InitOptionalArgs = struct {
-        id_device: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+        id_device: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
         channel_config: speaker_config.AkChannelConfig = .{},
         panning: common.AkPanningRule = .speakers,
     };

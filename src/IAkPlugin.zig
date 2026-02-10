@@ -1,7 +1,7 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
 const common = @import("common.zig");
+const constants = @import("constants.zig");
 const IAkPluginMemAlloc = @import("IAkPluginMemAlloc.zig").IAkPluginMemAlloc;
 const IAkStreamMgr = @import("IAkStreamMgr.zig");
 const midi_types = @import("midi_types.zig");
@@ -10,8 +10,9 @@ const platform_context = @import("platform_context.zig");
 const settings = @import("settings.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
-const virtual_acoustics = @import("virtual_acoustics.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
+const virtual_acoustics = @import("virtual_acoustics.zig");
 
 pub const AkCreatePluginCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPlugin;
 pub const AkCreateParamCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPluginParam;
@@ -138,7 +139,7 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub const SetRtpcValueOptionalArgs = struct {
-        game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+        game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
         value_change_duration: typedefs.AkTimeMs = 0,
         fade_curve: common.AkCurveInterpolation = .linear,
         bypass_internal_value_interpolation: bool = false,
@@ -280,7 +281,7 @@ pub const IAkGlobalPluginContext = opaque {
         cookie: ?*anyopaque = null,
         allocator: ?std.mem.Allocator = null,
         external_sources: ?[]const common.AkExternalSourceInfo = null,
-        playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+        playing_id: typedefs.AkPlayingID = connstants.AK_INVALID_PLAYING_ID,
     };
 
     pub fn postEventSync(
@@ -347,7 +348,7 @@ pub const IAkGlobalPluginContext = opaque {
         flags: callback_types.AkCallbackType = .{},
         callback: callback_types.AkCallbackFunc = null,
         cookie: ?*anyopaque = null,
-        playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+        playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
     };
 
     // NOTE: mlarouche: Workaround for translate-c that does not put the proper alignment on AkMIDIPost
@@ -375,9 +376,9 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub const StopMIDIOnEventSync = struct {
-        event_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
-        game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-        playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
+        event_id: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
+        game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
+        playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
     };
 
     pub fn stopMIDIOnEventSync(self: *IAkGlobalPluginContext, optional_args: StopMIDIOnEventSync) common.WwiseError!void {

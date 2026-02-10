@@ -1,15 +1,16 @@
-const std = @import("std");
+const builtin = @import("builtin");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const constants = @import("constants.zig");
 const error_message_translator = @import("error_message_translator.zig");
+const std = @import("std");
 const StreamMgr = @import("StreamMgr.zig");
-const builtin = @import("builtin");
 const typedefs = @import("typedefs.zig");
 
 pub const MsgContext = extern struct {
-    in_playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
-    in_game_obj_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-    in_sound_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    in_playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
+    in_game_obj_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
+    in_sound_id: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
     in_is_bus: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_AK_Monitor_MsgContext) MsgContext {
@@ -270,9 +271,9 @@ pub const ErrorCode = enum(common.DefaultEnumType) {
 pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const common.AkOSChar, in_error_level: ErrorLevel, in_playing_id: typedefs.AkPlayingID, in_game_object_id: typedefs.AkGameObjectID) callconv(.c) void;
 
 pub const PostCodeOptionalArgs = struct {
-    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
-    game_obj_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-    audio_node_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
+    game_obj_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
+    audio_node_id: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
     is_bus: bool = false,
 };
 
@@ -290,9 +291,9 @@ pub fn postCode(in_error: ErrorCode, in_error_level: ErrorLevel, optional_args: 
 }
 
 pub const PostStringOptionalArgs = struct {
-    playing_id: typedefs.AkPlayingID = common.AK_INVALID_PLAYING_ID,
-    game_obj_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
-    audio_node_id: typedefs.AkUniqueID = common.AK_INVALID_UNIQUE_ID,
+    playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
+    game_obj_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
+    audio_node_id: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
     is_bus: bool = false,
 };
 

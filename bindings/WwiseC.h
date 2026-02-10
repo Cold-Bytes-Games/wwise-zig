@@ -41,48 +41,13 @@ extern "C"
 
 // BEGIN AkTypedefs
 #include <AK/SoundEngine/Common/AkTypedefs.h>
-    // END AkTypedefs
+// END AkTypedefs
+
+// BEGIN AkConstants
+#include <AK/SoundEngine/Common/AkConstants.h>
+    // END AkConstants
 
     // BEGIN AkTypes
-
-    // Constants.
-    static const AkPluginID WWISEC_AK_INVALID_PLUGINID = (AkPluginID)-1;                    ///< Invalid FX ID
-    static const AkPluginID WWISEC_AK_INVALID_SHARE_SET_ID = (AkPluginID)-1;                ///< Invalid Share Set ID
-    static const AkGameObjectID WWISEC_AK_INVALID_GAME_OBJECT = (AkGameObjectID)-1;         ///< Invalid game object (may also mean all game objects)
-    static const AkUniqueID WWISEC_AK_INVALID_UNIQUE_ID = 0;                                ///< Invalid unique 32-bit ID
-    static const AkRtpcID WWISEC_AK_INVALID_RTPC_ID = WWISEC_AK_INVALID_UNIQUE_ID;          ///< Invalid RTPC ID
-    static const AkPlayingID WWISEC_AK_INVALID_PLAYING_ID = WWISEC_AK_INVALID_UNIQUE_ID;    ///< Invalid playing ID
-    static const AkUInt32 WWISEC_AK_DEFAULT_SWITCH_STATE = 0;                               ///< Switch selected if no switch has been set yet
-    static const AkMemPoolId WWISEC_AK_INVALID_POOL_ID = -1;                                ///< Invalid pool ID
-    static const AkMemPoolId WWISEC_AK_DEFAULT_POOL_ID = -1;                                ///< Default pool ID, same as AK_INVALID_POOL_ID
-    static const AkAuxBusID WWISEC_AK_INVALID_AUX_ID = WWISEC_AK_INVALID_UNIQUE_ID;         ///< Invalid auxiliary bus ID (or no Aux bus ID)
-    static const AkFileID WWISEC_AK_INVALID_FILE_ID = (AkFileID)-1;                         ///< Invalid file ID
-    static const AkCacheID WWISEC_AK_INVALID_CACHE_ID = (AkCacheID)-1;                      ///< Invalid cache ID
-    static const AkDeviceID WWISEC_AK_INVALID_DEVICE_ID = (AkDeviceID)-1;                   ///< Invalid streaming device ID
-    static const AkBankID WWISEC_AK_INVALID_BANK_ID = WWISEC_AK_INVALID_UNIQUE_ID;          ///< Invalid bank ID
-    static const AkArgumentValueID WWISEC_AK_FALLBACK_ARGUMENTVALUE_ID = 0;                 ///< Fallback argument value ID
-    static const AkChannelMask WWISEC_AK_INVALID_CHANNELMASK = 0;                           ///< Invalid channel mask
-    static const AkUInt32 WWISEC_AK_INVALID_OUTPUT_DEVICE_ID = WWISEC_AK_INVALID_UNIQUE_ID; ///< Invalid Device ID
-    static const AkPipelineID WWISEC_AK_INVALID_PIPELINE_ID = WWISEC_AK_INVALID_UNIQUE_ID;  ///< Invalid pipeline ID (for profiling)
-    static const AkAudioObjectID WWISEC_AK_INVALID_AUDIO_OBJECT_ID = (AkAudioObjectID)-1;   ///< Invalid audio object ID
-
-    // Priority.
-    static const AkPriority WWISEC_AK_DEFAULT_PRIORITY = 50; ///< Default sound / I/O priority
-    static const AkPriority WWISEC_AK_MIN_PRIORITY = 0;      ///< Minimal priority value [0,100]
-    static const AkPriority WWISEC_AK_MAX_PRIORITY = 100;    ///< Maximal priority value [0,100]
-
-    // Default bank I/O settings.
-    static const AkPriority WWISEC_AK_DEFAULT_BANK_IO_PRIORITY = WWISEC_AK_DEFAULT_PRIORITY; ///<  Default bank load I/O priority
-    static const AkReal32 WWISEC_AK_DEFAULT_BANK_THROUGHPUT = 1 * 1024 * 1024 / 1000.f;      ///<  Default bank load throughput (1 Mb/ms)
-
-    // Bank version
-    static const AkUInt32 WWISEC_AK_SOUNDBANK_VERSION = 154; ///<  Version of the soundbank reader
-
-    // Job types
-    static const AkJobType WWISEC_AkJobType_Generic = 0;         ///< Job type for general-purpose work
-    static const AkJobType WWISEC_AkJobType_AudioProcessing = 1; ///< Job type for DSP work
-    static const AkJobType WWISEC_AkJobType_SpatialAudio = 2;    ///< Job type for Spatial Audio computations
-    static const AkUInt32 WWISEC_AK_NUM_JOB_TYPES = 3;           ///< Number of possible job types recognized by the Sound Engine
 
 #ifndef WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT
 #define WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT 24024 ///< Default discovery port for most platforms using IP sockets for communication.
@@ -380,90 +345,6 @@ extern "C"
         AkRayID id;                        ///< ID of this emitter-listener pair, unique for a given emitter.
         AkGameObjectID m_uListenerID;      ///< Listener game object ID.
     } WWISEC_AkEmitterListenerPair;
-
-    // ---------------------------------------------------------------
-// Languages
-// ---------------------------------------------------------------
-#define WWISEC_AK_MAX_LANGUAGE_NAME_SIZE (32)
-
-// ---------------------------------------------------------------
-// File Type ID Definitions
-// ---------------------------------------------------------------
-
-// These correspond to IDs specified in the conversion plug-ins' XML
-// files. Audio sources persist them to "remember" their format.
-// DO NOT CHANGE THEM without talking to someone in charge of persistence!
-
-// Company ID for plugin development.
-#define WWISEC_AKCOMPANYID_PLUGINDEV_MIN (64)
-#define WWISEC_AKCOMPANYID_PLUGINDEV_MAX (255)
-
-// Vendor ID.
-#define WWISEC_AKCOMPANYID_AUDIOKINETIC (0)          ///< Audiokinetic inc.
-#define WWISEC_AKCOMPANYID_AUDIOKINETIC_EXTERNAL (1) ///< Audiokinetic inc.
-#define WWISEC_AKCOMPANYID_MCDSP (256)               ///< McDSP
-#define WWISEC_AKCOMPANYID_WAVEARTS (257)            ///< WaveArts
-#define WWISEC_AKCOMPANYID_PHONETICARTS (258)        ///< Phonetic Arts
-#define WWISEC_AKCOMPANYID_IZOTOPE (259)             ///< iZotope
-#define WWISEC_AKCOMPANYID_CRANKCASEAUDIO (261)      ///< Crankcase Audio
-#define WWISEC_AKCOMPANYID_IOSONO (262)              ///< IOSONO
-#define WWISEC_AKCOMPANYID_AUROTECHNOLOGIES (263)    ///< Auro Technologies
-#define WWISEC_AKCOMPANYID_DOLBY (264)               ///< Dolby
-#define WWISEC_AKCOMPANYID_TWOBIGEARS (265)          ///< Two Big Ears
-#define WWISEC_AKCOMPANYID_OCULUS (266)              ///< Oculus
-#define WWISEC_AKCOMPANYID_BLUERIPPLESOUND (267)     ///< Blue Ripple Sound
-#define WWISEC_AKCOMPANYID_ENZIEN (268)              ///< Enzien Audio
-#define WWISEC_AKCOMPANYID_KROTOS (269)              ///< Krotos (Dehumanizer)
-#define WWISEC_AKCOMPANYID_NURULIZE (270)            ///< Nurulize
-#define WWISEC_AKCOMPANYID_SUPERPOWERED (271)        ///< Super Powered
-#define WWISEC_AKCOMPANYID_GOOGLE (272)              ///< Google
-#define WWISEC_AKCOMPANYID_VISISONICS (277)          ///< Visisonics
-
-// File/encoding types of Audiokinetic.
-#define WWISEC_AKCODECID_BANK (0)             ///< Bank encoding
-#define WWISEC_AKCODECID_PCM (1)              ///< PCM encoding
-#define WWISEC_AKCODECID_ADPCM (2)            ///< ADPCM encoding
-#define WWISEC_AKCODECID_XMA (3)              ///< XMA encoding
-#define WWISEC_AKCODECID_VORBIS (4)           ///< Vorbis encoding
-#define WWISEC_AKCODECID_WIIADPCM (5)         ///< ADPCM encoding on the Wii
-#define WWISEC_AKCODECID_PCMEX (7)            ///< Standard PCM WAV file parser for Wwise Authoring
-#define WWISEC_AKCODECID_EXTERNAL_SOURCE (8)  ///< External Source (unknown encoding)
-#define WWISEC_AKCODECID_XWMA (9)             ///< xWMA encoding
-#define WWISEC_AKCODECID_FILE_PACKAGE (11)    ///< File package files generated by the File Packager utility.
-#define WWISEC_AKCODECID_ATRAC9 (12)          ///< ATRAC-9 encoding
-#define WWISEC_AKCODECID_VAG (13)             ///< VAG/HE-VAG encoding
-#define WWISEC_AKCODECID_PROFILERCAPTURE (14) ///< Profiler capture file (.prof) as written through AK::SoundEngine::StartProfilerCapture
-#define WWISEC_AKCODECID_ANALYSISFILE (15)    ///< Analysis file
-#define WWISEC_AKCODECID_MIDI (16)            ///< MIDI file
-#define WWISEC_AKCODECID_OPUSNX (17)          ///< OpusNX encoding
-#define WWISEC_AKCODECID_CAF (18)             ///< CAF file
-#define WWISEC_AKCODECID_AKOPUS (19)          ///< Opus encoding, 2018.1 to 2019.2
-#define WWISEC_AKCODECID_AKOPUS_WEM (20)      ///< Opus encoding, wrapped in WEM
-#define WWISEC_AKCODECID_MEMORYMGR_DUMP (21)  ///< Memory stats file as written through AK::MemoryMgr::DumpToFile();
-#define WWISEC_AKCODECID_SONY360 (22)         ///< Sony 360 encoding
-
-#define WWISEC_AKCODECID_BANK_EVENT (30) ///< Bank encoding for event banks. These banks are contained in the /event sub-folder.
-#define WWISEC_AKCODECID_BANK_BUS (31)   ///< Bank encoding for bus banks. These banks are contained in the /bus sub-folder.
-
-#define WWISEC_AKPLUGINID_METER (129)    ///< Meter Plugin
-#define WWISEC_AKPLUGINID_RECORDER (132) ///< Recorder Plugin
-#define WWISEC_AKPLUGINID_IMPACTER (184)
-#define WWISEC_AKPLUGINID_SYSTEM_OUTPUT_META (900)            ///< System output metadata
-#define WWISEC_AKPLUGINID_AUDIO_OBJECT_ATTENUATION_META (901) ///< Attenuation curve metadata
-#define WWISEC_AKPLUGINID_AUDIO_OBJECT_PRIORITY_META (902)    ///< Audio object priority metadata
-
-#define WWISEC_AKEXTENSIONID_SPATIALAUDIO (800)     ///< Spatial Audio
-#define WWISEC_AKEXTENSIONID_INTERACTIVEMUSIC (801) ///< Interactive Music
-#define WWISEC_AKEXTENSIONID_MIDIDEVICEMGR (802)    ///< MIDI Device Manager (Authoring)
-
-// The following are internally defined
-#define WWISEC_AK_WAVE_FORMAT_VAG 0xFFFB
-#define WWISEC_AK_WAVE_FORMAT_AT9 0xFFFC
-#define WWISEC_AK_WAVE_FORMAT_VORBIS 0xFFFF
-#define WWISEC_AK_WAVE_FORMAT_OPUSNX 0x3039
-#define WWISEC_AK_WAVE_FORMAT_OPUS 0x3040
-#define WWISEC_AK_WAVE_FORMAT_OPUS_WEM 0x3041
-#define WWISEC_WAVE_FORMAT_XMA2 0x166
 
     typedef struct WWISEC_IAkSoftwareCodec WWISEC_IAkSoftwareCodec;
     typedef struct WWISEC_IAkFileCodec WWISEC_IAkFileCodec;

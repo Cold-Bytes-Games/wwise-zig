@@ -1,6 +1,7 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const constants = @import("constants.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
 
 pub const AK_MAX_NUM_TEXTURE = c.WWISEC_AK_MAX_NUM_TEXTURE;
@@ -65,7 +66,7 @@ pub const AkReflectImageSource = extern struct {
 };
 
 pub const AkReflectGameData = extern struct {
-    listener_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    listener_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     num_image_sources: u32 = 0,
     sources: [1]AkReflectImageSource = undefined,
 

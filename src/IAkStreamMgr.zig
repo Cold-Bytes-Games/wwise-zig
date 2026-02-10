@@ -1,7 +1,8 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const constants = @import("constants.zig");
 const settings = @import("settings.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
 
 pub const AK_MONITOR_STREAMNAME_MAXLENGTH = c.WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH;
@@ -35,9 +36,9 @@ pub const AkFileSystemFlags = extern struct {
     custom_param: ?*anyopaque = null,
     is_language_specific: bool = false,
     is_automatic_stream: bool = false,
-    cache_id: common.AkCacheID = common.AK_INVALID_CACHE_ID,
+    cache_id: common.AkCacheID = constants.AK_INVALID_CACHE_ID,
     num_bytes_prefetch: u32 = 0,
-    directory_hash: u32 = common.AK_INVALID_UNIQUE_ID,
+    directory_hash: u32 = constants.AK_INVALID_UNIQUE_ID,
 
     pub fn fromC(value: c.WWISEC_AkFileSystemFlags) AkFileSystemFlags {
         return @bitCast(value);
@@ -219,7 +220,7 @@ pub const NativeAkStreamRecord = extern struct {
     stream_id: u32 = 0,
     device_id: typedefs.AkDeviceID = 0,
     stream_name: [AK_MONITOR_STREAMNAME_MAXLENGTH]common.AkUtf16,
-    id_file: typedefs.AkFileID = common.AK_INVALID_FILE_ID,
+    id_file: typedefs.AkFileID = constants.AK_INVALID_FILE_ID,
     string_size: u32 = 0,
     file_size: u64 = 0,
     is_auto_stream: bool = false,
@@ -242,7 +243,7 @@ pub const AkStreamRecord = struct {
     stream_id: u32 = 0,
     device_id: typedefs.AkDeviceID = 0,
     stream_name: []const u8,
-    id_file: typedefs.AkFileID = common.AK_INVALID_FILE_ID,
+    id_file: typedefs.AkFileID = constants.AK_INVALID_FILE_ID,
     file_size: u64 = 0,
     is_auto_stream: bool = false,
     is_caching_stream: bool = false,
@@ -308,14 +309,14 @@ pub const AkStreamData = extern struct {
 
 pub const NativeAkFileOpenData = extern struct {
     file_name: ?[*:0]const common.AkOSChar align(4) = null,
-    file_id: typedefs.AkFileID align(4) = common.AK_INVALID_FILE_ID,
+    file_id: typedefs.AkFileID align(4) = constants.AK_INVALID_FILE_ID,
     flags: ?*AkFileSystemFlags align(4) = null,
     open_mode: AkOpenMode align(4) = .read,
 };
 
 pub const AkFileOpenData = struct {
     file_name: []const u8 = &.{},
-    file_id: typedefs.AkFileID = common.AK_INVALID_FILE_ID,
+    file_id: typedefs.AkFileID = constants.AK_INVALID_FILE_ID,
     flags: ?AkFileSystemFlags = null,
     open_mode: AkOpenMode = .read,
 

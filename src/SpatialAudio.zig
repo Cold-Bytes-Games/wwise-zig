@@ -1,7 +1,8 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const constants = @import("constants.zig");
 const reflect_game_data = @import("reflect_game_data.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
 
 pub const ReverbEstimation = @import("ReverbEstimation.zig");
@@ -183,7 +184,7 @@ pub const AkTriangle = extern struct {
 };
 
 pub const AkAcousticSurface = extern struct {
-    texture_id: u32 = common.AK_INVALID_UNIQUE_ID,
+    texture_id: u32 = constants.AK_INVALID_UNIQUE_ID,
     transmission_loss: f32 = 1.0,
     str_name: ?[*:0]const u8 = null,
 
@@ -258,7 +259,7 @@ pub const AkPortalParams = extern struct {
 pub const AkRoomParams = extern struct {
     front: common.AkVector = .{ .z = 1.0 },
     up: common.AkVector = .{ .y = 1.0 },
-    reverb_aux_bus: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
+    reverb_aux_bus: typedefs.AkAuxBusID = constants.AK_INVALID_AUX_ID,
     reverb_level: f32 = 1.0,
     transmission_loss: f32 = 1.0,
     room_game_obj_aux_send_level_to_self: f32 = 0.0,
@@ -366,8 +367,8 @@ pub fn setGameObjectRadius(in_game_object_id: typedefs.AkGameObjectID, in_outer_
 }
 
 pub const SetImageSourceOptionalArgs = struct {
-    aux_bus_id: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    aux_bus_id: typedefs.AkAuxBusID = constants.AK_INVALID_AUX_ID,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
 };
 
 pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: typedefs.AkImageSourceID, in_info: *const AkImageSourceSettings, in_name: []const u8, optional_args: SetImageSourceOptionalArgs) common.WwiseError!void {
@@ -389,8 +390,8 @@ pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: typedefs
 }
 
 pub const RemoveImageSourceOptionalArgs = struct {
-    aux_bus_id: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    aux_bus_id: typedefs.AkAuxBusID = constants.AK_INVALID_AUX_ID,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
 };
 
 pub fn removeImageSource(in_src_id: typedefs.AkImageSourceID, optional_args: RemoveImageSourceOptionalArgs) common.WwiseError!void {
@@ -404,8 +405,8 @@ pub fn removeImageSource(in_src_id: typedefs.AkImageSourceID, optional_args: Rem
 }
 
 pub const ClearImageSourcesOptionalArgs = struct {
-    aux_bus_id: typedefs.AkAuxBusID = common.AK_INVALID_AUX_ID,
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    aux_bus_id: typedefs.AkAuxBusID = constants.AK_INVALID_AUX_ID,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
 };
 
 pub fn clearImageSources(optional_args: ClearImageSourcesOptionalArgs) common.WwiseError!void {
@@ -590,7 +591,7 @@ pub fn setMaxGlobalReflectionPaths(in_max_global_reflection_paths: u32) common.W
 }
 
 pub const SetMaxDiffractionPathsOptionalArgs = struct {
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
 };
 pub fn setMaxDiffractionPaths(in_max_diffraction_paths: u32, optional_args: SetMaxDiffractionPathsOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
@@ -620,7 +621,7 @@ pub fn setLoadBalancingSpread(in_nb_frames: u32) common.WwiseError!void {
 }
 
 pub const SetSmoothingConstantOptionalArgs = struct {
-    game_object_id: typedefs.AkGameObjectID = common.AK_INVALID_GAME_OBJECT,
+    game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
 };
 pub fn setSmoothingConstant(in_smoothing_constant_ms: f32, optional_args: SetSmoothingConstantOptionalArgs) common.WwiseError!void {
     return common.handleAkResult(
