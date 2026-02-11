@@ -1,6 +1,7 @@
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
+const enums = @import("enums.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const std = @import("std");
@@ -9,10 +10,10 @@ const zig = @import("zig.zig");
 
 pub const AkPositioningInfo = extern struct {
     center_pct: f32 = 0,
-    panner_type: common.AkSpeakerPanningType = .direct_speaker_assignment,
-    @"3d_positioning_type": common.Ak3DPositionType = .emitter,
+    panner_type: enums.AkSpeakerPanningType = .direct_speaker_assignment,
+    @"3d_positioning_type": enums.Ak3DPositionType = .emitter,
     hold_emitter_pos_and_orient: bool = false,
-    @"3d_spatialization_mode": common.Ak3DSpatializationMode = .none,
+    @"3d_spatialization_mode": enums.Ak3DSpatializationMode = .none,
     enable_attenuation: bool = false,
     use_cone_attenuation: bool = false,
     inner_angle: f32 = 0.0,

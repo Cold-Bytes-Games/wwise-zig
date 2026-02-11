@@ -1,5 +1,6 @@
-const std = @import("std");
 const c = @import("wwise_c");
+const enums = @import("enums.zig");
+const std = @import("std");
 
 // NOTE: Please sync this with the defines in AkSpeakerConfig.h
 pub const AkSpeakerSetup = packed struct(u20) {
@@ -602,19 +603,9 @@ pub const AK_STANDARD_MAX_NUM_CHANNELS = 8;
 pub const AK_MAX_AMBISONICS_ORDER = 5;
 pub const AK_DEFAULT_HEIGHT_ANGLE = c.WWISEC_AK_DEFAULT_HEIGHT_ANGLE;
 
-pub const AkChannelConfigType = enum(u4) {
-    anonymous = 0,
-    standard = 1,
-    ambisonic = 2,
-    objects = 3,
-
-    use_device_main = 0xE,
-    use_device_passthrough = 0xF,
-};
-
 pub const AkChannelConfig = packed struct(u32) {
     num_channels: u8 = 0,
-    config_type: AkChannelConfigType = .anonymous,
+    config_type: enums.AkChannelConfigType = .anonymous,
     channel_mask: AkSpeakerSetup = .{},
 
     pub inline fn standard(channel_mask: AkSpeakerSetup) AkChannelConfig {

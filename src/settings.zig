@@ -36,13 +36,13 @@ pub const AkJobMgrSettings = extern struct {
 pub const AkOutputSettings = extern struct {
     audio_device_shareset: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
     id_device: u32 = 0,
-    panning_rule: common.AkPanningRule = .speakers,
+    panning_rule: enusm.AkPanningRule = .speakers,
     channel_config: speaker_config.AkChannelConfig = .{},
 
     pub const InitOptionalArgs = struct {
         id_device: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
         channel_config: speaker_config.AkChannelConfig = .{},
-        panning: common.AkPanningRule = .speakers,
+        panning: enusm.AkPanningRule = .speakers,
     };
 
     pub fn init(fallback_allocator: std.mem.Allocator, device_shareset: []const u8, optional_args: InitOptionalArgs) !AkOutputSettings {

@@ -74,7 +74,7 @@ pub const IAkGlobalPluginContext = opaque {
         );
     }
 
-    pub fn registerPlugin(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: AkCreatePluginCallback, in_create_param_func: AkCreateParamCallback) zig.WwiseError!void {
+    pub fn registerPlugin(self: *IAkGlobalPluginContext, in_type: enums.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: AkCreatePluginCallback, in_create_param_func: AkCreateParamCallback) zig.WwiseError!void {
         return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterPlugin(
                 @ptrCast(self),
@@ -104,7 +104,7 @@ pub const IAkGlobalPluginContext = opaque {
         cookie: ?*anyopaque = null,
     };
 
-    pub fn registerGlobalCallback(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_callback: callback_types.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) zig.WwiseError!void {
+    pub fn registerGlobalCallback(self: *IAkGlobalPluginContext, in_type: enums.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_callback: callback_types.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) zig.WwiseError!void {
         return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterGlobalCallback(
                 @ptrCast(self),
@@ -143,7 +143,7 @@ pub const IAkGlobalPluginContext = opaque {
     pub const SetRtpcValueOptionalArgs = struct {
         game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
         value_change_duration: typedefs.AkTimeMs = 0,
-        fade_curve: common.AkCurveInterpolation = .linear,
+        fade_curve: enums.AkCurveInterpolation = .linear,
         bypass_internal_value_interpolation: bool = false,
     };
 
@@ -170,7 +170,7 @@ pub const IAkGlobalPluginContext = opaque {
         self: *IAkGlobalPluginContext,
         in_bus_id: typedefs.AkUniqueID,
         in_bus_object_id: typedefs.AkGameObjectID,
-        in_type: common.AkPluginType,
+        in_type: enums.AkPluginType,
         in_company_id: u32,
         in_plugin_id: u32,
         in_data: ?*const anyopaque,

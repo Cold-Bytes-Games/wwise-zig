@@ -135,13 +135,6 @@ pub const AkExternalSourceInfo = struct {
     }
 };
 
-pub const AkConnectionType = enum(DefaultEnumType) {
-    direct = c.WWISEC_ConnectionType_Direct,
-    game_def_send = c.WWISEC_ConnectionType_GameDefSend,
-    user_def_send = c.WWISEC_ConnectionType_UserDefSend,
-    reflections_send = c.WWISEC_ConnectionType_ReflectionsSend,
-};
-
 pub const AkVector64 = extern struct {
     x: f64 = 0.0,
     y: f64 = 0.0,
@@ -320,98 +313,6 @@ pub const AkEmitterListenerPair = extern struct {
     pub fn toC(self: AkEmitterListenerPair) c.WWISEC_AkEmitterListenerPair {
         return @bitCast(self);
     }
-};
-
-pub const AkSetPositionFlags = packed struct(u8) {
-    emitter: bool = false,
-    listener: bool = false,
-    pad: u6 = 0,
-
-    pub const Default = AkSetPositionFlags{ .emitter = true, .listener = true };
-
-    pub inline fn fromC(value: c.WWISEC_AkSetPositionFlags) AkSetPositionFlags {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: AkSetPositionFlags) c.WWISEC_AkSetPositionFlags {
-        return @as(u8, @bitCast(self));
-    }
-
-    comptime {
-        std.debug.assert(@as(u8, @bitCast(AkSetPositionFlags{ .emitter = true })) == c.WWISEC_AkSetPositionFlags_Emitter);
-        std.debug.assert(@as(u8, @bitCast(AkSetPositionFlags{ .listener = true })) == c.WWISEC_AkSetPositionFlags_Listener);
-        std.debug.assert(Default.toC() == c.WWISEC_AkSetPositionFlags_Default);
-    }
-};
-
-pub const AkSpeakerPanningType = enum(u8) {
-    direct_speaker_assignment = c.WWISEC_AkSpeakerPanningType_AK_DirectSpeakerAssignment,
-    balance_fadee_height = c.WWISEC_AkSpeakerPanningType_AK_BalanceFadeHeight,
-    steering_panner = c.WWISEC_AkSpeakerPanningType_AK_SteeringPanner,
-};
-
-pub const Ak3DPositionType = enum(u8) {
-    emitter = c.WWISEC_Ak3DPositionType_AK_3DPositionType_Emitter,
-    emitter_with_automation = c.WWISEC_Ak3DPositionType_AK_3DPositionType_EmitterWithAutomation,
-    listener_with_automation = c.WWISEC_Ak3DPositionType_AK_3DPositionType_ListenerWithAutomation,
-};
-
-pub const AkPanningRule = enum(u8) {
-    speakers = c.WWISEC_AkPanningRule_Speakers,
-    headphones = c.WWISEC_AkPanningRule_Headphones,
-};
-
-pub const Ak3DSpatializationMode = enum(u8) {
-    none = c.WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_None,
-    position_only = c.WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionOnly,
-    position_and_orientation = c.WWISEC_Ak3DSpatializationMode_AK_SpatializationMode_PositionAndOrientation,
-};
-
-pub const AkMeteringFlags = packed struct(u8) {
-    enable_bus_meter_peak: bool = false,
-    enable_bus_meter_true_peak: bool = false,
-    enable_bus_meter_rms: bool = false,
-    reserved0: bool = false,
-    enable_bus_meter_kpower: bool = false,
-    enable_bus_meter_3d_meter: bool = false,
-    reserved1: u2 = 0,
-
-    pub inline fn fromC(value: c.WWISEC_AkMeteringFlags) AkMeteringFlags {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: AkMeteringFlags) c.WWISEC_AkMeteringFlags {
-        return @bitCast(self);
-    }
-};
-
-pub const AkPluginType = enum(u8) {
-    none = c.WWISEC_AkPluginTypeNone,
-    codec = c.WWISEC_AkPluginTypeCodec,
-    source = c.WWISEC_AkPluginTypeSource,
-    effect = c.WWISEC_AkPluginTypeEffect,
-    mixer = c.WWISEC_AkPluginTypeMixer,
-    sink = c.WWISEC_AkPluginTypeSink,
-    global_extension = c.WWISEC_AkPluginTypeGlobalExtension,
-    metadata = c.WWISEC_AkPluginTypeMetadata,
-};
-
-pub const AkGroupType = enum(DefaultEnumType) {
-    @"switch" = c.WWISEC_AkGroupType_Switch,
-    state = c.WWISEC_AkGroupType_State,
-};
-
-pub const AkCurveInterpolation = enum(DefaultEnumType) {
-    log3 = c.WWISEC_AkCurveInterpolation_Log3,
-    sine = c.WWISEC_AkCurveInterpolation_Sine,
-    log1 = c.WWISEC_AkCurveInterpolation_Log1,
-    inv_scurve = c.WWISEC_AkCurveInterpolation_InvSCurve,
-    linear = c.WWISEC_AkCurveInterpolation_Linear,
-    scurve = c.WWISEC_AkCurveInterpolation_SCurve,
-    exp1 = c.WWISEC_AkCurveInterpolation_Exp1,
-    sine_recip = c.WWISEC_AkCurveInterpolation_SineRecip,
-    exp3 = c.WWISEC_AkCurveInterpolation_Exp3,
-    constant = c.WWISEC_AkCurveInterpolation_Constant,
 };
 
 pub const AkAuxSendValue = extern struct {

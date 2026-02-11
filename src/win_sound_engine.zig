@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const enums = @import("enums.zig");
 
 pub const IMMDevice = anyopaque;
 
@@ -19,7 +20,7 @@ pub fn getDeviceIDFromName(fallback_allocator: std.mem.Allocator, in_token: []co
 }
 
 pub const GetWindowsDeviceNameOptionalArgs = struct {
-    device_state_mask: common.AkAudioDeviceState = common.AkAudioDeviceState.All,
+    device_state_mask: enums.AkAudioDeviceState = enums.AkAudioDeviceState.All,
 };
 
 pub fn getWindowsDeviceName(allocator: std.mem.Allocator, index: i32, out_device_id: *u32, optional_args: GetWindowsDeviceNameOptionalArgs) ![]u8 {
@@ -30,7 +31,7 @@ pub fn getWindowsDeviceName(allocator: std.mem.Allocator, index: i32, out_device
 }
 
 pub const GetWindowsDeviceCountOptionalArgs = struct {
-    device_state_mask: common.AkAudioDeviceState = common.AkAudioDeviceState.All,
+    device_state_mask: enums.AkAudioDeviceState = enums.AkAudioDeviceState.All,
 };
 
 pub fn getWindowsDeviceCount(optional_args: GetWindowsDeviceCountOptionalArgs) u32 {
@@ -38,7 +39,7 @@ pub fn getWindowsDeviceCount(optional_args: GetWindowsDeviceCountOptionalArgs) u
 }
 
 pub const GetWindowsDeviceOptionalArgs = struct {
-    device_state_mask: common.AkAudioDeviceState = common.AkAudioDeviceState.All,
+    device_state_mask: enums.AkAudioDeviceState = enums.AkAudioDeviceState.All,
 };
 
 pub fn getWindowsDevice(in_index: i32, out_device_id: *u32, out_device: **IMMDevice, optional_args: GetWindowsDeviceOptionalArgs) bool {

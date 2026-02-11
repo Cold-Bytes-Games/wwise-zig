@@ -1,6 +1,7 @@
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
 const common = @import("common.zig");
+const enums = @import("enums.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
 const zig = @import("zig.zig");
@@ -196,16 +197,11 @@ pub const Playlist = opaque {
     }
 };
 
-pub const DynamicSequenceType = enum(zig.DefaultEnumType) {
-    sample_accurate = c.WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType_SampleAccurate,
-    normal_transition = c.WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType_NormalTransition,
-};
-
 pub const OpenOptionalArgs = struct {
     flags: callback_types.AkCallbackType = .{},
     callback: callback_types.AkCallbackFunc = null,
     cookie: ?*anyopaque = null,
-    dynamic_sequence_type: DynamicSequenceType = .sample_accurate,
+    dynamic_sequence_type: enums.AkDynamicSequenceType = .sample_accurate,
 };
 
 pub fn open(in_game_object_id: typedefs.AkGameObjectID, optional_args: OpenOptionalArgs) typedefs.AkPlayingID {
@@ -226,7 +222,7 @@ pub fn close(in_playing_id: typedefs.AkPlayingID) zig.WwiseError!void {
 
 pub const PlayOptionalArgs = struct {
     transition_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
 };
 
 pub fn play(in_playing_id: typedefs.AkPlayingID, optional_args: PlayOptionalArgs) zig.WwiseError!void {
@@ -241,7 +237,7 @@ pub fn play(in_playing_id: typedefs.AkPlayingID, optional_args: PlayOptionalArgs
 
 pub const PauseOptionalArgs = struct {
     transition_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
 };
 
 pub fn pause(in_playing_id: typedefs.AkPlayingID, optional_args: PauseOptionalArgs) zig.WwiseError!void {
@@ -256,7 +252,7 @@ pub fn pause(in_playing_id: typedefs.AkPlayingID, optional_args: PauseOptionalAr
 
 pub const ResumeOptionalArgs = struct {
     transition_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
 };
 
 pub fn @"resume"(in_playing_id: typedefs.AkPlayingID, optional_args: ResumeOptionalArgs) zig.WwiseError!void {
@@ -271,7 +267,7 @@ pub fn @"resume"(in_playing_id: typedefs.AkPlayingID, optional_args: ResumeOptio
 
 pub const StopOptionalArgs = struct {
     transition_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
 };
 
 pub fn stop(in_playing_id: typedefs.AkPlayingID, optional_args: StopOptionalArgs) zig.WwiseError!void {

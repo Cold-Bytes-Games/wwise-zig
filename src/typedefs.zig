@@ -51,9 +51,3 @@ pub const AkSpeakerVolumesConstVectorPtr = c.AkSpeakerVolumesConstVectorPtr;
 pub const AkSpeakerVolumesConstMatrixPtr = c.AkSpeakerVolumesConstMatrixPtr;
 
 pub const AkExternalSourceArray = c.AkExternalSourceArray;
-
-pub const AkBankType = enum(u32) {
-    user = c.WWISEC_AkBankType_User,
-    event = c.WWISEC_AkBankType_Event,
-    bus = c.WWISEC_AkBankType_Bus,
-};

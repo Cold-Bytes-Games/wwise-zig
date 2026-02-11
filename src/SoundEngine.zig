@@ -150,7 +150,7 @@ pub fn getOutputDeviceConfiguration(in_id_output: typedefs.AkOutputDeviceID, io_
     );
 }
 
-pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!common.AkPanningRule {
+pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!enusm.AkPanningRule {
     var raw_panning_rule: c.WWISEC_AkPanningRule = 0;
 
     try zig.handleAkResult(
@@ -160,7 +160,7 @@ pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!co
     return @enumFromInt(raw_panning_rule);
 }
 
-pub fn setPanningRule(in_panning_rule: common.AkPanningRule, in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
+pub fn setPanningRule(in_panning_rule: enusm.AkPanningRule, in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetPanningRule(@intFromEnum(in_panning_rule), in_id_output),
     );
@@ -216,7 +216,7 @@ pub fn getGlobalPluginContext() ?*IAkPlugin.IAkGlobalPluginContext {
     return @ptrCast(c.WWISEC_AK_SoundEngine_GetGlobalPluginContext());
 }
 
-pub fn registerPlugin(in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: IAkPlugin.AkCreatePluginCallback, in_create_param_func: IAkPlugin.AkCreateParamCallback) zig.WwiseError!void {
+pub fn registerPlugin(in_type: enums.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: IAkPlugin.AkCreatePluginCallback, in_create_param_func: IAkPlugin.AkCreateParamCallback) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterPlugin(
             @intFromEnum(in_type),
@@ -250,14 +250,14 @@ pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []c
     );
 }
 
-pub fn isPluginRegistered(in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32) bool {
+pub fn isPluginRegistered(in_type: enums.AkPluginType, in_company_id: u32, in_plugin_id: u32) bool {
     return c.WWISEC_AK_SoundEngine_IsPluginRegistered(@intFromEnum(in_type), in_company_id, in_plugin_id);
 }
 
 pub const RegisterGlobalCallbackOptionalArgs = struct {
     location: callback_types.AkGlobalCallbackLocation = .{ .begin_render = true },
     cookie: ?*anyopaque = null,
-    plugin_type: common.AkPluginType = .none,
+    plugin_type: enums.AkPluginType = .none,
     company_id: u32 = 0,
     plugin_id: u32 = 0,
 };
@@ -439,22 +439,14 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
     );
 }
 
-pub const AkActionOnEventType = enum(zig.DefaultEnumType) {
-    stop = c.WWISEC_AkActionOnEventType_Stop,
-    pause = c.WWISEC_AkActionOnEventType_Pause,
-    @"resume" = c.WWISEC_AkActionOnEventType_Resume,
-    @"break" = c.WWISEC_AkActionOnEventType_Break,
-    release_envelope = c.WWISEC_AkActionOnEventType_ReleaseEnvelope,
-};
-
 pub const ExecuteActionOnEventOptionalArgs = struct {
     game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     transition_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
     playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
-pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) zig.WwiseError!void {
+pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: enums.AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(
             in_event_id,
@@ -467,7 +459,7 @@ pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: 
     );
 }
 
-pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) zig.WwiseError!void {
+pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_action_type: enums.AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
@@ -724,7 +716,7 @@ pub fn stopAll(optional_args: StopAllOptionalArgs) void {
 
 pub const StopPlayingIDOptionalArgs = struct {
     transition_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
 };
 
 pub fn stopPlayingID(in_playing_id: typedefs.AkPlayingID, optional_args: StopPlayingIDOptionalArgs) void {
@@ -737,10 +729,10 @@ pub fn stopPlayingID(in_playing_id: typedefs.AkPlayingID, optional_args: StopPla
 
 pub const ExecuteActionOnPlayingIDOptionalArgs = struct {
     transition_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
 };
 
-pub fn executeActionOnPlayingID(in_action_type: AkActionOnEventType, in_playing_id: typedefs.AkPlayingID, optional_args: ExecuteActionOnPlayingIDOptionalArgs) void {
+pub fn executeActionOnPlayingID(in_action_type: enums.AkActionOnEventType, in_playing_id: typedefs.AkPlayingID, optional_args: ExecuteActionOnPlayingIDOptionalArgs) void {
     c.WWISEC_AK_SoundEngine_ExecuteActionOnPlayingID(
         @intFromEnum(in_action_type),
         in_playing_id,
@@ -764,7 +756,7 @@ pub fn getBackgroundMusicMute() bool {
 pub fn sendPluginCustomGameData(
     in_bus_id: typedefs.AkUniqueID,
     in_bus_object_id: typedefs.AkUniqueID,
-    in_type: common.AkPluginType,
+    in_type: enums.AkPluginType,
     in_company_id: u32,
     in_plugin_id: u32,
     in_data: ?*anyopaque,
@@ -814,7 +806,7 @@ pub fn unregisterAllGameObj() zig.WwiseError!void {
 }
 
 pub const SetPositionOptionalArgs = struct {
-    flags: common.AkSetPositionFlags = common.AkSetPositionFlags.Default,
+    flags: enums.AkSetPositionFlags = enums.AkSetPositionFlags.Default,
 };
 
 pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: common.AkSoundPosition, optional_args: SetPositionOptionalArgs) zig.WwiseError!void {
@@ -829,7 +821,7 @@ pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: comm
 
 pub const SetMultiplePositionOptionalArgs = struct {
     multi_position_type: MultiPositionType = .multi_directions,
-    flags: common.AkSetPositionFlags = common.AkSetPositionFlags.Default,
+    flags: enums.AkSetPositionFlags = enums.AkSetPositionFlags.Default,
 };
 
 pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID, positions: []const common.AkSoundPosition, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
@@ -881,7 +873,7 @@ pub fn setBankLoadIOSettings(in_throughput: f32, in_priority: typedefs.AkPriorit
 }
 
 pub const LoadBankOptionalArgs = struct {
-    bank_type: typedefs.AkBankType = .user,
+    bank_type: enums.AkBankType = .user,
 };
 
 pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, optional_args: LoadBankOptionalArgs) zig.WwiseError!typedefs.AkBankID {
@@ -916,7 +908,7 @@ pub fn loadBankMemoryView(in_memory_bank: ?*const anyopaque, in_memory_bank_size
     return out_bank_id;
 }
 
-pub fn loadBankMemoryViewOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) zig.WwiseError!void {
+pub fn loadBankMemoryViewOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *enums.AkBankType) zig.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
     try zig.handleAkResult(
@@ -936,7 +928,7 @@ pub fn loadBankMemoryCopy(in_memory_bank: ?*const anyopaque, in_memory_bank_size
     return out_bank_id;
 }
 
-pub fn loadBankMemoryCopyOutBankType(in_memory_bank: ?*anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) zig.WwiseError!void {
+pub fn loadBankMemoryCopyOutBankType(in_memory_bank: ?*anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *enums.AkBankType) zig.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
     try zig.handleAkResult(
@@ -1006,7 +998,7 @@ pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank
     return out_bank_id;
 }
 
-pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) zig.WwiseError!void {
+pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *typedefs.AkBankID, out_bank_type: *enums.AkBankType) zig.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
     try zig.handleAkResult(
@@ -1035,7 +1027,7 @@ pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank
 }
 
 pub const UnloadBankOptionalArgs = struct {
-    bank_type: typedefs.AkBankType = .user,
+    bank_type: enums.AkBankType = .user,
 };
 
 pub fn unloadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, optional_args: UnloadBankOptionalArgs) zig.WwiseError!void {
@@ -1092,7 +1084,7 @@ pub fn cancelBankCallbackCookie(in_cookie: ?*anyopaque) void {
 
 pub const PrepareBankOptionalArgs = struct {
     flags: AkBankContent = .all,
-    bank_type: typedefs.AkBankType = .user,
+    bank_type: enums.AkBankType = .user,
 };
 
 pub fn prepareBankString(
@@ -1382,7 +1374,7 @@ pub fn tryUnsetMedia(in_source_settings: []const AkSourceSettings, unset_results
 
 pub fn prepareGameSyncsString(
     fallback_allocator: std.mem.Allocator,
-    in_game_sync_type: common.AkGroupType,
+    in_game_sync_type: enums.AkGroupType,
     in_preparation_type: PreparationType,
     in_group_name: []const u8,
     in_game_sync_names: [][]const u8,
@@ -1418,7 +1410,7 @@ pub fn prepareGameSyncsString(
 
 pub fn prepareGameSyncsID(
     in_preparation_type: PreparationType,
-    in_game_sync_type: common.AkGroupType,
+    in_game_sync_type: enums.AkGroupType,
     in_group_id: u32,
     in_game_sync_ids: []const u32,
 ) zig.WwiseError!void {
@@ -1436,7 +1428,7 @@ pub fn prepareGameSyncsID(
 pub fn prepareGameSyncsAsyncString(
     fallback_allocator: std.mem.Allocator,
     in_preparation_type: PreparationType,
-    in_game_sync_type: common.AkGroupType,
+    in_game_sync_type: enums.AkGroupType,
     in_group_name: []const u8,
     in_game_sync_names: [][]const u8,
     in_bank_callback: callback_types.AkBankCallbackFunc,
@@ -1475,7 +1467,7 @@ pub fn prepareGameSyncsAsyncString(
 
 pub fn prepareGameSyncsAsyncID(
     in_preparation_type: PreparationType,
-    in_game_sync_type: common.AkGroupType,
+    in_game_sync_type: enums.AkGroupType,
     in_group_id: u32,
     in_game_sync_ids: []const u32,
     in_bank_callback: callback_types.AkBankCallbackFunc,
@@ -1562,7 +1554,7 @@ pub fn setListenerSpatialization(
 pub const SetRTPCValueOptionalArgs = struct {
     game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     value_change_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
     bypass_internal_value_interpolation: bool = false,
 };
 
@@ -1600,7 +1592,7 @@ pub fn setRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: [
 
 pub const SetRTPCValueByPlayingIDOptionalArgs = struct {
     value_change_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
     bypass_internal_value_interpolation: bool = false,
 };
 
@@ -1650,7 +1642,7 @@ pub fn setRTPCValueByPlayingIDString(
 pub const ResetRTPCValueOptionalArgs = struct {
     game_object_id: typedefs.AkGameObjectID = constants.AK_INVALID_GAME_OBJECT,
     value_change_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
     bypass_internal_value_interpolation: bool = false,
 };
 
@@ -1686,7 +1678,7 @@ pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name:
 
 pub const ResetRTPCValueByPlayingIDOptionalArgs = struct {
     value_change_duration: typedefs.AkTimeMs = 0,
-    fade_curve: common.AkCurveInterpolation = .linear,
+    fade_curve: enums.AkCurveInterpolation = .linear,
     bypass_internal_value_interpolation: bool = false,
 };
 
@@ -1807,7 +1799,7 @@ pub fn registerBusVolumeCallback(in_bus_id: typedefs.AkUniqueID, in_callback: ca
     );
 }
 
-pub fn registerBusMeteringCallback(in_bus_id: typedefs.AkUniqueID, in_callback: callback_types.AkBusMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) zig.WwiseError!void {
+pub fn registerBusMeteringCallback(in_bus_id: typedefs.AkUniqueID, in_callback: callback_types.AkBusMeteringCallbackFunc, in_metering_flags: enums.AkMeteringFlags, in_cookie: ?*anyopaque) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(
             in_bus_id,
@@ -1818,7 +1810,7 @@ pub fn registerBusMeteringCallback(in_bus_id: typedefs.AkUniqueID, in_callback: 
     );
 }
 
-pub fn registerOutputDeviceMeteringCallback(in_id_output: typedefs.AkOutputDeviceID, in_callback: callback_types.AkOutputDeviceMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) zig.WwiseError!void {
+pub fn registerOutputDeviceMeteringCallback(in_id_output: typedefs.AkOutputDeviceID, in_callback: callback_types.AkOutputDeviceMeteringCallbackFunc, in_metering_flags: enums.AkMeteringFlags, in_cookie: ?*anyopaque) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(
             in_id_output,

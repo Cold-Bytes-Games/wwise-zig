@@ -280,7 +280,7 @@ pub const AkBusMeteringCallbackInfo = extern struct {
     base: AkCallbackInfo = .{},
     metering: ?*common_defs.AkMetering = null,
     channel_config: speaker_config.AkChannelConfig = .{},
-    metering_flags: common.AkMeteringFlags = .{},
+    metering_flags: enums.AkMeteringFlags = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkBusMeteringCallbackInfo) AkBusMeteringCallbackInfo {
         return @bitCast(value);
@@ -303,7 +303,7 @@ pub const AkOutputDeviceMeteringCallbackInfo = extern struct {
     passthrough_mix_config: speaker_config.AkChannelConfig = .{},
     num_system_audio_objects: u32 = 0,
     system_audio_object_metering: [*]?*common_defs.AkMetering,
-    metering_flags: common.AkMeteringFlags = .{},
+    metering_flags: enums.AkMeteringFlags = .{},
 
     pub inline fn fromC(value: c.WWISEC_AkOutputDeviceMeteringCallbackInfo) AkOutputDeviceMeteringCallbackInfo {
         return @bitCast(value);
