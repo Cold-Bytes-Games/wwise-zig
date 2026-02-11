@@ -1,8 +1,9 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
-const typedefs = @import("typedefs.zig");
 const constants = @import("constants.zig");
+const std = @import("std");
+const typedefs = @import("typedefs.zig");
+const zig = @import("zig.zig");
 
 pub const AkCandidateCallbackFunc = ?*const fn (in_id_event: typedefs.AkUniqueID, in_id_candidate: typedefs.AkUniqueID, in_cookie: ?*anyopaque) callconv(.c) bool;
 
@@ -52,10 +53,10 @@ pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_even
     );
 }
 
-pub fn getDialogueEventCustomPropertyValue(in_event_id: typedefs.AkUniqueID, in_prop_id: u32) common.WwiseError!i32 {
+pub fn getDialogueEventCustomPropertyValue(in_event_id: typedefs.AkUniqueID, in_prop_id: u32) zig.WwiseError!i32 {
     var out_value: i32 = 0;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicDialogue_GetDialogueEventCustomPropertyValue(in_event_id, in_prop_id, &out_value),
     );
 

@@ -2,6 +2,7 @@ const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
+const enums = @import("enums.zig");
 const IAkPluginMemAlloc = @import("IAkPluginMemAlloc.zig").IAkPluginMemAlloc;
 const IAkStreamMgr = @import("IAkStreamMgr.zig");
 const midi_types = @import("midi_types.zig");
@@ -13,12 +14,13 @@ const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
 const virtual_acoustics = @import("virtual_acoustics.zig");
+const zig = @import("zig.zig");
 
 pub const AkCreatePluginCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPlugin;
 pub const AkCreateParamCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPluginParam;
-pub const AkGetDeviceListCallback = ?*const fn (io_max_num_devices: *u32, out_device_description: ?[*]c.WWISEC_AkDeviceDescription) callconv(.c) common.AKRESULT;
+pub const AkGetDeviceListCallback = ?*const fn (io_max_num_devices: *u32, out_device_description: ?[*]c.WWISEC_AkDeviceDescription) callconv(.c) enums.AKRESULT;
 
-pub const AkPluginServiceType = enum(common.DefaultEnumType) {
+pub const AkPluginServiceType = enum(zig.DefaultEnumType) {
     mixer = c.WWISEC_AK_PluginServiceType_Mixer,
     rng = c.WWISEC_AK_PluginServiceType_RNG,
     audio_object_attenuation = c.WWISEC_AK_PluginServiceType_AudioObjectAttenuation,
@@ -56,14 +58,14 @@ pub const IAkGlobalPluginContext = opaque {
         return c.WWISEC_AK_IAkGlobalPluginContext_GetSampleRate(@ptrCast(self));
     }
 
-    pub fn postMonitorMessage(self: *IAkGlobalPluginContext, fallback_allocator: std.mem.Allocator, in_error: []const u8, in_error_level: Monitor.ErrorLevel) common.WwiseError!void {
+    pub fn postMonitorMessage(self: *IAkGlobalPluginContext, fallback_allocator: std.mem.Allocator, in_error: []const u8, in_error_level: Monitor.ErrorLevel) zig.WwiseError!void {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
         var allocator = stack_char_allocator.get();
 
-        const raw_error = common.toCString(allocator, in_error) catch return common.WwiseError.Fail;
+        const raw_error = common.toCString(allocator, in_error) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_error);
 
-        return common.handleAkResult(
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_PostMonitorMessage(
                 @ptrCast(self),
                 raw_error,
@@ -72,8 +74,8 @@ pub const IAkGlobalPluginContext = opaque {
         );
     }
 
-    pub fn registerPlugin(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: AkCreatePluginCallback, in_create_param_func: AkCreateParamCallback) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn registerPlugin(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: AkCreatePluginCallback, in_create_param_func: AkCreateParamCallback) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterPlugin(
                 @ptrCast(self),
                 @intFromEnum(in_type),
@@ -85,8 +87,8 @@ pub const IAkGlobalPluginContext = opaque {
         );
     }
 
-    pub fn registerCodec(self: *IAkGlobalPluginContext, in_company_id: u32, in_plugin_id: u32, in_file_create_func: common.AkCreateFileSourceCallback, in_bank_create_func: common.AkCreateBankSourceCallback) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn registerCodec(self: *IAkGlobalPluginContext, in_company_id: u32, in_plugin_id: u32, in_file_create_func: common.AkCreateFileSourceCallback, in_bank_create_func: common.AkCreateBankSourceCallback) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterCodec(
                 @ptrCast(self),
                 in_company_id,
@@ -102,8 +104,8 @@ pub const IAkGlobalPluginContext = opaque {
         cookie: ?*anyopaque = null,
     };
 
-    pub fn registerGlobalCallback(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_callback: callback_types.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn registerGlobalCallback(self: *IAkGlobalPluginContext, in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_callback: callback_types.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterGlobalCallback(
                 @ptrCast(self),
                 @intFromEnum(in_type),
@@ -124,8 +126,8 @@ pub const IAkGlobalPluginContext = opaque {
         self: *IAkGlobalPluginContext,
         in_callback: callback_types.AkGlobalCallbackFunc,
         optional_args: UnregisterGlobalCallbackOptionArgs,
-    ) common.WwiseError!void {
-        return common.handleAkResult(
+    ) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_UnregisterGlobalCallback(
                 @ptrCast(self),
                 @ptrCast(in_callback),
@@ -150,8 +152,8 @@ pub const IAkGlobalPluginContext = opaque {
         in_rtpcID: typedefs.AkRtpcID,
         in_value: typedefs.AkRtpcValue,
         optional_args: SetRtpcValueOptionalArgs,
-    ) common.WwiseError!void {
-        return common.handleAkResult(
+    ) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(
                 @ptrCast(self),
                 in_rtpcID,
@@ -173,8 +175,8 @@ pub const IAkGlobalPluginContext = opaque {
         in_plugin_id: u32,
         in_data: ?*const anyopaque,
         in_size_in_bytes: u32,
-    ) common.WwiseError!void {
-        return common.handleAkResult(
+    ) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(
                 @ptrCast(self),
                 in_bus_id,
@@ -209,8 +211,8 @@ pub const IAkGlobalPluginContext = opaque {
         in_samples: []const common.AkVector,
         in_cfg_ambisonics: speaker_config.AkChannelConfig,
         out_mx_volume: SpeakerVolumes.MatrixPtr,
-    ) common.WwiseError!void {
-        return common.handleAkResult(
+    ) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(
                 @ptrCast(self),
                 @ptrCast(in_samples),
@@ -232,8 +234,8 @@ pub const IAkGlobalPluginContext = opaque {
         in_pair: *const common.AkEmitterListenerPair,
         out_azimuth: *f32,
         out_elevation: *f32,
-    ) common.WwiseError!void {
-        return common.handleAkResult(
+    ) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(
                 @ptrCast(self),
                 @ptrCast(in_pair),
@@ -259,9 +261,9 @@ pub const IAkGlobalPluginContext = opaque {
         }
     }
 
-    pub fn getAudioSettings(self: *const IAkGlobalPluginContext) common.WwiseError!common.AkAudioSettings {
+    pub fn getAudioSettings(self: *const IAkGlobalPluginContext) zig.WwiseError!common.AkAudioSettings {
         var result: common.AkAudioSettings = .{};
-        try common.handleAkResult(c.WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(@ptrCast(self), @ptrCast(&result)));
+        try zig.handleAkResult(c.WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(@ptrCast(self), @ptrCast(&result)));
         return result;
     }
 
@@ -381,8 +383,8 @@ pub const IAkGlobalPluginContext = opaque {
         playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
     };
 
-    pub fn stopMIDIOnEventSync(self: *IAkGlobalPluginContext, optional_args: StopMIDIOnEventSync) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn stopMIDIOnEventSync(self: *IAkGlobalPluginContext, optional_args: StopMIDIOnEventSync) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(
                 @ptrCast(self),
                 optional_args.event_id,

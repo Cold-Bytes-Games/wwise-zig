@@ -1,7 +1,8 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const settings = @import("settings.zig");
+const std = @import("std");
+const zig = @import("zig.zig");
 
 pub const InitSettings = extern struct {
     execution_time_usec: u32 = 0,
@@ -31,8 +32,8 @@ pub fn isInnitialized() bool {
     return c.WWISEC_AK_JobWorkerMgr_IsInitialized();
 }
 
-pub fn initWorkers(in_impl_init_settings: *const InitSettings) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn initWorkers(in_impl_init_settings: *const InitSettings) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_JobWorkerMgr_InitWorkers(@ptrCast(in_impl_init_settings)),
     );
 }

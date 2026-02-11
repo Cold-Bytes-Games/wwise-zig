@@ -1,7 +1,8 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const std = @import("std");
 const virtual_acoustics = @import("virtual_acoustics.zig");
+const zig = @import("zig.zig");
 
 pub fn calculateSlope(texture: *const virtual_acoustics.AkAcousticTexture) f32 {
     return c.WWISEC_AK_SpatialAudio_ReverbEstimation_CalculateSlope(@ptrCast(texture));
@@ -16,10 +17,10 @@ pub fn getAverageAbsorptionValues(in_textures: *virtual_acoustics.AkAcousticText
     );
 }
 
-pub fn estimateT60Decay(in_volume_cubic_meters: f32, in_surface_area_squared_meters: f32, in_environment_average_absorption: f32) common.WwiseError!f32 {
+pub fn estimateT60Decay(in_volume_cubic_meters: f32, in_surface_area_squared_meters: f32, in_environment_average_absorption: f32) zig.WwiseError!f32 {
     var out_decay_estimate: f32 = 0.0;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateT60Decay(
             in_volume_cubic_meters,
             in_surface_area_squared_meters,
@@ -35,8 +36,8 @@ pub const EstimateTimeToFirstReflectionOptionalArgs = struct {
     speed_of_sound: f32 = 343.0,
 };
 
-pub fn estimateTimeToFirstReflection(in_environment_extent_meters: common.AkVector, out_time_to_first_reflection_ms: *f32, optional_args: EstimateTimeToFirstReflectionOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn estimateTimeToFirstReflection(in_environment_extent_meters: common.AkVector, out_time_to_first_reflection_ms: *f32, optional_args: EstimateTimeToFirstReflectionOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(
             in_environment_extent_meters.toC(),
             out_time_to_first_reflection_ms,

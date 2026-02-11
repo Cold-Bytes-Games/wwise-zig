@@ -164,7 +164,7 @@ You can create derivated Zig struct from Wwise C++ clases that have virtual meth
 pub const IAkIOHookDeferredBatch = opaque {
     pub const FunctionTable = extern struct {
         destructor: *const fn (self: *IAkIOHookBlocking) callconv(.C) void,
-        close: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) common.AKRESULT,
+        close: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) AK.AKRESULT,
         get_block_size: *const fn (self: *IAkIOHookBlocking, in_file_desc: *AkFileDesc) callconv(.C) u32,
         get_device_desc: *const fn (self: *IAkIOHookBlocking, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.C) void,
         get_device_data: *const fn (self: *IAkIOHookBlocking) callconv(.C) u32,
@@ -173,15 +173,15 @@ pub const IAkIOHookDeferredBatch = opaque {
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
-            io_dispatch_results: [*]common.AKRESULT,
-        ) callconv(.C) common.AKRESULT,
+            io_dispatch_results: [*]AK.AKRESULT,
+        ) callconv(.C) AK.AKRESULT,
         batch_write: *const fn (
             self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,
             in_transfer_items: [*]BatchIoTransferItem,
             in_batch_io_callback: AkBatchIOCallback,
-            io_dispatch_results: [*]common.AKRESULT,
-        ) callconv(.C) common.AKRESULT,
+            io_dispatch_results: [*]AK.AKRESULT,
+        ) callconv(.C) AK.AKRESULT,
         batch_cancel: *const fn (
             self: *IAkIOHookDeferredBatch,
             in_num_transfers: u32,

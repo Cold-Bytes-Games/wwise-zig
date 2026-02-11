@@ -81,13 +81,10 @@ pub const AkPanningRule = common.AkPanningRule;
 pub const Ak3DSpatializationMode = common.Ak3DSpatializationMode;
 pub const AkMeteringFlags = common.AkMeteringFlags;
 pub const AkPluginType = common.AkPluginType;
-pub const AKRESULT = common.AKRESULT;
 pub const AkGroupType = common.AkGroupType;
 pub const AkCurveInterpolation = common.AkCurveInterpolation;
 pub const AkAuxSendValue = common.AkAuxSendValue;
 pub const AkAudioSettings = common.AkAudioSettings;
-pub const WwiseError = common.WwiseError;
-pub const handleAkResult = common.handleAkResult;
 pub const fromOSChar = common.fromOSChar;
 pub const toOSChar = common.toOSChar;
 pub const fromOSCharUtf16 = common.fromOSCharUtf16;
@@ -95,7 +92,6 @@ pub const toOSCharUtf16 = common.toOSCharUtf16;
 pub const fromCString = common.fromCString;
 pub const toCString = common.toCString;
 pub const stackCharAllocator = common.stackCharAllocator;
-pub const DefaultEnumType = common.DefaultEnumType;
 
 // constants.zig
 const constants = @import("constants.zig");
@@ -200,6 +196,10 @@ pub const AkMetering = common_defs.AkMetering;
 pub const Ak3DAudioSinkCapabilities = common_defs.Ak3DAudioSinkCapabilities;
 pub const AkSampleType = common_defs.AkSampleType;
 pub const AkAudioBuffer = common_defs.AkAudioBuffer;
+
+// enums.zig
+const enums = @import("enums.zig");
+pub const AKRESULT = enums.AKRESULT;
 
 // error_message_translator.zig
 const error_message_translator = @import("error_message_translator.zig");
@@ -486,6 +486,12 @@ pub const platform = wwise_platform.platform;
 
 pub const reflect_game_data = if (wwise_options.use_spatial_audio) @import("reflect_game_data.zig") else struct {};
 pub const Windows = if (wwise_options.platform == .windows) @import("win_sound_engine.zig") else struct {};
+
+// zig.zig
+const zig = @import("zig.zig");
+pub const DefaultEnumType = zig.DefaultEnumType;
+pub const handleAkResult = zig.handleAkResult;
+pub const WwiseError = zig.WwiseError;
 
 comptime {
     @setEvalBranchQuota(5000);

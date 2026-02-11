@@ -2,10 +2,12 @@ const builtin = @import("builtin");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
+const enums = @import("enums.zig");
 const speaker_config = @import("speaker_config.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
 const wwise_options = @import("wwise_options");
+const zig = @import("zig.zig");
 
 pub const AkJobWorkerFunc = ?*const fn (in_job_type: typedefs.AkJobType, in_execution_time_usec: u32) callconv(.c) void;
 
@@ -70,7 +72,7 @@ pub const AkOutputSettings = extern struct {
     }
 };
 
-pub const AkFloorPlane = enum(common.DefaultEnumType) {
+pub const AkFloorPlane = enum(zig.DefaultEnumType) {
     xz = c.WWISEC_AkFloorPlane_XZ,
     xy = c.WWISEC_AkFloorPlane_XY,
     yz = c.WWISEC_AkFloorPlane_YZ,
@@ -79,7 +81,7 @@ pub const AkFloorPlane = enum(common.DefaultEnumType) {
 };
 
 pub const AkAssertHook = ?*const fn (in_expression: ?[*:0]const u8, in_filename: ?[*:0]const u8, in_line_number: i32) callconv(.c) void;
-pub const AkBackgroundMusicChangeCallbackFunc = ?*const fn (in_background_music_muted: bool, in_cookie: ?*anyopaque) callconv(.c) common.AKRESULT;
+pub const AkBackgroundMusicChangeCallbackFunc = ?*const fn (in_background_music_muted: bool, in_cookie: ?*anyopaque) callconv(.c) enums.AKRESULT;
 pub const AkProfilerPushTimerFunc = ?*const fn (in_plugin_id: typedefs.AkPluginID, in_zone_name: ?[*:0]const u8) callconv(.c) void;
 pub const AkProfilerPopTimerFunc = ?*const fn () callconv(.c) void;
 pub const AkProfilerPostMarkerFunc = ?*const fn (in_plugin_id: typedefs.AkPluginID, in_marker_name: ?[*:0]const u8) callconv(.c) void;
@@ -261,7 +263,7 @@ pub const WIN_AkPlatformInitSettings = extern struct {
     }
 };
 
-pub const AkAudioAPILinux = packed struct(common.DefaultEnumType) {
+pub const AkAudioAPILinux = packed struct(zig.DefaultEnumType) {
     pulse_audio: bool = false,
     alsa: bool = false,
     padding: u30 = 0,
@@ -300,7 +302,7 @@ pub const LINUX_AkPlatformInitSettings = extern struct {
     }
 };
 
-pub const AkAudioAPIMac = packed struct(common.DefaultEnumType) {
+pub const AkAudioAPIMac = packed struct(zig.DefaultEnumType) {
     av_audio_engine: bool = false,
     audio_unit: bool = false,
     padding: u30 = 0,
@@ -342,14 +344,14 @@ pub const MACOSX_AkPlatformInitSettings = extern struct {
     }
 };
 
-pub const IOS_AkAudioSessionCategory = enum(common.DefaultEnumType) {
+pub const IOS_AkAudioSessionCategory = enum(zig.DefaultEnumType) {
     ambient = c.WWISEC_IOS_AkAudioSessionCategoryAmbient,
     solo_ambient = c.WWISEC_IOS_AkAudioSessionCategorySoloAmbient,
     play_and_record = c.WWISEC_IOS_AkAudioSessionCategoryPlayAndRecord,
     playback = c.WWISEC_IOS_AkAudioSessionCategoryPlayback,
 };
 
-pub const IOS_AkAudioSessionCategoryOptions = enum(common.DefaultEnumType) {
+pub const IOS_AkAudioSessionCategoryOptions = enum(zig.DefaultEnumType) {
     mix_with_others = c.WWISEC_IOS_AkAudioSessionCategoryOptionMixWithOthers,
     duck_others = c.WWISEC_IOS_AkAudioSessionCategoryOptionDuckOthers,
     allow_bluetooth = c.WWISEC_IOS_AkAudioSessionCategoryOptionAllowBluetooth,
@@ -357,7 +359,7 @@ pub const IOS_AkAudioSessionCategoryOptions = enum(common.DefaultEnumType) {
     allow_bluetooth_a2dp = c.WWISEC_IOS_AkAudioSessionCategoryOptionAllowBluetoothA2DP,
 };
 
-pub const IOS_AkAudioSessionMode = enum(common.DefaultEnumType) {
+pub const IOS_AkAudioSessionMode = enum(zig.DefaultEnumType) {
     default = c.WWISEC_IOS_AkAudioSessionModeDefault,
     voice_chat = c.WWISEC_IOS_AkAudioSessionModeVoiceChat,
     game_chat = c.WWISEC_IOS_AkAudioSessionModeGameChat,
@@ -367,17 +369,17 @@ pub const IOS_AkAudioSessionMode = enum(common.DefaultEnumType) {
     video_chat = c.WWISEC_IOS_AkAudioSessionModeVideoChat,
 };
 
-pub const IOS_AkAudioSessionRouteSharingPolicy = enum(common.DefaultEnumType) {
+pub const IOS_AkAudioSessionRouteSharingPolicy = enum(zig.DefaultEnumType) {
     default = c.WWISEC_IOS_AkAudioSessionRouteSharingPolicyDefault,
     long_form_audio = c.WWISEC_IOS_AkAudioSessionRouteSharingPolicyLongFormAudio,
     long_form_video = c.WWISEC_IOS_AkAudioSessionRouteSharingPolicyLongFormVideo,
 };
 
-pub const IOS_AkAudioSessionSetActiveOptions = enum(common.DefaultEnumType) {
+pub const IOS_AkAudioSessionSetActiveOptions = enum(zig.DefaultEnumType) {
     notify_others_on_deactivation = c.WWISEC_IOS_AkAudioSessionSetActiveOptionNotifyOthersOnDeactivation,
 };
 
-pub const IOS_AkAudioSessionBehaviorOptions = enum(common.DefaultEnumType) {
+pub const IOS_AkAudioSessionBehaviorOptions = enum(zig.DefaultEnumType) {
     suspend_in_background = c.WWISEC_IOS_AkAudioSessionBehaviorSuspendInBackground,
 };
 
@@ -402,7 +404,7 @@ pub const IOS_AkAudioSessionProperties = extern struct {
     }
 };
 
-pub const AkAudioAPIiOs = packed struct(common.DefaultEnumType) {
+pub const AkAudioAPIiOs = packed struct(zig.DefaultEnumType) {
     av_audio_engine: bool = false,
     audio_unit: bool = false,
     padding: u30 = 0,
@@ -468,7 +470,7 @@ pub const IOS_AkPlatformInitSettings = extern struct {
     }
 };
 
-pub const AkAudioAPIAndroid = packed struct(common.DefaultEnumType) {
+pub const AkAudioAPIAndroid = packed struct(zig.DefaultEnumType) {
     aaudio: bool = false,
     opensl_es: bool = false,
     pad: u30 = 0,

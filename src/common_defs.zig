@@ -3,6 +3,7 @@ const c = @import("wwise_c");
 const common = @import("common.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const speaker_config = @import("speaker_config.zig");
+const enums = @import("enums.zig");
 
 pub const AK_INT = c.WWISEC_AK_INT;
 pub const AK_FLOAT = c.WWISEC_AK_FLOAT;
@@ -51,7 +52,7 @@ pub const AkSampleType = c.WWISEC_AkSampleType;
 pub const AkAudioBuffer = extern struct {
     data: ?*anyopaque,
     channel_config: speaker_config.AkChannelConfig,
-    state: common.AKRESULT,
+    state: enums.AKRESULT,
     max_frames: u16,
     valid_frames: u16,
 

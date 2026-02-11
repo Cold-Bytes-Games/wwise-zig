@@ -3,6 +3,7 @@ const callback_types = @import("callback_types.zig");
 const common = @import("common.zig");
 const common_defs = @import("common_defs.zig");
 const constants = @import("constants.zig");
+const enums = @import("enums.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
 const IBytes = @import("IBytes.zig");
 const midi_types = @import("midi_types.zig");
@@ -12,6 +13,7 @@ const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
 const wwise_options = @import("wwise_options");
+const zig = @import("zig.zig");
 
 pub const DynamicDialogue = @import("DynamicDialogue.zig");
 pub const DynamicSequence = @import("DynamicSequence.zig");
@@ -58,19 +60,19 @@ pub const AkSourcePosition = extern struct {
     }
 };
 
-pub const MultiPositionType = enum(common.DefaultEnumType) {
+pub const MultiPositionType = enum(zig.DefaultEnumType) {
     single_source = c.WWISEC_AK_SoundEngine_MultiPositionType_SingleSource,
     multi_sources = c.WWISEC_AK_SoundEngine_MultiPositionType_MultiSources,
     multi_directions = c.WWISEC_AK_SoundEngine_MultiPositionType_MultiDirections,
 };
 
-pub const PreparationType = enum(common.DefaultEnumType) {
+pub const PreparationType = enum(zig.DefaultEnumType) {
     load = c.WWISEC_AK_SoundEngine_Preparation_Load,
     unload = c.WWISEC_AK_SoundEngine_Preparation_Unload,
     load_and_decode = c.WWISEC_AK_SoundEngine_Preparation_LoadAndDecode,
 };
 
-pub const AkBankContent = enum(common.DefaultEnumType) {
+pub const AkBankContent = enum(zig.DefaultEnumType) {
     structure_only = c.WWISEC_AK_SoundEngine_AkBankContent_StructureOnly,
     all = c.WWISEC_AK_SoundEngine_AkBankContent_All,
 };
@@ -79,13 +81,13 @@ pub fn isInitialized() bool {
     return c.WWISEC_AK_SoundEngine_IsInitialized();
 }
 
-pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings.AkInitSettings, platform_init_settings_opt: ?*settings.AkPlatformInitSettings) common.WwiseError!void {
+pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings.AkInitSettings, platform_init_settings_opt: ?*settings.AkPlatformInitSettings) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
     const native_init_settings_ptr = blk: {
         if (init_settings_opt) |init_settings| {
-            var native_init_settings = init_settings.toC(allocator) catch return common.WwiseError.Fail;
+            var native_init_settings = init_settings.toC(allocator) catch return zig.WwiseError.Fail;
             break :blk &native_init_settings;
         }
 
@@ -107,7 +109,7 @@ pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings
         break :blk @as(?*c.WWISEC_AkPlatformInitSettings, null);
     };
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_Init(native_init_settings_ptr, native_platform_init_settings_ptr),
     );
 }
@@ -130,8 +132,8 @@ pub fn term() void {
     c.WWISEC_AK_SoundEngine_Term();
 }
 
-pub fn getAudioSettings(out_settings: *common.AkAudioSettings) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getAudioSettings(out_settings: *common.AkAudioSettings) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetAudioSettings(@ptrCast(out_settings)),
     );
 }
@@ -142,30 +144,30 @@ pub fn getSpeakerConfiguration(in_id_output: typedefs.AkOutputDeviceID) speaker_
     );
 }
 
-pub fn getOutputDeviceConfiguration(in_id_output: typedefs.AkOutputDeviceID, io_channel_config: *speaker_config.AkChannelConfig, io_capabilities: *common_defs.Ak3DAudioSinkCapabilities) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getOutputDeviceConfiguration(in_id_output: typedefs.AkOutputDeviceID, io_channel_config: *speaker_config.AkChannelConfig, io_capabilities: *common_defs.Ak3DAudioSinkCapabilities) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(in_id_output, @ptrCast(io_channel_config), @ptrCast(io_capabilities)),
     );
 }
 
-pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) common.WwiseError!common.AkPanningRule {
+pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!common.AkPanningRule {
     var raw_panning_rule: c.WWISEC_AkPanningRule = 0;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetPanningRule(&raw_panning_rule, in_id_output),
     );
 
     return @enumFromInt(raw_panning_rule);
 }
 
-pub fn setPanningRule(in_panning_rule: common.AkPanningRule, in_id_output: typedefs.AkOutputDeviceID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setPanningRule(in_panning_rule: common.AkPanningRule, in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetPanningRule(@intFromEnum(in_panning_rule), in_id_output),
     );
 }
 
-pub fn getSpeakerAngles(io_speaker_angles: ?*[]f32, io_num_angles: *u32, out_height_angle: *f32, in_id_output: typedefs.AkOutputDeviceID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getSpeakerAngles(io_speaker_angles: ?*[]f32, io_num_angles: *u32, out_height_angle: *f32, in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetSpeakerAngles(@ptrCast(io_speaker_angles), io_num_angles, out_height_angle, in_id_output),
     );
 }
@@ -175,8 +177,8 @@ pub const SetSpeakerAnglesOptionalArgs = struct {
     id_output: typedefs.AkOutputDeviceID = 0,
 };
 
-pub fn setSpeakerAngles(in_speaker_angles: []const f32, optional_args: SetSpeakerAnglesOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setSpeakerAngles(in_speaker_angles: []const f32, optional_args: SetSpeakerAnglesOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetSpeakerAngles(
             @ptrCast(in_speaker_angles),
             @truncate(in_speaker_angles.len),
@@ -186,26 +188,26 @@ pub fn setSpeakerAngles(in_speaker_angles: []const f32, optional_args: SetSpeake
     );
 }
 
-pub fn setVolumeThreshold(in_volume_threshold_db: f32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setVolumeThreshold(in_volume_threshold_db: f32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetVolumeThreshold(in_volume_threshold_db),
     );
 }
 
-pub fn setMaxNumVoicesLimit(in_max_number_voices: u16) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setMaxNumVoicesLimit(in_max_number_voices: u16) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMaxNumVoicesLimit(in_max_number_voices),
     );
 }
 
-pub fn setJobMgrMaxActiveWorkers(in_job_type: typedefs.AkJobType, in_new_max_active_workers: u32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setJobMgrMaxActiveWorkers(in_job_type: typedefs.AkJobType, in_new_max_active_workers: u32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetJobMgrMaxActiveWorkers(in_job_type, in_new_max_active_workers),
     );
 }
 
-pub fn renderAudio(in_allow_sync_render: bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn renderAudio(in_allow_sync_render: bool) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RenderAudio(in_allow_sync_render),
     );
 }
@@ -214,8 +216,8 @@ pub fn getGlobalPluginContext() ?*IAkPlugin.IAkGlobalPluginContext {
     return @ptrCast(c.WWISEC_AK_SoundEngine_GetGlobalPluginContext());
 }
 
-pub fn registerPlugin(in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: IAkPlugin.AkCreatePluginCallback, in_create_param_func: IAkPlugin.AkCreateParamCallback) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerPlugin(in_type: common.AkPluginType, in_company_id: u32, in_plugin_id: u32, in_create_func: IAkPlugin.AkCreatePluginCallback, in_create_param_func: IAkPlugin.AkCreateParamCallback) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterPlugin(
             @intFromEnum(in_type),
             in_company_id,
@@ -226,24 +228,24 @@ pub fn registerPlugin(in_type: common.AkPluginType, in_company_id: u32, in_plugi
     );
 }
 
-pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []const u8, in_dll_path_opt: ?[]const u8) common.WwiseError!void {
+pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []const u8, in_dll_path_opt: ?[]const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(allocator);
     defer area_allocator.deinit();
 
-    const raw_in_dll_name = common.toOSChar(area_allocator.allocator(), in_dll_name) catch return common.WwiseError.Fail;
+    const raw_in_dll_name = common.toOSChar(area_allocator.allocator(), in_dll_name) catch return zig.WwiseError.Fail;
 
     const raw_in_dll_path = blk: {
         if (in_dll_path_opt) |in_dll_path| {
-            break :blk @as([*c]const common.AkOSChar, common.toOSChar(area_allocator.allocator(), in_dll_path) catch return common.WwiseError.Fail);
+            break :blk @as([*c]const common.AkOSChar, common.toOSChar(area_allocator.allocator(), in_dll_path) catch return zig.WwiseError.Fail);
         }
 
         break :blk @as([*c]const common.AkOSChar, null);
     };
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterPluginDLL(raw_in_dll_name, raw_in_dll_path),
     );
 }
@@ -260,8 +262,8 @@ pub const RegisterGlobalCallbackOptionalArgs = struct {
     plugin_id: u32 = 0,
 };
 
-pub fn registerGlobalCallback(in_callback: callback_types.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerGlobalCallback(in_callback: callback_types.AkGlobalCallbackFunc, optional_args: RegisterGlobalCallbackOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterGlobalCallback(
             @ptrCast(in_callback),
             @intCast(optional_args.location.toC()),
@@ -277,8 +279,8 @@ pub const UnregisterGlobalCallbackOptionalArgs = struct {
     location: callback_types.AkGlobalCallbackLocation = .{ .begin_render = true },
 };
 
-pub fn unregisterGlobalCallback(in_callback: callback_types.AkGlobalCallbackFunc, optional_args: UnregisterGlobalCallbackOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unregisterGlobalCallback(in_callback: callback_types.AkGlobalCallbackFunc, optional_args: UnregisterGlobalCallbackOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterGlobalCallback(
             @ptrCast(in_callback),
             @intCast(optional_args.location.toC()),
@@ -286,26 +288,26 @@ pub fn unregisterGlobalCallback(in_callback: callback_types.AkGlobalCallbackFunc
     );
 }
 
-pub fn registerResourceMonitorCallback(in_callback: callback_types.AkResourceMonitorCallbackFunc) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerResourceMonitorCallback(in_callback: callback_types.AkResourceMonitorCallbackFunc) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterResourceMonitorCallback(@ptrCast(in_callback)),
     );
 }
 
-pub fn unregisterResourceMonitorCallback(in_callback: callback_types.AkResourceMonitorCallbackFunc) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unregisterResourceMonitorCallback(in_callback: callback_types.AkResourceMonitorCallbackFunc) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterResourceMonitorCallback(@ptrCast(in_callback)),
     );
 }
 
-pub fn registerAudioDeviceStatusCallback(in_callback: callback_types.AkDeviceStatusCallbackFunc) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerAudioDeviceStatusCallback(in_callback: callback_types.AkDeviceStatusCallbackFunc) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterAudioDeviceStatusCallback(@ptrCast(in_callback)),
     );
 }
 
-pub fn unregisterAudioDeviceStatusCallback() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unregisterAudioDeviceStatusCallback() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterAudioDeviceStatusCallback(),
     );
 }
@@ -437,7 +439,7 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
     );
 }
 
-pub const AkActionOnEventType = enum(common.DefaultEnumType) {
+pub const AkActionOnEventType = enum(zig.DefaultEnumType) {
     stop = c.WWISEC_AkActionOnEventType_Stop,
     pause = c.WWISEC_AkActionOnEventType_Pause,
     @"resume" = c.WWISEC_AkActionOnEventType_Resume,
@@ -452,8 +454,8 @@ pub const ExecuteActionOnEventOptionalArgs = struct {
     playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
-pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ExecuteActionOnEvent_ID(
             in_event_id,
             @intFromEnum(in_action_type),
@@ -465,14 +467,14 @@ pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: 
     );
 }
 
-pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) common.WwiseError!void {
+pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_action_type: AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(
             raw_event_name,
             @intFromEnum(in_action_type),
@@ -520,8 +522,8 @@ pub const StopMIDIOnEventOptionalArgs = struct {
     playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
-pub fn stopMIDIOnEvent(optional_args: StopMIDIOnEventOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn stopMIDIOnEvent(optional_args: StopMIDIOnEventOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_StopMIDIOnEvent(
             optional_args.event_id,
             optional_args.game_object_id,
@@ -530,8 +532,8 @@ pub fn stopMIDIOnEvent(optional_args: StopMIDIOnEventOptionalArgs) common.WwiseE
     );
 }
 
-pub fn pinEventInStreamCacheID(in_event_id: typedefs.AkUniqueID, in_active_priority: typedefs.AkPriority, in_inactive_priority: typedefs.AkPriority) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn pinEventInStreamCacheID(in_event_id: typedefs.AkUniqueID, in_active_priority: typedefs.AkPriority, in_inactive_priority: typedefs.AkPriority) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PinEventInStreamCache_ID(
             in_event_id,
             in_active_priority,
@@ -540,14 +542,14 @@ pub fn pinEventInStreamCacheID(in_event_id: typedefs.AkUniqueID, in_active_prior
     );
 }
 
-pub fn pinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_active_priority: typedefs.AkPriority, in_inactive_priority: typedefs.AkPriority) common.WwiseError!void {
+pub fn pinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_active_priority: typedefs.AkPriority, in_inactive_priority: typedefs.AkPriority) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PinEventInStreamCache_String(
             raw_event_name,
             in_active_priority,
@@ -556,26 +558,26 @@ pub fn pinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_eve
     );
 }
 
-pub fn unpinEventInStreamCacheID(in_event_id: typedefs.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unpinEventInStreamCacheID(in_event_id: typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnpinEventInStreamCache_ID(in_event_id),
     );
 }
 
-pub fn unpinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8) common.WwiseError!void {
+pub fn unpinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnpinEventInStreamCache_String(raw_event_name),
     );
 }
 
-pub fn getBufferStatusForPinnedEventID(in_event_id: typedefs.AkUniqueID, out_percent_buffered: *f32, out_cache_pinned_memory_full: *bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getBufferStatusForPinnedEventID(in_event_id: typedefs.AkUniqueID, out_percent_buffered: *f32, out_cache_pinned_memory_full: *bool) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_ID(
             in_event_id,
             out_percent_buffered,
@@ -584,14 +586,14 @@ pub fn getBufferStatusForPinnedEventID(in_event_id: typedefs.AkUniqueID, out_per
     );
 }
 
-pub fn getBufferStatusForPinnedEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, out_percent_buffered: *f32, out_cache_pinned_memory_full: *bool) common.WwiseError!void {
+pub fn getBufferStatusForPinnedEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, out_percent_buffered: *f32, out_cache_pinned_memory_full: *bool) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetBufferStatusForPinnedEvent_String(
             raw_event_name,
             out_percent_buffered,
@@ -605,8 +607,8 @@ pub const SeekOnEventOptionalArgs = struct {
     playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
-pub fn seekOnEventTimeID(in_event_id: typedefs.AkUniqueID, in_game_object: typedefs.AkGameObjectID, in_position: typedefs.AkTimeMs, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn seekOnEventTimeID(in_event_id: typedefs.AkUniqueID, in_game_object: typedefs.AkGameObjectID, in_position: typedefs.AkTimeMs, optional_args: SeekOnEventOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SeekOnEvent_Time_ID(
             in_event_id,
             in_game_object,
@@ -617,14 +619,14 @@ pub fn seekOnEventTimeID(in_event_id: typedefs.AkUniqueID, in_game_object: typed
     );
 }
 
-pub fn seekOnEventTimeString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: typedefs.AkGameObjectID, in_position: typedefs.AkTimeMs, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
+pub fn seekOnEventTimeString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: typedefs.AkGameObjectID, in_position: typedefs.AkTimeMs, optional_args: SeekOnEventOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SeekOnEvent_Time_String(
             raw_event_name,
             in_game_object,
@@ -635,8 +637,8 @@ pub fn seekOnEventTimeString(fallback_allocator: std.mem.Allocator, in_event_nam
     );
 }
 
-pub fn seekOnEventPercentID(in_event_id: typedefs.AkUniqueID, in_game_object: typedefs.AkGameObjectID, in_percent: f32, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn seekOnEventPercentID(in_event_id: typedefs.AkUniqueID, in_game_object: typedefs.AkGameObjectID, in_percent: f32, optional_args: SeekOnEventOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SeekOnEvent_Percent_ID(
             in_event_id,
             in_game_object,
@@ -647,14 +649,14 @@ pub fn seekOnEventPercentID(in_event_id: typedefs.AkUniqueID, in_game_object: ty
     );
 }
 
-pub fn seekOnEventPercentString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: typedefs.AkGameObjectID, in_percent: f32, optional_args: SeekOnEventOptionalArgs) common.WwiseError!void {
+pub fn seekOnEventPercentString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: typedefs.AkGameObjectID, in_percent: f32, optional_args: SeekOnEventOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return common.WwiseError.Fail;
+    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SeekOnEvent_Percent_String(
             raw_event_name,
             in_game_object,
@@ -677,10 +679,10 @@ pub fn cancelEventCallback(in_playing_id: typedefs.AkPlayingID) void {
     c.WWISEC_AK_SoundEngine_CancelEventCallback(in_playing_id);
 }
 
-pub fn getSourcePlayPosition(in_playing_id: typedefs.AkPlayingID, extrapolate: bool) common.WwiseError!typedefs.AkTimeMs {
+pub fn getSourcePlayPosition(in_playing_id: typedefs.AkPlayingID, extrapolate: bool) zig.WwiseError!typedefs.AkTimeMs {
     var out_position: typedefs.AkTimeMs = undefined;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetSourcePlayPosition(
             in_playing_id,
             &out_position,
@@ -691,8 +693,8 @@ pub fn getSourcePlayPosition(in_playing_id: typedefs.AkPlayingID, extrapolate: b
     return out_position;
 }
 
-pub fn getSourcePlayPositions(in_playing_id: typedefs.AkPlayingID, out_positions: ?[*]AkSourcePosition, io_positions_count: *u32, in_extrapolate: bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getSourcePlayPositions(in_playing_id: typedefs.AkPlayingID, out_positions: ?[*]AkSourcePosition, io_positions_count: *u32, in_extrapolate: bool) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetSourcePlayPositions(
             in_playing_id,
             @ptrCast(out_positions),
@@ -702,8 +704,8 @@ pub fn getSourcePlayPositions(in_playing_id: typedefs.AkPlayingID, out_positions
     );
 }
 
-pub fn getSourceStreamBuffering(in_playing_id: typedefs.AkPlayingID, out_buffering: *typedefs.AkTimeMs, out_is_buffering: *bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getSourceStreamBuffering(in_playing_id: typedefs.AkPlayingID, out_buffering: *typedefs.AkTimeMs, out_is_buffering: *bool) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetSourceStreamBuffering(
             in_playing_id,
             out_buffering,
@@ -767,8 +769,8 @@ pub fn sendPluginCustomGameData(
     in_plugin_id: u32,
     in_data: ?*anyopaque,
     in_size_in_bytes: u32,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SendPluginCustomGameData(
             in_bus_id,
             in_bus_object_id,
@@ -781,32 +783,32 @@ pub fn sendPluginCustomGameData(
     );
 }
 
-pub fn registerGameObj(in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerGameObj(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterGameObj(in_game_object_id),
     );
 }
 
-pub fn registerGameObjWithName(fallback_allocator: std.mem.Allocator, in_game_object_id: typedefs.AkGameObjectID, in_name: []const u8) common.WwiseError!void {
+pub fn registerGameObjWithName(fallback_allocator: std.mem.Allocator, in_game_object_id: typedefs.AkGameObjectID, in_name: []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_name = common.toCString(allocator, in_name) catch return common.WwiseError.Fail;
+    const raw_name = common.toCString(allocator, in_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterGameObjWithName(in_game_object_id, raw_name),
     );
 }
 
-pub fn unregisterGameObj(in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unregisterGameObj(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterGameObj(in_game_object_id),
     );
 }
 
-pub fn unregisterAllGameObj() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unregisterAllGameObj() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterAllGameObj(),
     );
 }
@@ -815,8 +817,8 @@ pub const SetPositionOptionalArgs = struct {
     flags: common.AkSetPositionFlags = common.AkSetPositionFlags.Default,
 };
 
-pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: common.AkSoundPosition, optional_args: SetPositionOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: common.AkSoundPosition, optional_args: SetPositionOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetPosition(
             in_game_object_id,
             @ptrCast(&in_position),
@@ -830,8 +832,8 @@ pub const SetMultiplePositionOptionalArgs = struct {
     flags: common.AkSetPositionFlags = common.AkSetPositionFlags.Default,
 };
 
-pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID, positions: []const common.AkSoundPosition, optional_args: SetMultiplePositionOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID, positions: []const common.AkSoundPosition, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(
             in_game_object,
             @ptrCast(positions),
@@ -842,8 +844,8 @@ pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID
     );
 }
 
-pub fn setMultiplePositionChannelEmitter(in_game_object: typedefs.AkGameObjectID, positions: []const common.AkChannelEmitter, optional_args: SetMultiplePositionOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setMultiplePositionChannelEmitter(in_game_object: typedefs.AkGameObjectID, positions: []const common.AkChannelEmitter, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(
             in_game_object,
             @ptrCast(positions),
@@ -854,26 +856,26 @@ pub fn setMultiplePositionChannelEmitter(in_game_object: typedefs.AkGameObjectID
     );
 }
 
-pub fn setScalingFactor(in_game_object_id: typedefs.AkGameObjectID, in_attenuation_scaling_factor: f32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setScalingFactor(in_game_object_id: typedefs.AkGameObjectID, in_attenuation_scaling_factor: f32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetScalingFactor(in_game_object_id, in_attenuation_scaling_factor),
     );
 }
 
-pub fn setDistanceProbe(in_listener_game_object_id: typedefs.AkGameObjectID, in_distance_probe_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setDistanceProbe(in_listener_game_object_id: typedefs.AkGameObjectID, in_distance_probe_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetDistanceProbe(in_listener_game_object_id, in_distance_probe_game_object_id),
     );
 }
 
-pub fn clearBanks() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn clearBanks() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ClearBanks(),
     );
 }
 
-pub fn setBankLoadIOSettings(in_throughput: f32, in_priority: typedefs.AkPriority) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setBankLoadIOSettings(in_throughput: f32, in_priority: typedefs.AkPriority) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBankLoadIOSettings(in_throughput, in_priority),
     );
 }
@@ -882,70 +884,70 @@ pub const LoadBankOptionalArgs = struct {
     bank_type: typedefs.AkBankType = .user,
 };
 
-pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, optional_args: LoadBankOptionalArgs) common.WwiseError!typedefs.AkBankID {
+pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, optional_args: LoadBankOptionalArgs) zig.WwiseError!typedefs.AkBankID {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_String(raw_bank_name, &out_bank_id, @intFromEnum(optional_args.bank_type)),
     );
 
     return out_bank_id;
 }
 
-pub fn loadBankID(in_bank_id: typedefs.AkBankID, optional_args: LoadBankOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn loadBankID(in_bank_id: typedefs.AkBankID, optional_args: LoadBankOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_ID(in_bank_id, @intFromEnum(optional_args.bank_type)),
     );
 }
 
-pub fn loadBankMemoryView(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32) common.WwiseError!typedefs.AkBankID {
+pub fn loadBankMemoryView(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32) zig.WwiseError!typedefs.AkBankID {
     var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView(in_memory_bank, in_memory_bank_size, &out_bank_id),
     );
 
     return out_bank_id;
 }
 
-pub fn loadBankMemoryViewOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) common.WwiseError!void {
+pub fn loadBankMemoryViewOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) zig.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView_OutBankType(in_memory_bank, in_memory_bank_size, out_bank_id, &raw_bank_type),
     );
 
     out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
-pub fn loadBankMemoryCopy(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32) common.WwiseError!typedefs.AkBankID {
+pub fn loadBankMemoryCopy(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32) zig.WwiseError!typedefs.AkBankID {
     var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryCopy(in_memory_bank, in_memory_bank_size, &out_bank_id),
     );
 
     return out_bank_id;
 }
 
-pub fn loadBankMemoryCopyOutBankType(in_memory_bank: ?*anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) common.WwiseError!void {
+pub fn loadBankMemoryCopyOutBankType(in_memory_bank: ?*anyopaque, in_memory_bank_size: u32, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) zig.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryCopy_OutBankType(in_memory_bank, in_memory_bank_size, out_bank_id, &raw_bank_type),
     );
 
     out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
-pub fn decodeBank(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_pool_for_decoded_bank: typedefs.AkMemPoolId, out_decoded_bank_ptr: *?*anyopaque, out_decoded_bank_size: u32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn decodeBank(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_pool_for_decoded_bank: typedefs.AkMemPoolId, out_decoded_bank_ptr: *?*anyopaque, out_decoded_bank_size: u32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DecodeBank(
             in_memory_bank,
             in_memory_bank_size,
@@ -956,16 +958,16 @@ pub fn decodeBank(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, i
     );
 }
 
-pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) common.WwiseError!typedefs.AkBankID {
+pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) zig.WwiseError!typedefs.AkBankID {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_Async_String(
             raw_bank_name,
             @ptrCast(in_bank_callback),
@@ -977,8 +979,8 @@ pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: 
     return out_bank_id;
 }
 
-pub fn loadBankAsyncID(in_bank_id: typedefs.AkBankID, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn loadBankAsyncID(in_bank_id: typedefs.AkBankID, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBank_Async_ID(
             in_bank_id,
             @ptrCast(in_bank_callback),
@@ -988,10 +990,10 @@ pub fn loadBankAsyncID(in_bank_id: typedefs.AkBankID, in_bank_callback: callback
     );
 }
 
-pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!typedefs.AkBankID {
+pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque) zig.WwiseError!typedefs.AkBankID {
     var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView_Async(
             in_memory_bank,
             in_memory_bank_size,
@@ -1004,10 +1006,10 @@ pub fn loadBankMemoryViewAsync(in_memory_bank: ?*const anyopaque, in_memory_bank
     return out_bank_id;
 }
 
-pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) common.WwiseError!void {
+pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *typedefs.AkBankID, out_bank_type: *typedefs.AkBankType) zig.WwiseError!void {
     var raw_bank_type: u32 = 0;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryView_Async_OutBankType(
             in_memory_bank,
             in_memory_bank_size,
@@ -1020,8 +1022,8 @@ pub fn loadBankMemoryViewAsyncOutBankType(in_memory_bank: ?*const anyopaque, in_
     out_bank_type.* = @enumFromInt(raw_bank_type);
 }
 
-pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *typedefs.AkBankID) common.WwiseError!void {
-    try common.handleAkResult(
+pub fn loadBankMemoryCopyAsync(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, out_bank_id: *typedefs.AkBankID) zig.WwiseError!void {
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_LoadBankMemoryCopy_Async(
             in_memory_bank,
             in_memory_bank_size,
@@ -1036,32 +1038,32 @@ pub const UnloadBankOptionalArgs = struct {
     bank_type: typedefs.AkBankType = .user,
 };
 
-pub fn unloadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
+pub fn unloadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, optional_args: UnloadBankOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnloadBank_String(raw_bank_name, in_memory_bank, @intFromEnum(optional_args.bank_type)),
     );
 }
 
-pub fn unloadBankID(in_bank_id: typedefs.AkBankID, in_memory_bank: ?*const anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unloadBankID(in_bank_id: typedefs.AkBankID, in_memory_bank: ?*const anyopaque, optional_args: UnloadBankOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnloadBank_ID(in_bank_id, in_memory_bank, @intFromEnum(optional_args.bank_type)),
     );
 }
 
-pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
+pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnloadBank_Async_String(
             raw_bank_name,
             in_memory_bank,
@@ -1072,8 +1074,8 @@ pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name
     );
 }
 
-pub fn unloadBankAsyncID(in_bank_id: typedefs.AkBankID, in_memory_bank: ?*const anyopaque, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unloadBankAsyncID(in_bank_id: typedefs.AkBankID, in_memory_bank: ?*const anyopaque, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnloadBank_Async_ID(
             in_bank_id,
             in_memory_bank,
@@ -1098,14 +1100,14 @@ pub fn prepareBankString(
     in_preparation_type: PreparationType,
     in_bank_name: []const u8,
     optional_args: PrepareBankOptionalArgs,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_String(
             @intFromEnum(in_preparation_type),
             raw_bank_name,
@@ -1119,8 +1121,8 @@ pub fn prepareBankID(
     in_preparation_type: PreparationType,
     in_bank_id: typedefs.AkBankID,
     optional_args: PrepareBankOptionalArgs,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_ID(
             @intFromEnum(in_preparation_type),
             in_bank_id,
@@ -1137,14 +1139,14 @@ pub fn prepareBankAsyncString(
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
     optional_args: PrepareBankOptionalArgs,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return common.WwiseError.Fail;
+    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_Async_String(
             @intFromEnum(in_preparation_type),
             raw_bank_name,
@@ -1162,8 +1164,8 @@ pub fn prepareBankAsyncID(
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
     optional_args: PrepareBankOptionalArgs,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBank_Async_ID(
             @intFromEnum(in_preparation_type),
             in_bank_id,
@@ -1175,13 +1177,13 @@ pub fn prepareBankAsyncID(
     );
 }
 
-pub fn clearPreparedEvents() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn clearPreparedEvents() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ClearPreparedEvents(),
     );
 }
 
-pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_type: PreparationType, in_event_names: []const []const u8) common.WwiseError!void {
+pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_type: PreparationType, in_event_names: []const []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
@@ -1194,11 +1196,11 @@ pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_
     defer raw_event_names_list.deinit(allocator);
 
     for (in_event_names) |event_name| {
-        const raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
-        raw_event_names_list.append(allocator, raw_event_name) catch return common.WwiseError.Fail;
+        const raw_event_name = common.toCString(allocator, event_name) catch return zig.WwiseError.Fail;
+        raw_event_names_list.append(allocator, raw_event_name) catch return zig.WwiseError.Fail;
     }
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_String(
             @intFromEnum(in_preparation_type),
             @ptrCast(raw_event_names_list.items),
@@ -1207,8 +1209,8 @@ pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_
     );
 }
 
-pub fn prepareEventID(in_preparation_type: PreparationType, in_event_ids: []const typedefs.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn prepareEventID(in_preparation_type: PreparationType, in_event_ids: []const typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_ID(
             @intFromEnum(in_preparation_type),
             @ptrCast(@constCast(in_event_ids)),
@@ -1223,7 +1225,7 @@ pub fn prepareEventAsyncString(
     in_event_names: [][]const u8,
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
@@ -1236,11 +1238,11 @@ pub fn prepareEventAsyncString(
     defer raw_event_names_list.deinit(allocator);
 
     for (in_event_names) |event_name| {
-        const raw_event_name = common.toCString(allocator, event_name) catch return common.WwiseError.Fail;
-        raw_event_names_list.append(allocator, raw_event_name) catch return common.WwiseError.Fail;
+        const raw_event_name = common.toCString(allocator, event_name) catch return zig.WwiseError.Fail;
+        raw_event_names_list.append(allocator, raw_event_name) catch return zig.WwiseError.Fail;
     }
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_Async_String(
             @intFromEnum(in_preparation_type),
             @ptrCast(raw_event_names_list.items),
@@ -1256,8 +1258,8 @@ pub fn prepareEventAsyncID(
     in_event_ids: []const typedefs.AkUniqueID,
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareEvent_Async_ID(
             @intFromEnum(in_preparation_type),
             @ptrCast(@constCast(in_event_ids)),
@@ -1272,7 +1274,7 @@ pub fn prepareBusString(
     fallback_allocator: std.mem.Allocator,
     in_preparation_type: PreparationType,
     in_bus_names: [][]const u8,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
@@ -1285,11 +1287,11 @@ pub fn prepareBusString(
     defer raw_bus_names_list.deinit(allocator);
 
     for (in_bus_names) |bus_name| {
-        const raw_bus_name = common.toCString(allocator, bus_name) catch return common.WwiseError.Fail;
-        raw_bus_names_list.append(allocator, raw_bus_name) catch return common.WwiseError.Fail;
+        const raw_bus_name = common.toCString(allocator, bus_name) catch return zig.WwiseError.Fail;
+        raw_bus_names_list.append(allocator, raw_bus_name) catch return zig.WwiseError.Fail;
     }
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBus_String(
             @intFromEnum(in_preparation_type),
             @ptrCast(raw_bus_names_list.items),
@@ -1298,8 +1300,8 @@ pub fn prepareBusString(
     );
 }
 
-pub fn prepareBusID(in_preparation_type: PreparationType, in_bus_ids: []const typedefs.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn prepareBusID(in_preparation_type: PreparationType, in_bus_ids: []const typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBus_ID(
             @intFromEnum(in_preparation_type),
             @ptrCast(@constCast(in_bus_ids)),
@@ -1314,7 +1316,7 @@ pub fn prepareBusAsyncString(
     in_bus_names: [][]const u8,
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
@@ -1327,11 +1329,11 @@ pub fn prepareBusAsyncString(
     defer raw_bus_names_list.deinit(allocator);
 
     for (in_bus_names) |bus_name| {
-        const raw_bus_name = common.toCString(allocator, bus_name) catch return common.WwiseError.Fail;
-        raw_bus_names_list.append(allocator, raw_bus_name) catch return common.WwiseError.Fail;
+        const raw_bus_name = common.toCString(allocator, bus_name) catch return zig.WwiseError.Fail;
+        raw_bus_names_list.append(allocator, raw_bus_name) catch return zig.WwiseError.Fail;
     }
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBus_Async_String(
             @intFromEnum(in_preparation_type),
             @ptrCast(raw_bus_names_list.items),
@@ -1347,8 +1349,8 @@ pub fn prepareBusAsyncID(
     in_bus_ids: []const typedefs.AkUniqueID,
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareBus_Async_ID(
             @intFromEnum(in_preparation_type),
             @ptrCast(@constCast(in_bus_ids)),
@@ -1359,8 +1361,8 @@ pub fn prepareBusAsyncID(
     );
 }
 
-pub fn setMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setMedia(in_source_settings: []const AkSourceSettings) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMedia(
             @ptrCast(@constCast(in_source_settings)),
             @truncate(in_source_settings.len),
@@ -1368,8 +1370,8 @@ pub fn setMedia(in_source_settings: []const AkSourceSettings) common.WwiseError!
     );
 }
 
-pub fn tryUnsetMedia(in_source_settings: []const AkSourceSettings, unset_results: ?[*]common.AKRESULT) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn tryUnsetMedia(in_source_settings: []const AkSourceSettings, unset_results: ?[*]enums.AKRESULT) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_TryUnsetMedia(
             @ptrCast(@constCast(in_source_settings)),
             @truncate(in_source_settings.len),
@@ -1384,7 +1386,7 @@ pub fn prepareGameSyncsString(
     in_preparation_type: PreparationType,
     in_group_name: []const u8,
     in_game_sync_names: [][]const u8,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
@@ -1393,17 +1395,17 @@ pub fn prepareGameSyncsString(
 
     const allocator = area_allocator.allocator();
 
-    const raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
+    const raw_group_name = common.toCString(allocator, in_group_name) catch return zig.WwiseError.Fail;
 
     var raw_game_sync_names_list: std.ArrayList([*:0]const u8) = .empty;
     defer raw_game_sync_names_list.deinit(allocator);
 
     for (in_game_sync_names) |game_sync_name| {
-        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
-        raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return common.WwiseError.Fail;
+        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return zig.WwiseError.Fail;
+        raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return zig.WwiseError.Fail;
     }
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_String(
             @intFromEnum(in_preparation_type),
             @intFromEnum(in_game_sync_type),
@@ -1419,8 +1421,8 @@ pub fn prepareGameSyncsID(
     in_game_sync_type: common.AkGroupType,
     in_group_id: u32,
     in_game_sync_ids: []const u32,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_ID(
             @intFromEnum(in_preparation_type),
             @intFromEnum(in_game_sync_type),
@@ -1439,7 +1441,7 @@ pub fn prepareGameSyncsAsyncString(
     in_game_sync_names: [][]const u8,
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
@@ -1448,17 +1450,17 @@ pub fn prepareGameSyncsAsyncString(
 
     const allocator = area_allocator.allocator();
 
-    const raw_group_name = common.toCString(allocator, in_group_name) catch return common.WwiseError.Fail;
+    const raw_group_name = common.toCString(allocator, in_group_name) catch return zig.WwiseError.Fail;
 
     var raw_game_sync_names_list: std.ArrayList([*:0]const u8) = .empty;
     defer raw_game_sync_names_list.deinit(allocator);
 
     for (in_game_sync_names) |game_sync_name| {
-        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return common.WwiseError.Fail;
-        raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return common.WwiseError.Fail;
+        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return zig.WwiseError.Fail;
+        raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return zig.WwiseError.Fail;
     }
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_String(
             @intFromEnum(in_preparation_type),
             @intFromEnum(in_game_sync_type),
@@ -1478,8 +1480,8 @@ pub fn prepareGameSyncsAsyncID(
     in_game_sync_ids: []const u32,
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PrepareGameSyncs_Async_ID(
             @intFromEnum(in_preparation_type),
             @intFromEnum(in_game_sync_type),
@@ -1492,8 +1494,8 @@ pub fn prepareGameSyncsAsyncID(
     );
 }
 
-pub fn setListeners(in_emitter_game_obj: typedefs.AkGameObjectID, in_listener_game_objs: []const typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setListeners(in_emitter_game_obj: typedefs.AkGameObjectID, in_listener_game_objs: []const typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetListeners(
             in_emitter_game_obj,
             @ptrCast(in_listener_game_objs),
@@ -1502,20 +1504,20 @@ pub fn setListeners(in_emitter_game_obj: typedefs.AkGameObjectID, in_listener_ga
     );
 }
 
-pub fn addListener(in_emitter_game_obj: typedefs.AkGameObjectID, in_listener_game_obj: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn addListener(in_emitter_game_obj: typedefs.AkGameObjectID, in_listener_game_obj: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddListener(in_emitter_game_obj, in_listener_game_obj),
     );
 }
 
-pub fn removeListener(in_emitter_game_obj: typedefs.AkGameObjectID, in_listener_game_obj: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn removeListener(in_emitter_game_obj: typedefs.AkGameObjectID, in_listener_game_obj: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RemoveListener(in_emitter_game_obj, in_listener_game_obj),
     );
 }
 
-pub fn setDefaultListeners(in_listener_game_objs: []const typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setDefaultListeners(in_listener_game_objs: []const typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetDefaultListeners(
             @ptrCast(in_listener_game_objs),
             @truncate(in_listener_game_objs.len),
@@ -1523,20 +1525,20 @@ pub fn setDefaultListeners(in_listener_game_objs: []const typedefs.AkGameObjectI
     );
 }
 
-pub fn addDefaultListener(in_listener_game_obj: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn addDefaultListener(in_listener_game_obj: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddDefaultListener(in_listener_game_obj),
     );
 }
 
-pub fn removeDefaultListener(in_listener_game_obj: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn removeDefaultListener(in_listener_game_obj: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RemoveDefaultListener(in_listener_game_obj),
     );
 }
 
-pub fn resetListenersToDefault(in_emitter_game_obj: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn resetListenersToDefault(in_emitter_game_obj: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ResetListenersToDefault(in_emitter_game_obj),
     );
 }
@@ -1546,8 +1548,8 @@ pub fn setListenerSpatialization(
     in_spatialized: bool,
     in_channel_config: speaker_config.AkChannelConfig,
     in_volume_offsets: SpeakerVolumes.VectorPtr,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetListenerSpatialization(
             in_listener_id,
             in_spatialized,
@@ -1564,8 +1566,8 @@ pub const SetRTPCValueOptionalArgs = struct {
     bypass_internal_value_interpolation: bool = false,
 };
 
-pub fn setRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, in_value: typedefs.AkRtpcValue, optional_args: SetRTPCValueOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, in_value: typedefs.AkRtpcValue, optional_args: SetRTPCValueOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetRTPCValue_ID(
             in_rtpc_id,
             in_value,
@@ -1577,14 +1579,14 @@ pub fn setRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, in_value: typedefs.AkRtpcVa
     );
 }
 
-pub fn setRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_value: typedefs.AkRtpcValue, optional_args: SetRTPCValueOptionalArgs) common.WwiseError!void {
+pub fn setRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_value: typedefs.AkRtpcValue, optional_args: SetRTPCValueOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetRTPCValue_String(
             raw_rtpc_name,
             in_value,
@@ -1607,8 +1609,8 @@ pub fn setRTPCValueByPlayingID(
     in_value: typedefs.AkRtpcValue,
     in_playing_id: typedefs.AkPlayingID,
     optional_args: SetRTPCValueByPlayingIDOptionalArgs,
-) common.WwiseError!void {
-    return common.handleAkResult(
+) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_ID(
             in_rtpc_id,
             in_value,
@@ -1626,14 +1628,14 @@ pub fn setRTPCValueByPlayingIDString(
     in_value: typedefs.AkRtpcValue,
     in_playing_id: typedefs.AkPlayingID,
     optional_args: SetRTPCValueByPlayingIDOptionalArgs,
-) common.WwiseError!void {
+) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetRTPCValueByPlayingID_String(
             raw_rtpc_name,
             in_value,
@@ -1652,8 +1654,8 @@ pub const ResetRTPCValueOptionalArgs = struct {
     bypass_internal_value_interpolation: bool = false,
 };
 
-pub fn resetRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, optional_args: ResetRTPCValueOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn resetRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, optional_args: ResetRTPCValueOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ResetRTPCValue_ID(
             in_rtpc_id,
             optional_args.game_object_id,
@@ -1664,14 +1666,14 @@ pub fn resetRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, optional_args: ResetRTPCV
     );
 }
 
-pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, optional_args: ResetRTPCValueOptionalArgs) common.WwiseError!void {
+pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, optional_args: ResetRTPCValueOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ResetRTPCValue_String(
             raw_rtpc_name,
             optional_args.game_object_id,
@@ -1688,8 +1690,8 @@ pub const ResetRTPCValueByPlayingIDOptionalArgs = struct {
     bypass_internal_value_interpolation: bool = false,
 };
 
-pub fn resetRTPCValueByPlayingID(in_rtpc_id: typedefs.AkRtpcID, in_playing_id: typedefs.AkPlayingID, optional_args: ResetRTPCValueByPlayingIDOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn resetRTPCValueByPlayingID(in_rtpc_id: typedefs.AkRtpcID, in_playing_id: typedefs.AkPlayingID, optional_args: ResetRTPCValueByPlayingIDOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_ID(
             in_rtpc_id,
             in_playing_id,
@@ -1700,14 +1702,14 @@ pub fn resetRTPCValueByPlayingID(in_rtpc_id: typedefs.AkRtpcID, in_playing_id: t
     );
 }
 
-pub fn resetRTPCValueByPlayingIDString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_playing_id: typedefs.AkPlayingID, optional_args: ResetRTPCValueByPlayingIDOptionalArgs) common.WwiseError!void {
+pub fn resetRTPCValueByPlayingIDString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_playing_id: typedefs.AkPlayingID, optional_args: ResetRTPCValueByPlayingIDOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return common.WwiseError.Fail;
+    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ResetRTPCValueByPlayingID_String(
             raw_rtpc_name,
             in_playing_id,
@@ -1718,75 +1720,75 @@ pub fn resetRTPCValueByPlayingIDString(fallback_allocator: std.mem.Allocator, in
     );
 }
 
-pub fn setSwitchID(in_switch_group: typedefs.AkSwitchGroupID, in_switch_state: typedefs.AkSwitchStateID, in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setSwitchID(in_switch_group: typedefs.AkSwitchGroupID, in_switch_state: typedefs.AkSwitchStateID, in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetSwitch_ID(in_switch_group, in_switch_state, in_game_object_id),
     );
 }
 
-pub fn setSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group: []const u8, in_switch_state: []const u8, in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
+pub fn setSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group: []const u8, in_switch_state: []const u8, in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_switch_group = common.toCString(allocator, in_switch_group) catch return common.WwiseError.Fail;
+    const raw_switch_group = common.toCString(allocator, in_switch_group) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_switch_group);
 
-    const raw_switch_state = common.toCString(allocator, in_switch_state) catch return common.WwiseError.Fail;
+    const raw_switch_state = common.toCString(allocator, in_switch_state) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_switch_state);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetSwitch_String(raw_switch_group, raw_switch_state, in_game_object_id),
     );
 }
 
-pub fn postTriggerID(in_trigger_id: typedefs.AkTriggerID, in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn postTriggerID(in_trigger_id: typedefs.AkTriggerID, in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PostTrigger_ID(in_trigger_id, in_game_object_id),
     );
 }
 
-pub fn postTriggerString(fallback_allocator: std.mem.Allocator, in_trigger_name: []const u8, in_game_object_id: typedefs.AkGameObjectID) common.WwiseError!void {
+pub fn postTriggerString(fallback_allocator: std.mem.Allocator, in_trigger_name: []const u8, in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_trigger_name = common.toCString(allocator, in_trigger_name) catch return common.WwiseError.Fail;
+    const raw_trigger_name = common.toCString(allocator, in_trigger_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_trigger_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_PostTrigger_String(raw_trigger_name, in_game_object_id),
     );
 }
 
-pub fn setStateID(in_state_group: typedefs.AkStateGroupID, in_state: typedefs.AkStateID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setStateID(in_state_group: typedefs.AkStateGroupID, in_state: typedefs.AkStateID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetState_ID(in_state_group, in_state),
     );
 }
 
-pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []const u8, in_state: []const u8) common.WwiseError!void {
+pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []const u8, in_state: []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_state_group = common.toCString(allocator, in_state_group) catch return common.WwiseError.Fail;
+    const raw_state_group = common.toCString(allocator, in_state_group) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_state_group);
 
-    const raw_state = common.toCString(allocator, in_state) catch return common.WwiseError.Fail;
+    const raw_state = common.toCString(allocator, in_state) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_state);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetState_String(raw_state_group, raw_state),
     );
 }
 
-pub fn setGameObjectAuxSendValues(allocator: std.mem.Allocator, in_game_object_id: typedefs.AkGameObjectID, in_aux_send_values: []const common.AkAuxSendValue) common.WwiseError!void {
-    const raw_aux_send_values = allocator.alloc(c.WWISEC_AkAuxSendValue, in_aux_send_values.len) catch return common.WwiseError.Fail;
+pub fn setGameObjectAuxSendValues(allocator: std.mem.Allocator, in_game_object_id: typedefs.AkGameObjectID, in_aux_send_values: []const common.AkAuxSendValue) zig.WwiseError!void {
+    const raw_aux_send_values = allocator.alloc(c.WWISEC_AkAuxSendValue, in_aux_send_values.len) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_aux_send_values);
 
     for (0..in_aux_send_values.len) |index| {
         raw_aux_send_values[index] = in_aux_send_values[index].toC();
     }
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetGameObjectAuxSendValues(
             in_game_object_id,
             @ptrCast(raw_aux_send_values),
@@ -1795,8 +1797,8 @@ pub fn setGameObjectAuxSendValues(allocator: std.mem.Allocator, in_game_object_i
     );
 }
 
-pub fn registerBusVolumeCallback(in_bus_id: typedefs.AkUniqueID, in_callback: callback_types.AkBusCallbackFunc, in_cookie: ?*anyopaque) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerBusVolumeCallback(in_bus_id: typedefs.AkUniqueID, in_callback: callback_types.AkBusCallbackFunc, in_cookie: ?*anyopaque) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterBusVolumeCallback(
             in_bus_id,
             @ptrCast(in_callback),
@@ -1805,8 +1807,8 @@ pub fn registerBusVolumeCallback(in_bus_id: typedefs.AkUniqueID, in_callback: ca
     );
 }
 
-pub fn registerBusMeteringCallback(in_bus_id: typedefs.AkUniqueID, in_callback: callback_types.AkBusMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerBusMeteringCallback(in_bus_id: typedefs.AkUniqueID, in_callback: callback_types.AkBusMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterBusMeteringCallback(
             in_bus_id,
             @ptrCast(in_callback),
@@ -1816,8 +1818,8 @@ pub fn registerBusMeteringCallback(in_bus_id: typedefs.AkUniqueID, in_callback: 
     );
 }
 
-pub fn registerOutputDeviceMeteringCallback(in_id_output: typedefs.AkOutputDeviceID, in_callback: callback_types.AkOutputDeviceMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn registerOutputDeviceMeteringCallback(in_id_output: typedefs.AkOutputDeviceID, in_callback: callback_types.AkOutputDeviceMeteringCallbackFunc, in_metering_flags: common.AkMeteringFlags, in_cookie: ?*anyopaque) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterOutputDeviceMeteringCallback(
             in_id_output,
             @ptrCast(in_callback),
@@ -1827,68 +1829,68 @@ pub fn registerOutputDeviceMeteringCallback(in_id_output: typedefs.AkOutputDevic
     );
 }
 
-pub fn setGameObjectOutputBusVolume(in_emitter_obj_id: typedefs.AkGameObjectID, in_listener_obj_id: typedefs.AkGameObjectID, in_control_value: f32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setGameObjectOutputBusVolume(in_emitter_obj_id: typedefs.AkGameObjectID, in_listener_obj_id: typedefs.AkGameObjectID, in_control_value: f32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(in_emitter_obj_id, in_listener_obj_id, in_control_value),
     );
 }
 
-pub fn setActorMixerEffect(in_audio_node_id: typedefs.AkUniqueID, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setActorMixerEffect(in_audio_node_id: typedefs.AkUniqueID, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetActorMixerEffect(in_audio_node_id, in_fx_index, in_share_set_id),
     );
 }
 
-pub fn setBusEffectID(in_audio_node_id: typedefs.AkUniqueID, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setBusEffectID(in_audio_node_id: typedefs.AkUniqueID, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusEffect_ID(in_audio_node_id, in_fx_index, in_share_set_id),
     );
 }
 
-pub fn setBusEffectString(fallback_allocatr: std.mem.Allocator, in_bus_name: []const u8, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) common.WwiseError!void {
+pub fn setBusEffectString(fallback_allocatr: std.mem.Allocator, in_bus_name: []const u8, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocatr);
     var allocator = stack_char_allocator.get();
 
-    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusEffect_String(raw_bus_name, in_fx_index, in_share_set_id),
     );
 }
 
-pub fn setOutputDeviceEffect(in_output_device_id: typedefs.AkOutputDeviceID, in_fx_index: u32, in_fx_share_set_id: typedefs.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setOutputDeviceEffect(in_output_device_id: typedefs.AkOutputDeviceID, in_fx_index: u32, in_fx_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetOutputDeviceEffect(in_output_device_id, in_fx_index, in_fx_share_set_id),
     );
 }
 
-pub fn setBusConfigID(in_audio_node_id: typedefs.AkUniqueID, in_channel_config: speaker_config.AkChannelConfig) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setBusConfigID(in_audio_node_id: typedefs.AkUniqueID, in_channel_config: speaker_config.AkChannelConfig) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusConfig_ID(in_audio_node_id, in_channel_config.toC()),
     );
 }
 
-pub fn setBusConfigString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_channe_config: speaker_config.AkChannelConfig) common.WwiseError!void {
+pub fn setBusConfigString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_channe_config: speaker_config.AkChannelConfig) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusConfig_String(raw_bus_name, in_channe_config.toC()),
     );
 }
 
-pub fn setObjectObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID, in_obstruction_level: f32, in_occlusion_level: f32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setObjectObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID, in_obstruction_level: f32, in_occlusion_level: f32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetObjectObstructionAndOcclusion(in_emitter_id, in_listener_id, in_obstruction_level, in_occlusion_level),
     );
 }
 
-pub fn setMultipleObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID, in_obstruction_occlusion_values: []const common.AkObstructionOcclusionValues) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setMultipleObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID, in_obstruction_occlusion_values: []const common.AkObstructionOcclusionValues) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(
             in_emitter_id,
             in_listener_id,
@@ -1898,49 +1900,49 @@ pub fn setMultipleObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID
     );
 }
 
-pub fn getContainerHistory(in_bytes: ?*IBytes.IWriteBytes) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getContainerHistory(in_bytes: ?*IBytes.IWriteBytes) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetContainerHistory(@ptrCast(in_bytes)),
     );
 }
 
-pub fn setContainerHistory(in_bytes: ?*IBytes.IReadBytes) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setContainerHistory(in_bytes: ?*IBytes.IReadBytes) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetContainerHistory(@ptrCast(in_bytes)),
     );
 }
 
-pub fn startOutputCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) common.WwiseError!void {
+pub fn startOutputCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
+    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_capture_file_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_StartOutputCapture(raw_capture_file_name),
     );
 }
 
-pub fn stopOutputCapture() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn stopOutputCapture() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_StopOutputCapture(),
     );
 }
 
-pub fn addOutputCaptureMarker(fallback_allocator: std.mem.Allocator, in_marker_text: []const u8) common.WwiseError!void {
+pub fn addOutputCaptureMarker(fallback_allocator: std.mem.Allocator, in_marker_text: []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     const allocator = stack_char_allocator.get();
 
-    const raw_marker_text = common.toCString(allocator, in_marker_text) catch return common.WwiseError.Fail;
+    const raw_marker_text = common.toCString(allocator, in_marker_text) catch return zig.WwiseError.Fail;
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutputCaptureMarker(raw_marker_text),
     );
 }
 
-pub fn addOutputCaptureBinaryMarker(in_marker_data: []const u8) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn addOutputCaptureBinaryMarker(in_marker_data: []const u8) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutputCaptureBinaryMarker(
             @ptrCast(@constCast(in_marker_data)),
             @truncate(in_marker_data.len),
@@ -1957,8 +1959,8 @@ pub const RegistereCaptureCallbackOptionalArgs = struct {
     cookie: ?*anyopaque = null,
 };
 
-pub fn regiserCaptureCallback(in_callback: callback_types.AkCaptureCallbackFunc, optional_args: RegistereCaptureCallbackOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn regiserCaptureCallback(in_callback: callback_types.AkCaptureCallbackFunc, optional_args: RegistereCaptureCallbackOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RegisterCaptureCallback(
             @ptrCast(in_callback),
             optional_args.id_output,
@@ -1972,8 +1974,8 @@ pub const UnregistereCaptureCallbackOptionalArgs = struct {
     cookie: ?*anyopaque = null,
 };
 
-pub fn unregisterCaptureCallback(in_callback: callback_types.AkCaptureCallbackFunc, optional_args: UnregistereCaptureCallbackOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unregisterCaptureCallback(in_callback: callback_types.AkCaptureCallbackFunc, optional_args: UnregistereCaptureCallbackOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_UnregisterCaptureCallback(
             @ptrCast(in_callback),
             optional_args.id_output,
@@ -1982,40 +1984,40 @@ pub fn unregisterCaptureCallback(in_callback: callback_types.AkCaptureCallbackFu
     );
 }
 
-pub fn startProfilerCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) common.WwiseError!void {
+pub fn startProfilerCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return common.WwiseError.Fail;
+    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_capture_file_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_StartProfilerCapture(raw_capture_file_name),
     );
 }
 
-pub fn stopProfilerCapture() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn stopProfilerCapture() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_StopProfilerCapture(),
     );
 }
 
-pub fn setOfflineRenderingFrameTime(in_frame_time_in_secconds: f32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setOfflineRenderingFrameTime(in_frame_time_in_secconds: f32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetOfflineRenderingFrameTime(in_frame_time_in_secconds),
     );
 }
 
-pub fn setOfflineRendering(in_enable_offline_rendering: bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setOfflineRendering(in_enable_offline_rendering: bool) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetOfflineRendering(in_enable_offline_rendering),
     );
 }
 
-pub fn addOutput(output_settings: *const settings.AkOutputSettings, listeners: []typedefs.AkGameObjectID) common.WwiseError!typedefs.AkOutputDeviceID {
+pub fn addOutput(output_settings: *const settings.AkOutputSettings, listeners: []typedefs.AkGameObjectID) zig.WwiseError!typedefs.AkOutputDeviceID {
     var out_device_id: typedefs.AkOutputDeviceID = constants.AK_INVALID_OUTPUT_DEVICE_ID;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutput(
             @ptrCast(output_settings),
             @ptrCast(&out_device_id),
@@ -2027,14 +2029,14 @@ pub fn addOutput(output_settings: *const settings.AkOutputSettings, listeners: [
     return out_device_id;
 }
 
-pub fn removeOutput(id_output: typedefs.AkOutputDeviceID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn removeOutput(id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_RemoveOutput(id_output),
     );
 }
 
-pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_device_id: typedefs.AkOutputDeviceID, out_device_id: ?*typedefs.AkOutputDeviceID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_device_id: typedefs.AkOutputDeviceID, out_device_id: ?*typedefs.AkOutputDeviceID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ReplaceOutput(@ptrCast(output_settings), in_device_id, @ptrCast(out_device_id)),
     );
 }
@@ -2053,28 +2055,28 @@ pub fn getOuputIDString(fallback_allocator: std.mem.Allocator, in_share_set: []c
     return c.WWISEC_AK_SoundEngine_GetOutputID_String(raw_share_set, in_id_device);
 }
 
-pub fn setBusDeviceID(in_id_bus: typedefs.AkUniqueID, in_id_new_device: typedefs.AkUniqueID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setBusDeviceID(in_id_bus: typedefs.AkUniqueID, in_id_new_device: typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusDevice_ID(in_id_bus, in_id_new_device),
     );
 }
 
-pub fn setBusDeviceString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_device_name: []const u8) common.WwiseError!void {
+pub fn setBusDeviceString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_device_name: []const u8) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return common.WwiseError.Fail;
+    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
-    const raw_device_name = common.toCString(allocator, in_device_name) catch return common.WwiseError.Fail;
+    const raw_device_name = common.toCString(allocator, in_device_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_device_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusDevice_String(raw_bus_name, raw_device_name),
     );
 }
 
-pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_plugin_id: u32, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) common.WwiseError!void {
+pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_plugin_id: u32, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) zig.WwiseError!void {
     var area_allocator_instance = std.heap.ArenaAllocator.init(allocator);
     defer area_allocator_instance.deinit();
 
@@ -2082,14 +2084,14 @@ pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_
 
     const raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
-            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
+            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return zig.WwiseError.Fail;
             break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 
         break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);
     };
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetDeviceList_Plugin(
             in_company_id,
             in_plugin_id,
@@ -2101,13 +2103,13 @@ pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_
     if (out_device_descriptions_opt) |out_device_descriptions| {
         if (raw_device_descriptions_ptr) |raw_device_descritions| {
             for (0..io_max_num_devices.*) |index| {
-                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return common.WwiseError.Fail;
+                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return zig.WwiseError.Fail;
             }
         }
     }
 }
 
-pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share_set_id: typedefs.AkUniqueID, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) common.WwiseError!void {
+pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share_set_id: typedefs.AkUniqueID, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) zig.WwiseError!void {
     var area_allocator_instance = std.heap.ArenaAllocator.init(allocator);
     defer area_allocator_instance.deinit();
 
@@ -2115,14 +2117,14 @@ pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share
 
     const raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
-            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return common.WwiseError.Fail;
+            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return zig.WwiseError.Fail;
             break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 
         break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);
     };
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetDeviceList_ShareSet(
             in_audio_device_share_set_id,
             io_max_num_devices,
@@ -2133,20 +2135,20 @@ pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share
     if (out_device_descriptions_opt) |out_device_descriptions| {
         if (raw_device_descriptions_ptr) |raw_device_descritions| {
             for (0..io_max_num_devices.*) |index| {
-                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return common.WwiseError.Fail;
+                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return zig.WwiseError.Fail;
             }
         }
     }
 }
 
-pub fn setOutputVolume(in_id_output: typedefs.AkOutputDeviceID, in_volume: f32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setOutputVolume(in_id_output: typedefs.AkOutputDeviceID, in_volume: f32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetOutputVolume(in_id_output, in_volume),
     );
 }
 
-pub fn getDeviceSpatialAudioSupport(in_id_device: u32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getDeviceSpatialAudioSupport(in_id_device: u32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetDeviceSpatialAudioSupport(in_id_device),
     );
 }
@@ -2156,8 +2158,8 @@ pub const SuspendOptionalArgs = struct {
     fadeout: bool = true,
 };
 
-pub fn @"suspend"(optional_args: SuspendOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn @"suspend"(optional_args: SuspendOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_Suspend(optional_args.render_anyway, optional_args.fadeout),
     );
 }
@@ -2166,8 +2168,8 @@ pub const WakeupFromSuspendOptionalArgs = struct {
     delay_ms: u32 = 0,
 };
 
-pub fn wakeupFromSuspend(optional_args: WakeupFromSuspendOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn wakeupFromSuspend(optional_args: WakeupFromSuspendOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_WakeupFromSuspend(optional_args.delay_ms),
     );
 }

@@ -1,14 +1,16 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const common_defs = @import("common_defs.zig");
+const enums = @import("enums.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
 const midi_types = @import("midi_types.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
+const zig = @import("zig.zig");
 
-pub const AkCallbackType = packed struct(common.DefaultEnumType) {
+pub const AkCallbackType = packed struct(zig.DefaultEnumType) {
     end_of_event: bool = false,
     end_of_dynamic_sequence_item: bool = false,
     marker: bool = false,
@@ -43,11 +45,11 @@ pub const AkCallbackType = packed struct(common.DefaultEnumType) {
     }
 
     comptime {
-        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .midi_event = true })) == c.WWISEC_AK_MIDIEvent);
-        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_play_position = true })) == c.WWISEC_AK_EnableGetSourcePlayPosition);
-        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_music_play_position = true })) == c.WWISEC_AK_EnableGetMusicPlayPosition);
-        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_stream_buffering = true })) == c.WWISEC_AK_EnableGetSourceStreamBuffering);
-        std.debug.assert(@as(common.DefaultEnumType, @bitCast(AkCallbackType{ .dynamic_sequence_select = true })) == c.WWISEC_AK_DynamicSequenceSelect);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .midi_event = true })) == c.WWISEC_AK_MIDIEvent);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_play_position = true })) == c.WWISEC_AK_EnableGetSourcePlayPosition);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_music_play_position = true })) == c.WWISEC_AK_EnableGetMusicPlayPosition);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_stream_buffering = true })) == c.WWISEC_AK_EnableGetSourceStreamBuffering);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .dynamic_sequence_select = true })) == c.WWISEC_AK_DynamicSequenceSelect);
     }
 };
 
@@ -57,7 +59,7 @@ pub const AkAudioDeviceEvent = enum(u8) {
     system_removal,
 };
 
-pub const AkGlobalCallbackLocation = packed struct(common.DefaultEnumType) {
+pub const AkGlobalCallbackLocation = packed struct(zig.DefaultEnumType) {
     register: bool = false,
     begin: bool = false,
     pre_process_message_queue_for_render: bool = false,
@@ -359,7 +361,7 @@ pub const AkDynamicSequenceSelectCallbackInfo = struct {
 pub const AkEventCallbackFunc = ?*const fn (in_type: AkCallbackType, in_event_info: *AkEventCallbackInfo, in_callback_info: ?*anyopaque, in_cookie: ?*anyopaque) callconv(.c) void;
 pub const AkCallbackFunc = AkEventCallbackFunc;
 pub const AkBusCallbackFunc = ?*const fn (in_callback_info: *AkSpeakerVolumeMatrixCallbackInfo, in_cookie: ?*anyopaque) callconv(.c) void;
-pub const AkBankCallbackFunc = ?*const fn (in_bank_id: u32, in_memory_bank_ptr: ?*const anyopaque, in_load_result: common.AKRESULT, in_cookie: ?*anyopaque) callconv(.c) void;
+pub const AkBankCallbackFunc = ?*const fn (in_bank_id: u32, in_memory_bank_ptr: ?*const anyopaque, in_load_result: enums.AKRESULT, in_cookie: ?*anyopaque) callconv(.c) void;
 pub const AkGlobalCallbackFunc = *const fn (in_context: ?*IAkPlugin.IAkGlobalPluginContext, in_location: AkGlobalCallbackLocation, in_cookie: ?*anyopaque) callconv(.c) void;
 pub const AkResourceMonitorCallbackFunc = *const fn (in_data_summary: ?*const AkResourceMonitorDataSummary) callconv(.c) void;
 pub const AkDeviceStatusCallbackFunc = *const fn (
@@ -367,7 +369,7 @@ pub const AkDeviceStatusCallbackFunc = *const fn (
     in_id_audio_device_shareset: typedefs.AkUniqueID,
     in_id_device_id: u32,
     in_id_event: AkAudioDeviceEvent,
-    in_ak_result: common.AKRESULT,
+    in_ak_result: enums.AKRESULT,
 ) callconv(.c) void;
 
 pub const AkBusMeteringCallbackFunc = ?*const fn (in_callback_info: *AkBusMeteringCallbackInfo) callconv(.c) void;

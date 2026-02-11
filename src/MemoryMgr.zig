@@ -1,13 +1,14 @@
-const std = @import("std");
+const BookmarkAlloc = @import("BookmarkAlloc.zig");
 const c = @import("wwise_c");
 const common = @import("common.zig");
-const BookmarkAlloc = @import("BookmarkAlloc.zig");
 const MemoryArena = @import("MemoryArena.zig");
+const std = @import("std");
 const TempAlloc = @import("TempAlloc.zig");
+const zig = @import("zig.zig");
 
 pub const AkMemPoolId = c.WWISEC_AkMemPoolId;
 
-pub const AkMemID = enum(common.DefaultEnumType) {
+pub const AkMemID = enum(zig.DefaultEnumType) {
     object = c.WWISEC_AkMemID_Object,
     event = c.WWISEC_AkMemID_Event,
     structure = c.WWISEC_AkMemID_Structure,
@@ -88,7 +89,7 @@ pub const AkMemDebugRealloc = ?*const fn (pool_id: AkMemPoolId, old_address: ?*a
 pub const AkMemDebugReallocAligned = ?*const fn (pool_id: AkMemPoolId, old_address: ?*anyopaque, size: usize, alignment: u32, new_address: ?*anyopaque, file: ?[*:0]const u8, line: u32) callconv(.c) void;
 pub const AkMemDebugFree = ?*const fn (pool_id: AkMemPoolId, address: ?*anyopaque) callconv(.c) void;
 
-pub const AkMemoryMgrArena = enum(common.DefaultEnumType) {
+pub const AkMemoryMgrArena = enum(zig.DefaultEnumType) {
     primary = 0,
     media,
     profiler,
@@ -131,8 +132,8 @@ pub const AkMemSettings = extern struct {
     }
 };
 
-pub fn init(in_pSettings: *AkMemSettings) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn init(in_pSettings: *AkMemSettings) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_MemoryMgr_Init(@ptrCast(in_pSettings)),
     );
 }

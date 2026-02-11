@@ -1,8 +1,9 @@
-const std = @import("std");
 const c = @import("wwise_c");
-const common = @import("common.zig");
 const callback_types = @import("callback_types.zig");
+const common = @import("common.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
+const zig = @import("zig.zig");
 
 pub const AkExternalSourceArray = ?*anyopaque;
 
@@ -20,8 +21,8 @@ pub const PlaylistItem = extern struct {
         return @bitCast(self);
     }
 
-    pub fn setExternalSources(self: *PlaylistItem, external_srcs: []const common.AkExternalSourceInfo) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn setExternalSources(self: *PlaylistItem, external_srcs: []const common.AkExternalSourceInfo) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem_SetExternalSources(
                 @ptrCast(self),
                 @truncate(external_srcs.len),
@@ -42,8 +43,8 @@ pub const Playlist = opaque {
         external_sources: []const common.AkExternalSourceInfo = &.{},
     };
 
-    pub fn enqueue(self: *Playlist, in_audio_node_id: typedefs.AkUniqueID, optional_args: EnqueueOptionalArgs) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn enqueue(self: *Playlist, in_audio_node_id: typedefs.AkUniqueID, optional_args: EnqueueOptionalArgs) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Enqueue(
                 @ptrCast(self),
                 in_audio_node_id,
@@ -75,8 +76,8 @@ pub const Playlist = opaque {
         );
     }
 
-    pub fn reserve(self: *Playlist, in_reserve: u32) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn reserve(self: *Playlist, in_reserve: u32) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Reserve(
                 @ptrCast(self),
                 in_reserve,
@@ -84,8 +85,8 @@ pub const Playlist = opaque {
         );
     }
 
-    pub fn reserveExtra(self: *Playlist, in_reserve: u32) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn reserveExtra(self: *Playlist, in_reserve: u32) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_ReserveExtra(
                 @ptrCast(self),
                 in_reserve,
@@ -142,8 +143,8 @@ pub const Playlist = opaque {
         c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveLast(@ptrCast(self));
     }
 
-    pub fn remove(self: *Playlist, in_item: *const PlaylistItem) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn remove(self: *Playlist, in_item: *const PlaylistItem) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Remove(
                 @ptrCast(self),
                 @ptrCast(in_item),
@@ -151,8 +152,8 @@ pub const Playlist = opaque {
         );
     }
 
-    pub fn removeSwap(self: *Playlist, in_item: *const PlaylistItem) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn removeSwap(self: *Playlist, in_item: *const PlaylistItem) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_RemoveSwap(
                 @ptrCast(self),
                 @ptrCast(in_item),
@@ -188,14 +189,14 @@ pub const Playlist = opaque {
         c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Transfer(@ptrCast(self), @ptrCast(source));
     }
 
-    pub fn copy(self: *Playlist, source: *const Playlist) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn copy(self: *Playlist, source: *const Playlist) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_Playlist_Copy(@ptrCast(self), @ptrCast(source)),
         );
     }
 };
 
-pub const DynamicSequenceType = enum(common.DefaultEnumType) {
+pub const DynamicSequenceType = enum(zig.DefaultEnumType) {
     sample_accurate = c.WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType_SampleAccurate,
     normal_transition = c.WWISEC_AK_SoundEngine_DynamicSequence_DynamicSequenceType_NormalTransition,
 };
@@ -217,8 +218,8 @@ pub fn open(in_game_object_id: typedefs.AkGameObjectID, optional_args: OpenOptio
     );
 }
 
-pub fn close(in_playing_id: typedefs.AkPlayingID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn close(in_playing_id: typedefs.AkPlayingID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Close(in_playing_id),
     );
 }
@@ -228,8 +229,8 @@ pub const PlayOptionalArgs = struct {
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn play(in_playing_id: typedefs.AkPlayingID, optional_args: PlayOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn play(in_playing_id: typedefs.AkPlayingID, optional_args: PlayOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Play(
             in_playing_id,
             optional_args.transition_duration,
@@ -243,8 +244,8 @@ pub const PauseOptionalArgs = struct {
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn pause(in_playing_id: typedefs.AkPlayingID, optional_args: PauseOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn pause(in_playing_id: typedefs.AkPlayingID, optional_args: PauseOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Pause(
             in_playing_id,
             optional_args.transition_duration,
@@ -258,8 +259,8 @@ pub const ResumeOptionalArgs = struct {
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn @"resume"(in_playing_id: typedefs.AkPlayingID, optional_args: ResumeOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn @"resume"(in_playing_id: typedefs.AkPlayingID, optional_args: ResumeOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Resume(
             in_playing_id,
             optional_args.transition_duration,
@@ -273,8 +274,8 @@ pub const StopOptionalArgs = struct {
     fade_curve: common.AkCurveInterpolation = .linear,
 };
 
-pub fn stop(in_playing_id: typedefs.AkPlayingID, optional_args: StopOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn stop(in_playing_id: typedefs.AkPlayingID, optional_args: StopOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Stop(
             in_playing_id,
             optional_args.transition_duration,
@@ -283,32 +284,32 @@ pub fn stop(in_playing_id: typedefs.AkPlayingID, optional_args: StopOptionalArgs
     );
 }
 
-pub fn @"break"(in_playing_id: typedefs.AkPlayingID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn @"break"(in_playing_id: typedefs.AkPlayingID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Break(in_playing_id),
     );
 }
 
-pub fn seekTime(in_playing_id: typedefs.AkPlayingID, in_position: typedefs.AkTimeMs, in_seek_to_nearest_marker: bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn seekTime(in_playing_id: typedefs.AkPlayingID, in_position: typedefs.AkTimeMs, in_seek_to_nearest_marker: bool) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Seek_Time(in_playing_id, in_position, in_seek_to_nearest_marker),
     );
 }
 
-pub fn seekPercent(in_playing_id: typedefs.AkPlayingID, in_percent: f32, in_seek_to_nearest_marker: bool) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn seekPercent(in_playing_id: typedefs.AkPlayingID, in_percent: f32, in_seek_to_nearest_marker: bool) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_Seek_Percent(in_playing_id, in_percent, in_seek_to_nearest_marker),
     );
 }
 
-pub fn getPauseTimes(in_playing_id: typedefs.AkPlayingID, out_time: *u32, out_duration: *u32) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getPauseTimes(in_playing_id: typedefs.AkPlayingID, out_time: *u32, out_duration: *u32) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_GetPauseTimes(in_playing_id, out_time, out_duration),
     );
 }
 
-pub fn getPlayingItem(in_playing_id: typedefs.AkPlayingID, out_audio_node_id: *typedefs.AkUniqueID, out_custom_info: *?*anyopaque) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn getPlayingItem(in_playing_id: typedefs.AkPlayingID, out_audio_node_id: *typedefs.AkUniqueID, out_custom_info: *?*anyopaque) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_GetPlayingItem(in_playing_id, out_audio_node_id, out_custom_info),
     );
 }
@@ -317,8 +318,8 @@ pub fn lockPlaylist(in_playing_id: typedefs.AkPlayingID) ?*Playlist {
     return @ptrCast(c.WWISEC_AK_SoundEngine_DynamicSequence_LockPlaylist(in_playing_id));
 }
 
-pub fn unlockPlaylist(in_playing_id: typedefs.AkPlayingID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn unlockPlaylist(in_playing_id: typedefs.AkPlayingID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_DynamicSequence_UnlockPlaylist(in_playing_id),
     );
 }

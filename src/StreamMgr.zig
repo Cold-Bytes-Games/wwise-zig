@@ -1,10 +1,12 @@
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
+const enums = @import("enums.zig");
 const settings = @import("settings.zig");
 const std = @import("std");
 const stream_interfaces = @import("IAkStreamMgr.zig");
 const typedefs = @import("typedefs.zig");
+const zig = @import("zig.zig");
 
 pub const AkStreamMgrSettings = extern struct {
     dummy: u8 = 0,
@@ -84,7 +86,7 @@ pub const AkIOTransferInfo = extern struct {
     }
 };
 
-pub const AkIOCallback = ?*const fn (in_transfer_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.c) void;
+pub const AkIOCallback = ?*const fn (in_transfer_info: ?*anyopaque, in_result: enums.AKRESULT) callconv(.c) void;
 
 pub const AkAsyncIOTransferInfo = extern struct {
     base: AkIOTransferInfo = .{},
@@ -107,7 +109,7 @@ pub const AkAsyncIOTransferInfo = extern struct {
 };
 
 // The first parameter is NativeAkAsyncFileOpenData but it introduce a dependency loop
-pub const AkFileOpenCallback = ?*const fn (in_open_info: ?*anyopaque, in_result: common.AKRESULT) callconv(.c) void;
+pub const AkFileOpenCallback = ?*const fn (in_open_info: ?*anyopaque, in_result: enums.AKRESULT) callconv(.c) void;
 
 pub const NativeAkAsyncFileOpenData = extern struct {
     base: stream_interfaces.NativeAkFileOpenData,
@@ -138,7 +140,7 @@ pub const AkIoHeuristics = extern struct {
 pub const IAkLowLevelIOHook = opaque {
     pub const FunctionTable = extern struct {
         destructor: *const fn (self: *IAkLowLevelIOHook) callconv(.c) void,
-        close: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.c) common.AKRESULT,
+        close: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.c) enums.AKRESULT,
         get_block_size: *const fn (self: *IAkLowLevelIOHook, in_file_desc: *AkFileDesc) callconv(.c) u32,
         get_device_desc: *const fn (self: *IAkLowLevelIOHook, out_device_desc: *stream_interfaces.NativeAkDeviceDesc) callconv(.c) void,
         get_device_data: *const fn (self: *IAkLowLevelIOHook) callconv(.c) u32,
@@ -159,11 +161,11 @@ pub const IAkLowLevelIOHook = opaque {
         ) callconv(.c) void,
         output_searched_paths: *const fn (
             self: *IAkLowLevelIOHook,
-            in_result: common.AKRESULT,
+            in_result: enums.AKRESULT,
             in_file_open: *const stream_interfaces.NativeAkFileOpenData,
             out_searched_path: [*]common.AkOSChar,
             in_path_size: i32,
-        ) callconv(.c) common.AKRESULT,
+        ) callconv(.c) enums.AKRESULT,
     };
 
     pub const BatchIoTransferItem = extern struct {
@@ -184,8 +186,8 @@ pub const IAkLowLevelIOHook = opaque {
         }
     };
 
-    pub fn close(self: *IAkLowLevelIOHook, in_file_desc: *const AkFileDesc) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn close(self: *IAkLowLevelIOHook, in_file_desc: *const AkFileDesc) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_Close(
                 @ptrCast(self),
                 @ptrCast(@constCast(in_file_desc)),
@@ -249,19 +251,19 @@ pub const IAkLowLevelIOHook = opaque {
     pub fn outputSearchedPaths(
         self: *IAkLowLevelIOHook,
         fallback_allocator: std.mem.Allocator,
-        in_result: common.AKRESULT,
+        in_result: enums.AKRESULT,
         in_file_open: stream_interfaces.AkFileOpenData,
         out_searched_path: [*]common.AkOSChar,
         in_path_size: i32,
-    ) common.WwiseError!void {
+    ) zig.WwiseError!void {
         var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
         const char_allocator = stack_char_allocator.get();
         var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
         defer area_allocator.deinit();
 
-        const native_file_open = in_file_open.toC(area_allocator.allocator()) catch return common.WwiseError.Fail;
+        const native_file_open = in_file_open.toC(area_allocator.allocator()) catch return zig.WwiseError.Fail;
 
-        return common.handleAkResult(c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_OutputSearchedPaths(
+        return zig.handleAkResult(c.WWISEC_AK_StreamMgr_IAkLowLevelIOHook_OutputSearchedPaths(
             @ptrCast(self),
             @intFromEnum(in_result),
             @ptrCast(@alignCast(&native_file_open)),
@@ -284,11 +286,11 @@ pub const IAkLowLevelIOHook = opaque {
 pub const IAkFileLocationResolver = opaque {
     pub const FunctionTable = extern struct {
         destructor: *const fn (self: *IAkFileLocationResolver) callconv(.c) void,
-        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *typedefs.AkDeviceID) callconv(.c) common.AKRESULT,
+        get_next_preferred_device: *const fn (self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *typedefs.AkDeviceID) callconv(.c) enums.AKRESULT,
     };
 
-    pub fn getNextPreferredDevice(self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *typedefs.AkDeviceID) common.WwiseError!void {
-        return common.handleAkResult(
+    pub fn getNextPreferredDevice(self: *IAkFileLocationResolver, in_file_open: *NativeAkAsyncFileOpenData, io_id_device: *typedefs.AkDeviceID) zig.WwiseError!void {
+        return zig.handleAkResult(
             c.WWISEC_AK_StreamMgr_IAkFileLocationResolver_GetNextPreferredDevice(
                 @ptrCast(self),
                 @ptrCast(@alignCast(in_file_open)),
@@ -324,24 +326,24 @@ pub fn setFileLocationResolver(in_file_location_resolver: ?*IAkFileLocationResol
     c.WWISEC_AK_StreamMgr_SetFileLocationResolver(in_file_location_resolver);
 }
 
-pub fn createDevice(in_settings: *const AkDeviceSettings, in_low_level_hook: ?*IAkLowLevelIOHook) common.WwiseError!typedefs.AkDeviceID {
+pub fn createDevice(in_settings: *const AkDeviceSettings, in_low_level_hook: ?*IAkLowLevelIOHook) zig.WwiseError!typedefs.AkDeviceID {
     var result: typedefs.AkDeviceID = undefined;
 
-    try common.handleAkResult(
+    try zig.handleAkResult(
         c.WWISEC_AK_StreamMgr_CreateDevice(@ptrCast(in_settings), in_low_level_hook, @ptrCast(&result)),
     );
 
     return result;
 }
 
-pub fn destroyDevice(in_device_id: typedefs.AkDeviceID) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn destroyDevice(in_device_id: typedefs.AkDeviceID) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_StreamMgr_DestroyDevice(in_device_id),
     );
 }
 
-pub fn performIO() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn performIO() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_StreamMgr_PerformIO(),
     );
 }
@@ -350,14 +352,14 @@ pub fn getDefaultDeviceSettings(out_settings: *AkDeviceSettings) void {
     c.WWISEC_AK_StreamMgr_GetDefaultDeviceSettings(@ptrCast(out_settings));
 }
 
-pub fn setCurrentLanguage(fallback_allocator: std.mem.Allocator, language_name: []const u8) common.WwiseError!void {
+pub fn setCurrentLanguage(fallback_allocator: std.mem.Allocator, language_name: []const u8) zig.WwiseError!void {
     var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_oschar_allocator.get();
 
-    const raw_language_name = common.toOSChar(allocator, language_name) catch return common.WwiseError.Fail;
+    const raw_language_name = common.toOSChar(allocator, language_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_language_name);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_StreamMgr_SetCurrentLanguage(@ptrCast(raw_language_name)),
     );
 }
@@ -368,8 +370,8 @@ pub fn getCurrentLanguage(allocator: std.mem.Allocator) ![]const u8 {
 
 pub const AkLanguageCChangeHandler = c.WWISEC_AK_StreamMgr_AkLanguageChangeHandler;
 
-pub fn addLanguageChangeObserver(in_handler: AkLanguageCChangeHandler, in_cookie: ?*anyopaque) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn addLanguageChangeObserver(in_handler: AkLanguageCChangeHandler, in_cookie: ?*anyopaque) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_StreamMgr_AddLanguageChangeObserver(in_handler, in_cookie),
     );
 }

@@ -6,6 +6,7 @@ const error_message_translator = @import("error_message_translator.zig");
 const std = @import("std");
 const StreamMgr = @import("StreamMgr.zig");
 const typedefs = @import("typedefs.zig");
+const zig = @import("zig.zig");
 
 pub const MsgContext = extern struct {
     in_playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
@@ -26,7 +27,7 @@ pub const MsgContext = extern struct {
     }
 };
 
-pub const ErrorLevel = packed struct(common.DefaultEnumType) {
+pub const ErrorLevel = packed struct(zig.DefaultEnumType) {
     message: bool = false,
     @"error": bool = false,
     pad: u30 = 0,
@@ -42,7 +43,7 @@ pub const ErrorLevel = packed struct(common.DefaultEnumType) {
     }
 };
 
-pub const ErrorCode = enum(common.DefaultEnumType) {
+pub const ErrorCode = enum(zig.DefaultEnumType) {
     no_error = c.WWISEC_AK_Monitor_ErrorCode_NoError,
     file_not_found = c.WWISEC_AK_Monitor_ErrorCode_FileNotFound,
     cannot_open_file = c.WWISEC_AK_Monitor_ErrorCode_CannotOpenFile,
@@ -277,8 +278,8 @@ pub const PostCodeOptionalArgs = struct {
     is_bus: bool = false,
 };
 
-pub fn postCode(in_error: ErrorCode, in_error_level: ErrorLevel, optional_args: PostCodeOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn postCode(in_error: ErrorCode, in_error_level: ErrorLevel, optional_args: PostCodeOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_Monitor_PostCode(
             @intFromEnum(in_error),
             in_error_level.toC(),
@@ -297,14 +298,14 @@ pub const PostStringOptionalArgs = struct {
     is_bus: bool = false,
 };
 
-pub fn postString(fallback_allocator: std.mem.Allocator, in_error: []const u8, in_error_level: ErrorLevel, optional_args: PostStringOptionalArgs) common.WwiseError!void {
+pub fn postString(fallback_allocator: std.mem.Allocator, in_error: []const u8, in_error_level: ErrorLevel, optional_args: PostStringOptionalArgs) zig.WwiseError!void {
     var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_error = common.toCString(allocator, in_error) catch return common.WwiseError.Fail;
+    const raw_error = common.toCString(allocator, in_error) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_error);
 
-    return common.handleAkResult(
+    return zig.handleAkResult(
         c.WWISEC_AK_Monitor_PostString(
             raw_error,
             in_error_level.toC(),
@@ -321,8 +322,8 @@ pub const SetLocalOutputOptionalArgs = struct {
     monitor_func: LocalOutputFunc = null,
 };
 
-pub fn setLocalOutput(optional_args: SetLocalOutputOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn setLocalOutput(optional_args: SetLocalOutputOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_Monitor_SetLocalOutput(
             @intCast(optional_args.error_level.toC()),
             @ptrCast(optional_args.monitor_func),
@@ -334,8 +335,8 @@ pub const AddTranslatorOptionalArgs = struct {
     override_previous_translators: bool = false,
 };
 
-pub fn addTranslator(translator: *error_message_translator.AkErrorMessageTranslator, optional_args: AddTranslatorOptionalArgs) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn addTranslator(translator: *error_message_translator.AkErrorMessageTranslator, optional_args: AddTranslatorOptionalArgs) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_Monitor_AddTranslator(
             @ptrCast(translator),
             optional_args.override_previous_translators,
@@ -343,8 +344,8 @@ pub fn addTranslator(translator: *error_message_translator.AkErrorMessageTransla
     );
 }
 
-pub fn resetTranslator() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn resetTranslator() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_Monitor_ResetTranslator(),
     );
 }
@@ -369,7 +370,7 @@ pub fn monitorStreamMgrTerm() void {
     c.WWISEC_AK_Monitor_MonitorStreamMgrTerm();
 }
 
-pub inline fn akMonitorError(in_error_code: ErrorCode) common.WwiseError!void {
+pub inline fn akMonitorError(in_error_code: ErrorCode) zig.WwiseError!void {
     if (builtin.mode == .debug) {
         return postCode(in_error_code, ErrorLevel{ .@"error" = true }, .{});
     }

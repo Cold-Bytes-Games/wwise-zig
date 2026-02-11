@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const zig = @import("zig.zig");
 
 pub const AK_COMM_DEFAULT_DISCOVERY_PORT = c.WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT;
 
@@ -14,7 +15,7 @@ pub const AkCommSettings = extern struct {
     app_network_name: [AK_COMM_SETTINGS_MAX_STRING_SIZE]u8 = [_]u8{0} ** AK_COMM_SETTINGS_MAX_STRING_SIZE,
     comm_proxy_server_url: [AK_COMM_SETTINGS_MAX_URL_SIZE]u8 = [_]u8{0} ** AK_COMM_SETTINGS_MAX_URL_SIZE,
 
-    pub const AkCommSystem = enum(common.DefaultEnumType) {
+    pub const AkCommSystem = enum(zig.DefaultEnumType) {
         socket,
         htcs,
     };
@@ -60,8 +61,8 @@ pub const AkCommSettings = extern struct {
     }
 };
 
-pub fn init(in_settings: *const AkCommSettings) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn init(in_settings: *const AkCommSettings) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_Comm_Init(@ptrCast(in_settings)),
     );
 }
@@ -74,8 +75,8 @@ pub fn term() void {
     c.WWISEC_AK_Comm_Term();
 }
 
-pub fn reset() common.WwiseError!void {
-    return common.handleAkResult(
+pub fn reset() zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_Comm_Reset(),
     );
 }

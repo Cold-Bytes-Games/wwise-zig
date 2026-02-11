@@ -1,8 +1,9 @@
-const std = @import("std");
 const c = @import("wwise_c");
-const common = @import("common.zig");
 const callback_types = @import("callback_types.zig");
+const common = @import("common.zig");
+const std = @import("std");
 const typedefs = @import("typedefs.zig");
+const zig = @import("zig.zig");
 
 pub const AkMusicSettings = extern struct {
     streaming_look_ahead_ratio: f32 = 0.0,
@@ -20,8 +21,8 @@ pub const AkMusicSettings = extern struct {
     }
 };
 
-pub fn init(in_settings: ?*AkMusicSettings) common.WwiseError!void {
-    return common.handleAkResult(
+pub fn init(in_settings: ?*AkMusicSettings) zig.WwiseError!void {
+    return zig.handleAkResult(
         c.WWISEC_AK_MusicEngine_Init(@ptrCast(in_settings)),
     );
 }
@@ -34,8 +35,8 @@ pub fn term() void {
     c.WWISEC_AK_MusicEngine_Term();
 }
 
-pub fn getPlayingSegmentInfo(in_playing_id: typedefs.AkPlayingID, out_segment_info: *callback_types.AkSegmentInfo, extrapolate: bool) common.WwiseError!void {
-    try common.handleAkResult(
+pub fn getPlayingSegmentInfo(in_playing_id: typedefs.AkPlayingID, out_segment_info: *callback_types.AkSegmentInfo, extrapolate: bool) zig.WwiseError!void {
+    try zig.handleAkResult(
         c.WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(in_playing_id, @ptrCast(out_segment_info), extrapolate),
     );
 }

@@ -1,6 +1,7 @@
-const std = @import("std");
 const c = @import("wwise_c");
 const common = @import("common.zig");
+const std = @import("std");
+const zig = @import("zig.zig");
 
 pub const Stats = extern struct {
     mem_used: u32 = 0,
@@ -25,7 +26,7 @@ pub const Stats = extern struct {
     }
 };
 
-pub const Type = enum(common.DefaultEnumType) {
+pub const Type = enum(zig.DefaultEnumType) {
     audio_render = c.WWISEC_AK_TempAlloc_Type_AudioRender,
 };
 
