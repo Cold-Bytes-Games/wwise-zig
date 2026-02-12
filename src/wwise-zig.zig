@@ -14,19 +14,19 @@ pub const SpeakerVolumes = @import("SpeakerVolumes.zig");
 pub const StreamMgr = @import("StreamMgr.zig");
 pub const TempAlloc = @import("TempAlloc.zig");
 
-// ak3dobjects.zig
-const ak3dobjects = @import("ak3dobjects.zig");
-pub const AkVector64 = ak3dobjects.AkVector64;
-pub const AkVector = ak3dobjects.AkVector;
-pub const AkWorldTransform = ak3dobjects.AkWorldTransform;
-pub const AkTransform = ak3dobjects.AkTransform;
-pub const AkSoundPosition = ak3dobjects.AkSoundPosition;
-pub const AkListenerPosition = ak3dobjects.AkListenerPosition;
-pub const AkChannelEmitter = ak3dobjects.AkChannelEmitter;
-pub const AkPolarCoord = ak3dobjects.AkPolarCoord;
-pub const AkSphericalCoord = ak3dobjects.AkSphericalCoord;
-pub const AkEmitterListenerPair = ak3dobjects.AkEmitterListenerPair;
-pub const AkListener = ak3dobjects.AkListener;
+// ak_3d_objects.zig
+const ak_3d_objects = @import("ak_3d_objects.zig");
+pub const AkVector64 = ak_3d_objects.AkVector64;
+pub const AkVector = ak_3d_objects.AkVector;
+pub const AkWorldTransform = ak_3d_objects.AkWorldTransform;
+pub const AkTransform = ak_3d_objects.AkTransform;
+pub const AkSoundPosition = ak_3d_objects.AkSoundPosition;
+pub const AkListenerPosition = ak_3d_objects.AkListenerPosition;
+pub const AkChannelEmitter = ak_3d_objects.AkChannelEmitter;
+pub const AkPolarCoord = ak_3d_objects.AkPolarCoord;
+pub const AkSphericalCoord = ak_3d_objects.AkSphericalCoord;
+pub const AkEmitterListenerPair = ak_3d_objects.AkEmitterListenerPair;
+pub const AkListener = ak_3d_objects.AkListener;
 
 // callback_types.zig
 const callback_types = @import("callback_types.zig");

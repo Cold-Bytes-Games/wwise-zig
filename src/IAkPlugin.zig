@@ -1,4 +1,4 @@
-const ak3dobjects = @import("ak3dobjects.zig");
+const ak_3d_objects = @import("ak_3d_objects.zig");
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
 const common = @import("common.zig");
@@ -209,7 +209,7 @@ pub const IAkGlobalPluginContext = opaque {
 
     pub fn computeWeightedAmbisonicsDecodingFromSampledSphere(
         self: *IAkGlobalPluginContext,
-        in_samples: []const ak3dobjects.AkVector,
+        in_samples: []const ak_3d_objects.AkVector,
         in_cfg_ambisonics: speaker_config.AkChannelConfig,
         out_mx_volume: SpeakerVolumes.MatrixPtr,
     ) zig.WwiseError!void {
@@ -232,7 +232,7 @@ pub const IAkGlobalPluginContext = opaque {
 
     pub fn computeSphericalCoordinates(
         self: *const IAkGlobalPluginContext,
-        in_pair: *const ak3dobjects.AkEmitterListenerPair,
+        in_pair: *const ak_3d_objects.AkEmitterListenerPair,
         out_azimuth: *f32,
         out_elevation: *f32,
     ) zig.WwiseError!void {

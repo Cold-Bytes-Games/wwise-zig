@@ -1,4 +1,4 @@
-const ak3dobjects = @import("ak3dobjects.zig");
+const ak_3d_objects = @import("ak_3d_objects.zig");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
@@ -60,8 +60,8 @@ pub const AkObjectInfo = extern struct {
     }
 };
 
-pub fn getPosition(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!ak3dobjects.AkSoundPosition {
-    var result: ak3dobjects.AkSoundPosition = .{};
+pub fn getPosition(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!ak_3d_objects.AkSoundPosition {
+    var result: ak_3d_objects.AkSoundPosition = .{};
 
     try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetPosition(
@@ -83,8 +83,8 @@ pub fn getListeners(in_game_object_id: typedefs.AkGameObjectID, out_listener_obj
     );
 }
 
-pub fn getListenerPosition(in_listener_id: typedefs.AkGameObjectID) zig.WwiseError!common.AkListenerPosition {
-    var result: common.AkListenerPosition = .{};
+pub fn getListenerPosition(in_listener_id: typedefs.AkGameObjectID) zig.WwiseError!ak_3d_objects.AkListenerPosition {
+    var result: ak_3d_objects.AkListenerPosition = .{};
 
     try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetListenerPosition(

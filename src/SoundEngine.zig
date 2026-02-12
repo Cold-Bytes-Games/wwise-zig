@@ -1,4 +1,4 @@
-const ak3dobjects = @import("ak3dobjects.zig");
+const ak_3d_objects = @import("ak_3d_objects.zig");
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
 const common = @import("common.zig");
@@ -810,7 +810,7 @@ pub const SetPositionOptionalArgs = struct {
     flags: enums.AkSetPositionFlags = enums.AkSetPositionFlags.Default,
 };
 
-pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: ak3dobjects.AkSoundPosition, optional_args: SetPositionOptionalArgs) zig.WwiseError!void {
+pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: ak_3d_objects.AkSoundPosition, optional_args: SetPositionOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetPosition(
             in_game_object_id,
@@ -825,7 +825,7 @@ pub const SetMultiplePositionOptionalArgs = struct {
     flags: enums.AkSetPositionFlags = enums.AkSetPositionFlags.Default,
 };
 
-pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID, positions: []const ak3dobjects.AkSoundPosition, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
+pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID, positions: []const ak_3d_objects.AkSoundPosition, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(
             in_game_object,
@@ -837,7 +837,7 @@ pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID
     );
 }
 
-pub fn setMultiplePositionChannelEmitter(in_game_object: typedefs.AkGameObjectID, positions: []const ak3dobjects.AkChannelEmitter, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
+pub fn setMultiplePositionChannelEmitter(in_game_object: typedefs.AkGameObjectID, positions: []const ak_3d_objects.AkChannelEmitter, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(
             in_game_object,
