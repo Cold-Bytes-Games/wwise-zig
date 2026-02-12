@@ -14,6 +14,20 @@ pub const SpeakerVolumes = @import("SpeakerVolumes.zig");
 pub const StreamMgr = @import("StreamMgr.zig");
 pub const TempAlloc = @import("TempAlloc.zig");
 
+// ak3dobjects.zig
+const ak3dobjects = @import("ak3dobjects.zig");
+pub const AkVector64 = ak3dobjects.AkVector64;
+pub const AkVector = ak3dobjects.AkVector;
+pub const AkWorldTransform = ak3dobjects.AkWorldTransform;
+pub const AkTransform = ak3dobjects.AkTransform;
+pub const AkSoundPosition = ak3dobjects.AkSoundPosition;
+pub const AkListenerPosition = ak3dobjects.AkListenerPosition;
+pub const AkChannelEmitter = ak3dobjects.AkChannelEmitter;
+pub const AkPolarCoord = ak3dobjects.AkPolarCoord;
+pub const AkSphericalCoord = ak3dobjects.AkSphericalCoord;
+pub const AkEmitterListenerPair = ak3dobjects.AkEmitterListenerPair;
+pub const AkListener = ak3dobjects.AkListener;
+
 // callback_types.zig
 const callback_types = @import("callback_types.zig");
 pub const AkCallbackType = callback_types.AkCallbackType;
@@ -63,15 +77,8 @@ pub const AkCodecDescriptor = common.AkCodecDescriptor;
 pub const AkFileHandle = common.AkFileHandle;
 pub const AkDeviceDescription = common.AkDeviceDescription;
 pub const AkExternalSourceInfo = common.AkExternalSourceInfo;
-pub const AkVector64 = common.AkVector64;
-pub const AkVector = common.AkVector;
-pub const AkWorldTransform = common.AkWorldTransform;
-pub const AkTransform = common.AkTransform;
-pub const AkSoundPosition = common.AkSoundPosition;
-pub const AkListenerPosition = common.AkListenerPosition;
 pub const AkObstructionOcclusionValues = common.AkObstructionOcclusionValues;
-pub const AkChannelEmitter = common.AkChannelEmitter;
-pub const AkEmitterListenerPair = common.AkEmitterListenerPair;
+
 pub const AkAuxSendValue = common.AkAuxSendValue;
 pub const AkAudioSettings = common.AkAudioSettings;
 pub const fromOSChar = common.fromOSChar;

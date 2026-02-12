@@ -1,3 +1,4 @@
+const ak3dobjects = @import("ak3dobjects.zig");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const std = @import("std");
@@ -36,7 +37,7 @@ pub const EstimateTimeToFirstReflectionOptionalArgs = struct {
     speed_of_sound: f32 = 343.0,
 };
 
-pub fn estimateTimeToFirstReflection(in_environment_extent_meters: common.AkVector, out_time_to_first_reflection_ms: *f32, optional_args: EstimateTimeToFirstReflectionOptionalArgs) zig.WwiseError!void {
+pub fn estimateTimeToFirstReflection(in_environment_extent_meters: ak3dobjects.AkVector, out_time_to_first_reflection_ms: *f32, optional_args: EstimateTimeToFirstReflectionOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(
             in_environment_extent_meters.toC(),

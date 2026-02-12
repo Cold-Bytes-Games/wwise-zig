@@ -1,3 +1,4 @@
+const ak3dobjects = @import("ak3dobjects.zig");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
@@ -59,8 +60,8 @@ pub const AkObjectInfo = extern struct {
     }
 };
 
-pub fn getPosition(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!common.AkSoundPosition {
-    var result: common.AkSoundPosition = .{};
+pub fn getPosition(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!ak3dobjects.AkSoundPosition {
+    var result: ak3dobjects.AkSoundPosition = .{};
 
     try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetPosition(

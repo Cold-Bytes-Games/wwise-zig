@@ -49,7 +49,39 @@ extern "C"
 
 // BEGIN AkEnums
 #include <AK/SoundEngine/Common/AkEnums.h>
-    // END AkEnums
+// END AkEnums
+
+// BEGIN Ak3DObjects
+#include <AK/SoundEngine/Common/Ak3DObjects.h>
+
+    typedef struct WWISEC_AkSphericalCoord
+    {
+        AkPolarCoord base;
+        AkReal32 phi;
+    } WWISEC_AkSphericalCoord;
+
+    typedef struct WWISEC_AkEmitterListenerPair
+    {
+        struct AkWorldTransform emitter;   ///< Emitter position.
+        AkReal32 fDistance;                ///< Distance between emitter and listener.
+        AkReal32 fEmitterAngle;            ///< Angle between position vector and emitter orientation.
+        AkReal32 fListenerAngle;           ///< Angle between position vector and listener orientation.
+        AkReal32 fDryMixGain;              ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for direct connections.
+        AkReal32 fGameDefAuxMixGain;       ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for game-defined send connections.
+        AkReal32 fUserDefAuxMixGain;       ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for user-defined send connections.
+        AkReal32 fOcclusion;               ///< Emitter-listener-pair-specific occlusion factor
+        AkReal32 fObstruction;             ///< Emitter-listener-pair-specific obstruction factor
+        AkReal32 fDiffraction;             ///< Emitter-listener-pair-specific diffraction coefficient
+        AkReal32 fTransmissionLoss;        ///< Emitter-listener-pair-specific transmission occlusion.
+        AkReal32 fSpread;                  ///< Emitter-listener-pair-specific spread
+        AkReal32 fAperture;                ///< Emitter-listener-pair-specific aperture
+        AkReal32 fScalingFactor;           ///< Combined scaling factor due to both emitter and listener.
+        AkReal32 fPathGain;                ///< Emitter-listener-pair-specific overall gain that scales fDryMixGain, fGameDefAuxMixGain and fUserDefAuxMixGain
+        AkChannelMask uEmitterChannelMask; ///< Channels of the emitter that apply to this ray.
+        AkRayID id;                        ///< ID of this emitter-listener pair, unique for a given emitter.
+        AkGameObjectID m_uListenerID;      ///< Listener game object ID.
+    } WWISEC_AkEmitterListenerPair;
+    // END Ak3DObjects
 
     // BEGIN AkTypes
 
@@ -91,71 +123,11 @@ extern "C"
                                    ///< A value greater than 1.0f will amplify the sound.
     } WWISEC_AkAuxSendValue;
 
-    typedef struct WWISEC_AkVector64
-    {
-        AkReal64 X; ///< X Position
-        AkReal64 Y; ///< Y Position
-        AkReal64 Z; ///< Z Position
-    } WWISEC_AkVector64;
-
-    typedef struct WWISEC_AkVector
-    {
-        AkReal32 X; ///< X Position
-        AkReal32 Y; ///< Y Position
-        AkReal32 Z; ///< Z Position
-    } WWISEC_AkVector;
-
-    typedef struct WWISEC_AkWorldTransform
-    {
-        WWISEC_AkVector orientationFront; ///< Orientation of the listener
-        WWISEC_AkVector orientationTop;   ///< Top orientation of the listener
-        WWISEC_AkVector64 position;       ///< Position of the listener
-    } WWISEC_AkWorldTransform;
-
-    typedef struct WWISEC_AkTransform
-    {
-        WWISEC_AkVector orientationFront; ///< Orientation of the listener
-        WWISEC_AkVector orientationTop;   ///< Top orientation of the listener
-        WWISEC_AkVector position;         ///< Position of the listener
-    } WWISEC_AkTransform;
-
-    typedef WWISEC_AkWorldTransform WWISEC_AkSoundPosition;
-    typedef WWISEC_AkWorldTransform WWISEC_AkListenerPosition;
-
     typedef struct WWISEC_AkObstructionOcclusionValues
     {
         AkReal32 occlusion;   ///< OcclusionLevel: [0.0f..1.0f]
         AkReal32 obstruction; ///< ObstructionLevel: [0.0f..1.0f]
     } WWISEC_AkObstructionOcclusionValues;
-
-    typedef struct WWISEC_AkChannelEmitter
-    {
-        WWISEC_AkWorldTransform position; ///< Emitter position.
-        AkChannelMask uInputChannels;     ///< Channels to which the above position applies.
-        char padding[4];                  ///< In order to preserve consistent struct size across archs, we need some padding
-    } WWISEC_AkChannelEmitter;
-
-    typedef struct WWISEC_AkEmitterListenerPair
-    {
-        WWISEC_AkWorldTransform emitter;   ///< Emitter position.
-        AkReal32 fDistance;                ///< Distance between emitter and listener.
-        AkReal32 fEmitterAngle;            ///< Angle between position vector and emitter orientation.
-        AkReal32 fListenerAngle;           ///< Angle between position vector and listener orientation.
-        AkReal32 fDryMixGain;              ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for direct connections.
-        AkReal32 fGameDefAuxMixGain;       ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for game-defined send connections.
-        AkReal32 fUserDefAuxMixGain;       ///< Emitter-listener-pair-specific gain (due to distance and cone attenuation) for user-defined send connections.
-        AkReal32 fOcclusion;               ///< Emitter-listener-pair-specific occlusion factor
-        AkReal32 fObstruction;             ///< Emitter-listener-pair-specific obstruction factor
-        AkReal32 fDiffraction;             ///< Emitter-listener-pair-specific diffraction coefficient
-        AkReal32 fTransmissionLoss;        ///< Emitter-listener-pair-specific transmission occlusion.
-        AkReal32 fSpread;                  ///< Emitter-listener-pair-specific spread
-        AkReal32 fAperture;                ///< Emitter-listener-pair-specific aperture
-        AkReal32 fScalingFactor;           ///< Combined scaling factor due to both emitter and listener.
-        AkReal32 fPathGain;                ///< Emitter-listener-pair-specific overall gain that scales fDryMixGain, fGameDefAuxMixGain and fUserDefAuxMixGain
-        AkChannelMask uEmitterChannelMask; ///< Channels of the emitter that apply to this ray.
-        AkRayID id;                        ///< ID of this emitter-listener pair, unique for a given emitter.
-        AkGameObjectID m_uListenerID;      ///< Listener game object ID.
-    } WWISEC_AkEmitterListenerPair;
 
     typedef struct WWISEC_IAkSoftwareCodec WWISEC_IAkSoftwareCodec;
     typedef struct WWISEC_IAkFileCodec WWISEC_IAkFileCodec;
@@ -1873,7 +1845,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AKRESULT WWISEC_AK_IAkGlobalPluginContext_SetRTPCValue(WWISEC_AK_IAkGlobalPluginContext* self, AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID, AkTimeMs in_uValueChangeDuration, enum AkCurveInterpolation in_eFadeCurve, bool in_bBypassInternalValueInterpolation);
     AKRESULT WWISEC_AK_IAkGlobalPluginContext_SendPluginCustomGameData(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_busID, AkGameObjectID in_busObjectID, enum AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
     void WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(WWISEC_AK_IAkGlobalPluginContext* self, AkReal32 in_fAzimuth, AkReal32 in_fElevation, WWISEC_AkChannelConfig in_cfgAmbisonics, AkSpeakerVolumesMatrixPtr out_vVolumes);
-    AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, AkSpeakerVolumesMatrixPtr out_mxVolume);
+    AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const struct AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, AkSpeakerVolumesMatrixPtr out_mxVolume);
     const WWISEC_AkAcousticTexture* WWISEC_AK_IAkGlobalPluginContext_GetAcousticTexture(WWISEC_AK_IAkGlobalPluginContext* self, AkAcousticTextureID in_AcousticTextureID);
     AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeSphericalCoordinates(const WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkEmitterListenerPair* in_pair, AkReal32* out_fAzimuth, AkReal32* out_fElevation);
     const WWISEC_AkPlatformInitSettings* WWISEC_AK_IAkGlobalPluginContext_GetPlatformInitSettings(const WWISEC_AK_IAkGlobalPluginContext* self);
@@ -2190,11 +2162,11 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     AKRESULT WWISEC_AK_SoundEngine_UnregisterAllGameObj();
 
-    AKRESULT WWISEC_AK_SoundEngine_SetPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, enum AkSetPositionFlags in_eFlags);
+    AKRESULT WWISEC_AK_SoundEngine_SetPosition(AkGameObjectID in_GameObjectID, const AkSoundPosition* in_Position, enum AkSetPositionFlags in_eFlags);
 
-    AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags);
+    AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(AkGameObjectID in_GameObjectID, const AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags);
 
-    AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags);
+    AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(AkGameObjectID in_GameObjectID, const struct AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags);
 
     AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor);
 
@@ -3169,9 +3141,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkInt32 iDepth;      ///< Depth in tree
     } WWISEC_AkObjectInfo;
 
-    AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition);
+    AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(AkGameObjectID in_GameObjectID, AkSoundPosition* out_rPosition);
     AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(AkGameObjectID in_GameObjectID, AkGameObjectID* out_ListenerObjectIDs, AkUInt32* oi_uNumListeners);
-    AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition);
+    AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(AkGameObjectID in_uListenerID, AkListenerPosition* out_rPosition);
     AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerSpatialization(AkGameObjectID in_uListenerID, bool* out_rbSpatialized, AkSpeakerVolumesMatrixPtr* out_pVolumeOffsets, WWISEC_AkChannelConfig* out_channelConfig);
 
     typedef enum WWISEC_AK_SoundEngine_Query_RTPCValue_type
@@ -3361,7 +3333,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     typedef struct WWISEC_AkImageSourceParams
     {
-        WWISEC_AkVector64 sourcePosition; ///< Image source position, relative to the world.
+        struct AkVector64 sourcePosition; ///< Image source position, relative to the world.
         AkReal32 fDistanceScalingFactor;  ///< Image source distance scaling. This number effectively scales the sourcePosition vector with respect to the listener and, consequently, scales distance and preserves orientation.
         AkReal32 fLevel;                  ///< Game-controlled level for this source, linear.
         AkReal32 fDiffraction;            ///< Diffraction amount, normalized to the range [0,1].
@@ -3517,11 +3489,11 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     typedef struct WWISEC_AkReflectionPathInfo
     {
         /// Apparent source of the reflected sound that follows this path.
-        WWISEC_AkVector64 imageSource;
+        struct AkVector64 imageSource;
 
         /// Vertices of the indirect path.
         /// pathPoint[0] is closest to the emitter, pathPoint[numPathPoints-1] is closest to the listener.
-        WWISEC_AkVector64 pathPoint[WWISEC_AK_MAX_REFLECTION_PATH_LENGTH];
+        struct AkVector64 pathPoint[WWISEC_AK_MAX_REFLECTION_PATH_LENGTH];
 
         /// The texture that were hit in the path.
         /// textureIDs[0] is closest to the emitter, textureIDs[numPathPoints-1] is closest to the listener.
@@ -3552,11 +3524,11 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     {
         /// Diffraction points along the path. nodes[0] is the point closest to the listener; nodes[numNodes-1] is the point closest to the emitter.
         /// Neither the emitter position nor the listener position are represented in this array.
-        WWISEC_AkVector64 nodes[WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH];
+        struct AkVector64 nodes[WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH];
 
         /// Emitter position. This is the source position for an emitter. In all cases, except for radial emitters, it is the same position as the game object position.
         /// For radial emitters, it is the calculated position at the edge of the volume.
-        WWISEC_AkVector64 emitterPos;
+        struct AkVector64 emitterPos;
 
         /// Raw diffraction angles at each point, in radians.
         AkReal32 angles[WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH];
@@ -3572,7 +3544,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         WWISEC_AkRoomID rooms[WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH + 1];
 
         /// Virtual emitter position. This is the position that is passed to the sound engine to render the audio using multi-positioning, for this particular path.
-        WWISEC_AkWorldTransform virtualPos;
+        struct AkWorldTransform virtualPos;
 
         /// Total number of nodes in the path.  Defines the number of valid entries in the \c nodes, \c angles, and \c portals arrays. The \c rooms array has one extra slot to fit the emitter's room.
         AkUInt32 nodeCount;
@@ -3626,7 +3598,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// Position vector is the center of the opening.
         /// OrientationFront vector must be unit-length and point along the normal of the portal, and must be orthogonal to Up. It defines the local positive-Z dimension (depth/transition axis) of the portal, used by Extent.
         /// OrientationTop vector must be unit-length and point along the top of the portal (tangent to the wall), must be orthogonal to Front. It defines the local positive-Y direction (height) of the portal, used by Extent.
-        WWISEC_AkWorldTransform Transform;
+        struct AkWorldTransform Transform;
 
         /// Portal extent. Defines the dimensions of the portal relative to its center; all components must be positive numbers. The local right and up dimensions are used in diffraction calculations,
         /// whereas the front dimension defines a depth value which is used to implement smooth transitions between rooms. It is recommended that users experiment with different portal depths to find a value
@@ -3657,11 +3629,11 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     {
         /// Room Orientation. Up and Front must be orthonormal.
         /// Room orientation has an effect when the associated aux bus (see ReverbAuxBus) is set with 3D Spatialization in Wwise, as 3D Spatialization implements relative rotation of the emitter (room) and listener.
-        WWISEC_AkVector Front;
+        struct AkVector Front;
 
         /// Room Orientation. Up and Front must be orthonormal.
         /// Room orientation has an effect when the associated aux bus (see ReverbAuxBus) is set with 3D Spatialization in Wwise, as 3D Spatialization implements relative rotation of the emitter (room) and listener.
-        WWISEC_AkVector Up;
+        struct AkVector Up;
 
         /// The reverb aux bus that is associated with this room.
         /// When Spatial Audio is told that a game object is in a particular room via SetGameObjectInRoom, a send to this aux bus will be created to model the reverb of the room.
@@ -3779,13 +3751,13 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         /// - \ref AkInitSettings::eFloorPlane
         /// - \ref AK::SpatialAudio::SetGeometryInstance
         ///	- \ref AK::SpatialAudio::RemoveGeometryInstance
-        WWISEC_AkWorldTransform PositionAndOrientation;
+        struct AkWorldTransform PositionAndOrientation;
 
         /// Set the 3-dimensional scaling of the geometry instance.
         /// \sa
         /// - \ref AK::SpatialAudio::SetGeometryInstance
         ///	- \ref AK::SpatialAudio::RemoveGeometryInstance
-        WWISEC_AkVector Scale;
+        struct AkVector Scale;
 
         /// Geometry set referenced by the instance
         /// \sa
@@ -3824,7 +3796,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometry(WWISEC_AkGeometrySetID in_SetID);
     AKRESULT WWISEC_AK_SpatialAudio_SetGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID, const WWISEC_AkGeometryInstanceParams* in_params);
     AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID);
-    AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
+    AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
     AKRESULT WWISEC_AK_SpatialAudio_SetRoom(WWISEC_AkRoomID in_RoomID, const WWISEC_AkRoomParams* in_Params, const char* in_RoomName);
     AKRESULT WWISEC_AK_SpatialAudio_RemoveRoom(WWISEC_AkRoomID in_RoomID);
     AKRESULT WWISEC_AK_SpatialAudio_SetPortal(WWISEC_AkPortalID in_PortalID, const WWISEC_AkPortalParams* in_Params, const char* in_PortalName);
@@ -3847,7 +3819,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction);
     AKRESULT WWISEC_AK_SpatialAudio_SetPortalToPortalObstruction(WWISEC_AkPortalID in_PortalID0, WWISEC_AkPortalID in_PortalID1, AkReal32 in_fObstruction);
     AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_portal, AkReal32* out_wetDiffraction);
-    AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
+    AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize);
     AKRESULT WWISEC_AK_SpatialAudio_SetTransmissionOperation(WWISEC_AkTransmissionOperation in_eOperation);
     AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine();
     // END AkSpatialAudio
@@ -3856,7 +3828,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     float WWISEC_AK_SpatialAudio_ReverbEstimation_CalculateSlope(const WWISEC_AkAcousticTexture* texture);
     void WWISEC_AK_SpatialAudio_ReverbEstimation_GetAverageAbsorptionValues(WWISEC_AkAcousticTexture* in_textures, float* in_surfaceAreas, int in_numTextures, WWISEC_AkAcousticTexture* out_average);
     AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateT60Decay(AkReal32 in_volumeCubicMeters, AkReal32 in_surfaceAreaSquaredMeters, AkReal32 in_environmentAverageAbsorption, AkReal32* out_decayEstimate);
-    AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(WWISEC_AkVector in_environmentExtentMeters, AkReal32* out_timeToFirstReflectionMs, AkReal32 in_speedOfSound);
+    AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(struct AkVector in_environmentExtentMeters, AkReal32* out_timeToFirstReflectionMs, AkReal32 in_speedOfSound);
     AkReal32 WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateHFDamping(WWISEC_AkAcousticTexture* in_textures, float* in_surfaceAreas, int in_numTextures);
     // END AkReverbEstimation
 #endif

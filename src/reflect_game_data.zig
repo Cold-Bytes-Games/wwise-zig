@@ -1,3 +1,4 @@
+const ak3dobjects = @import("ak3dobjects.zig");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
@@ -33,7 +34,7 @@ pub const AkImageSourceTexture = extern struct {
 };
 
 pub const AkImageSourceParams = extern struct {
-    source_position: common.AkVector64 = .{},
+    source_position: ak3dobjects.AkVector64 = .{},
     distance_scaling_factor: f32 = 1.0,
     level: f32 = 1.0,
     diffraction: f32 = 0.0,

@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2023 Cold Bytes Games
+Copyright (c) 2023-2026 Cold Bytes Games
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,25 +50,18 @@ extern "C" void WWISEC_HACK_RegisterAllPlugins();
 #define WWISEC_ASSERT_ENUM_VALUE_SAME(name) static_assert(static_cast<std::size_t>(WWISEC_##name) == static_cast<std::size_t>(name))
 
 // BEGIN AkTypes
-WWISEC_ASSERT_ENUM_VALUE_SAME(AkDeviceState_All);
-WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_Direct);
-WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_GameDefSend);
-WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_UserDefSend);
-WWISEC_ASSERT_ENUM_VALUE_SAME(ConnectionType_ReflectionsSend);
 static_assert(sizeof(WWISEC_AkAudioSettings) == sizeof(AkAudioSettings));
 static_assert(sizeof(WWISEC_AkDeviceDescription) == sizeof(AkDeviceDescription));
 static_assert(sizeof(WWISEC_AkExternalSourceInfo) == sizeof(AkExternalSourceInfo));
 static_assert(WWISEC_AK_COMM_DEFAULT_DISCOVERY_PORT == AK_COMM_DEFAULT_DISCOVERY_PORT);
 static_assert(sizeof(WWISEC_AkAuxSendValue) == sizeof(AkAuxSendValue));
-static_assert(sizeof(WWISEC_AkVector64) == sizeof(AkVector64));
-static_assert(sizeof(WWISEC_AkVector) == sizeof(AkVector));
-static_assert(sizeof(WWISEC_AkWorldTransform) == sizeof(AkWorldTransform));
-static_assert(sizeof(WWISEC_AkTransform) == sizeof(AkTransform));
-static_assert(sizeof(WWISEC_AkChannelEmitter) == sizeof(AkChannelEmitter));
-static_assert(sizeof(WWISEC_AkEmitterListenerPair) == sizeof(AkEmitterListenerPair));
 static_assert(sizeof(WWISEC_AkCodecDescriptor) == sizeof(AkCodecDescriptor));
-static_assert(static_cast<int32_t>(WWISEC_ConnectionType_Last) == static_cast<int32_t>(ConnectionType_Last));
 // END AkTypes
+
+// BEGIN Ak3DObjects
+static_assert(sizeof(WWISEC_AkSphericalCoord) == sizeof(AkSphericalCoord));
+static_assert(sizeof(WWISEC_AkEmitterListenerPair) == sizeof(AkEmitterListenerPair));
+// END Ak3DObjects
 
 // BEGIN AkSpeakerConfig
 static_assert(WWISEC_AK_DEFAULT_HEIGHT_ANGLE == AK_DEFAULT_HEIGHT_ANGLE);
@@ -634,7 +627,7 @@ void WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(WWISEC_AK_IAkGlo
     reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->ComputeAmbisonicsEncoding(in_fAzimuth, in_fElevation, channelConfig, out_vVolumes);
 }
 
-AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const WWISEC_AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_MatrixPtr out_mxVolume)
+AKRESULT WWISEC_AK_IAkGlobalPluginContext_ComputeWeightedAmbisonicsDecodingFromSampledSphere(WWISEC_AK_IAkGlobalPluginContext* self, const struct AkVector* in_samples, AkUInt32 in_uNumSamples, WWISEC_AkChannelConfig in_cfgAmbisonics, WWISEC_AK_SpeakerVolumes_MatrixPtr out_mxVolume)
 {
     AkChannelConfig channelConfig;
     channelConfig.Deserialize(in_cfgAmbisonics);
@@ -1056,17 +1049,17 @@ AKRESULT WWISEC_AK_SoundEngine_UnregisterAllGameObj()
     return AK::SoundEngine::UnregisterAllGameObj();
 }
 
-AKRESULT WWISEC_AK_SoundEngine_SetPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_Position, enum AkSetPositionFlags in_eFlags)
+AKRESULT WWISEC_AK_SoundEngine_SetPosition(AkGameObjectID in_GameObjectID, const AkSoundPosition* in_Position, enum AkSetPositionFlags in_eFlags)
 {
     return AK::SoundEngine::SetPosition(in_GameObjectID, *reinterpret_cast<const AkSoundPosition*>(in_Position), static_cast<AkSetPositionFlags>(in_eFlags));
 }
 
-AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(AkGameObjectID in_GameObjectID, const WWISEC_AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags)
+AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_SoundPosition(AkGameObjectID in_GameObjectID, const AkSoundPosition* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags)
 {
     return AK::SoundEngine::SetMultiplePositions(in_GameObjectID, reinterpret_cast<const AkSoundPosition*>(in_pPositions), in_NumPositions, static_cast<AK::SoundEngine::MultiPositionType>(in_eMultiPositionType), static_cast<AkSetPositionFlags>(in_eFlags));
 }
 
-AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(AkGameObjectID in_GameObjectID, const WWISEC_AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags)
+AKRESULT WWISEC_AK_SoundEngine_SetMultiplePositions_ChannelEmitter(AkGameObjectID in_GameObjectID, const struct AkChannelEmitter* in_pPositions, AkUInt16 in_NumPositions, enum AkMultiPositionType in_eMultiPositionType, enum AkSetPositionFlags in_eFlags)
 {
     return AK::SoundEngine::SetMultiplePositions(in_GameObjectID, reinterpret_cast<const AkChannelEmitter*>(in_pPositions), in_NumPositions, static_cast<AK::SoundEngine::MultiPositionType>(in_eMultiPositionType), static_cast<AkSetPositionFlags>(in_eFlags));
 }
@@ -2933,7 +2926,7 @@ static_assert(sizeof(WWISEC_AK_SoundEngine_Query_AkGameObjectsList) == sizeof(AK
 static_assert(sizeof(WWISEC_AK_SoundEngine_Query_GameObjDst) == sizeof(AK::SoundEngine::Query::GameObjDst));
 static_assert(sizeof(WWISEC_AK_SoundEngine_Query_AkRadiusList) == sizeof(AK::SoundEngine::Query::AkRadiusList));
 
-AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(AkGameObjectID in_GameObjectID, WWISEC_AkSoundPosition* out_rPosition)
+AKRESULT WWISEC_AK_SoundEngine_Query_GetPosition(AkGameObjectID in_GameObjectID, AkSoundPosition* out_rPosition)
 {
     return AK::SoundEngine::Query::GetPosition(in_GameObjectID, *reinterpret_cast<AkSoundPosition*>(out_rPosition));
 }
@@ -2943,7 +2936,7 @@ AKRESULT WWISEC_AK_SoundEngine_Query_GetListeners(AkGameObjectID in_GameObjectID
     return AK::SoundEngine::Query::GetListeners(in_GameObjectID, out_ListenerObjectIDs, *oi_uNumListeners);
 }
 
-AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(AkGameObjectID in_uListenerID, WWISEC_AkListenerPosition* out_rPosition)
+AKRESULT WWISEC_AK_SoundEngine_Query_GetListenerPosition(AkGameObjectID in_uListenerID, AkListenerPosition* out_rPosition)
 {
     return AK::SoundEngine::Query::GetListenerPosition(in_uListenerID, *reinterpret_cast<AkListenerPosition*>(out_rPosition));
 }
@@ -3309,7 +3302,7 @@ AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(WWISEC_AkGeometryInstance
     return AK::SpatialAudio::RemoveGeometryInstance(in_GeometryInstanceID.id);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
 {
     return AK::SpatialAudio::QueryReflectionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkReflectionPathInfo*>(out_aPaths), *io_uArraySize);
 }
@@ -3424,7 +3417,7 @@ AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_portal,
     return AK::SpatialAudio::QueryWetDiffraction(in_portal.id, *out_wetDiffraction);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, WWISEC_AkVector64* out_listenerPos, WWISEC_AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
 {
     return AK::SpatialAudio::QueryDiffractionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkDiffractionPathInfo*>(out_aPaths), *io_uArraySize);
 }
@@ -3456,7 +3449,7 @@ AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateT60Decay(AkReal32 in_vo
     return AK::SpatialAudio::ReverbEstimation::EstimateT60Decay(in_volumeCubicMeters, in_surfaceAreaSquaredMeters, in_environmentAverageAbsorption, *out_decayEstimate);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(WWISEC_AkVector in_environmentExtentMeters, AkReal32* out_timeToFirstReflectionMs, AkReal32 in_speedOfSound)
+AKRESULT WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(struct AkVector in_environmentExtentMeters, AkReal32* out_timeToFirstReflectionMs, AkReal32 in_speedOfSound)
 {
     AkVector convertedAkVector;
     convertedAkVector.X = in_environmentExtentMeters.X;

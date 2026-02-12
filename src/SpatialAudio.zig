@@ -1,3 +1,4 @@
+const ak3dobjects = @import("ak3dobjects.zig");
 const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
@@ -199,8 +200,8 @@ pub const AkAcousticSurface = extern struct {
 };
 
 pub const AkReflectionPathInfo = extern struct {
-    image_source: common.AkVector64 = .{},
-    path_point: [AK_MAX_REFLECTION_PATH_LENGTH]common.AkVector64 = @splat(.{}),
+    image_source: ak3dobjects.AkVector64 = .{},
+    path_point: [AK_MAX_REFLECTION_PATH_LENGTH]ak3dobjects.AkVector64 = @splat(.{}),
     textureIDs: [AK_MAX_REFLECTION_PATH_LENGTH]u32 = @splat(0),
     num_path_points: u32 = 0,
     num_reflections: u32 = 0,
@@ -218,12 +219,12 @@ pub const AkReflectionPathInfo = extern struct {
 };
 
 pub const AkDiffractionPathInfo = extern struct {
-    nodes: [AK_MAX_SOUND_PROPAGATION_DEPTH]common.AkVector64 = @splat(.{}),
-    emitter_pos: common.AkVector64 = .{},
+    nodes: [AK_MAX_SOUND_PROPAGATION_DEPTH]ak3dobjects.AkVector64 = @splat(.{}),
+    emitter_pos: ak3dobjects.AkVector64 = .{},
     angles: [AK_MAX_SOUND_PROPAGATION_DEPTH]f32 = @splat(0.0),
     portals: [AK_MAX_SOUND_PROPAGATION_DEPTH]AkPortalID = @splat(.{}),
     rooms: [AK_MAX_SOUND_PROPAGATION_DEPTH + 1]AkRoomID = @splat(.{}),
-    virtual_pos: common.AkWorldTransform = .{},
+    virtual_pos: ak3dobjects.AkWorldTransform = .{},
     node_count: u32 = 0,
     diffraction: f32 = 0.0,
     transmission_loss: f32 = 0.0,
@@ -242,7 +243,7 @@ pub const AkDiffractionPathInfo = extern struct {
 };
 
 pub const AkPortalParams = extern struct {
-    transform: common.AkWorldTransform = .{},
+    transform: ak3dobjects.AkWorldTransform = .{},
     extent: AkExtent = .{},
     enabled: bool = false,
     front_room: AkRoomID = .{},
@@ -258,8 +259,8 @@ pub const AkPortalParams = extern struct {
 };
 
 pub const AkRoomParams = extern struct {
-    front: common.AkVector = .{ .z = 1.0 },
-    up: common.AkVector = .{ .y = 1.0 },
+    front: ak3dobjects.AkVector = .{ .z = 1.0 },
+    up: ak3dobjects.AkVector = .{ .y = 1.0 },
     reverb_aux_bus: typedefs.AkAuxBusID = constants.AK_INVALID_AUX_ID,
     reverb_level: f32 = 1.0,
     transmission_loss: f32 = 1.0,
@@ -307,7 +308,7 @@ pub const AK_DEFAULT_GEOMETRY_TOP_Y = c.WWISEC_AK_DEFAULT_GEOMETRY_TOP_Y;
 pub const AK_DEFAULT_GEOMETRY_TOP_Z = c.WWISEC_AK_DEFAULT_GEOMETRY_TOP_Z;
 
 pub const AkGeometryInstanceParams = extern struct {
-    position_and_orientation: common.AkWorldTransform = .{
+    position_and_orientation: ak3dobjects.AkWorldTransform = .{
         .position = .{
             .x = AK_DEFAULT_GEOMETRY_POSITION_X,
             .y = AK_DEFAULT_GEOMETRY_POSITION_Y,
@@ -324,7 +325,7 @@ pub const AkGeometryInstanceParams = extern struct {
             .z = AK_DEFAULT_GEOMETRY_TOP_Z,
         },
     },
-    scale: common.AkVector = .{
+    scale: ak3dobjects.AkVector = .{
         .x = 1,
         .y = 1,
         .z = 1,
@@ -452,8 +453,8 @@ pub fn removeGeometryInstance(in_geometry_instance_id: AkGeometryInstanceID) zig
 pub fn queryReflectionPaths(
     in_game_object_id: typedefs.AkGameObjectID,
     in_position_index: u32,
-    out_listener_pos: *common.AkVector64,
-    out_emitter_pos: *common.AkVector64,
+    out_listener_pos: *ak3dobjects.AkVector64,
+    out_emitter_pos: *ak3dobjects.AkVector64,
     out_paths: [*]AkReflectionPathInfo,
     io_array_size: *u32,
 ) zig.WwiseError!void {
@@ -676,8 +677,8 @@ pub fn queryWetDiffraction(in_portal: AkPortalID) zig.WwiseError!f32 {
 pub fn queryDiffractionPaths(
     in_game_object_id: typedefs.AkGameObjectID,
     in_position_index: u32,
-    out_listener_pos: *common.AkVector64,
-    out_emitter_pos: *common.AkVector64,
+    out_listener_pos: *ak3dobjects.AkVector64,
+    out_emitter_pos: *ak3dobjects.AkVector64,
     out_paths: ?[*]AkDiffractionPathInfo,
     io_array_size: *u32,
 ) zig.WwiseError!void {
