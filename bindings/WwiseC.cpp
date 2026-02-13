@@ -63,24 +63,6 @@ void WWISEC_AkOutputSettings_Init(struct AkOutputSettings* outputSettings, const
 }
 // END AkSoundEngineTypes
 
-// BEGIN AkMidiTypes
-static_assert(sizeof(WWISEC_AkMIDIEvent_tGen) == sizeof(AkMIDIEvent::tGen));
-static_assert(sizeof(WWISEC_AkMIDIEvent_tNoteOnOff) == sizeof(AkMIDIEvent::tNoteOnOff));
-static_assert(sizeof(WWISEC_AkMIDIEvent_tCc) == sizeof(AkMIDIEvent::tCc));
-static_assert(sizeof(WWISEC_AkMIDIEvent_tPitchBend) == sizeof(AkMIDIEvent::tPitchBend));
-static_assert(sizeof(WWISEC_AkMIDIEvent_tNoteAftertouch) == sizeof(AkMIDIEvent::tNoteAftertouch));
-static_assert(sizeof(WWISEC_AkMIDIEvent_tChanAftertouch) == sizeof(AkMIDIEvent::tChanAftertouch));
-static_assert(sizeof(WWISEC_AkMIDIEvent_tProgramChange) == sizeof(AkMIDIEvent::tProgramChange));
-static_assert(sizeof(WWISEC_AkMIDIEvent_tWwiseCmd) == sizeof(AkMIDIEvent::tWwiseCmd));
-static_assert(sizeof(WWISEC_AkMIDIEvent) == sizeof(AkMIDIEvent));
-static_assert(sizeof(WWISEC_AkMIDIPost) == sizeof(AkMIDIPost));
-static_assert(offsetof(WWISEC_AkMIDIPost, byChan) == offsetof(AkMIDIPost, byChan));
-static_assert(offsetof(WWISEC_AkMIDIPost, NoteOnOff.byNote) == offsetof(AkMIDIPost, NoteOnOff.byNote));
-static_assert(offsetof(WWISEC_AkMIDIPost, NoteOnOff.byVelocity) == offsetof(AkMIDIPost, NoteOnOff.byVelocity));
-static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uCmd) == offsetof(AkMIDIPost, WwiseCmd.uCmd));
-static_assert(offsetof(WWISEC_AkMIDIPost, WwiseCmd.uArg) == offsetof(AkMIDIPost, WwiseCmd.uArg));
-// END AkMidiTypes
-
 // BEGIN AkErrorMessageTranslator
 static_assert(WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE == AK_TRANSLATOR_MAX_NAME_SIZE);
 static_assert(WWISEC_AK_MAX_ERROR_LENGTH == AK_MAX_ERROR_LENGTH);
@@ -666,9 +648,9 @@ AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPl
     return static_cast<AkPlayingID>(reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostEventSync(in_eventID, in_gameObjectID, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_cExternals, n_pExternalSources, in_PlayingID));
 }
 
-AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID)
+AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, struct AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID)
 {
-    return reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostMIDIOnEventSync(in_eventID, in_gameObjectID, reinterpret_cast<AkMIDIPost*>(in_pPosts), in_uNumPosts, in_bAbsoluteOffsets, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_playingID);
+    return reinterpret_cast<AK::IAkGlobalPluginContext*>(self)->PostMIDIOnEventSync(in_eventID, in_gameObjectID, in_pPosts, in_uNumPosts, in_bAbsoluteOffsets, in_uFlags, reinterpret_cast<AkCallbackFunc>(in_pfnCallback), in_pCookie, in_playingID);
 }
 
 AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID)
@@ -885,12 +867,12 @@ AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEve
         in_PlayingID));
 }
 
-AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID)
+AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, struct AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID)
 {
     return AK::SoundEngine::PostMIDIOnEvent(
         in_eventID,
         in_gameObjectID,
-        reinterpret_cast<AkMIDIPost*>(in_pPosts),
+        in_pPosts,
         in_uNumPosts,
         in_bAbsoluteOffsets,
         in_uFlags,

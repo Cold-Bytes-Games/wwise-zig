@@ -359,7 +359,6 @@ pub const AK_MIDI_CC_OMNI_MODE_ON = midi_types.AK_MIDI_CC_OMNI_MODE_ON;
 pub const AK_MIDI_CC_OMNI_MONOPHONIC_ON = midi_types.AK_MIDI_CC_OMNI_MONOPHONIC_ON;
 pub const AK_MIDI_CC_OMNI_POLYPHONIC_ON = midi_types.AK_MIDI_CC_OMNI_POLYPHONIC_ON;
 pub const AkMIDIEvent = midi_types.AkMIDIEvent;
-pub const AlignedAkMIDIEvent = midi_types.AlignedAkMIDIEvent;
 pub const AkMIDIPost = midi_types.AkMIDIPost;
 
 // platform_context.zig

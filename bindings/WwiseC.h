@@ -111,274 +111,10 @@ extern "C"
     } WWISEC_AkCodecDescriptor;
 
     void WWISEC_AkOutputSettings_Init(struct AkOutputSettings* outputSettings, const char* in_szDeviceShareSet, AkUniqueID in_idDevice, struct AkChannelConfig in_channelConfig, enum AkPanningRule in_ePanning);
-    // END AkSoundEngineTypes
+// END AkSoundEngineTypes
 
-    // BEGIN AkMidiTypes
-    //-----------------------------------------------------------------------------
-    // Types.
-    //-----------------------------------------------------------------------------
-
-    typedef AkUInt8 WWISEC_AkMidiChannelNo; ///< MIDI channel number, usually 0-15.
-    typedef AkUInt8 WWISEC_AkMidiNoteNo;    ///< MIDI note number.
-
-    //-----------------------------------------------------------------------------
-    // Constants.
-    //-----------------------------------------------------------------------------
-
-    // Invalid values
-    static const WWISEC_AkMidiChannelNo WWISEC_AK_INVALID_MIDI_CHANNEL = (WWISEC_AkMidiChannelNo)-1; ///< Not a valid midi channel
-    static const WWISEC_AkMidiNoteNo WWISEC_AK_INVALID_MIDI_NOTE = (AkUInt8)-1;                      ///< Not a valid midi note
-
-// List of event types
-#define WWISEC_AK_MIDI_EVENT_TYPE_INVALID 0x00
-#define WWISEC_AK_MIDI_EVENT_TYPE_NOTE_OFF 0x80
-#define WWISEC_AK_MIDI_EVENT_TYPE_NOTE_ON 0x90
-#define WWISEC_AK_MIDI_EVENT_TYPE_NOTE_AFTERTOUCH 0xa0
-#define WWISEC_AK_MIDI_EVENT_TYPE_CONTROLLER 0xb0
-#define WWISEC_AK_MIDI_EVENT_TYPE_PROGRAM_CHANGE 0xc0
-#define WWISEC_AK_MIDI_EVENT_TYPE_CHANNEL_AFTERTOUCH 0xd0
-#define WWISEC_AK_MIDI_EVENT_TYPE_PITCH_BEND 0xe0
-#define WWISEC_AK_MIDI_EVENT_TYPE_SYSEX 0xf0
-#define WWISEC_AK_MIDI_EVENT_TYPE_ESCAPE 0xf7
-#define WWISEC_AK_MIDI_EVENT_TYPE_WWISE_CMD 0xfe
-#define WWISEC_AK_MIDI_EVENT_TYPE_META 0xff
-
-// List of Continuous Controller (cc) values
-#define WWISEC_AK_MIDI_CC_BANK_SELECT_COARSE 0
-#define WWISEC_AK_MIDI_CC_MOD_WHEEL_COARSE 1
-#define WWISEC_AK_MIDI_CC_BREATH_CTRL_COARSE 2
-#define WWISEC_AK_MIDI_CC_CTRL_3_COARSE 3
-#define WWISEC_AK_MIDI_CC_FOOT_PEDAL_COARSE 4
-#define WWISEC_AK_MIDI_CC_PORTAMENTO_COARSE 5
-#define WWISEC_AK_MIDI_CC_DATA_ENTRY_COARSE 6
-#define WWISEC_AK_MIDI_CC_VOLUME_COARSE 7
-#define WWISEC_AK_MIDI_CC_BALANCE_COARSE 8
-#define WWISEC_AK_MIDI_CC_CTRL_9_COARSE 9
-#define WWISEC_AK_MIDI_CC_PAN_POSITION_COARSE 10
-#define WWISEC_AK_MIDI_CC_EXPRESSION_COARSE 11
-#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_1_COARSE 12
-#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_2_COARSE 13
-#define WWISEC_AK_MIDI_CC_CTRL_14_COARSE 14
-#define WWISEC_AK_MIDI_CC_CTRL_15_COARSE 15
-#define WWISEC_AK_MIDI_CC_GEN_SLIDER_1 16
-#define WWISEC_AK_MIDI_CC_GEN_SLIDER_2 17
-#define WWISEC_AK_MIDI_CC_GEN_SLIDER_3 18
-#define WWISEC_AK_MIDI_CC_GEN_SLIDER_4 19
-#define WWISEC_AK_MIDI_CC_CTRL_20_COARSE 20
-#define WWISEC_AK_MIDI_CC_CTRL_21_COARSE 21
-#define WWISEC_AK_MIDI_CC_CTRL_22_COARSE 22
-#define WWISEC_AK_MIDI_CC_CTRL_23_COARSE 23
-#define WWISEC_AK_MIDI_CC_CTRL_24_COARSE 24
-#define WWISEC_AK_MIDI_CC_CTRL_25_COARSE 25
-#define WWISEC_AK_MIDI_CC_CTRL_26_COARSE 26
-#define WWISEC_AK_MIDI_CC_CTRL_27_COARSE 27
-#define WWISEC_AK_MIDI_CC_CTRL_28_COARSE 28
-#define WWISEC_AK_MIDI_CC_CTRL_29_COARSE 29
-#define WWISEC_AK_MIDI_CC_CTRL_30_COARSE 30
-#define WWISEC_AK_MIDI_CC_CTRL_31_COARSE 31
-#define WWISEC_AK_MIDI_CC_BANK_SELECT_FINE 32
-#define WWISEC_AK_MIDI_CC_MOD_WHEEL_FINE 33
-#define WWISEC_AK_MIDI_CC_BREATH_CTRL_FINE 34
-#define WWISEC_AK_MIDI_CC_CTRL_3_FINE 35
-#define WWISEC_AK_MIDI_CC_FOOT_PEDAL_FINE 36
-#define WWISEC_AK_MIDI_CC_PORTAMENTO_FINE 37
-#define WWISEC_AK_MIDI_CC_DATA_ENTRY_FINE 38
-#define WWISEC_AK_MIDI_CC_VOLUME_FINE 39
-#define WWISEC_AK_MIDI_CC_BALANCE_FINE 40
-#define WWISEC_AK_MIDI_CC_CTRL_9_FINE 41
-#define WWISEC_AK_MIDI_CC_PAN_POSITION_FINE 42
-#define WWISEC_AK_MIDI_CC_EXPRESSION_FINE 43
-#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_1_FINE 44
-#define WWISEC_AK_MIDI_CC_EFFECT_CTRL_2_FINE 45
-#define WWISEC_AK_MIDI_CC_CTRL_14_FINE 46
-#define WWISEC_AK_MIDI_CC_CTRL_15_FINE 47
-
-#define WWISEC_AK_MIDI_CC_CTRL_20_FINE 52
-#define WWISEC_AK_MIDI_CC_CTRL_21_FINE 53
-#define WWISEC_AK_MIDI_CC_CTRL_22_FINE 54
-#define WWISEC_AK_MIDI_CC_CTRL_23_FINE 55
-#define WWISEC_AK_MIDI_CC_CTRL_24_FINE 56
-#define WWISEC_AK_MIDI_CC_CTRL_25_FINE 57
-#define WWISEC_AK_MIDI_CC_CTRL_26_FINE 58
-#define WWISEC_AK_MIDI_CC_CTRL_27_FINE 59
-#define WWISEC_AK_MIDI_CC_CTRL_28_FINE 60
-#define WWISEC_AK_MIDI_CC_CTRL_29_FINE 61
-#define WWISEC_AK_MIDI_CC_CTRL_30_FINE 62
-#define WWISEC_AK_MIDI_CC_CTRL_31_FINE 63
-
-#define WWISEC_AK_MIDI_CC_HOLD_PEDAL 64
-#define WWISEC_AK_MIDI_CC_PORTAMENTO_ON_OFF 65
-#define WWISEC_AK_MIDI_CC_SUSTENUTO_PEDAL 66
-#define WWISEC_AK_MIDI_CC_SOFT_PEDAL 67
-#define WWISEC_AK_MIDI_CC_LEGATO_PEDAL 68
-#define WWISEC_AK_MIDI_CC_HOLD_PEDAL_2 69
-
-#define WWISEC_AK_MIDI_CC_SOUND_VARIATION 70
-#define WWISEC_AK_MIDI_CC_SOUND_TIMBRE 71
-#define WWISEC_AK_MIDI_CC_SOUND_RELEASE_TIME 72
-#define WWISEC_AK_MIDI_CC_SOUND_ATTACK_TIME 73
-#define WWISEC_AK_MIDI_CC_SOUND_BRIGHTNESS 74
-#define WWISEC_AK_MIDI_CC_SOUND_CTRL_6 75
-#define WWISEC_AK_MIDI_CC_SOUND_CTRL_7 76
-#define WWISEC_AK_MIDI_CC_SOUND_CTRL_8 77
-#define WWISEC_AK_MIDI_CC_SOUND_CTRL_9 78
-#define WWISEC_AK_MIDI_CC_SOUND_CTRL_10 79
-
-#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_1 80
-#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_2 81
-#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_3 82
-#define WWISEC_AK_MIDI_CC_GENERAL_BUTTON_4 83
-
-#define WWISEC_AK_MIDI_CC_REVERB_LEVEL 91
-#define WWISEC_AK_MIDI_CC_TREMOLO_LEVEL 92
-#define WWISEC_AK_MIDI_CC_CHORUS_LEVEL 93
-#define WWISEC_AK_MIDI_CC_CELESTE_LEVEL 94
-#define WWISEC_AK_MIDI_CC_PHASER_LEVEL 95
-#define WWISEC_AK_MIDI_CC_DATA_BUTTON_P1 96
-#define WWISEC_AK_MIDI_CC_DATA_BUTTON_M1 97
-
-#define WWISEC_AK_MIDI_CC_NON_REGISTER_COARSE 98
-#define WWISEC_AK_MIDI_CC_NON_REGISTER_FINE 99
-
-#define WWISEC_AK_MIDI_CC_ALL_SOUND_OFF 120
-#define WWISEC_AK_MIDI_CC_ALL_CONTROLLERS_OFF 121
-#define WWISEC_AK_MIDI_CC_LOCAL_KEYBOARD 122
-#define WWISEC_AK_MIDI_CC_ALL_NOTES_OFF 123
-#define WWISEC_AK_MIDI_CC_OMNI_MODE_OFF 124
-#define WWISEC_AK_MIDI_CC_OMNI_MODE_ON 125
-#define WWISEC_AK_MIDI_CC_OMNI_MONOPHONIC_ON 126
-#define WWISEC_AK_MIDI_CC_OMNI_POLYPHONIC_ON 127
-
-    typedef struct WWISEC_AkMIDIEvent_tGen
-    {
-        AkUInt8 byParam1;
-        AkUInt8 byParam2;
-    } WWISEC_AkMIDIEvent_tGen;
-
-    typedef struct WWISEC_AkMIDIEvent_tNoteOnOff
-    {
-        WWISEC_AkMidiNoteNo byNote;
-        AkUInt8 byVelocity;
-    } WWISEC_AkMIDIEvent_tNoteOnOff;
-
-    typedef struct WWISEC_AkMIDIEvent_tCc
-    {
-        AkUInt8 byCc;
-        AkUInt8 byValue;
-    } WWISEC_AkMIDIEvent_tCc;
-
-    typedef struct WWISEC_AkMIDIEvent_tPitchBend
-    {
-        AkUInt8 byValueLsb;
-        AkUInt8 byValueMsb;
-    } WWISEC_AkMIDIEvent_tPitchBend;
-
-    typedef struct WWISEC_AkMIDIEvent_tNoteAftertouch
-    {
-        AkUInt8 byNote;
-        AkUInt8 byValue;
-    } WWISEC_AkMIDIEvent_tNoteAftertouch;
-
-    typedef struct WWISEC_AkMIDIEvent_tChanAftertouch
-    {
-        AkUInt8 byValue;
-    } WWISEC_AkMIDIEvent_tChanAftertouch;
-
-    typedef struct WWISEC_AkMIDIEvent_tProgramChange
-    {
-        AkUInt8 byProgramNum;
-    } WWISEC_AkMIDIEvent_tProgramChange;
-
-    typedef struct WWISEC_AkMIDIEvent_tWwiseCmd
-    {
-        AkUInt16 uCmd; ///< See AK_MIDI_WWISE_CMD_* pre-processor definitions
-        AkUInt32 uArg; ///< Optional argument for some commands
-    } WWISEC_AkMIDIEvent_tWwiseCmd;
-
-    typedef struct WWISEC_AkMIDIEvent
-    {
-        AkUInt8 byType; ///< See AK_MIDI_EVENT_TYPE_* pre-processor definitions
-        WWISEC_AkMidiChannelNo byChan;
-
-        union {
-            WWISEC_AkMIDIEvent_tGen Gen;
-            WWISEC_AkMIDIEvent_tCc Cc;
-            WWISEC_AkMIDIEvent_tNoteOnOff NoteOnOff;
-            WWISEC_AkMIDIEvent_tPitchBend PitchBend;
-            WWISEC_AkMIDIEvent_tNoteAftertouch NoteAftertouch;
-            WWISEC_AkMIDIEvent_tChanAftertouch ChanAftertouch;
-            WWISEC_AkMIDIEvent_tProgramChange ProgramChange;
-            WWISEC_AkMIDIEvent_tWwiseCmd WwiseCmd;
-        };
-    } WWISEC_AkMIDIEvent;
-
-#pragma pack(push, 4)
-    // NOTE: mlarouche: We are copying and inlining AkMIDIEvent and related inside AkMIDIPost to have proper alignment
-    typedef struct WWISEC_AkMIDIPost_tGen
-    {
-        AkUInt8 byParam1;
-        AkUInt8 byParam2;
-    } WWISEC_AkMIDIPost_tGen;
-
-    typedef struct WWISEC_AkMIDIPost_tNoteOnOff
-    {
-        WWISEC_AkMidiNoteNo byNote;
-        AkUInt8 byVelocity;
-    } WWISEC_AkMIDIPost_tNoteOnOff;
-
-    typedef struct WWISEC_AkMIDIPost_tCc
-    {
-        AkUInt8 byCc;
-        AkUInt8 byValue;
-    } WWISEC_AkMIDIPost_tCc;
-
-    typedef struct WWISEC_AkMIDIPost_tPitchBend
-    {
-        AkUInt8 byValueLsb;
-        AkUInt8 byValueMsb;
-    } WWISEC_AkMIDIPost_tPitchBend;
-
-    typedef struct WWISEC_AkMIDIPost_tNoteAftertouch
-    {
-        AkUInt8 byNote;
-        AkUInt8 byValue;
-    } WWISEC_AkMIDIPost_tNoteAftertouch;
-
-    typedef struct WWISEC_AkMIDIPost_tChanAftertouch
-    {
-        AkUInt8 byValue;
-    } WWISEC_AkMIDIPost_tChanAftertouch;
-
-    typedef struct WWISEC_AkMIDIPost_tProgramChange
-    {
-        AkUInt8 byProgramNum;
-    } WWISEC_AkMIDIPost_tProgramChange;
-
-    typedef struct WWISEC_AkMIDIPost_tWwiseCmd
-    {
-        AkUInt16 uCmd; ///< See AK_MIDI_WWISE_CMD_* pre-processor definitions
-        AkUInt32 uArg; ///< Optional argument for some commands
-    } WWISEC_AkMIDIPost_tWwiseCmd;
-
-    typedef struct WWISEC_AkMIDIPost
-    {
-        AkUInt8 byType; ///< See AK_MIDI_EVENT_TYPE_* pre-processor definitions
-        WWISEC_AkMidiChannelNo byChan;
-        union {
-            WWISEC_AkMIDIPost_tGen Gen;
-            WWISEC_AkMIDIPost_tCc Cc;
-            WWISEC_AkMIDIPost_tNoteOnOff NoteOnOff;
-            WWISEC_AkMIDIPost_tPitchBend PitchBend;
-            WWISEC_AkMIDIPost_tNoteAftertouch NoteAftertouch;
-            WWISEC_AkMIDIPost_tChanAftertouch ChanAftertouch;
-            WWISEC_AkMIDIPost_tProgramChange ProgramChange;
-            WWISEC_AkMIDIPost_tWwiseCmd WwiseCmd;
-        };
-
-        AkUInt64 uOffset; ///< Frame offset (in samples) for MIDI event post
-    } WWISEC_AkMIDIPost;
-
-#pragma pack(pop)
+// BEGIN AkMidiTypes
+#include <AK/SoundEngine/Common/AkMidiTypes.h>
     // END AkMidiTypes
 
     // BEGIN AkSpeakerVolumes
@@ -936,7 +672,7 @@ extern "C"
 
     typedef struct WWISEC_AkMIDIEventCallbackInfo
     {
-        WWISEC_AkMIDIEvent midiEvent; ///< MIDI event triggered by event.
+        struct AkMIDIEvent midiEvent; ///< MIDI event triggered by event.
     } WWISEC_AkMIDIEventCallbackInfo;
 
     typedef struct WWISEC_AkMarkerCallbackInfo
@@ -1798,7 +1534,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AKRESULT WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(const WWISEC_AK_IAkGlobalPluginContext* self, struct AkAudioSettings* out_audioSettings);
     AkUInt32 WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(const WWISEC_AK_IAkGlobalPluginContext* self, const char* in_pszString);
     AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkUInt32 in_cExternals, struct AkExternalSourceInfo* in_pExternalSources, AkPlayingID in_PlayingID);
-    AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID);
+    AkPlayingID WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, struct AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID);
     AKRESULT WWISEC_AK_IAkGlobalPluginContext_StopMIDIOnEventSync(WWISEC_AK_IAkGlobalPluginContext* self, AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID);
     WWISEC_IAkPlatformContext* WWISEC_AK_IAkGlobalPluginContext_GetPlatformContext(const WWISEC_AK_IAkGlobalPluginContext* self);
     WWISEC_IAkPluginService* WWISEC_AK_IAkGlobalPluginContext_GetPluginService(const WWISEC_AK_IAkGlobalPluginContext* self, WWISEC_AK_AkPluginServiceType in_pluginService);
@@ -2023,7 +1759,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     AKRESULT WWISEC_AK_SoundEngine_ExecuteActionOnEvent_String(const char* in_pszEventName, enum AkActionOnEventType in_ActionType, AkGameObjectID in_gameObjectID, AkTimeMs in_uTransitionDuration, enum AkCurveInterpolation in_eFadeCurve, AkPlayingID in_PlayingID);
 
-    AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, WWISEC_AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID);
+    AkPlayingID WWISEC_AK_SoundEngine_PostMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, struct AkMIDIPost* in_pPosts, AkUInt16 in_uNumPosts, bool in_bAbsoluteOffsets, AkUInt32 in_uFlags, WWISEC_AkCallbackFunc in_pfnCallback, void* in_pCookie, AkPlayingID in_playingID);
 
     AKRESULT WWISEC_AK_SoundEngine_StopMIDIOnEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID, AkPlayingID in_playingID);
 
