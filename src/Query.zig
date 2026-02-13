@@ -3,6 +3,7 @@ const c = @import("wwise_c");
 const common = @import("common.zig");
 const constants = @import("constants.zig");
 const enums = @import("enums.zig");
+const sound_engine_types = @import("sound_engine_types.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const std = @import("std");

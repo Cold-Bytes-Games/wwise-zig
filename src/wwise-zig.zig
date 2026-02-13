@@ -58,37 +58,6 @@ pub const AkAudioDeviceEvent = callback_types.AkAudioDeviceEvent;
 pub const AkDeviceStatusCallbackFunc = callback_types.AkDeviceStatusCallbackFunc;
 pub const AkCaptureCallbackFunc = callback_types.AkCaptureCallbackFunc;
 
-// common.zig
-const common = @import("common.zig");
-pub const AkOSChar = common.AkOSChar;
-pub const AkUtf16 = common.AkUtf16;
-
-pub const AK_MAX_PATH = common.AK_MAX_PATH;
-
-pub const AK_BANK_PLATFORM_DATA_ALIGNMENT = common.AK_BANK_PLATFORM_DATA_ALIGNMENT;
-pub const IAkSoftwareCodec = common.IAkSoftwareCodec;
-pub const IAkFileCodec = common.IAkFileCodec;
-pub const IAkGrainCodec = common.IAkGrainCodec;
-pub const AkCreateFileSourceCallback = common.AkCreateFileSourceCallback;
-pub const AkCreateBankSourceCallback = common.AkCreateBankSourceCallback;
-pub const AkCreateFileCodecCallback = common.AkCreateFileCodecCallback;
-pub const AkCreateGrainCodecCallback = common.AkCreateGrainCodecCallback;
-pub const AkCodecDescriptor = common.AkCodecDescriptor;
-pub const AkFileHandle = common.AkFileHandle;
-pub const AkDeviceDescription = common.AkDeviceDescription;
-pub const AkExternalSourceInfo = common.AkExternalSourceInfo;
-pub const AkObstructionOcclusionValues = common.AkObstructionOcclusionValues;
-
-pub const AkAuxSendValue = common.AkAuxSendValue;
-pub const AkAudioSettings = common.AkAudioSettings;
-pub const fromOSChar = common.fromOSChar;
-pub const toOSChar = common.toOSChar;
-pub const fromOSCharUtf16 = common.fromOSCharUtf16;
-pub const toOSCharUtf16 = common.toOSCharUtf16;
-pub const fromCString = common.fromCString;
-pub const toCString = common.toCString;
-pub const stackCharAllocator = common.stackCharAllocator;
-
 // constants.zig
 const constants = @import("constants.zig");
 pub const AK_INVALID_PLUGINID = constants.AK_INVALID_PLUGINID;
@@ -189,7 +158,6 @@ const common_defs = @import("common_defs.zig");
 pub const AK_INT = common_defs.AK_INT;
 pub const AK_FLOAT = common_defs.AK_FLOAT;
 pub const AkMetering = common_defs.AkMetering;
-pub const Ak3DAudioSinkCapabilities = common_defs.Ak3DAudioSinkCapabilities;
 pub const AkSampleType = common_defs.AkSampleType;
 pub const AkAudioBuffer = common_defs.AkAudioBuffer;
 
@@ -398,11 +366,18 @@ pub const AkMIDIPost = midi_types.AkMIDIPost;
 const platform_context = @import("platform_context.zig");
 pub const IAkPlatformContext = platform_context.IAkPlatformContext;
 
+// platform_types.zig
+const platform_types = @import("platform_types.zig");
+pub const AkOSChar = platform_types.AkOSChar;
+pub const AkUtf16 = platform_types.AkUtf16;
+pub const AkFileHandle = platform_types.AkFileHandle;
+pub const AK_MAX_PATH = platform_types.AK_MAX_PATH;
+pub const AK_BANK_PLATFORM_DATA_ALIGNMENT = platform_types.AK_BANK_PLATFORM_DATA_ALIGNMENT;
+
 // settings.zig
 const settings = @import("settings.zig");
 pub const AkJobWorkerFunc = settings.AkJobWorkerFunc;
 pub const AkJobMgrSettings = settings.AkJobMgrSettings;
-pub const AkOutputSettings = settings.AkOutputSettings;
 pub const AkFloorPlane = settings.AkFloorPlane;
 pub const AkAssertHook = settings.AkAssertHook;
 pub const AkBackgroundMusicChangeCallbackFunc = settings.AkBackgroundMusicChangeCallbackFunc;
@@ -434,6 +409,25 @@ pub const IOS_AkAudioCallbacks = settings.IOS_AkAudioCallbacks;
 pub const IOS_AkPlatformInitSettings = settings.IOS_AkPlatformInitSettings;
 pub const AkAudioAPIAndroid = settings.AkAudioAPIAndroid;
 pub const ANDROID_AkPlatformInitSettings = settings.ANDROID_AkPlatformInitSettings;
+
+// sound_engine_types.zig
+const sound_engine_types = @import("sound_engine_types.zig");
+pub const AkAudioSettings = sound_engine_types.AkAudioSettings;
+pub const AkDeviceDescription = sound_engine_types.AkDeviceDescription;
+pub const Ak3DAudioSinkCapabilities = sound_engine_types.Ak3DAudioSinkCapabilities;
+pub const AkOutputDeviceInfo = sound_engine_types.AkOutputDeviceInfo;
+pub const AkObstructionOcclusionValues = sound_engine_types.AkObstructionOcclusionValues;
+pub const AkAuxSendValue = sound_engine_types.AkAuxSendValue;
+pub const AkExternalSourceInfo = sound_engine_types.AkExternalSourceInfo;
+pub const AkOutputSettings = sound_engine_types.AkOutputSettings;
+pub const IAkSoftwareCodec = sound_engine_types.IAkSoftwareCodec;
+pub const IAkFileCodec = sound_engine_types.IAkFileCodec;
+pub const IAkGrainCodec = sound_engine_types.IAkGrainCodec;
+pub const AkCreateFileSourceCallback = sound_engine_types.AkCreateFileSourceCallback;
+pub const AkCreateBankSourceCallback = sound_engine_types.AkCreateBankSourceCallback;
+pub const AkCreateFileCodecCallback = sound_engine_types.AkCreateFileCodecCallback;
+pub const AkCreateGrainCodecCallback = sound_engine_types.AkCreateGrainCodecCallback;
+pub const AkCodecDescriptor = sound_engine_types.AkCodecDescriptor;
 
 // speaker_config.zig
 const speaker_config = @import("speaker_config.zig");
@@ -506,9 +500,16 @@ pub const Windows = if (wwise_options.platform == .windows) @import("win_sound_e
 
 // zig.zig
 const zig = @import("zig.zig");
-pub const DefaultEnumType = zig.DefaultEnumType;
-pub const handleAkResult = zig.handleAkResult;
 pub const WwiseError = zig.WwiseError;
+pub const handleAkResult = zig.handleAkResult;
+pub const DefaultEnumType = zig.DefaultEnumType;
+pub const fromOSChar = zig.fromOSChar;
+pub const toOSChar = zig.toOSChar;
+pub const fromOSCharUtf16 = zig.fromOSCharUtf16;
+pub const toOSCharUtf16 = zig.toOSCharUtf16;
+pub const fromCString = zig.fromCString;
+pub const toCString = zig.toCString;
+pub const stackCharAllocator = zig.stackCharAllocator;
 
 comptime {
     @setEvalBranchQuota(5000);

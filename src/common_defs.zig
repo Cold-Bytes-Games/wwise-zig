@@ -27,26 +27,6 @@ pub const AkMetering = extern struct {
     }
 };
 
-pub const Ak3DAudioSinkCapabilities = extern struct {
-    channel_config: speaker_config.AkChannelConfig = .{},
-    max_system_audio_objects: u32 = 0,
-    available_system_audio_objects: u32 = 0,
-    passthrough: bool = false,
-    multi_channel_objects: bool = false,
-
-    pub inline fn fromC(value: c.WWISEC_Ak3DAudioSinkCapabilities) Ak3DAudioSinkCapabilities {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: Ak3DAudioSinkCapabilities) c.WWISEC_Ak3DAudioSinkCapabilities {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(Ak3DAudioSinkCapabilities) == @sizeOf(c.WWISEC_Ak3DAudioSinkCapabilities));
-    }
-};
-
 pub const AkSampleType = c.WWISEC_AkSampleType;
 
 pub const AkAudioBuffer = extern struct {

@@ -10,6 +10,7 @@ const midi_types = @import("midi_types.zig");
 const Monitor = @import("Monitor.zig");
 const platform_context = @import("platform_context.zig");
 const settings = @import("settings.zig");
+const sound_engine_types = @import("sound_engine_types.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const std = @import("std");
@@ -262,8 +263,8 @@ pub const IAkGlobalPluginContext = opaque {
         }
     }
 
-    pub fn getAudioSettings(self: *const IAkGlobalPluginContext) zig.WwiseError!common.AkAudioSettings {
-        var result: common.AkAudioSettings = .{};
+    pub fn getAudioSettings(self: *const IAkGlobalPluginContext) zig.WwiseError!sound_engine_types.AkAudioSettings {
+        var result: sound_engine_types.AkAudioSettings = .{};
         try zig.handleAkResult(c.WWISEC_AK_IAkGlobalPluginContext_GetAudioSettings(@ptrCast(self), @ptrCast(&result)));
         return result;
     }

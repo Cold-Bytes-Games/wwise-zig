@@ -1,5 +1,7 @@
 const builtin = @import("builtin");
 const c = @import("wwise_c");
+const std = @import("std");
+const wwise_options = @import("wwise_options");
 
 // This is a mirror of AKRESULT without AK_Success
 pub const WwiseError = error{
@@ -163,3 +165,47 @@ pub const DefaultEnumType = switch (builtin.abi) {
     .msvc => i32,
     else => u32,
 };
+
+pub const fromOSChar = blk: {
+    if (builtin.os.tag == .windows) {
+        break :blk fromOSCharUtf16;
+    } else {
+        break :blk fromCString;
+    }
+};
+
+pub const toOSChar = blk: {
+    if (builtin.os.tag == .windows) {
+        break :blk toOSCharUtf16;
+    } else {
+        break :blk toCString;
+    }
+};
+
+pub fn fromOSCharUtf16(allocator: std.mem.Allocator, value_opt: ?[*:0]const u16) ![]u8 {
+    if (value_opt) |value| {
+        return std.unicode.utf16LeToUtf8Alloc(allocator, value[0..std.mem.len(value)]);
+    }
+
+    return "";
+}
+
+pub fn toOSCharUtf16(allocator: std.mem.Allocator, value: []const u8) ![:0]u16 {
+    return std.unicode.utf8ToUtf16LeAllocZ(allocator, value);
+}
+
+pub fn fromCString(allocator: std.mem.Allocator, value_opt: ?[*:0]const u8) ![]u8 {
+    if (value_opt) |value| {
+        return allocator.dupe(u8, value[0..std.mem.len(value)]);
+    }
+
+    return "";
+}
+
+pub fn toCString(allocator: std.mem.Allocator, value: []const u8) ![:0]u8 {
+    return allocator.dupeZ(u8, value);
+}
+
+pub fn stackCharAllocator(fallback_allocator: std.mem.Allocator) std.heap.StackFallbackAllocator(wwise_options.string_stack_size) {
+    return std.heap.stackFallback(wwise_options.string_stack_size, fallback_allocator);
+}

@@ -4,24 +4,25 @@ const std = @import("std");
 
 // NOTE: Please sync this with the defines in AkSpeakerConfig.h
 pub const AkSpeakerSetup = packed struct(u20) {
-    front_left: bool = false,
-    front_right: bool = false,
-    front_center: bool = false,
-    low_frequency: bool = false,
-    back_left: bool = false,
-    back_right: bool = false,
+    front_left: bool = false, // 0x01 (1 << 0)
+    front_right: bool = false, // 0x2 (1 << 1)
+    front_center: bool = false, // 0x4 (1 << 2)
+    low_frequency: bool = false, // 0x8 (1 << 3)
+    back_left: bool = false, // 0x10 (1 << 4)
+    back_right: bool = false, // 0x20 (1 << 5)
     padded1: u2 = 0,
-    back_center: bool = false,
-    side_left: bool = false,
-    side_right: bool = false,
-    height_top: bool = false,
-    height_front_left: bool = false,
-    height_front_center: bool = false,
-    height_front_right: bool = false,
-    height_back_left: bool = false,
-    height_back_center: bool = false,
-    height_back_right: bool = false,
-    padded2: u2 = 0,
+    back_center: bool = false, // 0x100 (1 << 8)
+    side_left: bool = false, // 0x200 (1 << 9)
+    side_right: bool = false, // 0x400 (1 << 10)
+    height_top: bool = false, // 0x800 (1 << 11)
+    height_front_left: bool = false, // 0x1000 (1 << 12)
+    height_front_center: bool = false, // 0x2000 (1 << 13)
+    height_front_right: bool = false, // 0x4000 (1 << 14)
+    height_back_left: bool = false, // 0x8000 (1 << 15)
+    height_back_center: bool = false, // 0x10000 (1 << 16)
+    height_back_right: bool = false, // 0x20000 (1 << 17)
+    height_side_left: bool = false, // 0x40000 (1 << 18)
+    height_side_right: bool = false, // 0x80000 (1 << 19)
 
     pub const @"0.1" = AkSpeakerSetup{
         .low_frequency = true,
@@ -357,6 +358,17 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_right = true,
     };
 
+    pub const @"Dolby 5.1.2" = AkSpeakerSetup{
+        .front_left = true,
+        .front_right = true,
+        .side_left = true,
+        .side_right = true,
+        .front_center = true,
+        .height_front_left = true,
+        .height_front_right = true,
+        .low_frequency = true,
+    };
+
     pub const @"Dolby 5.0.4" = AkSpeakerSetup{
         .front_left = true,
         .front_right = true,
@@ -379,17 +391,6 @@ pub const AkSpeakerSetup = packed struct(u20) {
         .height_front_right = true,
         .height_back_left = true,
         .height_back_right = true,
-        .low_frequency = true,
-    };
-
-    pub const @"Dolby 5.1.2" = AkSpeakerSetup{
-        .front_left = true,
-        .front_right = true,
-        .side_left = true,
-        .side_right = true,
-        .front_center = true,
-        .height_front_left = true,
-        .height_front_right = true,
         .low_frequency = true,
     };
 
@@ -599,9 +600,9 @@ comptime {
     std.debug.assert(@as(u20, @bitCast(AkSpeakerSetup{ .side_right = true })) == 0x400);
 }
 
-pub const AK_STANDARD_MAX_NUM_CHANNELS = 8;
-pub const AK_MAX_AMBISONICS_ORDER = 5;
-pub const AK_DEFAULT_HEIGHT_ANGLE = c.WWISEC_AK_DEFAULT_HEIGHT_ANGLE;
+pub const AK_STANDARD_MAX_NUM_CHANNELS = c.AK_STANDARD_MAX_NUM_CHANNELS;
+pub const AK_MAX_AMBISONICS_ORDER = c.AK_MAX_AMBISONICS_ORDER;
+pub const AK_DEFAULT_HEIGHT_ANGLE = c.AK_DEFAULT_HEIGHT_ANGLE;
 
 pub const AkChannelConfig = packed struct(u32) {
     num_channels: u8 = 0,
@@ -683,7 +684,7 @@ pub const AkChannelConfig = packed struct(u32) {
     }
 
     pub inline fn isValid(self: AkChannelConfig) bool {
-        return @intFromEnum(self.config_type) <= @intFromEnum(AkChannelConfigType.objects) and (self.num_channels != 0 or self.config_type == .objects);
+        return @intFromEnum(self.config_type) <= @intFromEnum(enums.AkChannelConfigType.objects) and (self.num_channels != 0 or self.config_type == .objects);
     }
 
     pub inline fn removeLFE(self: AkChannelConfig) AkChannelConfig {
@@ -712,11 +713,11 @@ pub const AkChannelConfig = packed struct(u32) {
         return self.channel_mask.hasCenter();
     }
 
-    pub inline fn fromC(channel_config: u32) AkChannelConfig {
+    pub inline fn fromC(channel_config: c.AkChannelConfig) AkChannelConfig {
         return @bitCast(channel_config);
     }
 
-    pub inline fn toC(self: AkChannelConfig) u32 {
+    pub inline fn toC(self: AkChannelConfig) c.AkChannelConfig {
         return @bitCast(self);
     }
 };

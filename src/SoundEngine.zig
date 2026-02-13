@@ -9,6 +9,7 @@ const IAkPlugin = @import("IAkPlugin.zig");
 const IBytes = @import("IBytes.zig");
 const midi_types = @import("midi_types.zig");
 const settings = @import("settings.zig");
+const sound_engine_types = @import("sound_engine_types.zig");
 const speaker_config = @import("speaker_config.zig");
 const SpeakerVolumes = @import("SpeakerVolumes.zig");
 const std = @import("std");
@@ -133,7 +134,7 @@ pub fn term() void {
     c.WWISEC_AK_SoundEngine_Term();
 }
 
-pub fn getAudioSettings(out_settings: *common.AkAudioSettings) zig.WwiseError!void {
+pub fn getAudioSettings(out_settings: *sound_engine_types.AkAudioSettings) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetAudioSettings(@ptrCast(out_settings)),
     );
@@ -145,13 +146,13 @@ pub fn getSpeakerConfiguration(in_id_output: typedefs.AkOutputDeviceID) speaker_
     );
 }
 
-pub fn getOutputDeviceConfiguration(in_id_output: typedefs.AkOutputDeviceID, io_channel_config: *speaker_config.AkChannelConfig, io_capabilities: *common_defs.Ak3DAudioSinkCapabilities) zig.WwiseError!void {
+pub fn getOutputDeviceConfiguration(in_id_output: typedefs.AkOutputDeviceID, io_channel_config: *speaker_config.AkChannelConfig, io_capabilities: *sound_engine_types.Ak3DAudioSinkCapabilities) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetOutputDeviceConfiguration(in_id_output, @ptrCast(io_channel_config), @ptrCast(io_capabilities)),
     );
 }
 
-pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!enusm.AkPanningRule {
+pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!enums.AkPanningRule {
     var raw_panning_rule: c.WWISEC_AkPanningRule = 0;
 
     try zig.handleAkResult(
@@ -161,7 +162,7 @@ pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!en
     return @enumFromInt(raw_panning_rule);
 }
 
-pub fn setPanningRule(in_panning_rule: enusm.AkPanningRule, in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
+pub fn setPanningRule(in_panning_rule: enums.AkPanningRule, in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetPanningRule(@intFromEnum(in_panning_rule), in_id_output),
     );
@@ -328,7 +329,7 @@ pub const PostEventOptionalArgs = struct {
     callback: callback_types.AkCallbackFunc = null,
     cookie: ?*anyopaque = null,
     allocator: ?std.mem.Allocator = null,
-    external_sources: ?[]const common.AkExternalSourceInfo = null,
+    external_sources: ?[]const sound_engine_types.AkExternalSourceInfo = null,
     playing_id: typedefs.AkPlayingID = 0,
 };
 
@@ -1773,8 +1774,8 @@ pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []c
     );
 }
 
-pub fn setGameObjectAuxSendValues(allocator: std.mem.Allocator, in_game_object_id: typedefs.AkGameObjectID, in_aux_send_values: []const common.AkAuxSendValue) zig.WwiseError!void {
-    const raw_aux_send_values = allocator.alloc(c.WWISEC_AkAuxSendValue, in_aux_send_values.len) catch return zig.WwiseError.Fail;
+pub fn setGameObjectAuxSendValues(allocator: std.mem.Allocator, in_game_object_id: typedefs.AkGameObjectID, in_aux_send_values: []const sound_engine_types.AkAuxSendValue) zig.WwiseError!void {
+    const raw_aux_send_values = allocator.alloc(c.AkAuxSendValue, in_aux_send_values.len) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_aux_send_values);
 
     for (0..in_aux_send_values.len) |index| {
@@ -1882,7 +1883,7 @@ pub fn setObjectObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, 
     );
 }
 
-pub fn setMultipleObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID, in_obstruction_occlusion_values: []const common.AkObstructionOcclusionValues) zig.WwiseError!void {
+pub fn setMultipleObstructionAndOcclusion(in_emitter_id: typedefs.AkGameObjectID, in_listener_id: typedefs.AkGameObjectID, in_obstruction_occlusion_values: []const sound_engine_types.AkObstructionOcclusionValues) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetMultipleObstructionAndOcclusion(
             in_emitter_id,
@@ -2069,7 +2070,7 @@ pub fn setBusDeviceString(fallback_allocator: std.mem.Allocator, in_bus_name: []
     );
 }
 
-pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_plugin_id: u32, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) zig.WwiseError!void {
+pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_plugin_id: u32, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]sound_engine_types.AkDeviceDescription) zig.WwiseError!void {
     var area_allocator_instance = std.heap.ArenaAllocator.init(allocator);
     defer area_allocator_instance.deinit();
 
@@ -2096,13 +2097,13 @@ pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_
     if (out_device_descriptions_opt) |out_device_descriptions| {
         if (raw_device_descriptions_ptr) |raw_device_descritions| {
             for (0..io_max_num_devices.*) |index| {
-                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return zig.WwiseError.Fail;
+                out_device_descriptions[index] = sound_engine_types.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return zig.WwiseError.Fail;
             }
         }
     }
 }
 
-pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share_set_id: typedefs.AkUniqueID, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]common.AkDeviceDescription) zig.WwiseError!void {
+pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share_set_id: typedefs.AkUniqueID, io_max_num_devices: *u32, out_device_descriptions_opt: ?[*]sound_engine_types.AkDeviceDescription) zig.WwiseError!void {
     var area_allocator_instance = std.heap.ArenaAllocator.init(allocator);
     defer area_allocator_instance.deinit();
 
@@ -2128,7 +2129,7 @@ pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share
     if (out_device_descriptions_opt) |out_device_descriptions| {
         if (raw_device_descriptions_ptr) |raw_device_descritions| {
             for (0..io_max_num_devices.*) |index| {
-                out_device_descriptions[index] = common.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return zig.WwiseError.Fail;
+                out_device_descriptions[index] = sound_engine_types.AkDeviceDescription.fromC(allocator, raw_device_descritions[index]) catch return zig.WwiseError.Fail;
             }
         }
     }
