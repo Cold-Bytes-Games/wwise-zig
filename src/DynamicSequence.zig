@@ -1,7 +1,7 @@
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
-const common = @import("common.zig");
 const enums = @import("enums.zig");
+const sound_engine_types = @import("sound_engine_types.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
 const zig = @import("zig.zig");
@@ -22,7 +22,7 @@ pub const PlaylistItem = extern struct {
         return @bitCast(self);
     }
 
-    pub fn setExternalSources(self: *PlaylistItem, external_srcs: []const common.AkExternalSourceInfo) zig.WwiseError!void {
+    pub fn setExternalSources(self: *PlaylistItem, external_srcs: []const sound_engine_types.AkExternalSourceInfo) zig.WwiseError!void {
         return zig.handleAkResult(
             c.WWISEC_AK_SoundEngine_DynamicSequence_PlaylistItem_SetExternalSources(
                 @ptrCast(self),
@@ -41,7 +41,7 @@ pub const Playlist = opaque {
     pub const EnqueueOptionalArgs = struct {
         ms_delay: typedefs.AkTimeMs = 0,
         custom_info: ?*anyopaque = null,
-        external_sources: []const common.AkExternalSourceInfo = &.{},
+        external_sources: []const sound_engine_types.AkExternalSourceInfo = &.{},
     };
 
     pub fn enqueue(self: *Playlist, in_audio_node_id: typedefs.AkUniqueID, optional_args: EnqueueOptionalArgs) zig.WwiseError!void {

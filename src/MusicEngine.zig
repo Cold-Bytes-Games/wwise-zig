@@ -1,6 +1,5 @@
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
-const common = @import("common.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
 const zig = @import("zig.zig");

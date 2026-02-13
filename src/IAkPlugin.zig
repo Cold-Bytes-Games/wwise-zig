@@ -1,7 +1,6 @@
 const ak_3d_objects = @import("ak_3d_objects.zig");
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
-const common = @import("common.zig");
 const constants = @import("constants.zig");
 const enums = @import("enums.zig");
 const IAkPluginMemAlloc = @import("IAkPluginMemAlloc.zig").IAkPluginMemAlloc;
@@ -284,8 +283,8 @@ pub const IAkGlobalPluginContext = opaque {
         callback: callback_types.AkCallbackFunc = null,
         cookie: ?*anyopaque = null,
         allocator: ?std.mem.Allocator = null,
-        external_sources: ?[]const common.AkExternalSourceInfo = null,
-        playing_id: typedefs.AkPlayingID = connstants.AK_INVALID_PLAYING_ID,
+        external_sources: ?[]const sound_engine_types.AkExternalSourceInfo = null,
+        playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
     };
 
     pub fn postEventSync(

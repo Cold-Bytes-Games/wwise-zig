@@ -1,7 +1,6 @@
 const ak_3d_objects = @import("ak_3d_objects.zig");
 const c = @import("wwise_c");
 const callback_types = @import("callback_types.zig");
-const common = @import("common.zig");
 const common_defs = @import("common_defs.zig");
 const constants = @import("constants.zig");
 const enums = @import("enums.zig");
@@ -2008,7 +2007,7 @@ pub fn setOfflineRendering(in_enable_offline_rendering: bool) zig.WwiseError!voi
     );
 }
 
-pub fn addOutput(output_settings: *const settings.AkOutputSettings, listeners: []typedefs.AkGameObjectID) zig.WwiseError!typedefs.AkOutputDeviceID {
+pub fn addOutput(output_settings: *const sound_engine_types.AkOutputSettings, listeners: []typedefs.AkGameObjectID) zig.WwiseError!typedefs.AkOutputDeviceID {
     var out_device_id: typedefs.AkOutputDeviceID = constants.AK_INVALID_OUTPUT_DEVICE_ID;
 
     try zig.handleAkResult(
@@ -2029,7 +2028,7 @@ pub fn removeOutput(id_output: typedefs.AkOutputDeviceID) zig.WwiseError!void {
     );
 }
 
-pub fn replaceOutput(output_settings: *const settings.AkOutputSettings, in_device_id: typedefs.AkOutputDeviceID, out_device_id: ?*typedefs.AkOutputDeviceID) zig.WwiseError!void {
+pub fn replaceOutput(output_settings: *const sound_engine_types.AkOutputSettings, in_device_id: typedefs.AkOutputDeviceID, out_device_id: ?*typedefs.AkOutputDeviceID) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ReplaceOutput(@ptrCast(output_settings), in_device_id, @ptrCast(out_device_id)),
     );

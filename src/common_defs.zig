@@ -1,9 +1,8 @@
-const std = @import("std");
 const c = @import("wwise_c");
-const common = @import("common.zig");
-const SpeakerVolumes = @import("SpeakerVolumes.zig");
-const speaker_config = @import("speaker_config.zig");
 const enums = @import("enums.zig");
+const speaker_config = @import("speaker_config.zig");
+const SpeakerVolumes = @import("SpeakerVolumes.zig");
+const std = @import("std");
 
 pub const AK_INT = c.WWISEC_AK_INT;
 pub const AK_FLOAT = c.WWISEC_AK_FLOAT;

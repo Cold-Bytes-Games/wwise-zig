@@ -1,8 +1,8 @@
 const builtin = @import("builtin");
 const c = @import("wwise_c");
-const common = @import("common.zig");
 const constants = @import("constants.zig");
 const enums = @import("enums.zig");
+const sound_engine_types = @import("sound_engine_types.zig");
 const speaker_config = @import("speaker_config.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
@@ -33,45 +33,6 @@ pub const AkJobMgrSettings = extern struct {
     }
 };
 
-pub const AkOutputSettings = extern struct {
-    audio_device_shareset: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
-    id_device: u32 = 0,
-    panning_rule: enusm.AkPanningRule = .speakers,
-    channel_config: speaker_config.AkChannelConfig = .{},
-
-    pub const InitOptionalArgs = struct {
-        id_device: typedefs.AkUniqueID = constants.AK_INVALID_UNIQUE_ID,
-        channel_config: speaker_config.AkChannelConfig = .{},
-        panning: enusm.AkPanningRule = .speakers,
-    };
-
-    pub fn init(fallback_allocator: std.mem.Allocator, device_shareset: []const u8, optional_args: InitOptionalArgs) !AkOutputSettings {
-        var raw_output_settings: c.WWISEC_AkOutputSettings = undefined;
-
-        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
-        var allocator = stack_char_allocator.get();
-
-        const device_shareset_cstr = try common.toCString(allocator, device_shareset);
-        defer allocator.free(device_shareset_cstr);
-
-        c.WWISEC_AkOutputSettings_Init(&raw_output_settings, device_shareset_cstr, optional_args.id_device, optional_args.channel_config.toC(), @intFromEnum(optional_args.panning));
-
-        return fromC(raw_output_settings);
-    }
-
-    pub inline fn fromC(value: c.WWISEC_AkOutputSettings) AkOutputSettings {
-        return @bitCast(value);
-    }
-
-    pub inline fn toC(self: AkOutputSettings) c.WWISEC_AkOutputSettings {
-        return @bitCast(self);
-    }
-
-    comptime {
-        std.debug.assert(@sizeOf(AkOutputSettings) == @sizeOf(c.WWISEC_AkOutputSettings));
-    }
-};
-
 pub const AkFloorPlane = enum(zig.DefaultEnumType) {
     xz = c.WWISEC_AkFloorPlane_XZ,
     xy = c.WWISEC_AkFloorPlane_XY,
@@ -95,7 +56,7 @@ pub const AkInitSettings = struct {
     num_samples_per_frame: u32 = 0,
     monitor_queue_pool_size: u32 = 0,
     cpu_monitor_queue_max_size: u32 = 0,
-    settings_main_output: AkOutputSettings = .{},
+    settings_main_output: sound_engine_types.AkOutputSettings = .{},
     settings_job_manager: AkJobMgrSettings = .{},
     max_hardware_timeout_ms: u32 = 0,
     use_sound_bank_mgr_thread: bool = false,
@@ -129,7 +90,7 @@ pub const AkInitSettings = struct {
             .num_samples_per_frame = value.uNumSamplesPerFrame,
             .monitor_queue_pool_size = value.uMonitorQueuePoolSize,
             .cpu_monitor_queue_max_size = value.uCpuMonitorQueueMaxSize,
-            .settings_main_output = AkOutputSettings.fromC(value.settingsMainOutput),
+            .settings_main_output = sound_engine_types.AkOutputSettings.fromC(value.settingsMainOutput),
             .settings_job_manager = AkJobMgrSettings.fromC(value.settingsJobManager),
             .max_hardware_timeout_ms = value.uMaxHardwareTimeoutMs,
             .use_sound_bank_mgr_thread = value.bUseSoundBankMgrThread,

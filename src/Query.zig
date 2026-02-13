@@ -1,6 +1,5 @@
 const ak_3d_objects = @import("ak_3d_objects.zig");
 const c = @import("wwise_c");
-const common = @import("common.zig");
 const constants = @import("constants.zig");
 const enums = @import("enums.zig");
 const sound_engine_types = @import("sound_engine_types.zig");
@@ -212,7 +211,7 @@ pub fn getStateString(fallback_allocator: std.mem.Allocator, in_state_group_name
     return result;
 }
 
-pub fn getGameObjectAuxSendValues(in_game_object_id: typedefs.AkGameObjectID, out_aux_send_values: ?[*]common.AkAuxSendValue, io_num_send_values: *u32) zig.WwiseError!void {
+pub fn getGameObjectAuxSendValues(in_game_object_id: typedefs.AkGameObjectID, out_aux_send_values: ?[*]sound_engine_types.AkAuxSendValue, io_num_send_values: *u32) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_Query_GetGameObjectAuxSendValues(
             in_game_object_id,

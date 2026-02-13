@@ -1,5 +1,4 @@
 const c = @import("wwise_c");
-const common = @import("common.zig");
 const std = @import("std");
 const StreamMgr = @import("StreamMgr.zig");
 const wwise_options = @import("wwise_options");

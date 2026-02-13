@@ -1,5 +1,4 @@
 const c = @import("wwise_c");
-const common = @import("common.zig");
 const common_defs = @import("common_defs.zig");
 const enums = @import("enums.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
