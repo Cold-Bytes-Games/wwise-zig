@@ -117,10 +117,6 @@ extern "C"
 #include <AK/SoundEngine/Common/AkMidiTypes.h>
     // END AkMidiTypes
 
-    // BEGIN AkSpeakerVolumes
-
-    // END AkSpeakerVolumes
-
 // BEGIN AkErrorMessageTranslator
 #define WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE 150
 #define WWISEC_AK_MAX_ERROR_LENGTH 1000
@@ -362,7 +358,6 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_MismatchingMediaSize,
         WWISEC_AK_Monitor_ErrorCode_IncompatibleBankVersion,
         WWISEC_AK_Monitor_ErrorCode_UnexpectedPrepareGameSyncsCall,
-        WWISEC_AK_Monitor_ErrorCode_MusicEngineNotInitialized,
         WWISEC_AK_Monitor_ErrorCode_LoadingBankMismatch,
 
         WWISEC_AK_Monitor_ErrorCode_ProxyObjectMismatch,
@@ -468,6 +463,14 @@ extern "C"
         WWISEC_AK_Monitor_ErrorCode_WwiseIODisconnected,
         WWISEC_AK_Monitor_ErrorCode_WwiseIODisconnectedStr,
         WWISEC_AK_Monitor_ErrorCode_IODevice,
+
+        WWISEC_AK_Monitor_ErrorCode_InvalidCommand,
+        WWISEC_AK_Monitor_ErrorCode_PlayingIDAlreadyExists,
+        WWISEC_AK_Monitor_ErrorCode_IOStreamLeak,
+
+        WWISEC_AK_Monitor_ErrorCode_SetSidechainMixConfigInvalid,
+
+        WWISEC_AK_Monitor_ErrorCode_NodeNotCompatibleWithMidi,
         // ALWAYS ADD NEW CODES AT THE END !!!!!!!
         // Otherwise it may break comm compatibility in a patch
 

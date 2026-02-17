@@ -2,6 +2,7 @@ const builtin = @import("builtin");
 const c = @import("wwise_c");
 const constants = @import("constants.zig");
 const error_message_translator = @import("error_message_translator.zig");
+const platform_types = @import("platform_types.zig");
 const std = @import("std");
 const StreamMgr = @import("StreamMgr.zig");
 const typedefs = @import("typedefs.zig");
@@ -181,7 +182,6 @@ pub const ErrorCode = enum(zig.DefaultEnumType) {
     mismatching_media_size = c.WWISEC_AK_Monitor_ErrorCode_MismatchingMediaSize,
     incompatible_bank_version = c.WWISEC_AK_Monitor_ErrorCode_IncompatibleBankVersion,
     unexpected_prepare_game_syncs_call = c.WWISEC_AK_Monitor_ErrorCode_UnexpectedPrepareGameSyncsCall,
-    music_engine_not_initialized = c.WWISEC_AK_Monitor_ErrorCode_MusicEngineNotInitialized,
     loading_bank_mismatch = c.WWISEC_AK_Monitor_ErrorCode_LoadingBankMismatch,
     proxy_object_mismatch = c.WWISEC_AK_Monitor_ErrorCode_ProxyObjectMismatch,
     proxy_object_memory = c.WWISEC_AK_Monitor_ErrorCode_ProxyObjectMemory,
@@ -266,9 +266,14 @@ pub const ErrorCode = enum(zig.DefaultEnumType) {
     wwise_io_disconnected = c.WWISEC_AK_Monitor_ErrorCode_WwiseIODisconnected,
     wwise_io_disconnected_str = c.WWISEC_AK_Monitor_ErrorCode_WwiseIODisconnectedStr,
     io_device = c.WWISEC_AK_Monitor_ErrorCode_IODevice,
+    invalid_command = c.WWISEC_AK_Monitor_ErrorCode_InvalidCommand,
+    playing_id_already_exists = c.WWISEC_AK_Monitor_ErrorCode_PlayingIDAlreadyExists,
+    io_stream_leak = c.WWISEC_AK_Monitor_ErrorCode_IOStreamLeak,
+    set_sidechain_mix_config_invalid = c.WWISEC_AK_Monitor_ErrorCode_SetSidechainMixConfigInvalid,
+    node_not_compatible_with_midi = c.WWISEC_AK_Monitor_ErrorCode_NodeNotCompatibleWithMidi,
 };
 
-pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const common.AkOSChar, in_error_level: ErrorLevel, in_playing_id: typedefs.AkPlayingID, in_game_object_id: typedefs.AkGameObjectID) callconv(.c) void;
+pub const LocalOutputFunc = ?*const fn (in_error_code: ErrorCode, in_error: [*:0]const platform_types.AkOSChar, in_error_level: ErrorLevel, in_playing_id: typedefs.AkPlayingID, in_game_object_id: typedefs.AkGameObjectID) callconv(.c) void;
 
 pub const PostCodeOptionalArgs = struct {
     playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
@@ -298,10 +303,10 @@ pub const PostStringOptionalArgs = struct {
 };
 
 pub fn postString(fallback_allocator: std.mem.Allocator, in_error: []const u8, in_error_level: ErrorLevel, optional_args: PostStringOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_error = common.toCString(allocator, in_error) catch return zig.WwiseError.Fail;
+    const raw_error = zig.toCString(allocator, in_error) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_error);
 
     return zig.handleAkResult(
