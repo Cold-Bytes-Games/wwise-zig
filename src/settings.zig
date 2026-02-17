@@ -434,9 +434,12 @@ pub const IOS_AkPlatformInitSettings = extern struct {
 pub const AkAudioAPIAndroid = packed struct(zig.DefaultEnumType) {
     aaudio: bool = false,
     opensl_es: bool = false,
-    pad: u30 = 0,
+    pad0: u6 = 0,
+    dolby_atmos: bool = false,
+    android_spatializer: bool = false,
+    pad1: u23 = 0,
 
-    pub const Default: AkAudioAPIAndroid = .{ .aaudio = true, .opensl_es = true };
+    pub const Default: AkAudioAPIAndroid = .{ .aaudio = true, .opensl_es = true, .dolby_atmos = true, .android_spatializer = true };
 
     pub inline fn fromC(value: c.WWISEC_AkAudioAPIAndroid) AkAudioAPIAndroid {
         return @bitCast(value);
@@ -447,21 +450,26 @@ pub const AkAudioAPIAndroid = packed struct(zig.DefaultEnumType) {
     }
 };
 
+pub const Android_AkAudioPath = enum(zig.DefaultEnumType) {
+    legacy = c.WWISEC_Android_AkAudioPath_AkAudioPath_Legacy,
+    LowLatency = c.WWISEC_Android_AkAudioPath_AkAudioPath_LowLatency,
+    exclusive = c.WWISEC_Android_AkAudioPath_AkAudioPath_Exclusive,
+    default = c.WWISEC_Android_AkAudioPath_AkAudioPath_Default,
+};
+
 pub const ANDROID_AkPlatformInitSettings = extern struct {
     thread_l_engine: POSIX_AkThreadProperties = .{},
     thread_output_mgr: POSIX_AkThreadProperties = .{},
     thread_bank_manager: POSIX_AkThreadProperties = .{},
     thread_monitor: POSIX_AkThreadProperties = .{},
     audio_api: AkAudioAPIAndroid = AkAudioAPIAndroid.Default,
+    audio_path: Android_AkAudioPath = .default,
     sample_rate: u32 = 0,
     num_refills_in_voice: u16 = 0,
-    round_frame_size_to_hw_size: bool = false,
     p_sl_engine: ?*anyopaque = null,
     p_java_vm: ?*anyopaque = null,
     j_activity: ?*anyopaque = null,
     verbose_sink: bool = false,
-    enable_low_latency: bool = false,
-    enable_exclusive_mode: bool = false,
 
     pub inline fn fromC(value: c.WWISEC_ANDROID_AkPlatformInitSettings) ANDROID_AkPlatformInitSettings {
         return @bitCast(value);

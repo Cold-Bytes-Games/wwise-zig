@@ -1051,10 +1051,37 @@ extern "C"
     ///< \sa AK::SoundEngine::Init
     typedef enum WWISEC_AkAudioAPIAndroid
     {
-        WWISEC_AkAudioAPIAndroid_AAudio = 1 << 0,                                                                ///< Use AAudio (lower latency, available only for Android 8.1 or above)
-        WWISEC_AkAudioAPIAndroid_OpenSL_ES = 1 << 1,                                                             ///< Use OpenSL ES (older API, compatible with all Android devices)
-        WWISEC_AkAudioAPIAndroid_Default = WWISEC_AkAudioAPIAndroid_AAudio | WWISEC_AkAudioAPIAndroid_OpenSL_ES, ///< Default value, will select the more appropriate API (AAudio for compatible devices, OpenSL for others)
+        WWISEC_AkAudioAPIAndroid_AAudio = 1 << 0,
+        WWISEC_AkAudioAPIAndroid_OpenSL_ES = 1 << 1,
+        WWISEC_AkAudioAPIAndroid_DolbyAtmos = 1 << 8,
+        WWISEC_AkAudioAPIAndroid_AndroidSpatializer = 1 << 9,
+        WWISEC_AkAudioAPIAndroid_Default = WWISEC_AkAudioAPIAndroid_AAudio | WWISEC_AkAudioAPIAndroid_OpenSL_ES | WWISEC_AkAudioAPIAndroid_DolbyAtmos | WWISEC_AkAudioAPIAndroid_AndroidSpatializer,
     } WWISEC_AkAudioAPIAndroid;
+
+    typedef enum WWISEC_Android_AkAudioPath
+    {
+        // Use the legacy path for audio output. This path has the highest latency but best compatibility with the widest range of devices.
+        WWISEC_Android_AkAudioPath_AkAudioPath_Legacy,
+
+        // Attempt to use a low-latency path to the system audio mixer. This gives improved latency and good compatibility.
+        // Devices that don't support a low-latency path automatically fall back to the Legacy path.
+        // This is the default path.
+        WWISEC_Android_AkAudioPath_AkAudioPath_LowLatency,
+
+        // Attempt to open an exclusive audio stream to the audio driver, bypassing the system audio mixer for best latency.
+        // When available, this mode gives the best latency. However, it has several drawbacks to be aware of:
+        // - App audio will not be mixed with other apps. Other apps will be prevented from using exclusive mode while this output stream is active.
+        // - Screen recordings may not contain any audio.
+        // - When the app is put in the background, there is a possibility that another app 'steals' this path. When the Wwise app comes back to the foreground, this mode can become unavailable.
+        // - Audio will bypass system-level DSP effects like volume normalization and spatialization. 3D Audio will not work, and output volume may be abnormally loud or quiet.
+        // - Other functionality such as audio recording may be disabled when using this path.
+        //
+        // Not all devices support exclusive mode. Devices that don't support exclusive mode can fallback to either LowLatency or Legacy depending on device capabilities.
+        WWISEC_Android_AkAudioPath_AkAudioPath_Exclusive,
+
+        // The default audio path.
+        WWISEC_Android_AkAudioPath_AkAudioPath_Default = AkAudioPath_LowLatency,
+    } WWISEC_Android_AkAudioPath;
 
     typedef const void* WWISEC_SLObjectItf;
     typedef const void* WWISEC_JavaVM;
@@ -1071,36 +1098,17 @@ extern "C"
         WWISEC_POSIX_AkThreadProperties threadBankManager; ///< Bank manager threading properties (its default priority is AK_THREAD_PRIORITY_NORMAL)
         WWISEC_POSIX_AkThreadProperties threadMonitor;     ///< Monitor threading properties (its default priority is AK_THREAD_PRIORITY_ABOVENORMAL). This parameter is not used in Release build.
 
-        WWISEC_AkAudioAPIAndroid eAudioAPI; ///< Main audio API to use. Leave to AkAPI_Default for the default sink (default value).
-                                            ///< \ref AkAudioAPI
+        WWISEC_AkAudioAPIAndroid eAudioAPI;
+        WWISEC_Android_AkAudioPath eAudioPath;
 
-        AkUInt32 uSampleRate;         ///< Sampling Rate.  Set to 0 to get the native sample rate.  Default value is 0.
-        AkUInt16 uNumRefillsInVoice;  ///< Number of refill buffers in voice buffer.  Defaults to 4.
-        bool bRoundFrameSizeToHWSize; ///< Used when hardware-preferred frame size and user-preferred frame size (AkInitSettings.uNumSamplesPerFrame) are not compatible.
-                                      /// If true (default) the sound engine will initialize to a multiple of the HW setting, close to the user setting.
-                                      /// If false, the user setting is used as is, regardless of the HW preference (might incur a performance hit).
+        AkUInt32 uSampleRate;        ///< Sampling Rate.  Set to 0 to get the native sample rate.  Default value is 0.
+        AkUInt16 uNumRefillsInVoice; ///< Number of refill buffers in voice buffer.  Defaults to 4.
 
         WWISEC_SLObjectItf pSLEngine; ///< OpenSL engine reference for sharing between various audio components.
         WWISEC_JavaVM* pJavaVM;       ///< Active JavaVM for the app, used for internal system calls.  Usually provided through the android_app structure given at startup or the NativeActivity. This parameter needs to be set to allow the sound engine initialization.
         WWISEC_jobject jActivity;     ///< android.app.Activity instance for this application. Usually provided through the android_app structure, or through other means if your application has an overridden activity.
 
-        bool bVerboseSink;      ///< Enable this to inspect sink behavior. Useful for debugging non-standard Android devices.
-        bool bEnableLowLatency; ///< Use a low latency audio path for the current hardware.
-                                /// If true (default), the output audio device will be initialized in low-latency operation, allowing for more responsive audio playback on most devices. However, when operating in low-latency mode, some devices may have differences in audio reproduction.
-                                /// If false, the output audio device will be initialized without low-latency operation.
-
-        // When bEnableLowLatency is set to true, this dictates whether the AAudio stream should be opened in exclusive mode.
-        // This mode bypasses the system audio mixer for best latency.
-        // When available, this mode gives the best latency. However, it has several drawbacks to be aware of:
-        // - App audio will not be mixed with other apps. Other apps will be prevented from using exclusive mode while this output stream is active.
-        // - Screen recordings may not contain any audio.
-        // - When the app is put in the background, there is a possibility that another app 'steals' this path. When the Wwise app comes back to the foreground, this mode can become unavailable.
-        // - Audio will bypass system-level DSP effects like volume normalization and spatialization. 3D Audio will not work, and output volume may be abnormally loud or quiet.
-        // - Other functionality such as audio recording may be disabled when using this path.
-        //
-        // This setting has no effect when bEnableLowLatency is set to FALSE.
-        // For backward-compatibility reasons, this setting is TRUE by default. But it is recommended to turn it off if any audio output problem arises on certain device models.
-        bool bEnableExclusiveMode;
+        bool bVerboseSink; ///< Enable this to inspect sink behavior. Useful for debugging non-standard Android devices.
     } WWISEC_ANDROID_AkPlatformInitSettings;
 
     /// The IDs of the iOS audio session categories, useful for defining app-level audio behaviours such as inter-app audio mixing policies and audio routing behaviours. These IDs are funtionally equivalent to the corresponding constants defined by the iOS audio session service backend (AVAudioSession). Refer to Xcode documentation for details on the audio session categories. The original prefix "AV" is replaced with "Ak" for the ID names.
