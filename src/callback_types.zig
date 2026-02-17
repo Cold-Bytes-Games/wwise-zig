@@ -32,8 +32,8 @@ pub const AkCallbackType = packed struct(zig.DefaultEnumType) {
     enable_get_source_stream_buffering: bool = false, // 22
     pad2: u10 = 0,
 
-    pub const music_sync_all: AkCallbackType = @bitCast(c.WWISEC_AK_MusicSyncAll);
-    pub const callback_bits: AkCallbackType = @bitCast(c.WWISEC_AK_CallbackBits);
+    pub const music_sync_all: AkCallbackType = @bitCast(c.AK_MusicSyncAll);
+    pub const callback_bits: AkCallbackType = @bitCast(c.AK_CallbackBits);
 
     pub inline fn fromC(value: u32) AkCallbackType {
         return @bitCast(value);
@@ -44,15 +44,15 @@ pub const AkCallbackType = packed struct(zig.DefaultEnumType) {
     }
 
     comptime {
-        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .midi_event = true })) == c.WWISEC_AK_MIDIEvent);
-        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_play_position = true })) == c.WWISEC_AK_EnableGetSourcePlayPosition);
-        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_music_play_position = true })) == c.WWISEC_AK_EnableGetMusicPlayPosition);
-        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_stream_buffering = true })) == c.WWISEC_AK_EnableGetSourceStreamBuffering);
-        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .dynamic_sequence_select = true })) == c.WWISEC_AK_DynamicSequenceSelect);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .midi_event = true })) == c.AK_MIDIEvent);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_play_position = true })) == c.AK_EnableGetSourcePlayPosition);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_music_play_position = true })) == c.AK_EnableGetMusicPlayPosition);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_stream_buffering = true })) == c.AK_EnableGetSourceStreamBuffering);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .dynamic_sequence_select = true })) == c.AK_DynamicSequenceSelect);
     }
 };
 
-pub const AkAudioDeviceEvent = enum(u8) {
+pub const AkAudioDeviceEvent = enum(zig.DefaultEnumType) {
     initialization,
     removal,
     system_removal,
@@ -96,16 +96,16 @@ pub const AkSegmentInfo = extern struct {
     grid_duration: f32 = 0.0,
     grid_offset: f32 = 0.0,
 
-    pub inline fn fromC(value: c.WWISEC_AkSegmentInfo) AkSegmentInfo {
+    pub inline fn fromC(value: c.AkSegmentInfo) AkSegmentInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkSegmentInfo) c.WWISEC_AkSegmentInfo {
+    pub inline fn toC(self: AkSegmentInfo) c.AkSegmentInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkSegmentInfo) == @sizeOf(c.WWISEC_AkSegmentInfo));
+        std.debug.assert(@sizeOf(AkSegmentInfo) == @sizeOf(c.AkSegmentInfo));
     }
 };
 
@@ -114,32 +114,32 @@ pub const AkEventCallbackInfo = extern struct {
     playing_id: typedefs.AkPlayingID = 0,
     event_id: typedefs.AkUniqueID = 0,
 
-    pub inline fn fromC(value: c.WWISEC_AkEventCallbackInfo) AkEventCallbackInfo {
+    pub inline fn fromC(value: c.AkEventCallbackInfo) AkEventCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkEventCallbackInfo) c.WWISEC_AkEventCallbackInfo {
+    pub inline fn toC(self: AkEventCallbackInfo) c.AkEventCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkEventCallbackInfo) == @sizeOf(c.WWISEC_AkEventCallbackInfo));
+        std.debug.assert(@sizeOf(AkEventCallbackInfo) == @sizeOf(c.AkEventCallbackInfo));
     }
 };
 
 pub const AkMIDIEventCallbackInfo = extern struct {
     midi_event: midi_types.AkMIDIEvent,
 
-    pub inline fn fromC(value: c.WWISEC_AkMIDIEventCallbackInfo) AkMIDIEventCallbackInfo {
+    pub inline fn fromC(value: c.AkMIDIEventCallbackInfo) AkMIDIEventCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkMIDIEventCallbackInfo) c.WWISEC_AkMIDIEventCallbackInfo {
+    pub inline fn toC(self: AkMIDIEventCallbackInfo) c.AkMIDIEventCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkMIDIEventCallbackInfo) == @sizeOf(c.WWISEC_AkMIDIEventCallbackInfo));
+        std.debug.assert(@sizeOf(AkMIDIEventCallbackInfo) == @sizeOf(c.AkMIDIEventCallbackInfo));
     }
 };
 
@@ -149,16 +149,16 @@ pub const AkMarkerCallbackInfo = extern struct {
     str_label: ?[*:0]const u8 = null,
     label_size: u32 = 0,
 
-    pub inline fn fromC(value: c.WWISEC_AkMarkerCallbackInfo) AkMarkerCallbackInfo {
+    pub inline fn fromC(value: c.AkMarkerCallbackInfo) AkMarkerCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkMarkerCallbackInfo) c.WWISEC_AkMarkerCallbackInfo {
+    pub inline fn toC(self: AkMarkerCallbackInfo) c.AkMarkerCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkMarkerCallbackInfo) == @sizeOf(c.WWISEC_AkMarkerCallbackInfo));
+        std.debug.assert(@sizeOf(AkMarkerCallbackInfo) == @sizeOf(c.AkMarkerCallbackInfo));
     }
 };
 
@@ -169,16 +169,16 @@ pub const AkDurationCallbackInfo = extern struct {
     media_id: typedefs.AkUniqueID,
     streaming: bool,
 
-    pub inline fn fromC(value: c.WWISEC_AkDurationCallbackInfo) AkDurationCallbackInfo {
+    pub inline fn fromC(value: c.AkDurationCallbackInfo) AkDurationCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkDurationCallbackInfo) c.WWISEC_AkDurationCallbackInfo {
+    pub inline fn toC(self: AkDurationCallbackInfo) c.AkDurationCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkDurationCallbackInfo) == @sizeOf(c.WWISEC_AkDurationCallbackInfo));
+        std.debug.assert(@sizeOf(AkDurationCallbackInfo) == @sizeOf(c.AkDurationCallbackInfo));
     }
 };
 
@@ -186,16 +186,16 @@ pub const AkDynamicSequenceItemCallbackInfo = extern struct {
     audio_node_id: typedefs.AkUniqueID = 0,
     custom_info: ?*anyopaque = null,
 
-    pub inline fn fromC(value: c.WWISEC_AkDynamicSequenceItemCallbackInfo) AkDynamicSequenceItemCallbackInfo {
+    pub inline fn fromC(value: c.AkDynamicSequenceItemCallbackInfo) AkDynamicSequenceItemCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkDynamicSequenceItemCallbackInfo) c.WWISEC_AkDynamicSequenceItemCallbackInfo {
+    pub inline fn toC(self: AkDynamicSequenceItemCallbackInfo) c.AkDynamicSequenceItemCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkDynamicSequenceItemCallbackInfo) == @sizeOf(c.WWISEC_AkDynamicSequenceItemCallbackInfo));
+        std.debug.assert(@sizeOf(AkDynamicSequenceItemCallbackInfo) == @sizeOf(c.AkDynamicSequenceItemCallbackInfo));
     }
 };
 
@@ -208,16 +208,16 @@ pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
     context: ?*IAkPlugin.IAkMixerInputContext = null,
     mixer_context: ?*IAkPlugin.IAkMixerPluginContext = null,
 
-    pub inline fn fromC(value: c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
+    pub inline fn fromC(value: c.AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkSpeakerVolumeMatrixCallbackInfo) c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo {
+    pub inline fn toC(self: AkSpeakerVolumeMatrixCallbackInfo) c.AkSpeakerVolumeMatrixCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkSpeakerVolumeMatrixCallbackInfo) == @sizeOf(c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo));
+        std.debug.assert(@sizeOf(AkSpeakerVolumeMatrixCallbackInfo) == @sizeOf(c.AkSpeakerVolumeMatrixCallbackInfo));
     }
 };
 
@@ -227,16 +227,16 @@ pub const AkMusicPlaylistCallbackInfo = extern struct {
     playlist_selection: u32 = 0,
     playlist_item_done: u32 = 0,
 
-    pub inline fn fromC(value: c.WWISEC_AkMusicPlaylistCallbackInfo) AkMusicPlaylistCallbackInfo {
+    pub inline fn fromC(value: c.AkMusicPlaylistCallbackInfo) AkMusicPlaylistCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkMusicPlaylistCallbackInfo) c.WWISEC_AkMusicPlaylistCallbackInfo {
+    pub inline fn toC(self: AkMusicPlaylistCallbackInfo) c.AkMusicPlaylistCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkMusicPlaylistCallbackInfo) == @sizeOf(c.WWISEC_AkMusicPlaylistCallbackInfo));
+        std.debug.assert(@sizeOf(AkMusicPlaylistCallbackInfo) == @sizeOf(c.AkMusicPlaylistCallbackInfo));
     }
 };
 
@@ -245,16 +245,16 @@ pub const AkMusicSyncCallbackInfo = extern struct {
     music_sync_type: AkCallbackType = .{},
     user_cue_name: ?[*:0]const u8 = null,
 
-    pub inline fn fromC(value: c.WWISEC_AkMusicSyncCallbackInfo) AkMusicSyncCallbackInfo {
+    pub inline fn fromC(value: c.AkMusicSyncCallbackInfo) AkMusicSyncCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkMusicSyncCallbackInfo) c.WWISEC_AkMusicSyncCallbackInfo {
+    pub inline fn toC(self: AkMusicSyncCallbackInfo) c.AkMusicSyncCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkMusicSyncCallbackInfo) == @sizeOf(c.WWISEC_AkMusicSyncCallbackInfo));
+        std.debug.assert(@sizeOf(AkMusicSyncCallbackInfo) == @sizeOf(c.AkMusicSyncCallbackInfo));
     }
 };
 
@@ -325,16 +325,16 @@ pub const AkResourceMonitorDataSummary = extern struct {
     total_voices: u32 = 0,
     nb_active_events: u32 = 0,
 
-    pub inline fn fromC(value: c.WWISEC_AkResourceMonitorDataSummary) AkResourceMonitorDataSummary {
+    pub inline fn fromC(value: c.AkResourceMonitorDataSummary) AkResourceMonitorDataSummary {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkResourceMonitorDataSummary) c.WWISEC_AkResourceMonitorDataSummary {
+    pub inline fn toC(self: AkResourceMonitorDataSummary) c.AkResourceMonitorDataSummary {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkResourceMonitorDataSummary) == @sizeOf(c.WWISEC_AkResourceMonitorDataSummary));
+        std.debug.assert(@sizeOf(AkResourceMonitorDataSummary) == @sizeOf(c.AkResourceMonitorDataSummary));
     }
 };
 
