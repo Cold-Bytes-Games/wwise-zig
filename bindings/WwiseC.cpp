@@ -1650,6 +1650,8 @@ static_assert(sizeof(WWISEC_AkFileSystemFlags) == sizeof(AkFileSystemFlags));
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_StmStatusError);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_MoveEnd);
 WWISEC_ASSERT_ENUM_VALUE_SAME(AK_OpenModeReadWrite);
+static_assert(WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH == AK_MONITOR_STREAMNAME_MAXLENGTH);
+static_assert(WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH == AK_MONITOR_DEVICENAME_MAXLENGTH);
 static_assert(sizeof(WWISEC_AkStreamInfo) == sizeof(AkStreamInfo));
 static_assert(sizeof(WWISEC_AkAutoStmHeuristics) == sizeof(AkAutoStmHeuristics));
 static_assert(sizeof(WWISEC_AkAutoStmBufSettings) == sizeof(WWISEC_AkAutoStmBufSettings));
@@ -1658,6 +1660,7 @@ static_assert(sizeof(WWISEC_AkDeviceData) == sizeof(AkDeviceData));
 static_assert(sizeof(WWISEC_AkStreamRecord) == sizeof(AkStreamRecord));
 static_assert(sizeof(WWISEC_AkStreamData) == sizeof(AkStreamData));
 static_assert(sizeof(WWISEC_AkFileOpenData) == sizeof(AkFileOpenData));
+
 class WWISEC_AK_IAkStreamProfile_Wrapper : public AK::IAkStreamProfile
 {
   public:

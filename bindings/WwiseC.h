@@ -1887,7 +1887,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
 // BEGIN IAkStreamMgr
 #define WWISEC_AK_MONITOR_STREAMNAME_MAXLENGTH (64)
-#define WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH (16)
+#define WWISEC_AK_MONITOR_DEVICENAME_MAXLENGTH (64)
 
     /// Stream status.
     typedef enum WWISEC_AkStmStatus
