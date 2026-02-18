@@ -1443,7 +1443,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
         AkUInt32 uCommandQueueSize;            ///< Size of the command queue, in bytes
         bool bEnableGameSyncPreparation;       ///< Sets to true to enable AK::SoundEngine::PrepareGameSync usage.
         AkUInt32 uContinuousPlaybackLookAhead; ///< Number of quanta ahead when continuous containers should instantiate a new voice before which next sounds should start playing. This look-ahead time allows I/O to occur, and is especially useful to reduce the latency of continuous containers with trigger rate or sample-accurate transitions.
-                                               ///< Default is 1 audio quantum, also known as an audio frame. Its size is equal to AkInitSettings::uNumSamplesPerFrame / AkPlatformInitSettings::uSampleRate. For many platforms the default values - which can be overridden - are respectively 1,024 samples and 48 kHz. This gives a default 21.3 ms for an audio quantum, which is adequate if you have a RAM-based streaming device that completes transfers within 20 ms. With 1 look-ahead quantum, voices spawned by continuous containers are more likely to be ready when they are required to play, thereby improving the overall precision of sound scheduling. If your device completes transfers in 30 ms instead, you might consider increasing this value to 2 because it will grant new voices 2 audio quanta (~43 ms) to fetch data.
+        ///< Default is 1 audio quantum, also known as an audio frame. Its size is equal to AkInitSettings::uNumSamplesPerFrame / AkPlatformInitSettings::uSampleRate. For many platforms the default values - which can be overridden - are respectively 1,024 samples and 48 kHz. This gives a default 21.3 ms for an audio quantum, which is adequate if you have a RAM-based streaming device that completes transfers within 20 ms. With 1 look-ahead quantum, voices spawned by continuous containers are more likely to be ready when they are required to play, thereby improving the overall precision of sound scheduling. If your device completes transfers in 30 ms instead, you might consider increasing this value to 2 because it will grant new voices 2 audio quanta (~43 ms) to fetch data.
+
+        AkReal32 fStreamingLookAheadRatio; ///< Multiplication factor for all streaming look-ahead heuristic values, for music streams.
 
         AkUInt32 uNumSamplesPerFrame; ///< Number of samples per audio frame (256, 512, 1024, or 2048).
 
@@ -1609,6 +1611,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     AKRESULT WWISEC_AK_SoundEngine_GetSourcePlayPositions(AkPlayingID in_PlayingID, WWISEC_AkSourcePosition* out_puPositions, AkUInt32* io_pcPositions, bool in_bExtrapolate);
 
+    AKRESULT WWISEC_AK_SoundEngine_GetPlayingSegmentInfo(AkPlayingID in_PlayingID, struct AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate);
+
     AKRESULT WWISEC_AK_SoundEngine_GetSourceStreamBuffering(AkPlayingID in_PlayingID, AkTimeMs* out_buffering, bool* out_bIsBuffering);
 
     void WWISEC_AK_SoundEngine_StopAll(AkGameObjectID in_gameObjectID);
@@ -1623,7 +1627,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     bool WWISEC_AK_SoundEngine_GetBackgroundMusicMute();
 
-    AKRESULT WWISEC_AK_SoundEngine_SendPluginCustomGameData(AkUniqueID in_busID, AkGameObjectID in_busObjectID, enum AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
+    AKRESULT WWISEC_AK_SoundEngine_SendPluginCustomGameData(AkUniqueID in_busID, AkGameObjectID in_gameObjectID, enum AkPluginType in_eType, AkUInt32 in_uCompanyID, AkUInt32 in_uPluginID, const void* in_pData, AkUInt32 in_uSizeInBytes);
 
     AKRESULT WWISEC_AK_SoundEngine_RegisterGameObj(AkGameObjectID in_gameObjectID);
 
@@ -1642,6 +1646,8 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AKRESULT WWISEC_AK_SoundEngine_SetScalingFactor(AkGameObjectID in_GameObjectID, AkReal32 in_fAttenuationScalingFactor);
 
     AKRESULT WWISEC_AK_SoundEngine_SetDistanceProbe(AkGameObjectID in_listenerGameObjectID, AkGameObjectID in_distanceProbeGameObjectID);
+
+    void WWISEC_AK_SoundEngine_ProcessBanks();
 
     AKRESULT WWISEC_AK_SoundEngine_ClearBanks();
 
@@ -1773,11 +1779,21 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     AKRESULT WWISEC_AK_SoundEngine_SetGameObjectOutputBusVolume(AkGameObjectID in_emitterObjID, AkGameObjectID in_listenerObjID, AkReal32 in_fControlValue);
 
+    AKRESULT WWISEC_AK_SoundEngine_SetContainerEffect(AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID);
+
     AKRESULT WWISEC_AK_SoundEngine_SetActorMixerEffect(AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID);
 
     AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_ID(AkUniqueID in_audioNodeID, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID);
 
     AKRESULT WWISEC_AK_SoundEngine_SetBusEffect_String(const char* in_pszBusName, AkUInt32 in_uFXIndex, AkUniqueID in_shareSetID);
+
+    AKRESULT WWISEC_AK_SoundEngine_ResetBusConfig_ID(AkUniqueID in_audioNodeID);
+
+    AKRESULT WWISEC_AK_SoundEngine_ResetBusConfig_String(const char* in_pszBusName);
+
+    AKRESULT WWISEC_AK_SoundEngine_SetSidechainMixConfig_ID(AkUniqueID in_sidechainMixId, AkChannelConfig in_channelConfig);
+
+    AKRESULT WWISEC_AK_SoundEngine_SetSidechainMixConfig_String(const char* in_pszSidechainMixName, AkChannelConfig in_channelConfig);
 
     AKRESULT WWISEC_AK_SoundEngine_SetOutputDeviceEffect(AkOutputDeviceID in_outputDeviceID, AkUInt32 in_uFXIndex, AkUniqueID in_FXShareSetID);
 
@@ -1797,9 +1813,9 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
 
     AKRESULT WWISEC_AK_SoundEngine_StopOutputCapture();
 
-    AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureMarker(const char* in_MarkerText);
+    AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureMarker(const char* in_MarkerText, AkUInt32 in_uSamplePos);
 
-    AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureBinaryMarker(void* in_pMarkerData, AkUInt32 in_uMarkerDataSize);
+    AKRESULT WWISEC_AK_SoundEngine_AddOutputCaptureBinaryMarker(void* in_pMarkerData, AkUInt32 in_uMarkerDataSize, AkUInt32 in_uSamplePos);
 
     AkUInt32 WWISEC_AK_SoundEngine_GetSampleRate();
 
@@ -1844,6 +1860,10 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AkUInt32 WWISEC_AK_SoundEngine_GetBufferTick();
 
     AkUInt64 WWISEC_AK_SoundEngine_GetSampleTick();
+
+    AKRESULT WWISEC_AK_SoundEngine_ResetGlobalValues();
+
+    AKRESULT WWISEC_AK_SoundEngine_SetAssertHook(WWISEC_AkAssertHook in_pfnAssertHook);
     // END AkSoundEngine
 
     // BEGIN AkFileSystemFlags
@@ -2458,7 +2478,7 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     AKRESULT WWISEC_AK_MusicEngine_Init(WWISEC_AkMusicSettings* in_pSettings);
     void WWISEC_AK_MusicEngine_GetDefaultInitSettings(WWISEC_AkMusicSettings* out_settings);
     void WWISEC_AK_MusicEngine_Term();
-    AKRESULT WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(AkPlayingID in_PlayingID, struct AkSegmentInfo* out_segmentInfo, bool in_bExtrapolate);
+
 // END AkMusicEngine
 
 // BEGIN AkCommunication

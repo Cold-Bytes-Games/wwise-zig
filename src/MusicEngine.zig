@@ -33,9 +33,3 @@ pub fn getDefaultInitSettings(out_settings: *AkMusicSettings) void {
 pub fn term() void {
     c.WWISEC_AK_MusicEngine_Term();
 }
-
-pub fn getPlayingSegmentInfo(in_playing_id: typedefs.AkPlayingID, out_segment_info: *callback_types.AkSegmentInfo, extrapolate: bool) zig.WwiseError!void {
-    try zig.handleAkResult(
-        c.WWISEC_AK_MusicEngine_GetPlayingSegmentInfo(in_playing_id, @ptrCast(out_segment_info), extrapolate),
-    );
-}

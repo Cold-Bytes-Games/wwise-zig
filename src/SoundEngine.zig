@@ -7,6 +7,7 @@ const enums = @import("enums.zig");
 const IAkPlugin = @import("IAkPlugin.zig");
 const IBytes = @import("IBytes.zig");
 const midi_types = @import("midi_types.zig");
+const platform_types = @import("platform_types.zig");
 const settings = @import("settings.zig");
 const sound_engine_types = @import("sound_engine_types.zig");
 const speaker_config = @import("speaker_config.zig");
@@ -83,7 +84,7 @@ pub fn isInitialized() bool {
 }
 
 pub fn init(fallback_allocator: std.mem.Allocator, init_settings_opt: ?*settings.AkInitSettings, platform_init_settings_opt: ?*settings.AkPlatformInitSettings) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
     const native_init_settings_ptr = blk: {
@@ -230,20 +231,20 @@ pub fn registerPlugin(in_type: enums.AkPluginType, in_company_id: u32, in_plugin
 }
 
 pub fn registerPluginDLL(fallback_allocator: std.mem.Allocator, in_dll_name: []const u8, in_dll_path_opt: ?[]const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(allocator);
     defer area_allocator.deinit();
 
-    const raw_in_dll_name = common.toOSChar(area_allocator.allocator(), in_dll_name) catch return zig.WwiseError.Fail;
+    const raw_in_dll_name = zig.toOSChar(area_allocator.allocator(), in_dll_name) catch return zig.WwiseError.Fail;
 
     const raw_in_dll_path = blk: {
         if (in_dll_path_opt) |in_dll_path| {
-            break :blk @as([*c]const common.AkOSChar, common.toOSChar(area_allocator.allocator(), in_dll_path) catch return zig.WwiseError.Fail);
+            break :blk @as([*c]const platform_types.AkOSChar, zig.toOSChar(area_allocator.allocator(), in_dll_path) catch return zig.WwiseError.Fail);
         }
 
-        break :blk @as([*c]const common.AkOSChar, null);
+        break :blk @as([*c]const platform_types.AkOSChar, null);
     };
 
     return zig.handleAkResult(
@@ -314,10 +315,10 @@ pub fn unregisterAudioDeviceStatusCallback() zig.WwiseError!void {
 }
 
 pub fn getIDFromString(fallback_allocator: std.mem.Allocator, string: []const u8) !u32 {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_string = try common.toCString(allocator, string);
+    const raw_string = try zig.toCString(allocator, string);
     defer allocator.free(raw_string);
 
     return c.WWISEC_AK_SoundEngine_GetIDFromString(raw_string);
@@ -386,10 +387,10 @@ pub fn postEventID(in_eventID: typedefs.AkUniqueID, game_object_id: typedefs.AkG
 }
 
 pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, game_object_id: typedefs.AkGameObjectID, optional_args: PostEventOptionalArgs) !typedefs.AkPlayingID {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var char_allocator = stack_char_allocator.get();
 
-    const raw_event_name = try common.toCString(char_allocator, in_event_name);
+    const raw_event_name = try zig.toCString(char_allocator, in_event_name);
     defer char_allocator.free(raw_event_name);
 
     var num_external_sources: u32 = 0;
@@ -461,10 +462,10 @@ pub fn executeActionOnEventID(in_event_id: typedefs.AkUniqueID, in_action_type: 
 }
 
 pub fn executeActionOnEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_action_type: enums.AkActionOnEventType, optional_args: ExecuteActionOnEventOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
+    const raw_event_name = zig.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return zig.handleAkResult(
@@ -536,10 +537,10 @@ pub fn pinEventInStreamCacheID(in_event_id: typedefs.AkUniqueID, in_active_prior
 }
 
 pub fn pinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_active_priority: typedefs.AkPriority, in_inactive_priority: typedefs.AkPriority) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
+    const raw_event_name = zig.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return zig.handleAkResult(
@@ -558,10 +559,10 @@ pub fn unpinEventInStreamCacheID(in_event_id: typedefs.AkUniqueID) zig.WwiseErro
 }
 
 pub fn unpinEventInStreamCacheString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
+    const raw_event_name = zig.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return zig.handleAkResult(
@@ -580,10 +581,10 @@ pub fn getBufferStatusForPinnedEventID(in_event_id: typedefs.AkUniqueID, out_per
 }
 
 pub fn getBufferStatusForPinnedEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, out_percent_buffered: *f32, out_cache_pinned_memory_full: *bool) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
+    const raw_event_name = zig.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return zig.handleAkResult(
@@ -613,10 +614,10 @@ pub fn seekOnEventTimeID(in_event_id: typedefs.AkUniqueID, in_game_object: typed
 }
 
 pub fn seekOnEventTimeString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: typedefs.AkGameObjectID, in_position: typedefs.AkTimeMs, optional_args: SeekOnEventOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
+    const raw_event_name = zig.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return zig.handleAkResult(
@@ -643,10 +644,10 @@ pub fn seekOnEventPercentID(in_event_id: typedefs.AkUniqueID, in_game_object: ty
 }
 
 pub fn seekOnEventPercentString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_game_object: typedefs.AkGameObjectID, in_percent: f32, optional_args: SeekOnEventOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
+    const raw_event_name = zig.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return zig.handleAkResult(
@@ -695,6 +696,19 @@ pub fn getSourcePlayPositions(in_playing_id: typedefs.AkPlayingID, out_positions
             in_extrapolate,
         ),
     );
+}
+
+pub const GetPlayingSegmentInfoOptionalArgs = struct {
+    extrapolate: bool = true,
+};
+pub fn getPlayingSegmentInfo(in_playing_id: typedefs.AkPlayingID, optional_args: GetPlayingSegmentInfoOptionalArgs) zig.WwiseError!callback_types.AkSegmentInfo {
+    var out_segment_info: callback_types.AkSegmentInfo = .{};
+
+    try zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_GetPlayingSegmentInfo(in_playing_id, @ptrCast(&out_segment_info), optional_args.extrapolate),
+    );
+
+    return out_segment_info;
 }
 
 pub fn getSourceStreamBuffering(in_playing_id: typedefs.AkPlayingID, out_buffering: *typedefs.AkTimeMs, out_is_buffering: *bool) zig.WwiseError!void {
@@ -756,7 +770,7 @@ pub fn getBackgroundMusicMute() bool {
 
 pub fn sendPluginCustomGameData(
     in_bus_id: typedefs.AkUniqueID,
-    in_bus_object_id: typedefs.AkUniqueID,
+    in_game_object_id: typedefs.AkGameObjectID,
     in_type: enums.AkPluginType,
     in_company_id: u32,
     in_plugin_id: u32,
@@ -766,7 +780,7 @@ pub fn sendPluginCustomGameData(
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SendPluginCustomGameData(
             in_bus_id,
-            in_bus_object_id,
+            in_game_object_id,
             @intFromEnum(in_type),
             in_company_id,
             in_plugin_id,
@@ -783,10 +797,10 @@ pub fn registerGameObj(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseErro
 }
 
 pub fn registerGameObjWithName(fallback_allocator: std.mem.Allocator, in_game_object_id: typedefs.AkGameObjectID, in_name: []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_name = common.toCString(allocator, in_name) catch return zig.WwiseError.Fail;
+    const raw_name = zig.toCString(allocator, in_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_name);
 
     return zig.handleAkResult(
@@ -861,6 +875,10 @@ pub fn setDistanceProbe(in_listener_game_object_id: typedefs.AkGameObjectID, in_
     );
 }
 
+pub fn processBanks() void {
+    c.WWISEC_AK_SoundEngine_ProcessBanks();
+}
+
 pub fn clearBanks() zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_ClearBanks(),
@@ -878,10 +896,10 @@ pub const LoadBankOptionalArgs = struct {
 };
 
 pub fn loadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, optional_args: LoadBankOptionalArgs) zig.WwiseError!typedefs.AkBankID {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
+    const raw_bank_name = zig.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
@@ -952,10 +970,10 @@ pub fn decodeBank(in_memory_bank: ?*const anyopaque, in_memory_bank_size: u32, i
 }
 
 pub fn loadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: LoadBankOptionalArgs) zig.WwiseError!typedefs.AkBankID {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
+    const raw_bank_name = zig.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     var out_bank_id: typedefs.AkBankID = constants.AK_INVALID_BANK_ID;
@@ -1032,10 +1050,10 @@ pub const UnloadBankOptionalArgs = struct {
 };
 
 pub fn unloadBankString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, optional_args: UnloadBankOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
+    const raw_bank_name = zig.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return zig.handleAkResult(
@@ -1050,10 +1068,10 @@ pub fn unloadBankID(in_bank_id: typedefs.AkBankID, in_memory_bank: ?*const anyop
 }
 
 pub fn unloadBankAsyncString(fallback_allocator: std.mem.Allocator, in_bank_name: []const u8, in_memory_bank: ?*const anyopaque, in_bank_callback: callback_types.AkBankCallbackFunc, in_cookie: ?*anyopaque, optional_args: UnloadBankOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
+    const raw_bank_name = zig.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return zig.handleAkResult(
@@ -1094,10 +1112,10 @@ pub fn prepareBankString(
     in_bank_name: []const u8,
     optional_args: PrepareBankOptionalArgs,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
+    const raw_bank_name = zig.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return zig.handleAkResult(
@@ -1133,10 +1151,10 @@ pub fn prepareBankAsyncString(
     in_cookie: ?*anyopaque,
     optional_args: PrepareBankOptionalArgs,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bank_name = common.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
+    const raw_bank_name = zig.toCString(allocator, in_bank_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bank_name);
 
     return zig.handleAkResult(
@@ -1177,7 +1195,7 @@ pub fn clearPreparedEvents() zig.WwiseError!void {
 }
 
 pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_type: PreparationType, in_event_names: []const []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
@@ -1189,7 +1207,7 @@ pub fn prepareEventString(fallback_allocator: std.mem.Allocator, in_preparation_
     defer raw_event_names_list.deinit(allocator);
 
     for (in_event_names) |event_name| {
-        const raw_event_name = common.toCString(allocator, event_name) catch return zig.WwiseError.Fail;
+        const raw_event_name = zig.toCString(allocator, event_name) catch return zig.WwiseError.Fail;
         raw_event_names_list.append(allocator, raw_event_name) catch return zig.WwiseError.Fail;
     }
 
@@ -1219,7 +1237,7 @@ pub fn prepareEventAsyncString(
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
@@ -1231,7 +1249,7 @@ pub fn prepareEventAsyncString(
     defer raw_event_names_list.deinit(allocator);
 
     for (in_event_names) |event_name| {
-        const raw_event_name = common.toCString(allocator, event_name) catch return zig.WwiseError.Fail;
+        const raw_event_name = zig.toCString(allocator, event_name) catch return zig.WwiseError.Fail;
         raw_event_names_list.append(allocator, raw_event_name) catch return zig.WwiseError.Fail;
     }
 
@@ -1268,7 +1286,7 @@ pub fn prepareBusString(
     in_preparation_type: PreparationType,
     in_bus_names: [][]const u8,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
@@ -1280,7 +1298,7 @@ pub fn prepareBusString(
     defer raw_bus_names_list.deinit(allocator);
 
     for (in_bus_names) |bus_name| {
-        const raw_bus_name = common.toCString(allocator, bus_name) catch return zig.WwiseError.Fail;
+        const raw_bus_name = zig.toCString(allocator, bus_name) catch return zig.WwiseError.Fail;
         raw_bus_names_list.append(allocator, raw_bus_name) catch return zig.WwiseError.Fail;
     }
 
@@ -1310,7 +1328,7 @@ pub fn prepareBusAsyncString(
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
@@ -1322,7 +1340,7 @@ pub fn prepareBusAsyncString(
     defer raw_bus_names_list.deinit(allocator);
 
     for (in_bus_names) |bus_name| {
-        const raw_bus_name = common.toCString(allocator, bus_name) catch return zig.WwiseError.Fail;
+        const raw_bus_name = zig.toCString(allocator, bus_name) catch return zig.WwiseError.Fail;
         raw_bus_names_list.append(allocator, raw_bus_name) catch return zig.WwiseError.Fail;
     }
 
@@ -1380,7 +1398,7 @@ pub fn prepareGameSyncsString(
     in_group_name: []const u8,
     in_game_sync_names: [][]const u8,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
@@ -1388,13 +1406,13 @@ pub fn prepareGameSyncsString(
 
     const allocator = area_allocator.allocator();
 
-    const raw_group_name = common.toCString(allocator, in_group_name) catch return zig.WwiseError.Fail;
+    const raw_group_name = zig.toCString(allocator, in_group_name) catch return zig.WwiseError.Fail;
 
     var raw_game_sync_names_list: std.ArrayList([*:0]const u8) = .empty;
     defer raw_game_sync_names_list.deinit(allocator);
 
     for (in_game_sync_names) |game_sync_name| {
-        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return zig.WwiseError.Fail;
+        const raw_game_sync_name = zig.toCString(allocator, game_sync_name) catch return zig.WwiseError.Fail;
         raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return zig.WwiseError.Fail;
     }
 
@@ -1435,7 +1453,7 @@ pub fn prepareGameSyncsAsyncString(
     in_bank_callback: callback_types.AkBankCallbackFunc,
     in_cookie: ?*anyopaque,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_char_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
@@ -1443,13 +1461,13 @@ pub fn prepareGameSyncsAsyncString(
 
     const allocator = area_allocator.allocator();
 
-    const raw_group_name = common.toCString(allocator, in_group_name) catch return zig.WwiseError.Fail;
+    const raw_group_name = zig.toCString(allocator, in_group_name) catch return zig.WwiseError.Fail;
 
     var raw_game_sync_names_list: std.ArrayList([*:0]const u8) = .empty;
     defer raw_game_sync_names_list.deinit(allocator);
 
     for (in_game_sync_names) |game_sync_name| {
-        const raw_game_sync_name = common.toCString(allocator, game_sync_name) catch return zig.WwiseError.Fail;
+        const raw_game_sync_name = zig.toCString(allocator, game_sync_name) catch return zig.WwiseError.Fail;
         raw_game_sync_names_list.append(allocator, raw_game_sync_name) catch return zig.WwiseError.Fail;
     }
 
@@ -1573,10 +1591,10 @@ pub fn setRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, in_value: typedefs.AkRtpcVa
 }
 
 pub fn setRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_value: typedefs.AkRtpcValue, optional_args: SetRTPCValueOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
+    const raw_rtpc_name = zig.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return zig.handleAkResult(
@@ -1622,10 +1640,10 @@ pub fn setRTPCValueByPlayingIDString(
     in_playing_id: typedefs.AkPlayingID,
     optional_args: SetRTPCValueByPlayingIDOptionalArgs,
 ) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
+    const raw_rtpc_name = zig.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return zig.handleAkResult(
@@ -1660,10 +1678,10 @@ pub fn resetRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, optional_args: ResetRTPCV
 }
 
 pub fn resetRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, optional_args: ResetRTPCValueOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
+    const raw_rtpc_name = zig.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return zig.handleAkResult(
@@ -1696,10 +1714,10 @@ pub fn resetRTPCValueByPlayingID(in_rtpc_id: typedefs.AkRtpcID, in_playing_id: t
 }
 
 pub fn resetRTPCValueByPlayingIDString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_playing_id: typedefs.AkPlayingID, optional_args: ResetRTPCValueByPlayingIDOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
+    const raw_rtpc_name = zig.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return zig.handleAkResult(
@@ -1720,13 +1738,13 @@ pub fn setSwitchID(in_switch_group: typedefs.AkSwitchGroupID, in_switch_state: t
 }
 
 pub fn setSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group: []const u8, in_switch_state: []const u8, in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_switch_group = common.toCString(allocator, in_switch_group) catch return zig.WwiseError.Fail;
+    const raw_switch_group = zig.toCString(allocator, in_switch_group) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_switch_group);
 
-    const raw_switch_state = common.toCString(allocator, in_switch_state) catch return zig.WwiseError.Fail;
+    const raw_switch_state = zig.toCString(allocator, in_switch_state) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_switch_state);
 
     return zig.handleAkResult(
@@ -1741,10 +1759,10 @@ pub fn postTriggerID(in_trigger_id: typedefs.AkTriggerID, in_game_object_id: typ
 }
 
 pub fn postTriggerString(fallback_allocator: std.mem.Allocator, in_trigger_name: []const u8, in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_trigger_name = common.toCString(allocator, in_trigger_name) catch return zig.WwiseError.Fail;
+    const raw_trigger_name = zig.toCString(allocator, in_trigger_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_trigger_name);
 
     return zig.handleAkResult(
@@ -1759,13 +1777,13 @@ pub fn setStateID(in_state_group: typedefs.AkStateGroupID, in_state: typedefs.Ak
 }
 
 pub fn setStateString(fallback_allocator: std.mem.Allocator, in_state_group: []const u8, in_state: []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_state_group = common.toCString(allocator, in_state_group) catch return zig.WwiseError.Fail;
+    const raw_state_group = zig.toCString(allocator, in_state_group) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_state_group);
 
-    const raw_state = common.toCString(allocator, in_state) catch return zig.WwiseError.Fail;
+    const raw_state = zig.toCString(allocator, in_state) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_state);
 
     return zig.handleAkResult(
@@ -1828,6 +1846,12 @@ pub fn setGameObjectOutputBusVolume(in_emitter_obj_id: typedefs.AkGameObjectID, 
     );
 }
 
+pub fn setContainerEffect(in_audio_node_id: typedefs.AkUniqueID, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetContainerEffect(in_audio_node_id, in_fx_index, in_share_set_id),
+    );
+}
+
 pub fn setActorMixerEffect(in_audio_node_id: typedefs.AkUniqueID, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetActorMixerEffect(in_audio_node_id, in_fx_index, in_share_set_id),
@@ -1840,15 +1864,51 @@ pub fn setBusEffectID(in_audio_node_id: typedefs.AkUniqueID, in_fx_index: u32, i
     );
 }
 
-pub fn setBusEffectString(fallback_allocatr: std.mem.Allocator, in_bus_name: []const u8, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocatr);
+pub fn setBusEffectString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_fx_index: u32, in_share_set_id: typedefs.AkUniqueID) zig.WwiseError!void {
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
+    const raw_bus_name = zig.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_SetBusEffect_String(raw_bus_name, in_fx_index, in_share_set_id),
+    );
+}
+
+pub fn resetBusConfigId(in_audio_node_id: typedefs.AkUniqueID) zig.WwiseError!void {
+    return zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ResetBusConfig_ID(in_audio_node_id),
+    );
+}
+
+pub fn resetBusConfigString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8) zig.WwiseError!void {
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    const raw_bus_name = zig.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
+    defer allocator.free(raw_bus_name);
+
+    return zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ResetBusConfig_String(raw_bus_name),
+    );
+}
+
+pub fn setSidechainMixConfigID(in_sidechain_mix_id: typedefs.AkUniqueID, in_channel_config: speaker_config.AkChannelConfig) zig.WwiseError!void {
+    return zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetSidechainMixConfig_ID(in_sidechain_mix_id, in_channel_config.toC()),
+    );
+}
+
+pub fn setSidechainMixConfigString(fallback_allocator: std.mem.Allocator, in_sidechain_mix_name: []const u8, in_channel_config: speaker_config.AkChannelConfig) zig.WwiseError!void {
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
+    var allocator = stack_char_allocator.get();
+
+    const raw_sidechain_mix_name = zig.toCString(allocator, in_sidechain_mix_name) catch return zig.WwiseError.Fail;
+    defer allocator.free(raw_sidechain_mix_name);
+
+    return zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetSidechainMixConfig_String(raw_sidechain_mix_name, in_channel_config.toC()),
     );
 }
 
@@ -1865,10 +1925,10 @@ pub fn setBusConfigID(in_audio_node_id: typedefs.AkUniqueID, in_channel_config: 
 }
 
 pub fn setBusConfigString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_channe_config: speaker_config.AkChannelConfig) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
+    const raw_bus_name = zig.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
     return zig.handleAkResult(
@@ -1906,10 +1966,10 @@ pub fn setContainerHistory(in_bytes: ?*IBytes.IReadBytes) zig.WwiseError!void {
 }
 
 pub fn startOutputCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return zig.WwiseError.Fail;
+    const raw_capture_file_name = zig.toOSChar(allocator, in_capture_file_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_capture_file_name);
 
     return zig.handleAkResult(
@@ -1923,22 +1983,29 @@ pub fn stopOutputCapture() zig.WwiseError!void {
     );
 }
 
-pub fn addOutputCaptureMarker(fallback_allocator: std.mem.Allocator, in_marker_text: []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+pub const AddOutputCaptureMarkerOptionalArgs = struct {
+    sample_pos: u32 = constants.AK_INVALID_SAMPLE_POS,
+};
+pub fn addOutputCaptureMarker(fallback_allocator: std.mem.Allocator, in_marker_text: []const u8, optional_args: AddOutputCaptureMarkerOptionalArgs) zig.WwiseError!void {
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     const allocator = stack_char_allocator.get();
 
-    const raw_marker_text = common.toCString(allocator, in_marker_text) catch return zig.WwiseError.Fail;
+    const raw_marker_text = zig.toCString(allocator, in_marker_text) catch return zig.WwiseError.Fail;
 
     return zig.handleAkResult(
-        c.WWISEC_AK_SoundEngine_AddOutputCaptureMarker(raw_marker_text),
+        c.WWISEC_AK_SoundEngine_AddOutputCaptureMarker(raw_marker_text, optional_args.sample_pos),
     );
 }
 
-pub fn addOutputCaptureBinaryMarker(in_marker_data: []const u8) zig.WwiseError!void {
+pub const AddOutputCaptureBinaryMarkerOptionalArgs = struct {
+    sample_pos: u32 = constants.AK_INVALID_SAMPLE_POS,
+};
+pub fn addOutputCaptureBinaryMarker(in_marker_data: []const u8, optional_args: AddOutputCaptureBinaryMarkerOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_AddOutputCaptureBinaryMarker(
             @ptrCast(@constCast(in_marker_data)),
             @truncate(in_marker_data.len),
+            optional_args.sample_pos,
         ),
     );
 }
@@ -1978,10 +2045,10 @@ pub fn unregisterCaptureCallback(in_callback: callback_types.AkCaptureCallbackFu
 }
 
 pub fn startProfilerCapture(fallback_allocator: std.mem.Allocator, in_capture_file_name: []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_capture_file_name = common.toOSChar(allocator, in_capture_file_name) catch return zig.WwiseError.Fail;
+    const raw_capture_file_name = zig.toOSChar(allocator, in_capture_file_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_capture_file_name);
 
     return zig.handleAkResult(
@@ -2039,10 +2106,10 @@ pub fn getOutputID(in_id_shareset: typedefs.AkUniqueID, in_id_device: u32) typed
 }
 
 pub fn getOuputIDString(fallback_allocator: std.mem.Allocator, in_share_set: []const u8, in_id_device: u32) !typedefs.AkOutputDeviceID {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_share_set = try common.toCString(allocator, in_share_set);
+    const raw_share_set = try zig.toCString(allocator, in_share_set);
     defer allocator.free(raw_share_set);
 
     return c.WWISEC_AK_SoundEngine_GetOutputID_String(raw_share_set, in_id_device);
@@ -2055,13 +2122,13 @@ pub fn setBusDeviceID(in_id_bus: typedefs.AkUniqueID, in_id_new_device: typedefs
 }
 
 pub fn setBusDeviceString(fallback_allocator: std.mem.Allocator, in_bus_name: []const u8, in_device_name: []const u8) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_bus_name = common.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
+    const raw_bus_name = zig.toCString(allocator, in_bus_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_bus_name);
 
-    const raw_device_name = common.toCString(allocator, in_device_name) catch return zig.WwiseError.Fail;
+    const raw_device_name = zig.toCString(allocator, in_device_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_device_name);
 
     return zig.handleAkResult(
@@ -2173,4 +2240,18 @@ pub fn getBufferTick() u32 {
 
 pub fn getSampleTick() u64 {
     return c.WWISEC_AK_SoundEngine_GetSampleTick();
+}
+
+pub fn resetGlobalValues() zig.WwiseError!void {
+    return zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_ResetGlobalValues(),
+    );
+}
+
+pub fn setAssertHook(in_assert_hook: settings.AkAssertHook) zig.WwiseError!void {
+    return zig.handleAkResult(
+        c.WWISEC_AK_SoundEngine_SetAssertHook(
+            @ptrCast(in_assert_hook),
+        ),
+    );
 }
