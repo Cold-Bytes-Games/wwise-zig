@@ -2469,18 +2469,6 @@ typedef WWISEC_IOS_AkPlatformInitSettings WWISEC_AkPlatformInitSettings;
     void WWISEC_AK_StreamMgr_FlushAllCaches();
     // END AkStreamMgrModule
 
-    // BEGIN AkMusicEngine
-    typedef struct WWISEC_AkMusicSettings
-    {
-        AkReal32 fStreamingLookAheadRatio; ///< Multiplication factor for all streaming look-ahead heuristic values.
-    } WWISEC_AkMusicSettings;
-
-    AKRESULT WWISEC_AK_MusicEngine_Init(WWISEC_AkMusicSettings* in_pSettings);
-    void WWISEC_AK_MusicEngine_GetDefaultInitSettings(WWISEC_AkMusicSettings* out_settings);
-    void WWISEC_AK_MusicEngine_Term();
-
-// END AkMusicEngine
-
 // BEGIN AkCommunication
 #if defined(WWISEC_USE_COMMUNICATION)
 #define WWISEC_AK_COMM_SETTINGS_MAX_STRING_SIZE 64

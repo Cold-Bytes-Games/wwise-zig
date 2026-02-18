@@ -7,7 +7,6 @@ pub const IOHooks = @import("IOHooks.zig");
 pub const JobWorkerMgr = if (wwise_options.use_default_job_worker) @import("JobWorkerMgr.zig") else void;
 pub const MemoryMgr = @import("MemoryMgr.zig");
 pub const Monitor = @import("Monitor.zig");
-pub const MusicEngine = @import("MusicEngine.zig");
 pub const SoundEngine = @import("SoundEngine.zig");
 pub const SpatialAudio = if (wwise_options.use_spatial_audio) @import("SpatialAudio.zig") else void;
 pub const SpeakerVolumes = @import("SpeakerVolumes.zig");

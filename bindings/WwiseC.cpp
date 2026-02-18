@@ -25,8 +25,6 @@ SOFTWARE.
 
 #include <AK/IBytes.h>
 
-#include <AK/MusicEngine/Common/AkMusicEngine.h>
-
 #include <AK/SoundEngine/Common/AkCallback.h>
 #include <AK/SoundEngine/Common/AkDynamicDialogue.h>
 #include <AK/SoundEngine/Common/AkDynamicSequence.h>
@@ -2622,25 +2620,6 @@ void WWISEC_AK_StreamMgr_FlushAllCaches()
 }
 
 // END StreamMgrModule
-
-// BEGIN AkMusicEngine
-static_assert(sizeof(WWISEC_AkMusicSettings) == sizeof(AkMusicSettings));
-
-AKRESULT WWISEC_AK_MusicEngine_Init(WWISEC_AkMusicSettings* in_pSettings)
-{
-    return AK::MusicEngine::Init(reinterpret_cast<AkMusicSettings*>(in_pSettings));
-}
-
-void WWISEC_AK_MusicEngine_GetDefaultInitSettings(WWISEC_AkMusicSettings* out_settings)
-{
-    AK::MusicEngine::GetDefaultInitSettings(*reinterpret_cast<AkMusicSettings*>(out_settings));
-}
-
-void WWISEC_AK_MusicEngine_Term()
-{
-    AK::MusicEngine::Term();
-}
-// END AkMusicEngine
 
 // BEGIN AkCommunication
 #if defined(WWISEC_USE_COMMUNICATION)
