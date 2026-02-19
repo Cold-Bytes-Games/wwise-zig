@@ -3172,48 +3172,18 @@ void WWISEC_AK_JobWorkerMgr_TermWorkers()
 #include <AK/SpatialAudio/Common/AkSpatialAudioTypes.h>
 
 // BEGIN AkSpatialAudioTypes
-static_assert(sizeof(WWISEC_AkSpatialAudioID) == sizeof(AkSpatialAudioID));
-static_assert(sizeof(WWISEC_AkRoomID) == sizeof(AkRoomID));
-
-const WWISEC_AkRoomID WWISEC_AK_SpatialAudio_kOutdoorRoomID{AK::SpatialAudio::kOutdoorRoomID};
+const AkRoomID WWISEC_AK_SpatialAudio_kOutdoorRoomID{AK::SpatialAudio::kOutdoorRoomID};
 // END AkSpatialAudioTypes
 
 // BEGIN AkReflectGameData
-static_assert(WWISEC_AK_MAX_NUM_TEXTURE == AK_MAX_NUM_TEXTURE);
-static_assert(sizeof(WWISEC_AkImageSourceName) == sizeof(AkImageSourceName));
-static_assert(sizeof(WWISEC_AkImageSourceTexture) == sizeof(AkImageSourceTexture));
-static_assert(sizeof(WWISEC_AkImageSourceParams) == sizeof(AkImageSourceParams));
 static_assert(sizeof(WWISEC_AkReflectImageSource) == sizeof(AkReflectImageSource));
 static_assert(sizeof(WWISEC_AkReflectGameData) == sizeof(AkReflectGameData));
 // END AkReflectGameData
 
 // BEGIN AkSpatialAudio
-static_assert(sizeof(WWISEC_AkSpatialAudioInitSettings) == sizeof(AkSpatialAudioInitSettings));
-static_assert(sizeof(WWISEC_AkImageSourceSettings) == sizeof(AkImageSourceSettings));
-static_assert(sizeof(WWISEC_AkVertex) == sizeof(AkVertex));
-static_assert(sizeof(WWISEC_AkExtent) == sizeof(AkExtent));
-static_assert(sizeof(WWISEC_AkTriangle) == sizeof(AkTriangle));
-static_assert(sizeof(WWISEC_AkAcousticSurface) == sizeof(AkAcousticSurface));
-static_assert(sizeof(WWISEC_AkReflectionPathInfo) == sizeof(WWISEC_AkReflectionPathInfo));
-static_assert(sizeof(WWISEC_AkDiffractionPathInfo) == sizeof(AkDiffractionPathInfo));
-static_assert(sizeof(WWISEC_AkPortalParams) == sizeof(AkPortalParams));
-static_assert(sizeof(WWISEC_AkRoomParams) == sizeof(AkRoomParams));
-static_assert(sizeof(WWISEC_AkGeometryParams) == sizeof(AkGeometryParams));
-static_assert(WWISEC_AK_MAX_SOUND_PROPAGATION_WIDTH == AK_MAX_SOUND_PROPAGATION_WIDTH);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_X == AK_DEFAULT_GEOMETRY_POSITION_X);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Y == AK_DEFAULT_GEOMETRY_POSITION_Y);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Z == AK_DEFAULT_GEOMETRY_POSITION_Z);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_FRONT_X == AK_DEFAULT_GEOMETRY_FRONT_X);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_FRONT_Y == AK_DEFAULT_GEOMETRY_FRONT_Y);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_FRONT_Z == AK_DEFAULT_GEOMETRY_FRONT_Z);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_X == AK_DEFAULT_GEOMETRY_TOP_X);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_Y == AK_DEFAULT_GEOMETRY_TOP_Y);
-static_assert(WWISEC_AK_DEFAULT_GEOMETRY_TOP_Z == AK_DEFAULT_GEOMETRY_TOP_Z);
-static_assert(sizeof(WWISEC_AkGeometryInstanceParams) == sizeof(AkGeometryInstanceParams));
-
-AKRESULT WWISEC_AK_SpatialAudio_Init(const WWISEC_AkSpatialAudioInitSettings* in_initSettings)
+AKRESULT WWISEC_AK_SpatialAudio_Init(const struct AkSpatialAudioInitSettings* in_initSettings)
 {
-    return AK::SpatialAudio::Init(*reinterpret_cast<const AkSpatialAudioInitSettings*>(in_initSettings));
+    return AK::SpatialAudio::Init(*in_initSettings);
 }
 
 AKRESULT WWISEC_AK_SpatialAudio_RegisterListener(AkGameObjectID in_gameObjectID)
@@ -3231,9 +3201,9 @@ AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectRadius(AkGameObjectID in_gameObject
     return AK::SpatialAudio::SetGameObjectRadius(in_gameObjectID, in_outerRadius, in_innerRadius);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(AkImageSourceID in_srcID, const WWISEC_AkImageSourceSettings* in_info, const char* in_name, AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID)
+AKRESULT WWISEC_AK_SpatialAudio_SetImageSource(AkImageSourceID in_srcID, const struct AkImageSourceSettings* in_info, const char* in_name, AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID)
 {
-    return AK::SpatialAudio::SetImageSource(in_srcID, *reinterpret_cast<const AkImageSourceSettings*>(in_info), in_name, in_AuxBusID, in_gameObjectID);
+    return AK::SpatialAudio::SetImageSource(in_srcID, *in_info, in_name, in_AuxBusID, in_gameObjectID);
 }
 
 AKRESULT WWISEC_AK_SpatialAudio_RemoveImageSource(AkImageSourceID in_srcID, AkUniqueID in_AuxBusID, AkGameObjectID in_gameObjectID)
@@ -3246,62 +3216,62 @@ AKRESULT WWISEC_AK_SpatialAudio_ClearImageSources(AkUniqueID in_AuxBusID, AkGame
     return AK::SpatialAudio::ClearImageSources(in_AuxBusID, in_gameObjectID);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetGeometry(WWISEC_AkGeometrySetID in_GeomSetID, const WWISEC_AkGeometryParams* in_params)
+AKRESULT WWISEC_AK_SpatialAudio_SetGeometry(AkGeometrySetID in_GeomSetID, const struct AkGeometryParams* in_params)
 {
-    return AK::SpatialAudio::SetGeometry(in_GeomSetID.id, *reinterpret_cast<const AkGeometryParams*>(in_params));
+    return AK::SpatialAudio::SetGeometry(in_GeomSetID.id, *in_params);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometry(WWISEC_AkGeometrySetID in_SetID)
+AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometry(AkGeometrySetID in_SetID)
 {
     return AK::SpatialAudio::RemoveGeometry(in_SetID.id);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID, const WWISEC_AkGeometryInstanceParams* in_params)
+AKRESULT WWISEC_AK_SpatialAudio_SetGeometryInstance(AkGeometryInstanceID in_GeometryInstanceID, const struct AkGeometryInstanceParams* in_params)
 {
-    return AK::SpatialAudio::SetGeometryInstance(in_GeometryInstanceID.id, *reinterpret_cast<const AkGeometryInstanceParams*>(in_params));
+    return AK::SpatialAudio::SetGeometryInstance(in_GeometryInstanceID.id, *in_params);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(WWISEC_AkGeometryInstanceID in_GeometryInstanceID)
+AKRESULT WWISEC_AK_SpatialAudio_RemoveGeometryInstance(AkGeometryInstanceID in_GeometryInstanceID)
 {
     return AK::SpatialAudio::RemoveGeometryInstance(in_GeometryInstanceID.id);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, WWISEC_AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+AKRESULT WWISEC_AK_SpatialAudio_QueryReflectionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, struct AkReflectionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
 {
-    return AK::SpatialAudio::QueryReflectionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkReflectionPathInfo*>(out_aPaths), *io_uArraySize);
+    return AK::SpatialAudio::QueryReflectionPaths(in_gameObjectID, in_positionIndex, *out_listenerPos, *out_emitterPos, out_aPaths, *io_uArraySize);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetRoom(WWISEC_AkRoomID in_RoomID, const WWISEC_AkRoomParams* in_Params, const char* in_RoomName)
+AKRESULT WWISEC_AK_SpatialAudio_SetRoom(AkRoomID in_RoomID, const struct AkRoomParams* in_Params, const char* in_RoomName)
 {
-    return AK::SpatialAudio::SetRoom(in_RoomID.id, *reinterpret_cast<const AkRoomParams*>(in_Params), in_RoomName);
+    return AK::SpatialAudio::SetRoom(in_RoomID.id, *in_Params, in_RoomName);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_RemoveRoom(WWISEC_AkRoomID in_RoomID)
+AKRESULT WWISEC_AK_SpatialAudio_RemoveRoom(AkRoomID in_RoomID)
 {
     return AK::SpatialAudio::RemoveRoom(in_RoomID.id);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetPortal(WWISEC_AkPortalID in_PortalID, const WWISEC_AkPortalParams* in_Params, const char* in_PortalName)
+AKRESULT WWISEC_AK_SpatialAudio_SetPortal(AkPortalID in_PortalID, const struct AkPortalParams* in_Params, const char* in_PortalName)
 {
-    return AK::SpatialAudio::SetPortal(in_PortalID.id, *reinterpret_cast<const AkPortalParams*>(in_Params), in_PortalName);
+    return AK::SpatialAudio::SetPortal(in_PortalID.id, *in_Params, in_PortalName);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_RemovePortal(WWISEC_AkPortalID in_PortalID)
+AKRESULT WWISEC_AK_SpatialAudio_RemovePortal(AkPortalID in_PortalID)
 {
     return AK::SpatialAudio::RemovePortal(in_PortalID.id);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetReverbZone(WWISEC_AkRoomID in_ReverbZone, WWISEC_AkRoomID in_ParentRoom, AkReal32 in_transitionRegionWidth)
+AKRESULT WWISEC_AK_SpatialAudio_SetReverbZone(AkRoomID in_ReverbZone, AkRoomID in_ParentRoom, AkReal32 in_transitionRegionWidth)
 {
     return AK::SpatialAudio::SetReverbZone(in_ReverbZone.id, in_ParentRoom.id, in_transitionRegionWidth);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_RemoveReverbZone(WWISEC_AkRoomID in_ReverbZone)
+AKRESULT WWISEC_AK_SpatialAudio_RemoveReverbZone(AkRoomID in_ReverbZone)
 {
     return AK::SpatialAudio::RemoveReverbZone(in_ReverbZone.id);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(AkGameObjectID in_gameObjectID, WWISEC_AkRoomID in_CurrentRoomID)
+AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(AkGameObjectID in_gameObjectID, AkRoomID in_CurrentRoomID)
 {
     return AK::SpatialAudio::SetGameObjectInRoom(in_gameObjectID, in_CurrentRoomID.id);
 }
@@ -3309,6 +3279,11 @@ AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectInRoom(AkGameObjectID in_gameObject
 AKRESULT WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(AkGameObjectID in_gameObjectID)
 {
     return AK::SpatialAudio::UnsetGameObjectInRoom(in_gameObjectID);
+}
+
+AKRESULT WWISEC_AK_SpatialAudio_SetAdjacentRoomBleed(AkReal32 in_fAdjacentRoomBleed)
+{
+    return AK::SpatialAudio::SetAdjacentRoomBleed(in_fAdjacentRoomBleed);
 }
 
 AKRESULT WWISEC_AK_SpatialAudio_SetReflectionsOrder(AkUInt32 in_uReflectionsOrder, bool in_bUpdatePaths)
@@ -3361,34 +3336,34 @@ AKRESULT WWISEC_AK_SpatialAudio_SetEarlyReflectionsVolume(AkGameObjectID in_game
     return AK::SpatialAudio::SetEarlyReflectionsVolume(in_gameObjectID, in_fSendVolume);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction, AkReal32 in_fOcclusion)
+AKRESULT WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(AkPortalID in_PortalID, AkReal32 in_fObstruction, AkReal32 in_fOcclusion, bool in_bTransition)
 {
-    return AK::SpatialAudio::SetPortalObstructionAndOcclusion(in_PortalID.id, in_fObstruction, in_fOcclusion);
+    return AK::SpatialAudio::SetPortalObstructionAndOcclusion(in_PortalID.id, in_fObstruction, in_fOcclusion, in_bTransition);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(AkGameObjectID in_gameObjectID, WWISEC_AkPortalID in_PortalID, AkReal32 in_fObstruction)
+AKRESULT WWISEC_AK_SpatialAudio_SetGameObjectToPortalObstruction(AkGameObjectID in_gameObjectID, AkPortalID in_PortalID, AkReal32 in_fObstruction)
 {
     return AK::SpatialAudio::SetGameObjectToPortalObstruction(in_gameObjectID, in_PortalID.id, in_fObstruction);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetPortalToPortalObstruction(WWISEC_AkPortalID in_PortalID0, WWISEC_AkPortalID in_PortalID1, AkReal32 in_fObstruction)
+AKRESULT WWISEC_AK_SpatialAudio_SetPortalToPortalObstruction(AkPortalID in_PortalID0, AkPortalID in_PortalID1, AkReal32 in_fObstruction)
 {
     return AK::SpatialAudio::SetPortalToPortalObstruction(in_PortalID0.id, in_PortalID1.id, in_fObstruction);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(WWISEC_AkPortalID in_portal, AkReal32* out_wetDiffraction)
+AKRESULT WWISEC_AK_SpatialAudio_QueryWetDiffraction(AkPortalID in_portal, AkReal32* out_wetDiffraction)
 {
     return AK::SpatialAudio::QueryWetDiffraction(in_portal.id, *out_wetDiffraction);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, WWISEC_AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
+AKRESULT WWISEC_AK_SpatialAudio_QueryDiffractionPaths(AkGameObjectID in_gameObjectID, AkUInt32 in_positionIndex, struct AkVector64* out_listenerPos, struct AkVector64* out_emitterPos, struct AkDiffractionPathInfo* out_aPaths, AkUInt32* io_uArraySize)
 {
-    return AK::SpatialAudio::QueryDiffractionPaths(in_gameObjectID, in_positionIndex, *reinterpret_cast<AkVector64*>(out_listenerPos), *reinterpret_cast<AkVector64*>(out_emitterPos), reinterpret_cast<AkDiffractionPathInfo*>(out_aPaths), *io_uArraySize);
+    return AK::SpatialAudio::QueryDiffractionPaths(in_gameObjectID, in_positionIndex, *out_listenerPos, *out_emitterPos, out_aPaths, *io_uArraySize);
 }
 
-AKRESULT WWISEC_AK_SpatialAudio_SetTransmissionOperation(WWISEC_AkTransmissionOperation in_eOperation)
+AKRESULT WWISEC_AK_SpatialAudio_SetTransmissionOperation(enum AkTransmissionOperation in_eOperation)
 {
-    return AK::SpatialAudio::SetTransmissionOperation(static_cast<AkTransmissionOperation>(in_eOperation));
+    return AK::SpatialAudio::SetTransmissionOperation(in_eOperation);
 }
 
 AKRESULT WWISEC_AK_SpatialAudio_ResetStochasticEngine()

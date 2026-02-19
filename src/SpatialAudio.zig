@@ -1,347 +1,74 @@
 const ak_3d_objects = @import("ak_3d_objects.zig");
 const c = @import("wwise_c");
 const constants = @import("constants.zig");
-const reflect_game_data = @import("reflect_game_data.zig");
+const reflect_game_data = @import("SpatialAudio/reflect_game_data.zig");
+const spatial_audio_types = @import("SpatialAudio/types.zig");
 const std = @import("std");
 const typedefs = @import("typedefs.zig");
 const zig = @import("zig.zig");
 
-pub const ReverbEstimation = @import("ReverbEstimation.zig");
+pub const ReverbEstimation = @import("SpatialAudio/ReverbEstimation.zig");
 
-pub const AK_MAX_REFLECT_ORDER = c.WWISEC_AK_MAX_REFLECT_ORDER;
-pub const AK_MAX_REFLECTION_PATH_LENGTH = c.WWISEC_AK_MAX_REFLECTION_PATH_LENGTH;
-pub const AK_MAX_SOUND_PROPAGATION_DEPTH = c.WWISEC_AK_MAX_SOUND_PROPAGATION_DEPTH;
-pub const AK_MAX_SOUND_PROPAGATION_WIDTH = c.WWISEC_AK_MAX_SOUND_PROPAGATION_WIDTH;
-pub const AK_DEFAULT_MOVEMENT_THRESHOLD = c.WWISEC_AK_DEFAULT_MOVEMENT_THRESHOLD;
-pub const AK_SA_EPSILON = c.WWISEC_AK_SA_EPSILON;
-pub const AK_SA_DIFFRACTION_EPSILON = c.WWISEC_AK_SA_DIFFRACTION_EPSILON;
-pub const AK_SA_DIFFRACTION_DOT_EPSILON = c.WWISEC_AK_SA_DIFFRACTION_DOT_EPSILON;
-pub const AK_SA_PLANE_THICKNESS = c.WWISEC_AK_SA_PLANE_THICKNESS;
-pub const AK_SA_MIN_ENVIRONMENT_ABSORPTION = c.WWISEC_AK_SA_MIN_ENVIRONMENT_ABSORPTION;
-pub const AK_SA_MIN_ENVIRONMENT_SURFACE_AREA = c.WWISEC_AK_SA_MIN_ENVIRONMENT_SURFACE_AREA;
+pub const AK_MAX_NUM_TEXTURE = spatial_audio_types.AK_MAX_NUM_TEXTURE;
+pub const AK_MAX_REFLECT_ORDER = spatial_audio_types.AK_MAX_REFLECT_ORDER;
+pub const AK_MAX_REFLECTION_PATH_LENGTH = spatial_audio_types.AK_MAX_REFLECTION_PATH_LENGTH;
+pub const AK_STOCHASTIC_RESERVE_LENGTH = spatial_audio_types.AK_STOCHASTIC_RESERVE_LENGTH;
+pub const AK_MAX_SOUND_PROPAGATION_DEPTH = spatial_audio_types.AK_MAX_SOUND_PROPAGATION_DEPTH;
+pub const AK_MAX_SOUND_PROPAGATION_WIDTH = spatial_audio_types.AK_MAX_SOUND_PROPAGATION_WIDTH;
+pub const AK_SA_EPSILON = spatial_audio_types.AK_SA_EPSILON;
+pub const AK_SA_DIFFRACTION_EPSILON = spatial_audio_types.AK_SA_DIFFRACTION_EPSILON;
+pub const AK_SA_DIFFRACTION_DOT_EPSILON = spatial_audio_types.AK_SA_DIFFRACTION_DOT_EPSILON;
+pub const AK_SA_PLANE_THICKNESS = spatial_audio_types.AK_SA_PLANE_THICKNESS;
+pub const AK_SA_MIN_ENVIRONMENT_ABSORPTION = spatial_audio_types.AK_SA_MIN_ENVIRONMENT_ABSORPTION;
+pub const AK_SA_MIN_ENVIRONMENT_SURFACE_AREA = spatial_audio_types.AK_SA_MIN_ENVIRONMENT_SURFACE_AREA;
 
-pub const kDefaultDiffractionMaxEdges = c.WWISEC_kDefaultDiffractionMaxEdges;
-pub const kDefaultDiffractionMaxPaths = c.WWISEC_kDefaultDiffractionMaxPaths;
+pub const AK_INVALID_VERTEX = spatial_audio_types.AK_INVALID_VERTEX;
+pub const AK_INVALID_TRIANGLE = spatial_audio_types.AK_INVALID_TRIANGLE;
+pub const AK_INVALID_SURFACE = spatial_audio_types.AK_INVALID_SURFACE;
+pub const AK_INVALID_SA_ID = spatial_audio_types.AK_INVALID_SA_ID;
 
-pub const kDiffractionMaxEdges = c.WWISEC_kDiffractionMaxEdges;
-pub const kDiffractionMaxPaths = c.WWISEC_kDiffractionMaxPaths;
-pub const kPortalToPortalDiffractionMaxPaths = c.WWISEC_kPortalToPortalDiffractionMaxPaths;
+pub const AkTransmissionOperation = spatial_audio_types.AkTransmissionOperation;
+pub const AkRoomDistanceBehavior = spatial_audio_types.AkRoomDistanceBehavior;
 
-pub const AkVertIdx = c.WWISEC_AkVertIdx;
-pub const AkTriIdx = c.WWISEC_AkTriIdx;
-pub const AkSurfIdx = c.WWISEC_AkSurfIdx;
-pub const AkEdgeIdx = c.WWISEC_AkEdgeIdx;
-pub const AkEdgeReceptorIdx = c.WWISEC_AkEdgeReceptorIdx;
+pub const AkSpatialAudioID = spatial_audio_types.AkSpatialAudioID;
+pub const AkRoomID = spatial_audio_types.AkRoomID;
+pub const AkVertex = spatial_audio_types.AkVertex;
+pub const AkPortalID = spatial_audio_types.AkPortalID;
+pub const AkGeometrySetID = spatial_audio_types.AkGeometrySetID;
+pub const AkGeometryInstanceID = spatial_audio_types.AkGeometryInstanceID;
 
-pub const AK_INVALID_VERTEX = c.WWISEC_AK_INVALID_VERTEX;
-pub const AK_INVALID_TRIANGLE = c.WWISEC_AK_INVALID_TRIANGLE;
-pub const AK_INVALID_SURFACE = c.WWISEC_AK_INVALID_SURFACE;
-pub const AK_INVALID_EDGE = c.WWISEC_AK_INVALID_EDGE;
+pub const AkImageSourceName = spatial_audio_types.AkImageSourceName;
+pub const AkSpatialAudioInitSettings = spatial_audio_types.AkSpatialAudioInitSettings;
+pub const AkImageSourceParams = spatial_audio_types.AkImageSourceParams;
+pub const AkImageSourceTexture = spatial_audio_types.AkImageSourceTexture;
+pub const AkImageSourceSettings = spatial_audio_types.AkImageSourceSettings;
+pub const AkExtent = spatial_audio_types.AkExtent;
+pub const AkTriangle = spatial_audio_types.AkTriangle;
+pub const AkAcousticSurface = spatial_audio_types.AkAcousticSurface;
+pub const AkReflectionPathInfo = spatial_audio_types.AkReflectionPathInfo;
+pub const AkDiffractionPathInfo = spatial_audio_types.AkDiffractionPathInfo;
+pub const AkPortalParams = spatial_audio_types.AkPortalParams;
+pub const AkRoomParams = spatial_audio_types.AkRoomParams;
+pub const AkGeometryParams = spatial_audio_types.AkGeometryParams;
 
-pub const AkSpatialAudioID = extern struct {
-    id: u64 = std.math.maxInt(u64),
+pub const AK_DEFAULT_GEOMETRY_POSITION_X = spatial_audio_types.AK_DEFAULT_GEOMETRY_POSITION_X;
+pub const AK_DEFAULT_GEOMETRY_POSITION_Y = spatial_audio_types.AK_DEFAULT_GEOMETRY_POSITION_Y;
+pub const AK_DEFAULT_GEOMETRY_POSITION_Z = spatial_audio_types.AK_DEFAULT_GEOMETRY_POSITION_Z;
+pub const AK_DEFAULT_GEOMETRY_FRONT_X = spatial_audio_types.AK_DEFAULT_GEOMETRY_FRONT_X;
+pub const AK_DEFAULT_GEOMETRY_FRONT_Y = spatial_audio_types.AK_DEFAULT_GEOMETRY_FRONT_Y;
+pub const AK_DEFAULT_GEOMETRY_FRONT_Z = spatial_audio_types.AK_DEFAULT_GEOMETRY_FRONT_Z;
+pub const AK_DEFAULT_GEOMETRY_TOP_X = spatial_audio_types.AK_DEFAULT_GEOMETRY_TOP_X;
+pub const AK_DEFAULT_GEOMETRY_TOP_Y = spatial_audio_types.AK_DEFAULT_GEOMETRY_TOP_Y;
+pub const AK_DEFAULT_GEOMETRY_TOP_Z = spatial_audio_types.AK_DEFAULT_GEOMETRY_TOP_Z;
 
-    pub fn fromC(value: c.WWISEC_AkSpatialAudioID) AkSpatialAudioID {
-        return @bitCast(value);
-    }
+pub const AkGeometryInstanceParams = spatial_audio_types.AkGeometryInstanceParams;
 
-    pub fn toC(self: AkSpatialAudioID) c.WWISEC_AkSpatialAudioID {
-        return @bitCast(self);
-    }
-
-    pub fn isValid(self: AkSpatialAudioID) bool {
-        return self.id != std.math.maxInt(u64);
-    }
-
-    pub fn asGameObjectID(self: AkSpatialAudioID) typedefs.AkGameObjectID {
-        return self.id;
-    }
-};
-
-pub const AkRoomID = extern struct {
-    id: u64 = std.math.maxInt(u64),
-
-    const OutdoorsGameObjID = c.WWISEC_OutdoorsGameObjID;
-
-    pub fn fromC(value: c.WWISEC_AkRoomID) AkRoomID {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkRoomID) c.WWISEC_AkRoomID {
-        return @bitCast(self);
-    }
-
-    pub fn isValid(self: AkRoomID) bool {
-        return self.id != std.math.maxInt(u64);
-    }
-
-    pub fn asGameObjectID(self: AkRoomID) typedefs.AkGameObjectID {
-        return if (self.isValid()) self.id else OutdoorsGameObjID;
-    }
-
-    pub fn fromGameObjectID(game_object_id: typedefs.AkGameObjectID) AkRoomID {
-        return if (game_object_id != OutdoorsGameObjID) AkRoomID{ .id = game_object_id } else AkRoomID{};
-    }
-};
-
-pub const AkPortalID = AkSpatialAudioID;
-pub const AkGeometrySetID = AkSpatialAudioID;
-pub const AkGeometryInstanceID = AkSpatialAudioID;
+pub const AkReflectImageSource = reflect_game_data.AkReflectImageSource;
+pub const AkReflectGameData = reflect_game_data.AkReflectGameData;
 
 pub fn getOutdoorRoomID() AkRoomID {
     return AkRoomID.fromC(c.WWISEC_AK_SpatialAudio_kOutdoorRoomID);
 }
-
-pub const AkTransmissionOperation = enum(u8) {
-    add = c.WWISEC_AkTransmissionOperation_Add,
-    multiply = c.WWISEC_AkTransmissionOperation_Multiply,
-    max = c.WWISEC_AkTransmissionOperation_Max,
-
-    pub const default: AkTransmissionOperation = .max;
-};
-
-pub const AkSpatialAudioInitSettings = extern struct {
-    max_sound_propagation_depth: u32 = AK_MAX_SOUND_PROPAGATION_DEPTH,
-    movement_threshold: f32 = AK_DEFAULT_MOVEMENT_THRESHOLD,
-    number_of_primary_rays: u32 = 100,
-    max_reflection_order: u32 = 1,
-    max_diffraction_order: u32 = 8,
-    max_diffraction_paths: u32 = 0,
-    max_global_reflection_paths: u32 = 0,
-    max_emitter_room_aux_sends: u32 = 3,
-    diffraction_on_reflections_order: u32 = 2,
-    max_diffraction_angle_degrees: f32 = 0.0,
-    max_path_length: f32 = 10000.0,
-    cpu_limit_percentage: f32 = 0.0,
-    smoothing_constant_ms: f32 = 0.0,
-    load_balancing_spread: u32 = 1,
-    enable_geometric_diffraction_and_transmission: bool = true,
-    calc_emitter_virtual_position: bool = true,
-    transmission_operation: AkTransmissionOperation = .default,
-
-    pub fn fromC(value: c.WWISEC_AkSpatialAudioInitSettings) AkSpatialAudioInitSettings {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkSpatialAudioInitSettings) c.WWISEC_AkSpatialAudioInitSettings {
-        return @bitCast(self);
-    }
-};
-
-pub const AkImageSourceSettings = extern struct {
-    params: reflect_game_data.AkImageSourceParams = .{},
-    texture: reflect_game_data.AkImageSourceTexture = .{},
-
-    pub fn fromC(value: c.WWISEC_AkImageSourceSettings) AkImageSourceSettings {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkImageSourceSettings) c.WWISEC_AkImageSourceSettings {
-        return @bitCast(self);
-    }
-};
-
-pub const AkVertex = extern struct {
-    x: f32 = 0.0,
-    y: f32 = 0.0,
-    z: f32 = 0.0,
-
-    pub fn fromC(value: c.WWISEC_AkVertex) AkVertex {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkVertex) c.WWISEC_AkVertex {
-        return @bitCast(self);
-    }
-};
-
-pub const AkExtent = extern struct {
-    half_width: f32 = 0.0,
-    half_height: f32 = 0.0,
-    half_depth: f32 = 0.0,
-
-    pub fn fromC(value: c.WWISEC_AkExtent) AkExtent {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkExtent) c.WWISEC_AkExtent {
-        return @bitCast(self);
-    }
-};
-
-pub const AkTriangle = extern struct {
-    point0: AkVertIdx = AK_INVALID_VERTEX,
-    point1: AkVertIdx = AK_INVALID_VERTEX,
-    point2: AkVertIdx = AK_INVALID_VERTEX,
-    surface: AkSurfIdx = AK_INVALID_SURFACE,
-
-    pub fn fromC(value: c.WWISEC_AkTriangle) AkTriangle {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkTriangle) c.WWISEC_AkTriangle {
-        return @bitCast(self);
-    }
-};
-
-pub const AkAcousticSurface = extern struct {
-    texture_id: u32 = constants.AK_INVALID_UNIQUE_ID,
-    transmission_loss: f32 = 1.0,
-    str_name: ?[*:0]const u8 = null,
-
-    pub fn fromC(value: c.WWISEC_AkAcousticSurface) AkAcousticSurface {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkAcousticSurface) c.WWISEC_AkAcousticSurface {
-        return @bitCast(self);
-    }
-};
-
-pub const AkReflectionPathInfo = extern struct {
-    image_source: ak_3d_objects.AkVector64 = .{},
-    path_point: [AK_MAX_REFLECTION_PATH_LENGTH]ak_3d_objects.AkVector64 = @splat(.{}),
-    textureIDs: [AK_MAX_REFLECTION_PATH_LENGTH]u32 = @splat(0),
-    num_path_points: u32 = 0,
-    num_reflections: u32 = 0,
-    diffraction: [AK_MAX_REFLECTION_PATH_LENGTH]f32 = @splat(0.0),
-    level: f32 = 0.0,
-    is_occluded: bool = false,
-
-    pub fn fromC(value: c.WWISEC_AkReflectionPathInfo) AkReflectionPathInfo {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkReflectionPathInfo) c.WWISEC_AkReflectionPathInfo {
-        return @bitCast(self);
-    }
-};
-
-pub const AkDiffractionPathInfo = extern struct {
-    nodes: [AK_MAX_SOUND_PROPAGATION_DEPTH]ak_3d_objects.AkVector64 = @splat(.{}),
-    emitter_pos: ak_3d_objects.AkVector64 = .{},
-    angles: [AK_MAX_SOUND_PROPAGATION_DEPTH]f32 = @splat(0.0),
-    portals: [AK_MAX_SOUND_PROPAGATION_DEPTH]AkPortalID = @splat(.{}),
-    rooms: [AK_MAX_SOUND_PROPAGATION_DEPTH + 1]AkRoomID = @splat(.{}),
-    virtual_pos: ak_3d_objects.AkWorldTransform = .{},
-    node_count: u32 = 0,
-    diffraction: f32 = 0.0,
-    transmission_loss: f32 = 0.0,
-    tot_length: f32 = 0.0,
-    obstruction_value: f32 = 0.0,
-    occlusion_value: f32 = 0.0,
-    gain: f32 = 0.0,
-
-    pub fn fromC(value: c.WWISEC_AkDiffractionPathInfo) AkDiffractionPathInfo {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkDiffractionPathInfo) c.WWISEC_AkDiffractionPathInfo {
-        return @bitCast(self);
-    }
-};
-
-pub const AkPortalParams = extern struct {
-    transform: ak_3d_objects.AkWorldTransform = .{},
-    extent: AkExtent = .{},
-    enabled: bool = false,
-    front_room: AkRoomID = .{},
-    back_room: AkRoomID = .{},
-
-    pub fn fromC(value: c.WWISEC_AkPortalParams) AkPortalParams {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkPortalParams) c.WWISEC_AkPortalParams {
-        return @bitCast(self);
-    }
-};
-
-pub const AkRoomParams = extern struct {
-    front: ak_3d_objects.AkVector = .{ .z = 1.0 },
-    up: ak_3d_objects.AkVector = .{ .y = 1.0 },
-    reverb_aux_bus: typedefs.AkAuxBusID = constants.AK_INVALID_AUX_ID,
-    reverb_level: f32 = 1.0,
-    transmission_loss: f32 = 1.0,
-    room_game_obj_aux_send_level_to_self: f32 = 0.0,
-    room_game_obj_keep_registered: bool = false,
-    geometry_instance_id: AkGeometrySetID = .{},
-    room_priority: f32 = 100.0,
-
-    pub fn fromC(value: c.WWISEC_AkRoomParams) AkRoomParams {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkRoomParams) c.WWISEC_AkRoomParams {
-        return @bitCast(self);
-    }
-};
-
-pub const AkGeometryParams = extern struct {
-    triangles: ?[*]const AkTriangle = null,
-    num_triangles: AkTriIdx = 0,
-    vertices: ?[*]const AkVertex = null,
-    num_vertices: AkVertIdx = 0,
-    surfaces: ?[*]const AkAcousticSurface = null,
-    num_surfaces: AkSurfIdx = 0,
-    enable_diffraction: bool = false,
-    enable_diffraction_on_boundary_edges: bool = false,
-
-    pub fn fromC(value: c.WWISEC_AkGeometryParams) AkGeometryParams {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkGeometryParams) c.WWISEC_AkGeometryParams {
-        return @bitCast(self);
-    }
-};
-
-pub const AK_DEFAULT_GEOMETRY_POSITION_X = c.WWISEC_AK_DEFAULT_GEOMETRY_POSITION_X;
-pub const AK_DEFAULT_GEOMETRY_POSITION_Y = c.WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Y;
-pub const AK_DEFAULT_GEOMETRY_POSITION_Z = c.WWISEC_AK_DEFAULT_GEOMETRY_POSITION_Z;
-pub const AK_DEFAULT_GEOMETRY_FRONT_X = c.WWISEC_AK_DEFAULT_GEOMETRY_FRONT_X;
-pub const AK_DEFAULT_GEOMETRY_FRONT_Y = c.WWISEC_AK_DEFAULT_GEOMETRY_FRONT_Y;
-pub const AK_DEFAULT_GEOMETRY_FRONT_Z = c.WWISEC_AK_DEFAULT_GEOMETRY_FRONT_Z;
-pub const AK_DEFAULT_GEOMETRY_TOP_X = c.WWISEC_AK_DEFAULT_GEOMETRY_TOP_X;
-pub const AK_DEFAULT_GEOMETRY_TOP_Y = c.WWISEC_AK_DEFAULT_GEOMETRY_TOP_Y;
-pub const AK_DEFAULT_GEOMETRY_TOP_Z = c.WWISEC_AK_DEFAULT_GEOMETRY_TOP_Z;
-
-pub const AkGeometryInstanceParams = extern struct {
-    position_and_orientation: ak_3d_objects.AkWorldTransform = .{
-        .position = .{
-            .x = AK_DEFAULT_GEOMETRY_POSITION_X,
-            .y = AK_DEFAULT_GEOMETRY_POSITION_Y,
-            .z = AK_DEFAULT_GEOMETRY_POSITION_Z,
-        },
-        .orientation_front = .{
-            .x = AK_DEFAULT_GEOMETRY_FRONT_X,
-            .y = AK_DEFAULT_GEOMETRY_FRONT_Y,
-            .z = AK_DEFAULT_GEOMETRY_FRONT_Z,
-        },
-        .orientation_top = .{
-            .x = AK_DEFAULT_GEOMETRY_TOP_X,
-            .y = AK_DEFAULT_GEOMETRY_TOP_Y,
-            .z = AK_DEFAULT_GEOMETRY_TOP_Z,
-        },
-    },
-    scale: ak_3d_objects.AkVector = .{
-        .x = 1,
-        .y = 1,
-        .z = 1,
-    },
-    geometry_set_id: AkGeometrySetID = .{},
-    use_for_reflection_and_diffraction: bool = true,
-    bypass_portal_subtraction: bool = false,
-    is_solid: bool = false,
-
-    pub fn fromC(value: c.WWISEC_AkGeometryInstanceParams) AkGeometryInstanceParams {
-        return @bitCast(value);
-    }
-
-    pub fn toC(self: AkGeometryInstanceParams) c.WWISEC_AkGeometryInstanceParams {
-        return @bitCast(self);
-    }
-};
 
 pub fn init(in_init_settings: *const AkSpatialAudioInitSettings) zig.WwiseError!void {
     return zig.handleAkResult(
@@ -373,10 +100,10 @@ pub const SetImageSourceOptionalArgs = struct {
 };
 
 pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: typedefs.AkImageSourceID, in_info: *const AkImageSourceSettings, in_name: []const u8, optional_args: SetImageSourceOptionalArgs) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_name = common.toCString(allocator, in_name) catch return zig.WwiseError.Fail;
+    const raw_name = zig.toCString(allocator, in_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_name);
 
     return zig.handleAkResult(
@@ -486,7 +213,7 @@ pub fn setRoom(in_room_id: AkRoomID, in_params: *const AkRoomParams, optional_ar
         if (optional_args.allocator != null and optional_args.room_name != null) {
             area_allocator_opt = std.heap.ArenaAllocator.init(optional_args.allocator.?);
 
-            const converted_name = common.toCString(area_allocator_opt.?.allocator(), optional_args.room_name.?) catch return zig.WwiseError.Fail;
+            const converted_name = zig.toCString(area_allocator_opt.?.allocator(), optional_args.room_name.?) catch return zig.WwiseError.Fail;
 
             break :blk @as(?[*:0]const u8, converted_name);
         }
@@ -526,7 +253,7 @@ pub fn setPortal(in_portal_id: AkPortalID, in_params: *const AkPortalParams, opt
         if (optional_args.allocator != null and optional_args.portal_name != null) {
             area_allocator_opt = std.heap.ArenaAllocator.init(optional_args.allocator.?);
 
-            const converted_name = common.toCString(area_allocator_opt.?.allocator(), optional_args.portal_name.?) catch return zig.WwiseError.Fail;
+            const converted_name = zig.toCString(area_allocator_opt.?.allocator(), optional_args.portal_name.?) catch return zig.WwiseError.Fail;
 
             break :blk @as(?[*:0]const u8, converted_name);
         }
@@ -570,6 +297,12 @@ pub fn setGameObjectInRoom(in_game_object_id: typedefs.AkGameObjectID, in_curren
 pub fn unsetGameObjectInRoom(in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_UnsetGameObjectInRoom(in_game_object_id),
+    );
+}
+
+pub fn setAdjacentRoomBleed(in_adjacent_room_bleed: f32) zig.WwiseError!void {
+    return zig.handleAkResult(
+        c.WWISEC_AK_SpatialAudio_SetAdjacentRoomBleed(in_adjacent_room_bleed),
     );
 }
 
@@ -645,9 +378,13 @@ pub fn setEarlyReflectionsVolume(in_game_object_id: typedefs.AkGameObjectID, in_
     );
 }
 
-pub fn setPortalObstructionAndOcclusion(in_portal_id: AkPortalID, obstruction: f32, occlusion: f32) zig.WwiseError!void {
+pub const SetPortalObstructionAndOcclusionOptionalArgs = struct {
+    transition: bool = false,
+};
+
+pub fn setPortalObstructionAndOcclusion(in_portal_id: AkPortalID, obstruction: f32, occlusion: f32, optional_args: SetPortalObstructionAndOcclusionOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
-        c.WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(in_portal_id.toC(), obstruction, occlusion),
+        c.WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(in_portal_id.toC(), obstruction, occlusion, optional_args.transition),
     );
 }
 

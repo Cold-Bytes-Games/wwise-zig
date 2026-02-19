@@ -1,8 +1,8 @@
-const ak_3d_objects = @import("ak_3d_objects.zig");
+const ak_3d_objects = @import("../ak_3d_objects.zig");
 const c = @import("wwise_c");
 const std = @import("std");
-const virtual_acoustics = @import("virtual_acoustics.zig");
-const zig = @import("zig.zig");
+const virtual_acoustics = @import("../virtual_acoustics.zig");
+const zig = @import("../zig.zig");
 
 pub fn calculateSlope(texture: *const virtual_acoustics.AkAcousticTexture) f32 {
     return c.WWISEC_AK_SpatialAudio_ReverbEstimation_CalculateSlope(@ptrCast(texture));
@@ -35,7 +35,6 @@ pub fn estimateT60Decay(in_volume_cubic_meters: f32, in_surface_area_squared_met
 pub const EstimateTimeToFirstReflectionOptionalArgs = struct {
     speed_of_sound: f32 = 343.0,
 };
-
 pub fn estimateTimeToFirstReflection(in_environment_extent_meters: ak_3d_objects.AkVector, out_time_to_first_reflection_ms: *f32, optional_args: EstimateTimeToFirstReflectionOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_ReverbEstimation_EstimateTimeToFirstReflection(
