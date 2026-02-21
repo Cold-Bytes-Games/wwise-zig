@@ -493,7 +493,6 @@ const wwise_platform = @import("wwise_platform.zig");
 pub const WwisePlatform = wwise_platform.WwisePlatform;
 pub const platform = wwise_platform.platform;
 
-pub const reflect_game_data = if (wwise_options.use_spatial_audio) @import("reflect_game_data.zig") else struct {};
 pub const Windows = if (wwise_options.platform == .windows) @import("win_sound_engine.zig") else struct {};
 
 // zig.zig

@@ -63,9 +63,9 @@ pub const AkSourcePosition = extern struct {
 };
 
 pub const MultiPositionType = enum(zig.DefaultEnumType) {
-    single_source = c.WWISEC_AK_SoundEngine_MultiPositionType_SingleSource,
-    multi_sources = c.WWISEC_AK_SoundEngine_MultiPositionType_MultiSources,
-    multi_directions = c.WWISEC_AK_SoundEngine_MultiPositionType_MultiDirections,
+    single_source = c.AkMultiPositionType_SingleSource,
+    multi_sources = c.AkMultiPositionType_MultiSources,
+    multi_directions = c.AkMultiPositionType_MultiDirections,
 };
 
 pub const PreparationType = enum(zig.DefaultEnumType) {
@@ -153,7 +153,7 @@ pub fn getOutputDeviceConfiguration(in_id_output: typedefs.AkOutputDeviceID, io_
 }
 
 pub fn getPanningRule(in_id_output: typedefs.AkOutputDeviceID) zig.WwiseError!enums.AkPanningRule {
-    var raw_panning_rule: c.WWISEC_AkPanningRule = 0;
+    var raw_panning_rule: c.AkPanningRule = 0;
 
     try zig.handleAkResult(
         c.WWISEC_AK_SoundEngine_GetPanningRule(&raw_panning_rule, in_id_output),
@@ -353,7 +353,7 @@ pub fn postEventID(in_eventID: typedefs.AkUniqueID, game_object_id: typedefs.AkG
             if (optional_args.external_sources) |external_sources| {
                 num_external_sources = @truncate(external_sources.len);
 
-                const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.WWISEC_AkExternalSourceInfo, num_external_sources);
+                const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.AkExternalSourceInfo, num_external_sources);
 
                 for (external_sources, 0..) |external_source, index| {
                     raw_external_sources[index] = try external_source.toC(area_allocator_opt.?.allocator());
@@ -363,15 +363,15 @@ pub fn postEventID(in_eventID: typedefs.AkUniqueID, game_object_id: typedefs.AkG
             }
         }
 
-        break :blk &[0]c.WWISEC_AkExternalSourceInfo{};
+        break :blk &[0]c.AkExternalSourceInfo{};
     };
 
     const external_sources_ptr = blk: {
         if (external_sources.len > 0) {
-            break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
+            break :blk @as(?[*]c.AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
         }
 
-        break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, null);
+        break :blk @as(?[*]c.AkExternalSourceInfo, null);
     };
 
     return c.WWISEC_AK_SoundEngine_PostEvent_ID(
@@ -408,7 +408,7 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
             if (optional_args.external_sources) |external_sources| {
                 num_external_sources = @truncate(external_sources.len);
 
-                const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.WWISEC_AkExternalSourceInfo, num_external_sources);
+                const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.AkExternalSourceInfo, num_external_sources);
 
                 for (external_sources, 0..) |external_source, index| {
                     raw_external_sources[index] = try external_source.toC(area_allocator_opt.?.allocator());
@@ -418,15 +418,15 @@ pub fn postEventString(fallback_allocator: std.mem.Allocator, in_event_name: []c
             }
         }
 
-        break :blk &[0]c.WWISEC_AkExternalSourceInfo{};
+        break :blk &[0]c.AkExternalSourceInfo{};
     };
 
     const external_sources_ptr = blk: {
         if (external_sources.len > 0) {
-            break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
+            break :blk @as(?[*]c.AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
         }
 
-        break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, null);
+        break :blk @as(?[*]c.AkExternalSourceInfo, null);
     };
 
     return c.WWISEC_AK_SoundEngine_PostEvent_String(
@@ -488,16 +488,13 @@ pub const PostMIDIOnEventOptionalArgs = struct {
     playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
 };
 
-// NOTE: mlarouche: Workaround for translate-c that does not put the proper alignment on AkMIDIPost
-extern fn WWISEC_AK_SoundEngine_PostMIDIOnEvent(in_eventID: c.WWISEC_AkUniqueID, in_gameObjectID: c.WWISEC_AkGameObjectID, in_pPosts: [*]midi_types.AkMIDIPost, in_uNumPosts: u16, in_bAbsoluteOffsets: bool, in_uFlags: u32, in_pfnCallback: c.WWISEC_AkCallbackFunc, in_pCookie: ?*anyopaque, in_playingID: c.WWISEC_AkPlayingID) c.WWISEC_AkPlayingID;
-
 pub fn postMIDIOnEvent(
     in_event_id: typedefs.AkUniqueID,
     in_game_object_id: typedefs.AkGameObjectID,
     in_midi_posts: []const midi_types.AkMIDIPost,
     optional_args: PostMIDIOnEventOptionalArgs,
 ) typedefs.AkPlayingID {
-    return WWISEC_AK_SoundEngine_PostMIDIOnEvent(
+    return c.WWISEC_AK_SoundEngine_PostMIDIOnEvent(
         in_event_id,
         in_game_object_id,
         @ptrCast(@constCast(in_midi_posts)),
@@ -821,7 +818,7 @@ pub fn unregisterAllGameObj() zig.WwiseError!void {
 }
 
 pub const SetPositionOptionalArgs = struct {
-    flags: enums.AkSetPositionFlags = enums.AkSetPositionFlags.Default,
+    flags: enums.AkSetPositionFlags = .default,
 };
 
 pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: ak_3d_objects.AkSoundPosition, optional_args: SetPositionOptionalArgs) zig.WwiseError!void {
@@ -836,7 +833,7 @@ pub fn setPosition(in_game_object_id: typedefs.AkGameObjectID, in_position: ak_3
 
 pub const SetMultiplePositionOptionalArgs = struct {
     multi_position_type: MultiPositionType = .multi_directions,
-    flags: enums.AkSetPositionFlags = enums.AkSetPositionFlags.Default,
+    flags: enums.AkSetPositionFlags = .default,
 };
 
 pub fn setMultiplePositionsSoundPosition(in_game_object: typedefs.AkGameObjectID, positions: []const ak_3d_objects.AkSoundPosition, optional_args: SetMultiplePositionOptionalArgs) zig.WwiseError!void {
@@ -1565,7 +1562,7 @@ pub fn setListenerSpatialization(
             in_listener_id,
             in_spatialized,
             in_channel_config.toC(),
-            in_volume_offsets,
+            @constCast(in_volume_offsets),
         ),
     );
 }
@@ -2142,13 +2139,13 @@ pub fn getDeviceListPlugin(allocator: std.mem.Allocator, in_company_id: u32, in_
 
     var area_allocator = area_allocator_instance.allocator();
 
-    const raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
+    const raw_device_descriptions_ptr: ?[*]c.AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
-            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return zig.WwiseError.Fail;
-            break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
+            const raw_device_descriptions = area_allocator.alloc(c.AkDeviceDescription, io_max_num_devices.*) catch return zig.WwiseError.Fail;
+            break :blk @as(?[*]c.AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 
-        break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);
+        break :blk @as(?[*]c.AkDeviceDescription, null);
     };
 
     try zig.handleAkResult(
@@ -2175,13 +2172,13 @@ pub fn getDeviceListShareSet(allocator: std.mem.Allocator, in_audio_device_share
 
     var area_allocator = area_allocator_instance.allocator();
 
-    const raw_device_descriptions_ptr: ?[*]c.WWISEC_AkDeviceDescription = blk: {
+    const raw_device_descriptions_ptr: ?[*]c.AkDeviceDescription = blk: {
         if (out_device_descriptions_opt) |_| {
-            const raw_device_descriptions = area_allocator.alloc(c.WWISEC_AkDeviceDescription, io_max_num_devices.*) catch return zig.WwiseError.Fail;
-            break :blk @as(?[*]c.WWISEC_AkDeviceDescription, @ptrCast(raw_device_descriptions));
+            const raw_device_descriptions = area_allocator.alloc(c.AkDeviceDescription, io_max_num_devices.*) catch return zig.WwiseError.Fail;
+            break :blk @as(?[*]c.AkDeviceDescription, @ptrCast(raw_device_descriptions));
         }
 
-        break :blk @as(?[*]c.WWISEC_AkDeviceDescription, null);
+        break :blk @as(?[*]c.AkDeviceDescription, null);
     };
 
     try zig.handleAkResult(

@@ -2,7 +2,7 @@ const c = @import("wwise_c");
 const std = @import("std");
 const zig = @import("zig.zig");
 
-pub const AKRESULT = enum(u32) {
+pub const AKRESULT = enum(zig.DefaultEnumType) {
     not_implemented = c.AK_NotImplemented,
     success = c.AK_Success,
     fail = c.AK_Fail,
@@ -101,11 +101,11 @@ pub const AkAudioDeviceState = packed struct(zig.DefaultEnumType) {
         .unplugged = true,
     };
 
-    pub inline fn fromC(value: c.WWISEC_AkAudioDeviceState) AkAudioDeviceState {
+    pub inline fn fromC(value: c.AkAudioDeviceState) AkAudioDeviceState {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkAudioDeviceState) c.WWISEC_AkAudioDeviceState {
+    pub inline fn toC(self: AkAudioDeviceState) c.AkAudioDeviceState {
         return @bitCast(self);
     }
 
@@ -189,7 +189,7 @@ pub const AkPanningRule = enum(zig.DefaultEnumType) {
     headphones = c.AkPanningRule_Headphones,
 };
 
-pub const Ak3DSpatializationMode = enum(u8) {
+pub const Ak3DSpatializationMode = enum(zig.DefaultEnumType) {
     none = c.AK_SpatializationMode_None,
     position_only = c.AK_SpatializationMode_PositionOnly,
     position_and_orientation = c.AK_SpatializationMode_PositionAndOrientation,
@@ -202,7 +202,7 @@ pub const AkMeteringFlags = packed struct(zig.DefaultEnumType) {
     reserved0: bool = false,
     enable_bus_meter_kpower: bool = false,
     enable_bus_meter_3d_meter: bool = false,
-    padding: u27 = 0,
+    padding: u26 = 0,
 
     pub inline fn fromC(value: c.AkMeteringFlags) AkMeteringFlags {
         return @bitCast(value);
@@ -241,20 +241,20 @@ pub const AkSetPositionFlags = packed struct(zig.DefaultEnumType) {
     listener: bool = false,
     pad: u30 = 0,
 
-    pub const Default = AkSetPositionFlags{ .emitter = true, .listener = true };
+    pub const default = AkSetPositionFlags{ .emitter = true, .listener = true };
 
     pub inline fn fromC(value: c.AkSetPositionFlags) AkSetPositionFlags {
         return @bitCast(value);
     }
 
     pub inline fn toC(self: AkSetPositionFlags) c.AkSetPositionFlags {
-        return @as(u8, @bitCast(self));
+        return @as(zig.DefaultEnumType, @bitCast(self));
     }
 
     comptime {
-        std.debug.assert(@as(u8, @bitCast(AkSetPositionFlags{ .emitter = true })) == c.AkSetPositionFlags_Emitter);
-        std.debug.assert(@as(u8, @bitCast(AkSetPositionFlags{ .listener = true })) == c.AkSetPositionFlags_Listener);
-        std.debug.assert(Default.toC() == c.AkSetPositionFlags_Default);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkSetPositionFlags{ .emitter = true })) == c.AkSetPositionFlags_Emitter);
+        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkSetPositionFlags{ .listener = true })) == c.AkSetPositionFlags_Listener);
+        std.debug.assert(default.toC() == c.AkSetPositionFlags_Default);
     }
 };
 

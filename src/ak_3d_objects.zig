@@ -205,19 +205,19 @@ pub const AkPolarCoord = extern struct {
 };
 
 pub const AkSphericalCoord = extern struct {
-    base: AkPolarCoord,
+    base: AkPolarCoord = .{},
     phi: f32 = 0.0,
 
-    pub inline fn fromC(value: c.WWISEC_AkSphericalCoord) AkPolarCoord {
+    pub inline fn fromC(value: c.WWISEC_AkSphericalCoord) AkSphericalCoord {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkPolarCoord) c.WWISEC_AkSphericalCoord {
+    pub inline fn toC(self: AkSphericalCoord) c.WWISEC_AkSphericalCoord {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkPolarCoord) == @sizeOf(c.WWISEC_AkSphericalCoord));
+        std.debug.assert(@sizeOf(AkSphericalCoord) == @sizeOf(c.WWISEC_AkSphericalCoord));
     }
 };
 

@@ -228,46 +228,6 @@ test "AkCommunication init" {
     try std.testing.expectEqualSlices(u8, comm_settings.comm_proxy_server_url[0..], current_comm_settings.comm_proxy_server_url[0..]);
 }
 
-test "AkMusicEngine init" {
-    var memory_settings: AK.AkMemSettings = .{};
-    AK.MemoryMgr.getDefaultSettings(&memory_settings);
-
-    try AK.MemoryMgr.init(&memory_settings);
-    defer AK.MemoryMgr.term();
-
-    var stream_settings: AK.StreamMgr.AkStreamMgrSettings = .{};
-    AK.StreamMgr.getDefaultSettings(&stream_settings);
-
-    const stream_mgr = AK.StreamMgr.create(&stream_settings);
-    try std.testing.expect(stream_mgr != null);
-    try std.testing.expect(AK.IAkStreamMgr.get() != null);
-    defer {
-        if (stream_mgr) |stream_instance| {
-            stream_instance.destroy();
-        }
-    }
-
-    var device_settings: AK.StreamMgr.AkDeviceSettings = .{};
-    AK.StreamMgr.getDefaultDeviceSettings(&device_settings);
-
-    var init_settings: AK.AkInitSettings = .{};
-    try AK.SoundEngine.getDefaultInitSettings(std.testing.allocator, &init_settings);
-
-    var platform_init_settings: AK.AkPlatformInitSettings = .{};
-    AK.SoundEngine.getDefaultPlatformInitSettings(&platform_init_settings);
-
-    init_settings.plugin_dll_path = "C:\\test";
-
-    try AK.SoundEngine.init(std.testing.allocator, &init_settings, &platform_init_settings);
-    defer AK.SoundEngine.term();
-
-    var music_settings: AK.MusicEngine.AkMusicSettings = .{};
-    AK.MusicEngine.getDefaultInitSettings(&music_settings);
-
-    try AK.MusicEngine.init(&music_settings);
-    defer AK.MusicEngine.term();
-}
-
 const DummyFileHandle = struct {
     file_size: usize = 1024,
     bytes_read: usize = 0,

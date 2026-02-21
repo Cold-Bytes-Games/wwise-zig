@@ -713,11 +713,11 @@ pub const AkChannelConfig = packed struct(u32) {
         return self.channel_mask.hasCenter();
     }
 
-    pub inline fn fromC(channel_config: c.AkChannelConfig) AkChannelConfig {
+    pub inline fn fromC(channel_config: c.WWISEC_AkChannelConfig) AkChannelConfig {
         return @bitCast(channel_config);
     }
 
-    pub inline fn toC(self: AkChannelConfig) c.AkChannelConfig {
+    pub inline fn toC(self: AkChannelConfig) c.WWISEC_AkChannelConfig {
         return @bitCast(self);
     }
 };

@@ -19,7 +19,7 @@ const zig = @import("zig.zig");
 
 pub const AkCreatePluginCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPlugin;
 pub const AkCreateParamCallback = ?*const fn (in_allocator: ?*IAkPluginMemAlloc) callconv(.c) ?*IAkPluginParam;
-pub const AkGetDeviceListCallback = ?*const fn (io_max_num_devices: *u32, out_device_description: ?[*]c.WWISEC_AkDeviceDescription) callconv(.c) enums.AKRESULT;
+pub const AkGetDeviceListCallback = ?*const fn (io_max_num_devices: *u32, out_device_description: ?[*]c.AkDeviceDescription) callconv(.c) enums.AKRESULT;
 
 pub const AkPluginServiceType = enum(zig.DefaultEnumType) {
     mixer = c.WWISEC_AK_PluginServiceType_Mixer,
@@ -29,6 +29,9 @@ pub const AkPluginServiceType = enum(zig.DefaultEnumType) {
     hash_table = c.WWISEC_AK_PluginServiceType_HashTable,
     markers = c.WWISEC_AK_PluginServiceType_Markers,
     temp_alloc = c.WWISEC_AK_PluginServiceType_TempAlloc,
+    wav_file_writer = c.WWISEC_AK_PluginServiceType_WavFileWriter,
+    meter = c.WWISEC_AK_PluginServiceType_Meter,
+    platform_funcs = c.WWISEC_AK_PluginServiceType_PlatformFuncs,
 };
 
 pub const IAkPluginService = opaque {};
@@ -60,10 +63,10 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub fn postMonitorMessage(self: *IAkGlobalPluginContext, fallback_allocator: std.mem.Allocator, in_error: []const u8, in_error_level: Monitor.ErrorLevel) zig.WwiseError!void {
-        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_char_allocator.get();
 
-        const raw_error = common.toCString(allocator, in_error) catch return zig.WwiseError.Fail;
+        const raw_error = zig.toCString(allocator, in_error) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_error);
 
         return zig.handleAkResult(
@@ -88,7 +91,7 @@ pub const IAkGlobalPluginContext = opaque {
         );
     }
 
-    pub fn registerCodec(self: *IAkGlobalPluginContext, in_company_id: u32, in_plugin_id: u32, in_file_create_func: common.AkCreateFileSourceCallback, in_bank_create_func: common.AkCreateBankSourceCallback) zig.WwiseError!void {
+    pub fn registerCodec(self: *IAkGlobalPluginContext, in_company_id: u32, in_plugin_id: u32, in_file_create_func: sound_engine_types.AkCreateFileSourceCallback, in_bank_create_func: sound_engine_types.AkCreateBankSourceCallback) zig.WwiseError!void {
         return zig.handleAkResult(
             c.WWISEC_AK_IAkGlobalPluginContext_RegisterCodec(
                 @ptrCast(self),
@@ -196,14 +199,14 @@ pub const IAkGlobalPluginContext = opaque {
         in_azimuth: f32,
         in_elevation: f32,
         in_cfg_ambisonics: speaker_config.AkChannelConfig,
-        out_volumes: SpeakerVolumes.VectorPtr,
+        out_volumes: *SpeakerVolumes.VectorPtr,
     ) void {
         return c.WWISEC_AK_IAkGlobalPluginContext_ComputeAmbisonicsEncoding(
             @ptrCast(self),
             in_azimuth,
             in_elevation,
             in_cfg_ambisonics.toC(),
-            out_volumes,
+            @ptrCast(out_volumes),
         );
     }
 
@@ -269,10 +272,10 @@ pub const IAkGlobalPluginContext = opaque {
     }
 
     pub fn getIDFromString(self: *const IAkGlobalPluginContext, fallback_allocator: std.mem.Allocator, in_string: []const u8) !u32 {
-        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_char_allocator.get();
 
-        const raw_string = try common.toCString(allocator, in_string);
+        const raw_string = try zig.toCString(allocator, in_string);
         defer allocator.free(raw_string);
 
         return c.WWISEC_AK_IAkGlobalPluginContext_GetIDFromString(@ptrCast(self), raw_string);
@@ -312,7 +315,7 @@ pub const IAkGlobalPluginContext = opaque {
                 if (optional_args.external_sources) |external_sources| {
                     num_external_sources = @truncate(external_sources.len);
 
-                    const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.WWISEC_AkExternalSourceInfo, num_external_sources);
+                    const raw_external_sources = try area_allocator_opt.?.allocator().alloc(c.AkExternalSourceInfo, num_external_sources);
 
                     for (external_sources, 0..) |external_source, index| {
                         raw_external_sources[index] = try external_source.toC(area_allocator_opt.?.allocator());
@@ -322,15 +325,15 @@ pub const IAkGlobalPluginContext = opaque {
                 }
             }
 
-            break :blk &[0]c.WWISEC_AkExternalSourceInfo{};
+            break :blk &[0]c.AkExternalSourceInfo{};
         };
 
         const external_sources_ptr = blk: {
             if (external_sources.len > 0) {
-                break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
+                break :blk @as(?[*]c.AkExternalSourceInfo, @ptrCast(@constCast(external_sources)));
             }
 
-            break :blk @as(?[*]c.WWISEC_AkExternalSourceInfo, null);
+            break :blk @as(?[*]c.AkExternalSourceInfo, null);
         };
 
         return c.WWISEC_AK_IAkGlobalPluginContext_PostEventSync(
@@ -354,9 +357,6 @@ pub const IAkGlobalPluginContext = opaque {
         playing_id: typedefs.AkPlayingID = constants.AK_INVALID_PLAYING_ID,
     };
 
-    // NOTE: mlarouche: Workaround for translate-c that does not put the proper alignment on AkMIDIPost
-    extern fn WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(self: ?*c.WWISEC_AK_IAkGlobalPluginContext, in_eventID: c.WWISEC_AkUniqueID, in_gameObjectID: c.WWISEC_AkGameObjectID, in_pPosts: [*]midi_types.AkMIDIPost, in_uNumPosts: u16, in_bAbsoluteOffsets: bool, in_uFlags: u32, in_pfnCallback: c.WWISEC_AkCallbackFunc, in_pCookie: ?*anyopaque, in_playingID: c.WWISEC_AkPlayingID) c.WWISEC_AkPlayingID;
-
     pub fn postMIDIOnEventSync(
         self: *IAkGlobalPluginContext,
         in_event_id: typedefs.AkUniqueID,
@@ -364,7 +364,7 @@ pub const IAkGlobalPluginContext = opaque {
         in_midi_posts: []const midi_types.AkMIDIPost,
         optional_args: PostMIDIOnEventSyncOptionalArgs,
     ) typedefs.AkPlayingID {
-        return WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(
+        return c.WWISEC_AK_IAkGlobalPluginContext_PostMIDIOnEventSync(
             @ptrCast(self),
             in_event_id,
             in_game_object_id,

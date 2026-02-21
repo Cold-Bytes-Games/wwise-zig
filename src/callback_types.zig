@@ -27,10 +27,10 @@ pub const AkCallbackType = packed struct(zig.DefaultEnumType) {
     music_sync_point: bool = false,
     midi_event: bool = false,
     dynamic_sequence_select: bool = false, // 16
-    pad1: u5 = 0,
+    pad1: u4 = 0,
     enable_get_music_play_position: bool = false, // 21
     enable_get_source_stream_buffering: bool = false, // 22
-    pad2: u10 = 0,
+    pad2: u9 = 0,
 
     pub const music_sync_all: AkCallbackType = @bitCast(c.AK_MusicSyncAll);
     pub const callback_bits: AkCallbackType = @bitCast(c.AK_CallbackBits);
@@ -45,7 +45,6 @@ pub const AkCallbackType = packed struct(zig.DefaultEnumType) {
 
     comptime {
         std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .midi_event = true })) == c.AK_MIDIEvent);
-        std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_play_position = true })) == c.AK_EnableGetSourcePlayPosition);
         std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_music_play_position = true })) == c.AK_EnableGetMusicPlayPosition);
         std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .enable_get_source_stream_buffering = true })) == c.AK_EnableGetSourceStreamBuffering);
         std.debug.assert(@as(zig.DefaultEnumType, @bitCast(AkCallbackType{ .dynamic_sequence_select = true })) == c.AK_DynamicSequenceSelect);
@@ -200,24 +199,25 @@ pub const AkDynamicSequenceItemCallbackInfo = extern struct {
 };
 
 pub const AkSpeakerVolumeMatrixCallbackInfo = extern struct {
-    volumes: SpeakerVolumes.MatrixPtr,
+    volumes: typedefs.AkSpeakerVolumesMatrixPtr,
     input_config: speaker_config.AkChannelConfig = .{},
     output_config: speaker_config.AkChannelConfig = .{},
     base_volume: [*]f32,
     emitter_listener_volume: [*]f32,
+    mix_connection_game_obj_id: typedefs.AkGameObjectID = 0,
     context: ?*IAkPlugin.IAkMixerInputContext = null,
     mixer_context: ?*IAkPlugin.IAkMixerPluginContext = null,
 
-    pub inline fn fromC(value: c.AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
+    pub inline fn fromC(value: c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo) AkSpeakerVolumeMatrixCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkSpeakerVolumeMatrixCallbackInfo) c.AkSpeakerVolumeMatrixCallbackInfo {
+    pub inline fn toC(self: AkSpeakerVolumeMatrixCallbackInfo) c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkSpeakerVolumeMatrixCallbackInfo) == @sizeOf(c.AkSpeakerVolumeMatrixCallbackInfo));
+        std.debug.assert(@sizeOf(AkSpeakerVolumeMatrixCallbackInfo) == @sizeOf(c.WWISEC_AkSpeakerVolumeMatrixCallbackInfo));
     }
 };
 
@@ -344,16 +344,16 @@ pub const AkDynamicSequenceSelectCallbackInfo = struct {
     custom_info: ?*anyopaque = null,
     ar_external_sources: typedefs.AkExternalSourceArray = null,
 
-    pub inline fn fromC(value: c.WWISEC_AkDynamicSequenceSelectCallbackInfo) AkDynamicSequenceSelectCallbackInfo {
+    pub inline fn fromC(value: c.AkDynamicSequenceSelectCallbackInfo) AkDynamicSequenceSelectCallbackInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkDynamicSequenceSelectCallbackInfo) c.WWISEC_AkDynamicSequenceSelectCallbackInfo {
+    pub inline fn toC(self: AkDynamicSequenceSelectCallbackInfo) c.AkDynamicSequenceSelectCallbackInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkDynamicSequenceSelectCallbackInfo) == @sizeOf(c.WWISEC_AkDynamicSequenceSelectCallbackInfo));
+        std.debug.assert(@sizeOf(AkDynamicSequenceSelectCallbackInfo) == @sizeOf(c.AkDynamicSequenceSelectCallbackInfo));
     }
 };
 

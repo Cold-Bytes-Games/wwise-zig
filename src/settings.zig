@@ -88,7 +88,7 @@ pub const AkInitSettings = struct {
             .command_queue_size = value.uCommandQueueSize,
             .enable_game_sync_preparation = value.bEnableGameSyncPreparation,
             .continuous_playback_look_ahead = value.uContinuousPlaybackLookAhead,
-            .streaming_look_ahead_ratio = value.ffStreamingLookAheadRatio,
+            .streaming_look_ahead_ratio = value.fStreamingLookAheadRatio,
             .num_samples_per_frame = value.uNumSamplesPerFrame,
             .monitor_queue_pool_size = value.uMonitorQueuePoolSize,
             .cpu_monitor_queue_max_size = value.uCpuMonitorQueueMaxSize,
@@ -251,7 +251,7 @@ pub const LINUX_AkPlatformInitSettings = extern struct {
     sample_rate: u32 = 0,
     num_refills_in_voice: u16 = 0,
     audio_api: AkAudioAPILinux = AkAudioAPILinux.Default,
-    sample_type: common.AkDataTypeID = 0,
+    sample_type: typedefs.AkDataTypeID = 0,
 
     pub inline fn fromC(value: c.WWISEC_LINUX_AkPlatformInitSettings) LINUX_AkPlatformInitSettings {
         return @bitCast(value);
@@ -440,7 +440,7 @@ pub const AkAudioAPIAndroid = packed struct(zig.DefaultEnumType) {
     pad0: u6 = 0,
     dolby_atmos: bool = false,
     android_spatializer: bool = false,
-    pad1: u23 = 0,
+    pad1: u22 = 0,
 
     pub const Default: AkAudioAPIAndroid = .{ .aaudio = true, .opensl_es = true, .dolby_atmos = true, .android_spatializer = true };
 
@@ -455,9 +455,10 @@ pub const AkAudioAPIAndroid = packed struct(zig.DefaultEnumType) {
 
 pub const Android_AkAudioPath = enum(zig.DefaultEnumType) {
     legacy = c.WWISEC_Android_AkAudioPath_AkAudioPath_Legacy,
-    LowLatency = c.WWISEC_Android_AkAudioPath_AkAudioPath_LowLatency,
+    low_latency = c.WWISEC_Android_AkAudioPath_AkAudioPath_LowLatency,
     exclusive = c.WWISEC_Android_AkAudioPath_AkAudioPath_Exclusive,
-    default = c.WWISEC_Android_AkAudioPath_AkAudioPath_Default,
+
+    pub const default: Android_AkAudioPath = @enumFromInt(c.WWISEC_Android_AkAudioPath_AkAudioPath_Default);
 };
 
 pub const ANDROID_AkPlatformInitSettings = extern struct {

@@ -1,14 +1,16 @@
 const c = @import("wwise_c");
+const platform_types = @import("platform_types.zig");
 const std = @import("std");
+const zig = @import("zig.zig");
 
 pub const AK_TRANSLATOR_MAX_NAME_SIZE = c.WWISEC_AK_TRANSLATOR_MAX_NAME_SIZE;
 
 pub const AkErrorMessageTranslator = opaque {
     pub const TagInformation = extern struct {
-        tag: ?[*:0]const common.AkOSChar = null,
-        start_block: ?[*:0]const common.AkOSChar = null,
+        tag: ?[*:0]const platform_types.AkOSChar = null,
+        start_block: ?[*:0]const platform_types.AkOSChar = null,
         args: ?[*:0]const u8 = null,
-        parsed_info: [AK_TRANSLATOR_MAX_NAME_SIZE]common.AkOSChar = undefined,
+        parsed_info: [AK_TRANSLATOR_MAX_NAME_SIZE]platform_types.AkOSChar = undefined,
         arg_size: u32 = 0,
         len: u16 = 0,
         info_is_parsed: bool = false,
@@ -29,7 +31,7 @@ pub const AkErrorMessageTranslator = opaque {
     pub const FunctionTable = extern struct {
         destructor: *const fn (self: *AkErrorMessageTranslator) callconv(.c) void,
         term: *const fn (self: *AkErrorMessageTranslator) callconv(.c) void,
-        translate: *const fn (self: *AkErrorMessageTranslator, in_error: [*:0]const common.AkOSChar, out_translated_error: [*:0]const common.AkOSChar, in_max_error_size: i32, in_args: [*:0]const u8, in_arg_size: u32) callconv(.c) bool,
+        translate: *const fn (self: *AkErrorMessageTranslator, in_error: [*:0]const platform_types.AkOSChar, out_translated_error: [*:0]const platform_types.AkOSChar, in_max_error_size: i32, in_args: [*:0]const u8, in_arg_size: u32) callconv(.c) bool,
         get_info: *const fn (self: *AkErrorMessageTranslator, in_tag_list: [*]TagInformation, in_count: u32, out_translated: *u32) callconv(.c) bool,
     };
 
@@ -47,15 +49,15 @@ pub const AkErrorMessageTranslator = opaque {
 
         var allocator = area_allocator.allocator();
 
-        const raw_error = try common.toOSChar(allocator, in_error);
+        const raw_error = try zig.toOSChar(allocator, in_error);
 
-        const raw_out_translated_error = try allocator.allocSentinel(common.AkOSChar, @intCast(max_error_size), 0);
+        const raw_out_translated_error = try allocator.allocSentinel(platform_types.AkOSChar, @intCast(max_error_size), 0);
 
-        const raw_args = try common.toCString(allocator, in_args);
+        const raw_args = try zig.toCString(allocator, in_args);
 
         const result = c.WWISEC_AkErrorMessageTranslator_Translate(@ptrCast(self), raw_error, raw_out_translated_error, max_error_size, raw_args, in_arg_size);
 
-        out_translated_error.* = try common.fromOSChar(in_allocator, raw_out_translated_error);
+        out_translated_error.* = try zig.fromOSChar(in_allocator, raw_out_translated_error);
 
         return result;
     }

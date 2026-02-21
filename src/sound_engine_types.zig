@@ -87,16 +87,16 @@ pub const Ak3DAudioSinkCapabilities = extern struct {
     passthrough: bool = false,
     multi_channel_objects: bool = false,
 
-    pub inline fn fromC(value: c.Ak3DAudioSinkCapabilities) Ak3DAudioSinkCapabilities {
+    pub inline fn fromC(value: c.WWISEC_Ak3DAudioSinkCapabilities) Ak3DAudioSinkCapabilities {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: Ak3DAudioSinkCapabilities) c.Ak3DAudioSinkCapabilities {
+    pub inline fn toC(self: Ak3DAudioSinkCapabilities) c.WWISEC_Ak3DAudioSinkCapabilities {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(Ak3DAudioSinkCapabilities) == @sizeOf(c.Ak3DAudioSinkCapabilities));
+        std.debug.assert(@sizeOf(Ak3DAudioSinkCapabilities) == @sizeOf(c.WWISEC_Ak3DAudioSinkCapabilities));
     }
 };
 
@@ -108,16 +108,16 @@ pub const AkOutputDeviceInfo = extern struct {
     capabilities: Ak3DAudioSinkCapabilities = .{},
     custom_data: ?*anyopaque,
 
-    pub inline fn fromC(value: c.AkOutputDeviceInfo) AkOutputDeviceInfo {
+    pub inline fn fromC(value: c.WWISEC_AkOutputDeviceInfo) AkOutputDeviceInfo {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkOutputDeviceInfo) c.AkOutputDeviceInfo {
+    pub inline fn toC(self: AkOutputDeviceInfo) c.WWISEC_AkOutputDeviceInfo {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(Ak3DAudioSinkCapabilities) == @sizeOf(c.AkOutputDeviceInfo));
+        std.debug.assert(@sizeOf(AkOutputDeviceInfo) == @sizeOf(c.WWISEC_AkOutputDeviceInfo));
     }
 };
 
@@ -179,7 +179,7 @@ pub const AkExternalSourceInfo = struct {
         return .{
             .iExternalSrcCookie = self.external_src_cookie,
             .idCodec = self.id_codec,
-            .szFile = if (self.file) |file| @as([*]platform_types.AkOSChar, @ptrCast(try zig.toCString(allocator, file))) else null,
+            .szFile = if (self.file) |file| @as([*:0]u8, @ptrCast(try zig.toCString(allocator, file))) else null,
             .pInMemory = self.in_memory,
             .uiMemorySize = self.memory_size,
             .idFile = self.id_file,
@@ -200,7 +200,7 @@ pub const AkOutputSettings = extern struct {
     };
 
     pub fn init(fallback_allocator: std.mem.Allocator, device_shareset: []const u8, optional_args: InitOptionalArgs) !AkOutputSettings {
-        var raw_output_settings: c.AkOutputSettings = undefined;
+        var raw_output_settings: c.WWISEC_AkOutputSettings = undefined;
 
         var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_char_allocator.get();
@@ -213,16 +213,16 @@ pub const AkOutputSettings = extern struct {
         return fromC(raw_output_settings);
     }
 
-    pub inline fn fromC(value: c.AkOutputSettings) AkOutputSettings {
+    pub inline fn fromC(value: c.WWISEC_AkOutputSettings) AkOutputSettings {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkOutputSettings) c.AkOutputSettings {
+    pub inline fn toC(self: AkOutputSettings) c.WWISEC_AkOutputSettings {
         return @bitCast(self);
     }
 
     comptime {
-        std.debug.assert(@sizeOf(AkOutputSettings) == @sizeOf(c.AkOutputSettings));
+        std.debug.assert(@sizeOf(AkOutputSettings) == @sizeOf(c.WWISEC_AkOutputSettings));
     }
 };
 

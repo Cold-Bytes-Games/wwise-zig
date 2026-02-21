@@ -32,10 +32,10 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
     }
 
     pub fn setBasePath(self: *CAkDefaultIOHookDeferred, fallback_allocator: std.mem.Allocator, base_path: []const u8) zig.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
+        const raw_base_path = zig.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return zig.handleAkResult(
@@ -44,10 +44,10 @@ pub const CAkDefaultIOHookDeferred = if (wwise_options.include_default_io_hook_d
     }
 
     pub fn addBasePath(self: *CAkDefaultIOHookDeferred, fallback_allocator: std.mem.Allocator, base_path: []const u8) zig.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
+        const raw_base_path = zig.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return zig.handleAkResult(
@@ -88,10 +88,10 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
     }
 
     pub fn setBasePath(self: *CAkFilePackageLowLevelIODeferred, fallback_allocator: std.mem.Allocator, base_path: []const u8) zig.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
+        const raw_base_path = zig.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return zig.handleAkResult(
@@ -100,10 +100,10 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
     }
 
     pub fn addBasePath(self: *CAkFilePackageLowLevelIODeferred, fallback_allocator: std.mem.Allocator, base_path: []const u8) zig.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        const raw_base_path = common.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
+        const raw_base_path = zig.toOSChar(allocator, base_path) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_base_path);
 
         return zig.handleAkResult(
@@ -118,10 +118,10 @@ pub const CAkFilePackageLowLevelIODeferred = if (wwise_options.include_file_pack
     pub fn loadFilePackage(self: *CAkFilePackageLowLevelIODeferred, falllback_allocator: std.mem.Allocator, file_package_name: []const u8) zig.WwiseError!u32 {
         var result: u32 = undefined;
 
-        var stack_oschar_allocator = common.stackCharAllocator(falllback_allocator);
+        var stack_oschar_allocator = zig.stackCharAllocator(falllback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        const raw_file_package_name = common.toOSChar(allocator, file_package_name) catch return zig.WwiseError.Fail;
+        const raw_file_package_name = zig.toOSChar(allocator, file_package_name) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_file_package_name);
 
         try zig.handleAkResult(

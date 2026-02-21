@@ -41,11 +41,11 @@ pub const AkRoomDistanceBehavior = enum(zig.DefaultEnumType) {
 pub const AkSpatialAudioID = extern struct {
     id: c.AkSpatialAudioID = std.math.maxInt(c.AkSpatialAudioID),
 
-    pub fn fromC(value: c.AkSpatialAudioID) AkSpatialAudioID {
+    pub inline fn fromC(value: c.AkSpatialAudioID) AkSpatialAudioID {
         return @bitCast(value);
     }
 
-    pub fn toC(self: AkSpatialAudioID) c.AkSpatialAudioID {
+    pub inline fn toC(self: AkSpatialAudioID) c.AkSpatialAudioID {
         return @bitCast(self);
     }
 
@@ -86,13 +86,13 @@ pub const AkRoomID = extern struct {
 
 pub const AkVertex = ak_3d_objects.AkVector;
 
-pub const AkPortalID = c.AkPortalID;
-pub const AkGeometrySetID = c.AkGeometrySetID;
-pub const AkGeometryInstanceID = c.AkGeometryInstanceID;
+pub const AkPortalID = AkSpatialAudioID;
+pub const AkGeometrySetID = AkSpatialAudioID;
+pub const AkGeometryInstanceID = AkSpatialAudioID;
 
 pub const AkImageSourceName = extern struct {
     num_char: u32 = 0,
-    name: ?[:0]u8 = null,
+    name: ?[*:0]u8 = null,
 
     pub inline fn fromC(value: c.AkImageSourceName) AkImageSourceName {
         return @bitCast(value);
@@ -281,7 +281,7 @@ pub const AkDiffractionPathInfo = extern struct {
     nodes: [AK_MAX_SOUND_PROPAGATION_DEPTH]ak_3d_objects.AkVector64 = @splat(.{}),
     emitter_pos: ak_3d_objects.AkVector64 = .{},
     angles: [AK_MAX_SOUND_PROPAGATION_DEPTH]f32 = @splat(0.0),
-    portals: [AK_MAX_SOUND_PROPAGATION_DEPTH]AkPortalID = @splat(0),
+    portals: [AK_MAX_SOUND_PROPAGATION_DEPTH]AkPortalID = @splat(.{}),
     rooms: [AK_MAX_SOUND_PROPAGATION_DEPTH + 1]AkRoomID = @splat(.{}),
     virtual_pos: ak_3d_objects.AkWorldTransform = .{},
     node_count: u32 = 0,
@@ -361,11 +361,11 @@ pub const AkGeometryParams = extern struct {
     enable_diffraction: bool = false,
     enable_diffraction_on_boundary_edges: bool = false,
 
-    pub inline fn fromC(value: c.WWISEC_AkGeometryParams) AkGeometryParams {
+    pub inline fn fromC(value: c.AkGeometryParams) AkGeometryParams {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkGeometryParams) c.WWISEC_AkGeometryParams {
+    pub inline fn toC(self: AkGeometryParams) c.AkGeometryParams {
         return @bitCast(self);
     }
 
@@ -407,16 +407,16 @@ pub const AkGeometryInstanceParams = extern struct {
         .y = 1,
         .z = 1,
     },
-    geometry_set_id: AkGeometrySetID = 0,
+    geometry_set_id: AkGeometrySetID = .{},
     use_for_reflection_and_diffraction: bool = true,
     bypass_portal_subtraction: bool = false,
     is_solid: bool = false,
 
-    pub inline fn fromC(value: c.WWISEC_AkGeometryInstanceParams) AkGeometryInstanceParams {
+    pub inline fn fromC(value: c.AkGeometryInstanceParams) AkGeometryInstanceParams {
         return @bitCast(value);
     }
 
-    pub inline fn toC(self: AkGeometryInstanceParams) c.WWISEC_AkGeometryInstanceParams {
+    pub inline fn toC(self: AkGeometryInstanceParams) c.AkGeometryInstanceParams {
         return @bitCast(self);
     }
 

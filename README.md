@@ -146,10 +146,10 @@ You can customize the size allocated by modifying the `string_stack_size` when i
 Each function that handle strings looks similar to this: 
 ```zig
 pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const filename_oschar = try common.toOSChar(allocator, filename);
+    const filename_oschar = try zig.toOSChar(allocator, filename);
     defer allocator.free(filename_oschar);
 
     c.WWISEC_AK_MemoryMgr_DumpToFile(filename_oschar);

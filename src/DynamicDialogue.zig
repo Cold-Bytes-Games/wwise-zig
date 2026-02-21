@@ -12,7 +12,7 @@ pub const ResolveDialogueEventOptionalArgs = struct {
     cookie: ?*anyopaque = null,
 };
 
-pub fn resolveDialogueEventID(in_event_id: typedefs.AkUniqueID, in_argument_values: []const common.AkArgumentValueID, optional_args: ResolveDialogueEventOptionalArgs) typedefs.AkUniqueID {
+pub fn resolveDialogueEventID(in_event_id: typedefs.AkUniqueID, in_argument_values: []const typedefs.AkArgumentValueID, optional_args: ResolveDialogueEventOptionalArgs) typedefs.AkUniqueID {
     return c.WWISEC_AK_SoundEngine_DynamicDialogue_ResolveDialogueEvent_ID(
         in_event_id,
         @ptrCast(@constCast(in_argument_values)),
@@ -24,7 +24,7 @@ pub fn resolveDialogueEventID(in_event_id: typedefs.AkUniqueID, in_argument_valu
 }
 
 pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, in_argument_value_names: []const []const u8, optional_args: ResolveDialogueEventOptionalArgs) !typedefs.AkUniqueID {
-    var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
     const char_allocator = stack_oschar_allocator.get();
 
     var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
@@ -32,13 +32,13 @@ pub fn resolveDialogueEventString(fallback_allocator: std.mem.Allocator, in_even
 
     const allocator = area_allocator.allocator();
 
-    const raw_event_name = try common.toCString(allocator, in_event_name);
+    const raw_event_name = try zig.toCString(allocator, in_event_name);
 
     var raw_argument_value_list: std.ArrayList([*:0]const u8) = .empty;
     defer raw_argument_value_list.deinit(allocator);
 
     for (in_argument_value_names) |argument_value_name| {
-        const raw_argument_value_name = try common.toCString(allocator, argument_value_name);
+        const raw_argument_value_name = try zig.toCString(allocator, argument_value_name);
         try raw_argument_value_list.append(allocator, raw_argument_value_name);
     }
 

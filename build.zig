@@ -241,7 +241,6 @@ fn wwiseLinkModule(module: *std.Build.Module, wwise_build_options: WwiseBuildOpt
     module.linkSystemLibrary("AkSoundEngine", .{ .needed = true });
     module.linkSystemLibrary("AkStreamMgr", .{ .needed = true });
     module.linkSystemLibrary("AkMemoryMgr", .{ .needed = true });
-    module.linkSystemLibrary("AkMusicEngine", .{ .needed = true });
 
     if (module.resolved_target) |target| {
         if (target.result.os.tag == .windows) {

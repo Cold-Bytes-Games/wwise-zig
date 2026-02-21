@@ -128,10 +128,10 @@ pub fn getRTPCValueID(in_rtpc_id: typedefs.AkRtpcID, in_game_object_id: typedefs
 }
 
 pub fn getRTPCValueString(fallback_allocator: std.mem.Allocator, in_rtpc_name: []const u8, in_game_object_id: typedefs.AkGameObjectID, in_playing_id: typedefs.AkPlayingID, out_value: *typedefs.AkRtpcValue, io_value_type: *RTPCValue_type) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_rtpc_name = common.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
+    const raw_rtpc_name = zig.toCString(allocator, in_rtpc_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_rtpc_name);
 
     return zig.handleAkResult(
@@ -160,10 +160,10 @@ pub fn getSwitchID(in_switch_group: typedefs.AkSwitchGroupID, in_game_object_id:
 }
 
 pub fn getSwitchString(fallback_allocator: std.mem.Allocator, in_switch_group_name: []const u8, in_game_object_id: typedefs.AkGameObjectID) zig.WwiseError!typedefs.AkSwitchStateID {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_switch_group_name = common.toCString(allocator, in_switch_group_name) catch return zig.WwiseError.Fail;
+    const raw_switch_group_name = zig.toCString(allocator, in_switch_group_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_switch_group_name);
 
     var result: typedefs.AkSwitchStateID = 0;
@@ -193,10 +193,10 @@ pub fn getStateID(in_state_group: typedefs.AkStateGroupID) zig.WwiseError!typede
 }
 
 pub fn getStateString(fallback_allocator: std.mem.Allocator, in_state_group_name: []const u8) zig.WwiseError!typedefs.AkStateID {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_state_group_name = common.toCString(allocator, in_state_group_name) catch return zig.WwiseError.Fail;
+    const raw_state_group_name = zig.toCString(allocator, in_state_group_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_state_group_name);
 
     var result: typedefs.AkStateID = 0;
@@ -257,10 +257,10 @@ pub fn queryAudioObjectIDsID(in_event_id: typedefs.AkUniqueID, io_num_items: *u3
 }
 
 pub fn queryAudioObjectIDsString(fallback_allocator: std.mem.Allocator, in_event_name: []const u8, io_num_items: *u32, out_object_infos: ?[*]AkObjectInfo) zig.WwiseError!void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const raw_event_name = common.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
+    const raw_event_name = zig.toCString(allocator, in_event_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_event_name);
 
     return zig.handleAkResult(

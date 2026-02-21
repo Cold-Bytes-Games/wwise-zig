@@ -59,10 +59,10 @@ pub fn getStats(in_type: Type) Stats {
 }
 
 pub fn dumpTempAllocsToFile(fallback_allocator: std.mem.Allocator, in_type: Type, filename: []const u8) !void {
-    var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
     const allocator = stack_oschar_allocator.get();
 
-    const raw_filename = try common.toOSChar(allocator, filename);
+    const raw_filename = try zig.toOSChar(allocator, filename);
     defer allocator.free(raw_filename);
 
     c.WWISEC_AK_TempAlloc_DumpTempAllocsToFile(@intFromEnum(in_type), raw_filename);

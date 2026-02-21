@@ -5,7 +5,7 @@ const std = @import("std");
 const TempAlloc = @import("TempAlloc.zig");
 const zig = @import("zig.zig");
 
-pub const AkMemPoolId = c.WWISEC_AkMemPoolId;
+pub const AkMemPoolId = c.AkMemPoolId;
 
 pub const AkMemID = enum(zig.DefaultEnumType) {
     object = c.WWISEC_AkMemID_Object,
@@ -195,10 +195,10 @@ pub fn stopProfileThreadUsage() u64 {
 }
 
 pub fn dumpToFile(fallback_allocator: std.mem.Allocator, filename: []const u8) !void {
-    var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
-    const filename_oschar = try common.toOSChar(allocator, filename);
+    const filename_oschar = try zig.toOSChar(allocator, filename);
     defer allocator.free(filename_oschar);
 
     c.WWISEC_AK_MemoryMgr_DumpToFile(filename_oschar);

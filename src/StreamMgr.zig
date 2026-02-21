@@ -1,6 +1,7 @@
 const c = @import("wwise_c");
 const constants = @import("constants.zig");
 const enums = @import("enums.zig");
+const platform_types = @import("platform_types.zig");
 const settings = @import("settings.zig");
 const std = @import("std");
 const stream_interfaces = @import("IAkStreamMgr.zig");
@@ -51,7 +52,7 @@ pub const AkDeviceSettings = extern struct {
 pub const AkFileDesc = extern struct {
     file_size: i64 = 0,
     sector: u64 = 0,
-    file_handle: common.AkFileHandle = null,
+    file_handle: platform_types.AkFileHandle = null,
     device_id: typedefs.AkDeviceID = 0,
 
     pub inline fn fromC(value: c.WWISEC_AkFileDesc) AkFileDesc {
@@ -116,7 +117,7 @@ pub const NativeAkAsyncFileOpenData = extern struct {
     cookie: ?*anyopaque = null,
     file_desc: ?*AkFileDesc = null,
     custom_data: ?*anyopaque = null,
-    stream_name: ?[*:0]const common.AkOSChar = null,
+    stream_name: ?[*:0]const platform_types.AkOSChar = null,
 };
 
 pub const AkIoHeuristics = extern struct {
@@ -162,7 +163,7 @@ pub const IAkLowLevelIOHook = opaque {
             self: *IAkLowLevelIOHook,
             in_result: enums.AKRESULT,
             in_file_open: *const stream_interfaces.NativeAkFileOpenData,
-            out_searched_path: [*]common.AkOSChar,
+            out_searched_path: [*]platform_types.AkOSChar,
             in_path_size: i32,
         ) callconv(.c) enums.AKRESULT,
     };
@@ -252,10 +253,10 @@ pub const IAkLowLevelIOHook = opaque {
         fallback_allocator: std.mem.Allocator,
         in_result: enums.AKRESULT,
         in_file_open: stream_interfaces.AkFileOpenData,
-        out_searched_path: [*]common.AkOSChar,
+        out_searched_path: [*]platform_types.AkOSChar,
         in_path_size: i32,
     ) zig.WwiseError!void {
-        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
         const char_allocator = stack_char_allocator.get();
         var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
         defer area_allocator.deinit();
@@ -352,10 +353,10 @@ pub fn getDefaultDeviceSettings(out_settings: *AkDeviceSettings) void {
 }
 
 pub fn setCurrentLanguage(fallback_allocator: std.mem.Allocator, language_name: []const u8) zig.WwiseError!void {
-    var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+    var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_oschar_allocator.get();
 
-    const raw_language_name = common.toOSChar(allocator, language_name) catch return zig.WwiseError.Fail;
+    const raw_language_name = zig.toOSChar(allocator, language_name) catch return zig.WwiseError.Fail;
     defer allocator.free(raw_language_name);
 
     return zig.handleAkResult(
@@ -364,7 +365,7 @@ pub fn setCurrentLanguage(fallback_allocator: std.mem.Allocator, language_name: 
 }
 
 pub fn getCurrentLanguage(allocator: std.mem.Allocator) ![]const u8 {
-    return try common.fromOSChar(allocator, c.WWISEC_AK_StreamMgr_GetCurrentLanguage());
+    return try zig.fromOSChar(allocator, c.WWISEC_AK_StreamMgr_GetCurrentLanguage());
 }
 
 pub const AkLanguageCChangeHandler = c.WWISEC_AK_StreamMgr_AkLanguageChangeHandler;

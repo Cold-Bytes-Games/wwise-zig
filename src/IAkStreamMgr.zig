@@ -3,6 +3,7 @@ const constants = @import("constants.zig");
 const enums = @import("enums.zig");
 const settings = @import("settings.zig");
 const std = @import("std");
+const platform_types = @import("platform_types.zig");
 const typedefs = @import("typedefs.zig");
 const zig = @import("zig.zig");
 
@@ -37,7 +38,7 @@ pub const AkFileSystemFlags = extern struct {
     custom_param: ?*anyopaque = null,
     is_language_specific: bool = false,
     is_automatic_stream: bool = false,
-    cache_id: common.AkCacheID = constants.AK_INVALID_CACHE_ID,
+    cache_id: typedefs.AkCacheID = constants.AK_INVALID_CACHE_ID,
     num_bytes_prefetch: u32 = 0,
     directory_hash: u32 = constants.AK_INVALID_UNIQUE_ID,
 
@@ -56,7 +57,7 @@ pub const AkFileSystemFlags = extern struct {
 
 pub const NativeAkStreamInfo = extern struct {
     device_id: typedefs.AkDeviceID = 0,
-    name: ?[*:0]const common.AkOSChar,
+    name: ?[*:0]const platform_types.AkOSChar,
     size: u64 = 0,
     is_open: bool = false,
     is_language_specific: bool = false,
@@ -88,7 +89,7 @@ pub const AkStreamInfo = struct {
     pub fn fromC(value: NativeAkStreamInfo, allocator: std.mem.Allocator) !AkStreamInfo {
         return .{
             .device_id = value.device_id,
-            .name = try common.fromOSChar(allocator, value.name),
+            .name = try zig.fromOSChar(allocator, value.name),
             .size = value.size,
             .is_open = value.is_open,
             .is_language_specific = value.is_language_specific,
@@ -98,7 +99,7 @@ pub const AkStreamInfo = struct {
     pub fn toC(self: AkStreamInfo, allocator: std.mem.Allocator) !NativeAkStreamInfo {
         return .{
             .device_id = self.device_id,
-            .name = try common.toOSChar(allocator, self.name),
+            .name = try zig.toOSChar(allocator, self.name),
             .size = self.size,
             .is_open = self.is_open,
             .is_language_specific = self.is_language_specific,
@@ -148,7 +149,7 @@ pub const NativeAkDeviceDesc = extern struct {
     device_id: typedefs.AkDeviceID = 0,
     can_write: bool = false,
     can_read: bool = false,
-    device_name: [AK_MONITOR_DEVICENAME_MAXLENGTH]common.AkUtf16 = undefined,
+    device_name: [AK_MONITOR_DEVICENAME_MAXLENGTH]platform_types.AkUtf16 = undefined,
     string_size: u32 = 0,
 
     comptime {
@@ -220,7 +221,7 @@ pub const AkDeviceData = extern struct {
 pub const NativeAkStreamRecord = extern struct {
     stream_id: u32 = 0,
     device_id: typedefs.AkDeviceID = 0,
-    stream_name: [AK_MONITOR_STREAMNAME_MAXLENGTH]common.AkUtf16,
+    stream_name: [AK_MONITOR_STREAMNAME_MAXLENGTH]platform_types.AkUtf16,
     id_file: typedefs.AkFileID = constants.AK_INVALID_FILE_ID,
     string_size: u32 = 0,
     file_size: u64 = 0,
@@ -309,7 +310,7 @@ pub const AkStreamData = extern struct {
 };
 
 pub const NativeAkFileOpenData = extern struct {
-    file_name: ?[*:0]const common.AkOSChar align(4) = null,
+    file_name: ?[*:0]const platform_types.AkOSChar align(4) = null,
     file_id: typedefs.AkFileID align(4) = constants.AK_INVALID_FILE_ID,
     flags: ?*AkFileSystemFlags align(4) = null,
     open_mode: AkOpenMode align(4) = .read,
@@ -327,7 +328,7 @@ pub const AkFileOpenData = struct {
 
     pub fn fromC(value: NativeAkFileOpenData, allocator: std.mem.Allocator) !AkFileOpenData {
         return .{
-            .file_name = try common.fromOSChar(allocator, value.file_name),
+            .file_name = try zig.fromOSChar(allocator, value.file_name),
             .file_id = value.file_id,
             .flags = if (value.flags) |flags| flags.* else null,
             .open_mode = value.open_mode,
@@ -336,7 +337,7 @@ pub const AkFileOpenData = struct {
 
     pub fn toC(self: AkFileOpenData, allocator: std.mem.Allocator) !NativeAkFileOpenData {
         return .{
-            .file_name = if (self.file_name.len > 0) try common.toOSChar(allocator, self.file_name) else null,
+            .file_name = if (self.file_name.len > 0) try zig.toOSChar(allocator, self.file_name) else null,
             .file_id = self.file_id,
             .flags = null,
             .open_mode = self.open_mode,
@@ -488,7 +489,7 @@ pub const IAkStdStream = opaque {
         destroy: *const fn (self: *IAkStdStream) callconv(.c) void,
         get_info: *const fn (self: *IAkStdStream, out_info: *NativeAkStreamInfo) callconv(.c) void,
         get_file_descriptor: *const fn (self: *IAkStdStream) callconv(.c) ?*anyopaque,
-        set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.c) enums.AKRESULT,
+        set_stream_name: *const fn (self: *IAkStdStream, in_stream_name: [*:0]const platform_types.AkOSChar) callconv(.c) enums.AKRESULT,
         get_block_size: *const fn (self: *IAkStdStream) callconv(.c) u32,
         read: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: typedefs.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) enums.AKRESULT,
         write: *const fn (self: *IAkStdStream, in_buffer: ?*anyopaque, in_req_size: u32, in_wait: bool, in_priority: typedefs.AkPriority, in_deadline: f32, out_size: *u32) callconv(.c) enums.AKRESULT,
@@ -515,10 +516,10 @@ pub const IAkStdStream = opaque {
     }
 
     pub fn setStreamName(self: *IAkStdStream, fallback_allocator: std.mem.Allocator, stream_name: []const u8) zig.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        const raw_stream_name = common.toOSChar(allocator, stream_name) catch return zig.WwiseError.Fail;
+        const raw_stream_name = zig.toOSChar(allocator, stream_name) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_stream_name);
 
         return zig.handleAkResult(
@@ -608,7 +609,7 @@ pub const IAkAutoStream = opaque {
         get_heuristics: *const fn (self: *IAkAutoStream, out_heuristics: *AkAutoStmHeuristics) callconv(.c) void,
         set_heuristics: *const fn (self: *IAkAutoStream, in_heuristics: *AkAutoStmHeuristics) callconv(.c) enums.AKRESULT,
         set_minimal_buffer_size: *const fn (self: *IAkAutoStream, in_min_buffer_size: u32) callconv(.c) enums.AKRESULT,
-        set_stream_name: *const fn (self: *IAkAutoStream, in_stream_name: [*:0]const common.AkOSChar) callconv(.c) enums.AKRESULT,
+        set_stream_name: *const fn (self: *IAkAutoStream, in_stream_name: [*:0]const platform_types.AkOSChar) callconv(.c) enums.AKRESULT,
         get_block_size: *const fn (self: *IAkAutoStream) callconv(.c) u32,
         query_buffering_status: *const fn (self: *IAkAutoStream, out_num_bytes_available: *u32) callconv(.c) enums.AKRESULT,
         get_nominal_buffering: *const fn (self: *IAkAutoStream) callconv(.c) u32,
@@ -651,10 +652,10 @@ pub const IAkAutoStream = opaque {
     }
 
     pub fn setStreamName(self: *IAkAutoStream, fallback_allocator: std.mem.Allocator, stream_name: []const u8) zig.WwiseError!void {
-        var stack_oschar_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_oschar_allocator = zig.stackCharAllocator(fallback_allocator);
         var allocator = stack_oschar_allocator.get();
 
-        const raw_stream_name = common.toOSChar(allocator, stream_name) catch return zig.WwiseError.Fail;
+        const raw_stream_name = zig.toOSChar(allocator, stream_name) catch return zig.WwiseError.Fail;
         defer allocator.free(raw_stream_name);
 
         return zig.handleAkResult(
@@ -803,7 +804,7 @@ pub const IAkStreamMgr = opaque {
         out_stream: *?*IAkStdStream,
         in_sync_open: bool,
     ) zig.WwiseError!void {
-        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
         const char_allocator = stack_char_allocator.get();
         var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
         defer area_allocator.deinit();
@@ -840,7 +841,7 @@ pub const IAkStreamMgr = opaque {
         in_sync_open: bool,
         in_caching: bool,
     ) zig.WwiseError!void {
-        var stack_char_allocator = common.stackCharAllocator(fallback_allocator);
+        var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
         const char_allocator = stack_char_allocator.get();
         var area_allocator = std.heap.ArenaAllocator.init(char_allocator);
         defer area_allocator.deinit();
