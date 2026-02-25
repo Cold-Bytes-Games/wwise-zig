@@ -357,6 +357,14 @@ pub const AK_MIDI_CC_OMNI_MODE_OFF = midi_types.AK_MIDI_CC_OMNI_MODE_OFF;
 pub const AK_MIDI_CC_OMNI_MODE_ON = midi_types.AK_MIDI_CC_OMNI_MODE_ON;
 pub const AK_MIDI_CC_OMNI_MONOPHONIC_ON = midi_types.AK_MIDI_CC_OMNI_MONOPHONIC_ON;
 pub const AK_MIDI_CC_OMNI_POLYPHONIC_ON = midi_types.AK_MIDI_CC_OMNI_POLYPHONIC_ON;
+pub const AkMIDIGen = midi_types.AkMIDIGen;
+pub const AkMIDINote = midi_types.AkMIDINote;
+pub const AkMIDICC = midi_types.AkMIDICC;
+pub const AkMIDIPitchbend = midi_types.AkMIDIPitchbend;
+pub const AkMIDINoteAftertouch = midi_types.AkMIDINoteAftertouch;
+pub const AkMIDIChannelAftertouch = midi_types.AkMIDIChannelAftertouch;
+pub const AkMIDIProgramChange = midi_types.AkMIDIProgramChange;
+pub const AkMIDIWwiseCmd = midi_types.AkMIDIWwiseCmd;
 pub const AkMIDIEvent = midi_types.AkMIDIEvent;
 pub const AkMIDIPost = midi_types.AkMIDIPost;
 
