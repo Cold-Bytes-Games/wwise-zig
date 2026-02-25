@@ -150,7 +150,7 @@ pub fn setGeometry(in_geom_set_id: AkGeometrySetID, in_params: *const AkGeometry
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetGeometry(
             in_geom_set_id.toC(),
-            @ptrCast(in_params),
+            @ptrCast(@alignCast(in_params)),
         ),
     );
 }
@@ -381,7 +381,6 @@ pub fn setEarlyReflectionsVolume(in_game_object_id: typedefs.AkGameObjectID, in_
 pub const SetPortalObstructionAndOcclusionOptionalArgs = struct {
     transition: bool = false,
 };
-
 pub fn setPortalObstructionAndOcclusion(in_portal_id: AkPortalID, obstruction: f32, occlusion: f32, optional_args: SetPortalObstructionAndOcclusionOptionalArgs) zig.WwiseError!void {
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetPortalObstructionAndOcclusion(in_portal_id.toC(), obstruction, occlusion, optional_args.transition),

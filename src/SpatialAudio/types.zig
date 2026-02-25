@@ -352,26 +352,30 @@ pub const AkRoomParams = extern struct {
 };
 
 pub const AkGeometryParams = extern struct {
-    triangles: ?[*]const AkTriangle = null,
-    num_triangles: typedefs.AkTriIdx = 0,
-    vertices: ?[*]const AkVertex = null,
-    num_vertices: typedefs.AkVertIdx = 0,
-    surfaces: ?[*]const AkAcousticSurface = null,
-    num_surfaces: typedefs.AkSurfIdx = 0,
-    enable_diffraction: bool = false,
-    enable_diffraction_on_boundary_edges: bool = false,
+    triangles: ?[*]const AkTriangle align(4) = null,
+    num_triangles: typedefs.AkTriIdx align(4) = 0,
+    vertices: ?[*]const AkVertex align(4) = null,
+    num_vertices: typedefs.AkVertIdx align(4) = 0,
+    surfaces: ?[*]const AkAcousticSurface align(4) = null,
+    num_surfaces: typedefs.AkSurfIdx align(4) = 0,
+    enable_diffraction: bool align(1) = false,
+    enable_diffraction_on_boundary_edges: bool align(1) = false,
 
-    pub inline fn fromC(value: c.AkGeometryParams) AkGeometryParams {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkGeometryParams
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkGeometryParams) c.AkGeometryParams {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.AkGeometryParams) AkGeometryParams {
+    //     return @bitCast(value);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkGeometryParams) == @sizeOf(c.AkGeometryParams));
-    }
+    // pub inline fn toC(self: AkGeometryParams) c.AkGeometryParams {
+    //     return @bitCast(self);
+    // }
+
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkGeometryParams) == @sizeOf(c.AkGeometryParams));
+    // }
 };
 
 pub const AK_DEFAULT_GEOMETRY_POSITION_X = c.AK_DEFAULT_GEOMETRY_POSITION_X;
