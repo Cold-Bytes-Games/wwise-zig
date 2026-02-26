@@ -389,7 +389,7 @@ pub const AK_DEFAULT_GEOMETRY_TOP_Y = c.AK_DEFAULT_GEOMETRY_TOP_Y;
 pub const AK_DEFAULT_GEOMETRY_TOP_Z = c.AK_DEFAULT_GEOMETRY_TOP_Z;
 
 pub const AkGeometryInstanceParams = extern struct {
-    position_and_orientation: ak_3d_objects.AkWorldTransform = .{
+    position_and_orientation: ak_3d_objects.AkWorldTransform align(1) = .{
         .position = .{
             .x = AK_DEFAULT_GEOMETRY_POSITION_X,
             .y = AK_DEFAULT_GEOMETRY_POSITION_Y,
@@ -406,25 +406,29 @@ pub const AkGeometryInstanceParams = extern struct {
             .z = AK_DEFAULT_GEOMETRY_TOP_Z,
         },
     },
-    scale: ak_3d_objects.AkVector = .{
+    scale: ak_3d_objects.AkVector align(1) = .{
         .x = 1,
         .y = 1,
         .z = 1,
     },
-    geometry_set_id: AkGeometrySetID = .{},
-    use_for_reflection_and_diffraction: bool = true,
-    bypass_portal_subtraction: bool = false,
-    is_solid: bool = false,
+    geometry_set_id: AkGeometrySetID align(1) = .{},
+    use_for_reflection_and_diffraction: bool align(1) = true,
+    bypass_portal_subtraction: bool align(1) = false,
+    is_solid: bool align(2) = false,
 
-    pub inline fn fromC(value: c.AkGeometryInstanceParams) AkGeometryInstanceParams {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkGeometryInstanceParams
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkGeometryInstanceParams) c.AkGeometryInstanceParams {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.AkGeometryInstanceParams) AkGeometryInstanceParams {
+    //     return @bitCast(value);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkGeometryInstanceParams) == @sizeOf(c.AkGeometryInstanceParams));
-    }
+    // pub inline fn toC(self: AkGeometryInstanceParams) c.AkGeometryInstanceParams {
+    //     return @bitCast(self);
+    // }
+
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkGeometryInstanceParams) == @sizeOf(c.AkGeometryInstanceParams));
+    // }
 };

@@ -165,7 +165,7 @@ pub fn setGeometryInstance(in_geometry_instance_id: AkGeometryInstanceID, in_par
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetGeometryInstance(
             in_geometry_instance_id.toC(),
-            @ptrCast(in_params),
+            @ptrCast(@alignCast(in_params)),
         ),
     );
 }
