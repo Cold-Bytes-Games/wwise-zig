@@ -153,18 +153,24 @@ pub const AkAttenuationCurveType = enum(zig.DefaultEnumType) {
     none = c.AttenuationCurveID_None,
 };
 
-pub const AkCurveInterpolation = enum(zig.DefaultEnumType) {
-    log3 = c.AkCurveInterpolation_Log3,
-    sine = c.AkCurveInterpolation_Sine,
-    log1 = c.AkCurveInterpolation_Log1,
-    inv_s_curve = c.AkCurveInterpolation_InvSCurve,
-    linear = c.AkCurveInterpolation_Linear,
-    s_curve = c.AkCurveInterpolation_SCurve,
-    exp1 = c.AkCurveInterpolation_Exp1,
-    sine_recip = c.AkCurveInterpolation_SineRecip,
-    exp3 = c.AkCurveInterpolation_Exp3,
-    constant = c.AkCurveInterpolation_Constant,
-};
+pub fn AkCurveInterpolationTemplate(comptime BackingType: type) type {
+    return enum(BackingType) {
+        log3 = c.AkCurveInterpolation_Log3,
+        sine = c.AkCurveInterpolation_Sine,
+        log1 = c.AkCurveInterpolation_Log1,
+        inv_s_curve = c.AkCurveInterpolation_InvSCurve,
+        linear = c.AkCurveInterpolation_Linear,
+        s_curve = c.AkCurveInterpolation_SCurve,
+        exp1 = c.AkCurveInterpolation_Exp1,
+        sine_recip = c.AkCurveInterpolation_SineRecip,
+        exp3 = c.AkCurveInterpolation_Exp3,
+        constant = c.AkCurveInterpolation_Constant,
+    };
+}
+
+pub const AkCurveInterpolation = AkCurveInterpolationTemplate(zig.DefaultEnumType);
+pub const AkCurveInterpolation_u8 = AkCurveInterpolationTemplate(u8);
+pub const AkCurveInterpolation_u16 = AkCurveInterpolationTemplate(u16);
 
 pub const AkBankType = enum(c.AkBankType) {
     user = c.AkBankType_User,
@@ -184,10 +190,15 @@ pub const Ak3DPositionType = enum(zig.DefaultEnumType) {
     listener_with_automation = c.AK_3DPositionType_ListenerWithAutomation,
 };
 
-pub const AkPanningRule = enum(zig.DefaultEnumType) {
-    speakers = c.AkPanningRule_Speakers,
-    headphones = c.AkPanningRule_Headphones,
-};
+pub fn AkPanningRuleTemplate(comptime BackingType: type) type {
+    return enum(BackingType) {
+        speakers = c.AkPanningRule_Speakers,
+        headphones = c.AkPanningRule_Headphones,
+    };
+}
+
+pub const AkPanningRule = AkPanningRuleTemplate(zig.DefaultEnumType);
+pub const AkPanningRule_u8 = AkPanningRuleTemplate(zig.DefaultEnumType);
 
 pub const Ak3DSpatializationMode = enum(zig.DefaultEnumType) {
     none = c.AK_SpatializationMode_None,
@@ -264,18 +275,27 @@ pub const AkListenerOp = enum(zig.DefaultEnumType) {
     remove = c.AkListenerOp_Remove,
 };
 
-pub const AkActionOnEventType = enum(zig.DefaultEnumType) {
-    stop = c.AkActionOnEventType_Stop,
-    pause = c.AkActionOnEventType_Pause,
-    @"resume" = c.AkActionOnEventType_Resume,
-    @"break" = c.AkActionOnEventType_Break,
-    release_envelope = c.AkActionOnEventType_ReleaseEnvelope,
-};
+pub fn AkActionOnEventTypeTemplate(comptime BackingType: type) type {
+    return enum(BackingType) {
+        stop = c.AkActionOnEventType_Stop,
+        pause = c.AkActionOnEventType_Pause,
+        @"resume" = c.AkActionOnEventType_Resume,
+        @"break" = c.AkActionOnEventType_Break,
+        release_envelope = c.AkActionOnEventType_ReleaseEnvelope,
+    };
+}
 
-pub const AkDynamicSequenceType = enum(zig.DefaultEnumType) {
-    sample_accurate = c.AkDynamicSequenceType_SampleAccurate,
-    normal_transition = c.AkDynamicSequenceType_NormalTransition,
-};
+pub const AkActionOnEventType = AkActionOnEventTypeTemplate(zig.DefaultEnumType);
+pub const AkActionOnEventType_u8 = AkActionOnEventTypeTemplate(u8);
+
+pub fn AkDynamicSequenceTypeTemplate(comptime BackingType: type) type {
+    return enum(BackingType) {
+        sample_accurate = c.AkDynamicSequenceType_SampleAccurate,
+        normal_transition = c.AkDynamicSequenceType_NormalTransition,
+    };
+}
+pub const AkDynamicSequenceType = AkDynamicSequenceTypeTemplate(zig.DefaultEnumType);
+pub const AkDynamicSequenceType_u8 = AkDynamicSequenceTypeTemplate(u8);
 
 pub const AkDynamicSequenceOp = enum(u32) {
     play = c.AkDynamicSequenceOp_Play,

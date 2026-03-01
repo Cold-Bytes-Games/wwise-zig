@@ -144,25 +144,30 @@ pub const AkSpatialAudioInitSettings = extern struct {
 };
 
 pub const AkImageSourceParams = extern struct {
-    source_position: ak_3d_objects.AkVector64 = .{},
-    distance_scaling_factor: f32 = 1.0,
-    level: f32 = 1.0,
-    diffraction: f32 = 0.0,
-    occlusion: f32 = 0.0,
-    diffraction_emitter_side: u8 = 0.0,
-    diffraction_listener_side: u8 = 0.0,
+    source_position: ak_3d_objects.AkVector64 align(1) = .{},
+    distance_scaling_factor: f32 align(1) = 1.0,
+    level: f32 align(1) = 1.0,
+    diffraction: f32 align(1) = 0.0,
+    occlusion: f32 align(1) = 0.0,
+    diffraction_emitter_side: u8 align(1) = 0.0,
+    diffraction_listener_side: u8 align(1) = 0.0,
+    _zig_padding: [2]u8 align(1) = @splat(0),
 
-    pub inline fn fromC(value: c.AkImageSourceParams) AkImageSourceParams {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkImageSourceSettings
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkImageSourceParams) c.AkImageSourceParams {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.AkImageSourceParams) AkImageSourceParams {
+    //     return @bitCast(value);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkImageSourceParams) == @sizeOf(c.AkImageSourceParams));
-    }
+    // pub inline fn toC(self: AkImageSourceParams) c.AkImageSourceParams {
+    //     return @bitCast(self);
+    // }
+
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkImageSourceParams) == @sizeOf(c.AkImageSourceParams));
+    // }
 };
 
 pub const AkImageSourceTexture = extern struct {
@@ -183,20 +188,24 @@ pub const AkImageSourceTexture = extern struct {
 };
 
 pub const AkImageSourceSettings = extern struct {
-    params: AkImageSourceParams = .{},
-    texture: AkImageSourceTexture = .{},
+    params: AkImageSourceParams align(4) = .{},
+    texture: AkImageSourceTexture align(4) = .{},
 
-    pub inline fn fromC(value: c.AkImageSourceSettings) AkImageSourceSettings {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkImageSourceSettings
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkImageSourceSettings) c.AkImageSourceSettings {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.AkImageSourceSettings) AkImageSourceSettings {
+    //     return @bitCast(value);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkImageSourceSettings) == @sizeOf(c.AkImageSourceSettings));
-    }
+    // pub inline fn toC(self: AkImageSourceSettings) c.AkImageSourceSettings {
+    //     return @bitCast(self);
+    // }
+
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkImageSourceSettings) == @sizeOf(c.AkImageSourceSettings));
+    // }
 };
 
 pub const AkExtent = extern struct {
@@ -306,49 +315,57 @@ pub const AkDiffractionPathInfo = extern struct {
 };
 
 pub const AkPortalParams = extern struct {
-    transform: ak_3d_objects.AkWorldTransform = .{},
-    extent: AkExtent = .{},
-    enabled: bool = false,
-    front_room: AkRoomID = .{},
-    back_room: AkRoomID = .{},
-    adjacent_room_bleed: f32 = 1.0,
+    transform: ak_3d_objects.AkWorldTransform align(4) = .{},
+    extent: AkExtent align(4) = .{},
+    enabled: bool align(4) = false,
+    front_room: AkRoomID align(4) = .{},
+    back_room: AkRoomID align(4) = .{},
+    adjacent_room_bleed: f32 align(4) = 1.0,
 
-    pub inline fn fromC(value: c.AkPortalParams) AkPortalParams {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkPortalParams
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkPortalParams) c.AkPortalParams {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.AkPortalParams) AkPortalParams {
+    //     return @bitCast(value);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkPortalParams) == @sizeOf(c.AkPortalParams));
-    }
+    // pub inline fn toC(self: AkPortalParams) c.AkPortalParams {
+    //     return @bitCast(self);
+    // }
+
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkPortalParams) == @sizeOf(c.AkPortalParams));
+    // }
 };
 
 pub const AkRoomParams = extern struct {
-    front: ak_3d_objects.AkVector = .{ .z = 1.0 },
-    up: ak_3d_objects.AkVector = .{ .y = 1.0 },
-    reverb_aux_bus: typedefs.AkAuxBusID = constants.AK_INVALID_AUX_ID,
-    reverb_level: f32 = 1.0,
-    transmission_loss: f32 = 1.0,
-    room_game_obj_aux_send_level_to_self: f32 = 0.0,
-    room_game_obj_keep_registered: bool = false,
-    geometry_instance_id: AkGeometrySetID = .{},
-    room_priority: f32 = 100.0,
-    distance_behavior: AkRoomDistanceBehavior = .default,
+    front: ak_3d_objects.AkVector align(4) = .{ .z = 1.0 },
+    up: ak_3d_objects.AkVector align(4) = .{ .y = 1.0 },
+    reverb_aux_bus: typedefs.AkAuxBusID align(4) = constants.AK_INVALID_AUX_ID,
+    reverb_level: f32 align(4) = 1.0,
+    transmission_loss: f32 align(4) = 1.0,
+    room_game_obj_aux_send_level_to_self: f32 align(4) = 0.0,
+    room_game_obj_keep_registered: bool align(4) = false,
+    geometry_instance_id: AkGeometrySetID align(4) = .{},
+    room_priority: f32 align(4) = 100.0,
+    distance_behavior: AkRoomDistanceBehavior align(4) = .default,
 
-    pub inline fn fromC(value: c.AkRoomParams) AkRoomParams {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkRoomParams
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkRoomParams) c.AkRoomParams {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.AkRoomParams) AkRoomParams {
+    //     return @bitCast(value);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkRoomParams) == @sizeOf(c.AkRoomParams));
-    }
+    // pub inline fn toC(self: AkRoomParams) c.AkRoomParams {
+    //     return @bitCast(self);
+    // }
+
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkRoomParams) == @sizeOf(c.AkRoomParams));
+    // }
 };
 
 pub const AkGeometryParams = extern struct {

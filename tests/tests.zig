@@ -513,3 +513,60 @@ test "Dummy I/O Hook works" {
 
     try std.testing.expect(zig_file_resolver.get_next_preferred_device_called);
 }
+
+test "Make sure AkCmd match their expected command size" {
+    try testAkCmd(AK.AkCmd_PostEvent);
+    try testAkCmd(AK.AkCmd_RegisterGameObject);
+    try testAkCmd(AK.AkCmd_UnregisterGameObject);
+    try testAkCmd(AK.AkCmd_Callback);
+    try testAkCmd(AK.AkCmd_SetRTPC);
+    try testAkCmd(AK.AkCmd_ResetRTPC);
+    try testAkCmd(AK.AkCmd_SetPosition);
+    try testAkCmd(AK.AkCmd_SetMultiplePositions);
+    try testAkCmd(AK.AkCmd_SetListeners);
+    try testAkCmd(AK.AkCmd_SetDefaultListeners);
+    try testAkCmd(AK.AkCmd_ResetListeners);
+    try testAkCmd(AK.AkCmd_SetListenerSpatialization);
+    try testAkCmd(AK.AkCmd_SetGameObjectAuxSendValues);
+    try testAkCmd(AK.AkCmd_SetGameObjectOutputBusVolume);
+    try testAkCmd(AK.AkCmd_SetScalingFactor);
+    try testAkCmd(AK.AkCmd_SetObjectObstructionAndOcclusion);
+    try testAkCmd(AK.AkCmd_SetMultipleObstructionAndOcclusion);
+    try testAkCmd(AK.AkCmd_SetDistanceProbe);
+    try testAkCmd(AK.AkCmd_StopAll);
+    try testAkCmd(AK.AkCmd_ExecuteActionOnEvent);
+    try testAkCmd(AK.AkCmd_ExecuteActionOnPlayingID);
+    try testAkCmd(AK.AkCmd_SeekOnEvent);
+    try testAkCmd(AK.AkCmd_SetState);
+    try testAkCmd(AK.AkCmd_SetSwitch);
+    try testAkCmd(AK.AkCmd_PostTrigger);
+    try testAkCmd(AK.AkCmd_PostMIDIOnEvent);
+    try testAkCmd(AK.AkCmd_StopMIDIOnEvent);
+    try testAkCmd(AK.AkCmd_DynamicSequence_Open);
+    try testAkCmd(AK.AkCmd_DynamicSequence_Op);
+    try testAkCmd(AK.AkCmd_DynamicSequence_Seek);
+    try testAkCmd(AK.AkCmd_AddOutput);
+    try testAkCmd(AK.AkCmd_RemoveOutput);
+    try testAkCmd(AK.AkCmd_ReplaceOutput);
+    try testAkCmd(AK.AkCmd_SetBusAudioDevice);
+    try testAkCmd(AK.AkCmd_SetBusConfig);
+    try testAkCmd(AK.AkCmd_ResetBusConfig);
+    try testAkCmd(AK.AkCmd_ResetGlobalValues);
+    try testAkCmd(AK.AkCmd_SetSidechainMixConfig);
+    try testAkCmd(AK.AkCmd_SetEffect);
+    try testAkCmd(AK.AkCmd_SetOutputVolume);
+    try testAkCmd(AK.AkCmd_SetPanningRule);
+    try testAkCmd(AK.AkCmd_SetSpeakerAngles);
+    try testAkCmd(AK.AkCmd_ControlOutputCapture);
+    try testAkCmd(AK.AkCmd_AddOutputCaptureMarker);
+    try testAkCmd(AK.AkCmd_ControlOfflineRendering);
+    try testAkCmd(AK.AkCmd_SetRandomSeed);
+    try testAkCmd(AK.AkCmd_ControlEventStreamCache);
+    try testAkCmd(AK.AkCmd_ControlSuspendedState);
+    try testAkCmd(AK.AkCmd_MuteBackgroundMusic);
+    try testAkCmd(AK.AkCmd_SendPluginCustomGameData);
+}
+
+fn testAkCmd(comptime T: type) !void {
+    try std.testing.expectEqual(AK.CommandBuffer.cmdSizeType(T), @sizeOf(T) + @sizeOf(AK.AkCommandHeader));
+}

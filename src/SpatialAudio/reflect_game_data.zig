@@ -11,17 +11,21 @@ pub const AkReflectImageSource = extern struct {
     texture: spatial_audio_types.AkImageSourceTexture = .{},
     name: spatial_audio_types.AkImageSourceName = .{},
 
-    pub inline fn fromC(value: c.WWISEC_AkReflectImageSource) AkReflectImageSource {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkReflectImageSource
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkReflectImageSource) c.WWISEC_AkReflectImageSource {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.WWISEC_AkReflectImageSource) AkReflectImageSource {
+    //     return @bitCast(value);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkReflectImageSource) == @sizeOf(c.WWISEC_AkReflectImageSource));
-    }
+    // pub inline fn toC(self: AkReflectImageSource) c.WWISEC_AkReflectImageSource {
+    //     return @bitCast(self);
+    // }
+
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkReflectImageSource) == @sizeOf(c.WWISEC_AkReflectImageSource));
+    // }
 };
 
 pub const AkReflectGameData = extern struct {
@@ -29,19 +33,19 @@ pub const AkReflectGameData = extern struct {
     num_image_sources: u32 = 0,
     sources: [1]AkReflectImageSource = undefined,
 
-    pub inline fn fromC(value: c.WWISEC_AkReflectGameData) AkReflectGameData {
-        return @bitCast(value);
-    }
+    // mlarouche: We can't convert directly from the translate-c AkReflectGameData
+    // because it use #pragma pack(push, 4) on the C side and it is not translated
+    // properly
 
-    pub inline fn toC(self: AkReflectGameData) c.WWISEC_AkReflectGameData {
-        return @bitCast(self);
-    }
+    // pub inline fn fromC(value: c.WWISEC_AkReflectGameData) AkReflectGameData {
+    //     return @bitCast(value);
+    // }
 
-    pub fn getSize(num_sources: u32) u32 {
-        return if (num_sources > 0) @sizeOf(AkReflectGameData) + (num_sources - 1) * @sizeOf(AkReflectImageSource) else @sizeOf(AkReflectGameData);
-    }
+    // pub inline fn toC(self: AkReflectGameData) c.WWISEC_AkReflectGameData {
+    //     return @bitCast(self);
+    // }
 
-    comptime {
-        std.debug.assert(@sizeOf(AkReflectGameData) == @sizeOf(c.WWISEC_AkReflectGameData));
-    }
+    // comptime {
+    //     std.debug.assert(@sizeOf(AkReflectGameData) == @sizeOf(c.WWISEC_AkReflectGameData));
+    // }
 };

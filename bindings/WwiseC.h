@@ -62,6 +62,14 @@ the specific language governing permissions and limitations under the License.
 #include <AK/SoundEngine/Common/AkCallbackTypes.h>
 // END AkCallbackTypes
 
+// BEGIN AkCommandTypes
+#include <AK/SoundEngine/Common/AkCommandTypes.h>
+// END AkCommandTypes
+
+// BEGIN AkCommandBuffer
+#include <AK/SoundEngine/Common/AkCommandBuffer.h>
+// END
+
 #if defined(WWISEC_USE_SPATIAL_AUDIO)
 // BEGIN AkSpatialAudioTypes
 #include <AK/SpatialAudio/Common/AkSpatialAudioTypes.h>

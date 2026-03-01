@@ -368,7 +368,7 @@ pub const IAkGlobalPluginContext = opaque {
             @ptrCast(self),
             in_event_id,
             in_game_object_id,
-            @ptrCast(@constCast(in_midi_posts)),
+            @ptrCast(@alignCast(@constCast(in_midi_posts))),
             @truncate(in_midi_posts.len),
             optional_args.absolute_offsets,
             optional_args.flags.toC(),

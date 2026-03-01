@@ -109,7 +109,7 @@ pub fn setImageSource(fallback_allocator: std.mem.Allocator, in_src_id: typedefs
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetImageSource(
             in_src_id,
-            @ptrCast(in_info),
+            @ptrCast(@alignCast(in_info)),
             raw_name,
             optional_args.aux_bus_id,
             optional_args.game_object_id,
@@ -224,7 +224,7 @@ pub fn setRoom(in_room_id: AkRoomID, in_params: *const AkRoomParams, optional_ar
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetRoom(
             in_room_id.toC(),
-            @ptrCast(in_params),
+            @ptrCast(@alignCast(in_params)),
             raw_name,
         ),
     );
@@ -264,7 +264,7 @@ pub fn setPortal(in_portal_id: AkPortalID, in_params: *const AkPortalParams, opt
     return zig.handleAkResult(
         c.WWISEC_AK_SpatialAudio_SetPortal(
             in_portal_id.toC(),
-            @ptrCast(in_params),
+            @ptrCast(@alignCast(in_params)),
             raw_name,
         ),
     );
