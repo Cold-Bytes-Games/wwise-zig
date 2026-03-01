@@ -2252,3 +2252,7 @@ pub fn setAssertHook(in_assert_hook: settings.AkAssertHook) zig.WwiseError!void 
         ),
     );
 }
+
+pub fn generatePlayingID() typedefs.AkPlayingID {
+    return c.AK_SoundEngine_GeneratePlayingID();
+}

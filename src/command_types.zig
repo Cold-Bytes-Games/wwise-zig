@@ -1902,12 +1902,12 @@ pub const AkCommandBufferHeader = extern struct {
     completion_callback: AkCommandCallbackFunc = null,
     completion_callback_cookie: ?*anyopaque = null,
 
-    pub inline fn fromC(value: c.AkCommandBufferHeader) AkCommandBufferHeader {
-        return @bitCast(value);
+    pub inline fn fromC(value: ?*anyopaque) *AkCommandBufferHeader {
+        return @ptrCast(@alignCast(value));
     }
 
-    pub inline fn toC(self: AkCommandBufferHeader) c.AkCommandBufferHeader {
-        return @bitCast(self);
+    pub inline fn toC(self: *AkCommandBufferHeader) ?*anyopaque {
+        return @ptrCast(self);
     }
 
     comptime {
@@ -1935,7 +1935,7 @@ pub const AkCommandHeader = extern struct {
 };
 
 pub const AkCommandBufferIterator = extern struct {
-    header: ?*AkCommandHeader = null,
+    header: *AkCommandHeader = undefined,
     payload: ?*anyopaque = null,
     buffer: ?*anyopaque = null,
 
