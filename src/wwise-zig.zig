@@ -156,6 +156,7 @@ pub const AK_INVALID_SAMPLE_POS = constants.AK_INVALID_SAMPLE_POS;
 // command_types.zig
 const command_types = @import("command_types.zig");
 pub const AkCommand = command_types.AkCommand;
+pub const AkCommand_u16 = command_types.AkCommand_u16;
 pub const AkCommandCallbackFunc = command_types.AkCommandCallbackFunc;
 pub const AkCmd_PostEvent = command_types.AkCmd_PostEvent;
 pub const AkCmd_RegisterGameObject = command_types.AkCmd_RegisterGameObject;
@@ -256,6 +257,7 @@ pub const AkAudioBuffer = common_defs.AkAudioBuffer;
 // enums.zig
 const enums = @import("enums.zig");
 pub const AKRESULT = enums.AKRESULT;
+pub const AKRESULT_u16 = enums.AKRESULT_u16;
 pub const AkGroupType = enums.AkGroupType;
 pub const AkAudioDeviceState = enums.AkAudioDeviceState;
 pub const AkConnectionType = enums.AkConnectionType;

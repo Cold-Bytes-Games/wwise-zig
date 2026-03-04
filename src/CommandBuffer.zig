@@ -10,6 +10,13 @@ header: *command_types.AkCommandBufferHeader = undefined,
 
 const CommandBuffer = @This();
 
+const ErrorSet = error{
+    CommandBufferCreateFailed,
+    CommandBufferInitFailed,
+    CommandBufferFull,
+    OutOfMemory,
+};
+
 pub fn cmdSize(in_cmd_id: command_types.AkCommand) usize {
     return c.AK_CommandBuffer_CmdSize(@intFromEnum(in_cmd_id));
 }
@@ -26,46 +33,80 @@ pub fn minSize() usize {
     return c.AK_CommandBuffer_MinSize();
 }
 
-pub fn create(in_size: usize) CommandBuffer {
+pub fn create(in_size: usize) ErrorSet!CommandBuffer {
+    const result = c.AK_CommandBuffer_Create(in_size);
+    if (result == null) {
+        return ErrorSet.CommandBufferCreateFailed;
+    }
+
     return .{
-        .header = command_types.AkCommandBufferHeader.fromC(c.AK_CommandBuffer_Create(in_size)),
+        .header = command_types.AkCommandBufferHeader.fromC(result.?),
     };
 }
 
-pub fn init(out_buffer: []u8, in_size: usize) CommandBuffer {
+pub fn init(out_buffer: []u8, in_size: usize) ErrorSet!CommandBuffer {
+    const result = c.AK_CommandBuffer_Init(@ptrCast(out_buffer), in_size);
+    if (result == null) {
+        return ErrorSet.CommandBufferInitFailed;
+    }
+
     return .{
-        .header = command_types.AkCommandBufferHeader.fromC(c.AK_CommandBuffer_Init(@ptrCast(out_buffer), in_size)),
+        .header = command_types.AkCommandBufferHeader.fromC(result.?),
     };
 }
 
-pub fn destroy(self: *CommandBuffer) void {
+pub fn reset(self: *CommandBuffer, in_size: usize) ErrorSet!void {
+    const result = c.AK_CommandBuffer_Init(@ptrCast(self.header), in_size);
+    if (result == null) {
+        return ErrorSet.CommandBufferInitFailed;
+    }
+
+    self.header = command_types.AkCommandBufferHeader.fromC(result.?);
+}
+
+pub fn destroy(self: CommandBuffer) void {
     c.AK_CommandBuffer_Destroy(self.header.toC());
 }
 
-pub fn addRaw(self: *CommandBuffer, in_cmd_id: command_types.AkCommand) ?*anyopaque {
+pub fn addRaw(self: CommandBuffer, in_cmd_id: command_types.AkCommand) ?*align(4) anyopaque {
     return c.AK_CommandBuffer_Add(self.header.toC(), @intFromEnum(in_cmd_id));
 }
 
-pub fn add(self: *CommandBuffer, comptime T: type) ?*T {
-    return @ptrCast(c.AK_CommandBuffer_Add(self.header.toC(), @intFromEnum(T.COMMAND_TYPE)));
+pub fn add(self: CommandBuffer, comptime T: type) ErrorSet!*align(4) T {
+    const result = c.AK_CommandBuffer_Add(self.header.toC(), @intFromEnum(T.COMMAND_TYPE));
+    if (result == null) {
+        return ErrorSet.CommandBufferFull;
+    }
+
+    return @ptrCast(@alignCast(result));
 }
 
 pub fn stringSize(str: [*:0]const u8) usize {
     return c.AK_CommandBuffer_StringSize(str);
 }
 
-pub fn addString(self: *CommandBuffer, fallback_allocator: std.mem.Allocator, str: []const u8) !?[*:0]u8 {
+pub fn addString(self: CommandBuffer, fallback_allocator: std.mem.Allocator, str: []const u8) ErrorSet![*:0]u8 {
     var stack_char_allocator = zig.stackCharAllocator(fallback_allocator);
     var allocator = stack_char_allocator.get();
 
     const raw_name = try zig.toCString(allocator, str);
     defer allocator.free(raw_name);
 
-    return @ptrCast(c.AK_CommandBuffer_AddString(self.header.toC(), raw_name));
+    const result = c.AK_CommandBuffer_AddString(self.header.toC(), raw_name);
+    if (result == null) {
+        return ErrorSet.CommandBufferFull;
+    }
+
+    return @ptrCast(result);
 }
 
-pub fn addStringZ(self: *CommandBuffer, str: [:0]const u8) ?[*:0]u8 {
-    return @ptrCast(c.AK_CommandBuffer_AddString(self.header.toC(), @ptrCast(str)));
+pub fn addStringZ(self: CommandBuffer, str: [:0]const u8) ![*:0]u8 {
+    const result = c.AK_CommandBuffer_AddString(self.header.toC(), str);
+    if (result == null) {
+        return ErrorSet.CommandBufferFull;
+    }
+
+    return @ptrCast(result);
 }
 
 pub fn arraySize(item_size: usize, num_items: u16) usize {
@@ -88,7 +129,7 @@ pub fn externalSourcesSize(external_sources: []const sound_engine_types.AkExtern
     return c.AK_CommandBuffer_ExternalSourcesSize(@truncate(external_sources.len), @ptrCast(external_sources));
 }
 
-pub fn addExternalSources(self: *CommandBuffer, external_sources: []const sound_engine_types.AkExternalSourceInfo) ?[*]sound_engine_types.AkExternalSourceInfo {
+pub fn addExternalSources(self: CommandBuffer, external_sources: []const sound_engine_types.AkExternalSourceInfo) ?[*]sound_engine_types.AkExternalSourceInfo {
     return @ptrCast(@alignCast(c.AK_CommandBuffer_AddExternalSources(
         self.header.toC(),
         @truncate(external_sources.len),
@@ -122,24 +163,22 @@ pub const addGeometry = blk: {
     }
 };
 
-pub fn remove(self: *CommandBuffer) void {
+pub fn remove(self: CommandBuffer) void {
     c.AK_CommandBuffer_Remove(self.header.toC());
 }
 
-pub fn submit(self: *CommandBuffer) void {
+pub fn submit(self: CommandBuffer) void {
     c.AK_CommandBuffer_Submit(self.header.toC());
 }
 
-pub fn submitNonBlocking(self: *CommandBuffer) zig.WwiseError!void {
+pub fn submitNonBlocking(self: CommandBuffer) zig.WwiseError!void {
     return zig.handleAkResult(
         @intCast(c.AK_CommandBuffer_SubmitNonBlocking(self.header.toC())),
     );
 }
 
-pub fn begin(self: *CommandBuffer, out_iterator: *command_types.AkCommandBufferIterator) void {
-    return c.AK_CommandBuffer_Begin(self.header.toC(), @ptrCast(out_iterator));
-}
-
-pub fn next(iterator: *command_types.AkCommandBufferIterator) c_int {
-    return c.AK_CommandBuffer_Next(@ptrCast(iterator));
+pub fn begin(self: CommandBuffer) command_types.AkCommandBufferIterator {
+    var it: command_types.AkCommandBufferIterator = undefined;
+    c.AK_CommandBuffer_Begin(self.header.toC(), @ptrCast(&it));
+    return it;
 }
