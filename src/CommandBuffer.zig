@@ -69,7 +69,7 @@ pub fn destroy(self: CommandBuffer) void {
 }
 
 pub fn addRaw(self: CommandBuffer, in_cmd_id: command_types.AkCommand) ?*align(4) anyopaque {
-    return c.AK_CommandBuffer_Add(self.header.toC(), @intFromEnum(in_cmd_id));
+    return @alignCast(c.AK_CommandBuffer_Add(self.header.toC(), @intFromEnum(in_cmd_id)));
 }
 
 pub fn add(self: CommandBuffer, comptime T: type) ErrorSet!*align(4) T {
