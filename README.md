@@ -14,10 +14,10 @@ This is a 3rd party binding and it is not affiliated with Audiokinetic.
 
 ## Zig version
 
-This library uses zig 0.15.2. To install using [`zigup`](https://github.com/marler8997/zigup):
+This library uses zig 0.16.0. To install using [`zigup`](https://github.com/marler8997/zigup):
 
 ```sh
-zigup 0.15.2
+zigup 0.16.0
 ```
 
 ## Versioning info

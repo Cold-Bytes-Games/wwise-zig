@@ -618,5 +618,5 @@ pub const stackCharAllocator = zig.stackCharAllocator;
 
 comptime {
     @setEvalBranchQuota(5000);
-    @import("std").testing.refAllDeclsRecursive(@This());
+    @import("std").testing.refAllDecls(@This());
 }

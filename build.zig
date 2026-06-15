@@ -89,14 +89,14 @@ pub fn build(b: *std.Build) !void {
         .linkage = .static,
         .root_module = wwise_c_module,
     });
-    wwise_c.addCSourceFile(.{
+    wwise_c.root_module.addCSourceFile(.{
         .file = b.path("bindings/WwiseC.cpp"),
         .flags = CppFlags,
     });
-    wwise_c.addIncludePath(b.path("bindings"));
+    wwise_c.root_module.addIncludePath(b.path("bindings"));
 
     const static_plugin_step = StaticPluginStep.create(b, .{ .static_plugins = wwise_build_options.static_plugins });
-    wwise_c.addCSourceFile(.{
+    wwise_c.root_module.addCSourceFile(.{
         .file = .{
             .generated = .{
                 .file = &static_plugin_step.output_file,
@@ -106,13 +106,13 @@ pub fn build(b: *std.Build) !void {
     });
 
     for (wwise_build_options.static_plugins) |static_plugin| {
-        wwise_c.linkSystemLibrary(static_plugin);
+        wwise_c.root_module.linkSystemLibrary(static_plugin, .{});
     }
 
     try wwiseLinkModule(wwise_c.root_module, wwise_build_options);
-    wwise_c.linkLibC();
+    wwise_c.root_module.link_libc = true;
     if (target.result.os.tag != .windows) {
-        wwise_c.linkLibCpp();
+        wwise_c.root_module.link_libcpp = true;
     }
 
     if (target.result.os.tag == .windows) {
@@ -132,7 +132,7 @@ pub fn build(b: *std.Build) !void {
         wwise_c.root_module.addCMacro("AK_OPTIMIZED", &.{});
     }
 
-    try handleDefaultWwiseSystems(wwise_c, wwise_build_options);
+    try handleDefaultWwiseSystems(b, wwise_c.root_module, wwise_build_options);
 
     const option_step = b.addOptions();
     option_step.addOption(usize, "string_stack_size", wwise_string_stack_size_option orelse 256);
@@ -357,7 +357,7 @@ fn getWwiseSDKPath(b: *std.Build, override_wwise_sdk_path_opt: ?[]const u8) []co
         }
     }
 
-    if (b.graph.env_map.get("WWISESDK")) |wwise_sdk_path| {
+    if (b.graph.environ_map.get("WWISESDK")) |wwise_sdk_path| {
         return wwise_sdk_path;
     }
 
@@ -441,7 +441,7 @@ fn getWwiseLibraryPath(b: *std.Build, target: std.Build.ResolvedTarget, wwise_bu
     return "";
 }
 
-fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_options: WwiseBuildOptions) !void {
+fn handleDefaultWwiseSystems(b: *std.Build, module: *std.Build.Module, wwise_build_options: WwiseBuildOptions) !void {
     if (!wwise_build_options.useDefaultIoHooks() and !wwise_build_options.use_default_job_worker) {
         return;
     }
@@ -453,49 +453,47 @@ fn handleDefaultWwiseSystems(compile_step: *std.Build.Step.Compile, wwise_build_
         else => return error.OsNotSupported,
     };
 
-    const b = compile_step.step.owner;
+    module.addIncludePath(lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path})));
 
-    compile_step.addIncludePath(lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common", .{wwise_build_options.wwise_sdk_path})));
-
-    compile_step.addIncludePath(lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/{s}", .{ wwise_build_options.wwise_sdk_path, platform_name })));
+    module.addIncludePath(lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/{s}", .{ wwise_build_options.wwise_sdk_path, platform_name })));
 
     if (wwise_build_options.useDefaultIoHooks()) {
-        compile_step.addCSourceFile(.{
+        module.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkMultipleFileLocation.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
-        compile_step.addCSourceFile(.{
+        module.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkGeneratedSoundBanksResolver.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
     }
 
     if (wwise_build_options.include_default_io_hook_deferred) {
-        compile_step.root_module.addCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", &.{});
-        compile_step.addCSourceFile(.{
+        module.addCMacro("WWISEC_INCLUDE_DEFAULT_IO_HOOK_DEFERRED", &.{});
+        module.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/{s}/AkDefaultIOHookDeferred.cpp", .{ wwise_build_options.wwise_sdk_path, platform_name })),
             .flags = CppFlags,
         });
     }
 
     if (wwise_build_options.include_file_package_io_deferred) {
-        compile_step.root_module.addCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED", &.{});
+        module.addCMacro("WWISEC_INCLUDE_FILE_PACKAGE_IO_DEFERRED", &.{});
     }
 
     if (wwise_build_options.use_default_job_worker) {
-        compile_step.root_module.addCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", &.{});
-        compile_step.addCSourceFile(.{
+        module.addCMacro("WWISEC_USE_DEFAULT_JOB_WORKER", &.{});
+        module.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkJobWorkerMgr.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
     }
 
     if (wwise_build_options.useFilePackageIO()) {
-        compile_step.addCSourceFile(.{
+        module.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkFilePackage.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });
-        compile_step.addCSourceFile(.{
+        module.addCSourceFile(.{
             .file = lazyPathAbsolute(b.fmt("{s}/samples/SoundEngine/Common/AkFilePackageLUT.cpp", .{wwise_build_options.wwise_sdk_path})),
             .flags = CppFlags,
         });

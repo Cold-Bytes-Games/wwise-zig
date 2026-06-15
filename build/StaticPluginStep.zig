@@ -79,13 +79,13 @@ fn make(step: *Step, make_options: std.Build.Step.MakeOptions) !void {
     const sub_path = try std.fs.path.join(arena, &.{ "o", &digest, file_name });
     const sub_path_dirname = std.fs.path.dirname(sub_path).?;
 
-    b.cache_root.handle.makePath(sub_path_dirname) catch |err| {
+    b.cache_root.handle.createDirPath(b.graph.io, sub_path_dirname) catch |err| {
         return step.fail("unable to make path '{f}{s}': {s}", .{
             b.cache_root, sub_path_dirname, @errorName(err),
         });
     };
 
-    b.cache_root.handle.writeFile(.{ .sub_path = sub_path, .data = output_allocating_writer.written() }) catch |err| {
+    b.cache_root.handle.writeFile(b.graph.io, .{ .sub_path = sub_path, .data = output_allocating_writer.written() }) catch |err| {
         return step.fail("unable to write file '{f}{s}': {s}", .{
             b.cache_root, sub_path, @errorName(err),
         });
